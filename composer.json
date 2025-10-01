@@ -1,5 +1,5 @@
 {
-    "name": "webkul/b2b-suite",
+    "name": "bagisto/b2b-suite",
     "description": "A comprehensive B2B Suite extension for Bagisto, providing company management, customer-company associations, and role-based permissions.",
     "keywords": [
         "bagisto",
@@ -17,8 +17,7 @@
         }
     ],
     "require": {
-        "php": "^8.1",
-        "laravel/framework": "^10.0"
+        "php": "^8.1"
     },
     "autoload": {
         "psr-4": {
