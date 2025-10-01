@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+    font-family: 'icomoon';
+    src: url('../fonts/icomoon.woff?g5go4n') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@layer components {
+    [class^="b2b-suite-"],
+    [class*="b2b-suite-"] {
+        font-family: 'icomoon';
+        speak: never;
+        font-style: normal;
+        font-weight: normal;
+        font-variant: normal;
+        text-transform: none;
+        line-height: 1 !important;
+
+        /* Better Font Rendering =========== */
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    .b2b-suite-communication-icon:before {
+        content: "\a909";
+    }
+
+    .b2b-suite-history-icon:before {
+        content: "\a90b";
+    }
+
+    .b2b-suite-attach-icon:before {
+        content: "\a90c";
+    }
+
+    .b2b-suite-reply-icon:before {
+        content: "\a90d";
+    }
+
+    .b2b-suite-store-icon:before {
+        content: "\e964";
+    }
+}

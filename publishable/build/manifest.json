@@ -1,0 +1,19 @@
+{
+  "src/Resources/assets/css/admin.css": {
+    "file": "assets/admin-VaMoyGny.css",
+    "src": "src/Resources/assets/css/admin.css",
+    "isEntry": true
+  },
+  "src/Resources/assets/css/shop.css": {
+    "file": "assets/shop-l0sNRNKZ.js",
+    "name": "shop",
+    "src": "src/Resources/assets/css/shop.css",
+    "isEntry": true
+  },
+  "src/Resources/assets/js/app.js": {
+    "file": "assets/app-l0sNRNKZ.js",
+    "name": "app",
+    "src": "src/Resources/assets/js/app.js",
+    "isEntry": true
+  }
+}
