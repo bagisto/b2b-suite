@@ -39,10 +39,22 @@ The **Bagisto B2B Suite** is a comprehensive package designed to extend the Bagi
 #### Step 1: Install via Composer
 
 ```bash
-composer require bagisto/b2b-suite
+composer require bagisto/b2b-suite:dev-master
 ```
 
-#### Step 2: Run the installation command
+### 2. Register the Service Provider
+
+In `bootstrap/providers.php`:
+
+> **Note:** Autoloading via Composer’s package auto-discovery is **not possible** for this provider. The registry order matters—`B2BSuiteServiceProvider` must be listed **after** the Shop package or at the end of the providers array. Auto-discovery would load it too early, which can cause issues.
+
+```php
+'providers' => [
+    Webkul\B2BSuite\Providers\B2BSuiteServiceProvider::class,
+],
+```
+
+#### Step 3: Run the installation command
 
 ```bash
 php artisan b2b-suite:install
