@@ -7,8 +7,6 @@
 <p align="center">
     <img alt="Packagist Downloads" src="https://img.shields.io/packagist/dt/bagisto/b2b-suite"> 
     <img alt="License" src="https://img.shields.io/github/license/bagisto/b2b-suite">
-    <img alt="Latest Version" src="https://img.shields.io/packagist/v/bagisto/b2b-suite">
-    <img alt="Stable Version" src="https://img.shields.io/packagist/v/bagisto/b2b-suite/stable">
 </p>
 
 ---
