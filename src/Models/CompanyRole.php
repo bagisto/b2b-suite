@@ -3,8 +3,8 @@
 namespace Webkul\B2BSuite\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Webkul\Customer\Models\CustomerProxy;
 use Webkul\B2BSuite\Contracts\CompanyRole as CompanyRoleContract;
+use Webkul\Customer\Models\CustomerProxy;
 
 class CompanyRole extends Model implements CompanyRoleContract
 {

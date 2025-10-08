@@ -10,6 +10,11 @@ use Webkul\B2BSuite\Repositories\CompanyRoleRepository;
 class CustomerBouncerMiddleware
 {
     /**
+     * Create a new class instance.
+     */
+    public function __construct(protected CompanyRoleRepository $roleRepo) {}
+
+    /**
      * Handle an incoming request.
      */
     public function handle($request, Closure $next)
@@ -27,7 +32,7 @@ class CustomerBouncerMiddleware
             $aclKey = $roles[$routeName];
 
             CustomerBouncer::allow($aclKey);
-        } 
+        }
 
         return $next($request);
     }
@@ -43,7 +48,7 @@ class CustomerBouncerMiddleware
             return true;
         }
 
-        $role = app(CompanyRoleRepository::class)
+        $role = $this->roleRepo
             ->findWhere(['customer_id' => $customer->id])
             ->first();
 
@@ -55,7 +60,10 @@ class CustomerBouncerMiddleware
             return false;
         }
 
-        if ($role->permission_type !== 'all' && empty($role->permissions)) {
+        if (
+            $role->permission_type !== 'all' 
+            && empty($role->permissions)
+        ) {
             return true;
         }
 
@@ -69,7 +77,7 @@ class CustomerBouncerMiddleware
      */
     protected function checkIfAuthorized(): void
     {
-        $roles = b2b_suite_acl()->getRoles(); 
+        $roles = b2b_suite_acl()->getRoles();
         $currentRoute = Route::currentRouteName();
 
         if (isset($roles[$currentRoute])) {

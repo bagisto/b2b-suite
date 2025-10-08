@@ -1,8 +1,8 @@
 <?php
 
 use Webkul\B2BSuite\Acl;
-use Webkul\B2BSuite\Facades\B2BSuite;
 use Webkul\B2BSuite\CustomerBouncer;
+use Webkul\B2BSuite\Facades\B2BSuite;
 
 /**
  * -------------------------

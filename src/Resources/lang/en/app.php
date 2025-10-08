@@ -558,7 +558,7 @@ return [
             'download'        => 'Download',
             'reviews'         => 'Reviews',
             'wishlist'        => 'Wishlist',
-            'gdpr-request'   => 'GDPR Request',
+            'gdpr-request'    => 'GDPR Request',
         ],
 
         'companies' => [

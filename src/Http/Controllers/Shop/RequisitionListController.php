@@ -5,11 +5,11 @@ namespace Webkul\B2BSuite\Http\Controllers\Shop;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
-use Webkul\Checkout\Facades\Cart;
 use Webkul\B2BSuite\DataGrids\Shop\CustomerRequisitionListDataGrid;
+use Webkul\B2BSuite\Http\Resources\RequisitionItemResource;
 use Webkul\B2BSuite\Models\CustomerRequisitionList;
 use Webkul\B2BSuite\Repositories\CustomerRequisitionRepository;
-use Webkul\B2BSuite\Http\Resources\RequisitionItemResource;
+use Webkul\Checkout\Facades\Cart;
 use Webkul\Customer\Repositories\CustomerRepository;
 use Webkul\Product\Repositories\ProductRepository;
 use Webkul\Shop\Http\Controllers\Controller;
@@ -309,7 +309,8 @@ class RequisitionListController extends Controller
 
             try {
                 Cart::addProduct($item->product, $additional);
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) {
+            }
         }
 
         session()->flash('success', trans('b2b_suite::app.shop.customers.account.requisitions.move-to-cart-success'));
@@ -357,7 +358,7 @@ class RequisitionListController extends Controller
                     'additional' => $additional ? json_encode(array_merge($additional, ['quantity' => $qty])) : null,
                 ]);
             }
-            
+
             // Reload updated items
             $updatedItems = $requisition->items()->get();
 
@@ -371,7 +372,7 @@ class RequisitionListController extends Controller
             ]);
         }
     }
-    
+
     /**
      * Removes the item from the requisition if it exists.
      */
@@ -381,7 +382,7 @@ class RequisitionListController extends Controller
             'requisition_id'       => 'required|exists:customer_requisition_lists,id',
             'requisition_item_ids' => 'required|array',
         ]);
-        
+
         $requisition = $this->customerRequisitionRepository->findOneWhere([
             'id'          => request()->input('requisition_id'),
             'customer_id' => auth()->guard('customer')->user()->id,
@@ -392,7 +393,7 @@ class RequisitionListController extends Controller
         }
 
         $requisitionItems = $requisition->items->whereIn('id', request()->input('requisition_item_ids'));
-        
+
         foreach ($requisitionItems as $item) {
             $item->delete();
         }

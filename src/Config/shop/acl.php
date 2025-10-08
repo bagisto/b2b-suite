@@ -10,7 +10,7 @@ return [
     | Including standard Bagisto customer account menu items so they can
     | also be permission-controlled under the B2B Suite company roles.
     |
-    */[
+    */ [
         'key'   => 'profile',
         'name'  => 'b2b_suite::app.shop.acl.profile',
         'route' => 'shop.customers.account.profile.index',
@@ -121,7 +121,7 @@ return [
         'route' => 'shop.customers.account.wishlist.index',
         'sort'  => 6,
     ],
-        [
+    [
         'key'   => 'wishlist.view',
         'name'  => 'b2b_suite::app.shop.acl.view',
         'route' => 'shop.customers.account.wishlist.index',
@@ -247,7 +247,7 @@ return [
         'name'  => 'b2b_suite::app.shop.acl.quick-orders',
         'route' => 'shop.customers.account.quick_orders.index',
         'sort'  => 11,
-    ],[
+    ], [
         'key'   => 'quick-orders.view',
         'name'  => 'b2b_suite::app.shop.acl.view',
         'route' => 'shop.customers.account.quick_orders.index',

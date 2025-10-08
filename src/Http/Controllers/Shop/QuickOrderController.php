@@ -4,13 +4,12 @@ namespace Webkul\B2BSuite\Http\Controllers\Shop;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Webkul\B2BSuite\Helpers\B2BHelper;
-use Webkul\Shop\Http\Controllers\Controller;
 use Webkul\Admin\Http\Resources\ProductResource;
-use Webkul\Product\Repositories\ProductRepository;
-use Webkul\Customer\Repositories\CustomerRepository;
 use Webkul\B2BSuite\Repositories\CompanyRoleRepository;
 use Webkul\Customer\Repositories\CustomerGroupRepository;
+use Webkul\Customer\Repositories\CustomerRepository;
+use Webkul\Product\Repositories\ProductRepository;
+use Webkul\Shop\Http\Controllers\Controller;
 
 class QuickOrderController extends Controller
 {
@@ -49,7 +48,7 @@ class QuickOrderController extends Controller
             'products'            => 'required_without:upload_file|array',
             'products.*.sku'      => 'sometimes|string|distinct|exists:products,sku',
             'products.*.quantity' => 'sometimes|numeric|min:1',
-            'upload_file'         => 'required_without:products|file|mimes:csv|max:' . ($maxFileSizeMB * 1024),
+            'upload_file'         => 'required_without:products|file|mimes:csv|max:'.($maxFileSizeMB * 1024),
         ]);
 
         $data = request()->only('products', 'upload_file');
@@ -57,8 +56,8 @@ class QuickOrderController extends Controller
         if (! empty($data['products'])) {
             b2b_suite()->addProductsToCart($data['products']);
         }
-        
-dd($data);
+
+        dd($data);
         session()->flash('success', trans('b2b_suite::app.shop.customers.account.quick-orders.create-success'));
 
         return redirect()->route('shop.customers.account.quick_orders.index');
@@ -108,6 +107,7 @@ dd($data);
 
         return ProductResource::collection($products);
     }
+
     /**
      * Fetch products by skus.
      *

@@ -2,13 +2,13 @@
 
 namespace Webkul\B2BSuite\Providers;
 
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Webkul\B2BSuite\Http\Middleware\CustomerBouncerMiddleware;
-use Webkul\Core\Menu as CoreMenu;
 use Webkul\B2BSuite\Menu as B2BMenu;
+use Webkul\Core\Menu as CoreMenu;
 
 class B2BSuiteServiceProvider extends ServiceProvider
 {

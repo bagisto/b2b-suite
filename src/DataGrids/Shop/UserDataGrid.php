@@ -30,9 +30,9 @@ class UserDataGrid extends DataGrid
     public function prepareQueryBuilder()
     {
         $tablePrefix = DB::getTablePrefix();
-        
+
         $customer = auth()->guard('customer')->user();
-        
+
         $queryBuilder = DB::table('customers')
             ->leftJoin('customer_groups', 'customers.customer_group_id', '=', 'customer_groups.id')
             ->addSelect(

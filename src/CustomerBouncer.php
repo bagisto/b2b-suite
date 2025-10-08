@@ -6,12 +6,14 @@ use Webkul\B2BSuite\Repositories\CompanyRoleRepository;
 
 class CustomerBouncer
 {
-    protected CompanyRoleRepository $roleRepo;
+    /**
+     * Permission types
+     */
+    public const PERMISSION_TYPE_ALL = 'all';
 
-    public function __construct(CompanyRoleRepository $roleRepo)
-    {
-        $this->roleRepo = $roleRepo;
-    }
+    public const PERMISSION_TYPE_CUSTOM = 'custom';
+
+    public function __construct(protected CompanyRoleRepository $roleRepo) {}
 
     /**
      * Check if the current logged-in customer has permission for a given key.
@@ -30,18 +32,18 @@ class CustomerBouncer
             return false;
         }
 
-        if ($role->permission_type === 'all') {
+        if ($role->permission_type === self::PERMISSION_TYPE_ALL) {
             return true;
         }
 
-        if ($role->permission_type === 'custom') {
+        if ($role->permission_type === self::PERMISSION_TYPE_CUSTOM) {
             $permissions = $role->permissions;
 
             if (is_string($permissions)) {
                 $permissions = json_decode($permissions, true) ?: [];
             }
 
-            if (!is_array($permissions)) {
+            if (! is_array($permissions)) {
                 $permissions = [];
             }
 

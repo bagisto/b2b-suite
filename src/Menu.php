@@ -4,9 +4,8 @@ namespace Webkul\B2BSuite;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Webkul\Core\Menu\MenuItem;
 use Webkul\Core\Menu as BaseMenu;
-use Illuminate\Support\Facades\Log;
+use Webkul\Core\Menu\MenuItem;
 
 class Menu extends BaseMenu
 {
@@ -39,17 +38,16 @@ class Menu extends BaseMenu
         switch ($area) {
             case self::ADMIN:
                 $this->configMenu = $configMenu
-                    ->filter(fn($item) => bouncer()->hasPermission($item['key']))
+                    ->filter(fn ($item) => bouncer()->hasPermission($item['key']))
                     ->toArray();
                 break;
 
             case self::CUSTOMER:
                 $canShowWishlist = ! (bool) core()->getConfigData('customer.settings.wishlist.wishlist_option');
-                $canShowGdpr     = ! (bool) core()->getConfigData('general.gdpr.settings.enabled');
+                $canShowGdpr = ! (bool) core()->getConfigData('general.gdpr.settings.enabled');
 
                 $this->configMenu = $configMenu
-                    ->reject(fn ($item) =>
-                        ($item['key'] == 'account.wishlist' && $canShowWishlist) ||
+                    ->reject(fn ($item) => ($item['key'] == 'account.wishlist' && $canShowWishlist) ||
                         ($item['key'] == 'account.gdpr_data_request' && $canShowGdpr)
                     )
                     ->filter(function ($item) {
