@@ -511,6 +511,16 @@ return [
                 'po-messages'    => 'Purchase Order Messages',
             ],
         ],
+
+        'acl' => [
+            'attributes'      => 'Attributes',
+            'create'          => 'Create',
+            'edit'            => 'Edit',
+            'update'          => 'Update',
+            'delete'          => 'Delete',
+            'companies'       => 'Companies',
+            'assign-product'  => 'Assign-Product',
+        ],
     ],
 
     'shop' => [
@@ -524,8 +534,10 @@ return [
         ],
 
         'acl' => [
+            'profile'         => 'Profile',
             'create'          => 'Create',
             'edit'            => 'Edit',
+            'update'          => 'Update',
             'delete'          => 'Delete',
             'view'            => 'View',
             'list'            => 'List',
@@ -534,9 +546,19 @@ return [
             'requisitions'    => 'Requisitions',
             'quotes'          => 'Quotations',
             'purchase-orders' => 'Purchase Orders',
+            'orders'          => 'Orders',
             'quick-orders'    => 'Quick Orders',
             'users'           => 'Users',
             'roles'           => 'Roles',
+            'address'         => 'Address',
+            'reorder'         => 'Reorder',
+            'cancel'          => 'Cancel',
+            'print-invoice'   => 'Print Invoice',
+            'downloadables'   => 'Downloadables',
+            'download'        => 'Download',
+            'reviews'         => 'Reviews',
+            'wishlist'        => 'Wishlist',
+            'gdpr-request'   => 'GDPR Request',
         ],
 
         'companies' => [

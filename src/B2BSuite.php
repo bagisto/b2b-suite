@@ -41,8 +41,6 @@ class B2BSuite
 
             // Cart::addProduct($product, $item['quantity']);
         }
-
-        dd('isB2BCustomer');
     }
 
     public function prepareCartData($product, $item)

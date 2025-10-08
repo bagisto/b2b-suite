@@ -36,7 +36,7 @@ Route::prefix('companies')->group(function () {
 });
 
 Route::group(['middleware' => ['theme', 'locale', 'currency'], 'prefix' => 'customer'], function () {
-    Route::group(['middleware' => ['customer', NoCacheMiddleware::class], 'prefix' => 'account'], function () {
+    Route::group(['middleware' => ['customer', 'customer_bouncer', NoCacheMiddleware::class], 'prefix' => 'account'], function () {
 
         /**
          * Requisitions List Routes.

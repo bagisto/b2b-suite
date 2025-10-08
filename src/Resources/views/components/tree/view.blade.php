@@ -24,7 +24,27 @@
         app.component('v-tree-view', {
             name: 'v-tree-view',
 
-            inheritAttrs: false,
+            template: `
+                <div class="v-tree-container">
+                    <div class="v-tree-item-wrapper">
+                        <tree-item
+                            v-for="(item, index) in formattedItems"
+                            :key="index"
+                            :item="item"
+                            :level="1"
+                            :collapse="collapse"
+                            :input-type="inputType"
+                            :name-field="nameField"
+                            :value-field="valueField"
+                            :id-field="idField"
+                            :label-field="labelField"
+                            :children-field="childrenField"
+                            :fallback-locale="fallbackLocale"
+                            @toggle-item="handleCheckbox"
+                        />
+                    </div>
+                </div>
+            `,
 
             props: {
                 inputType: {
@@ -96,14 +116,12 @@
             data() {
                 return {
                     formattedItems: null,
-
                     formattedValues: null,
                 };
             },
 
             created() {
                 this.formattedItems = this.getInitialFormattedItems();
-
                 this.formattedValues = this.getInitialFormattedValues();
             },
 
@@ -128,135 +146,6 @@
                         : this.value;
                 },
 
-                getId(item) {
-                    const timestamp = new Date().getTime().toString(36);
-
-                    const id = item[this.idField];
-
-                    return `${timestamp}_${id}`
-                },
-
-                getLabel(item) {
-                    return item[this.labelField]
-                        ? item[this.labelField]
-                        : item.translations.filter((translation) => translation.locale === this.fallbackLocale)[0][this.labelField];
-                },
-
-                generateToggleIconComponent(props) {
-                    return this.$h('i', {
-                        ...props,
-
-                        onClick: (selection) => {
-                            selection.srcElement.parentElement.classList.toggle('active');
-
-                            selection.srcElement.classList.toggle('icon-arrow-down', !selection.srcElement.classList.contains('icon-arrow-down'));
-                            selection.srcElement.classList.toggle('icon-arrow-right', !selection.srcElement.classList.contains('icon-arrow-right'));
-                        },
-                    });
-                },
-
-                generateFolderIconComponent(props) {
-                    return this.$h('i', {
-                        ...props,
-                    });
-                },
-
-                generateCheckboxComponent(props) {
-                    return this.$h(this.$resolveComponent('v-tree-checkbox'), {
-                        ...props,
-
-                        onChangeInput: (item) => {
-                            this.handleCheckbox(item.value);
-
-                            this.$emit('change-input', this.formattedValues);
-                        },
-                    });
-                },
-
-                generateRadioComponent(props) {
-                    return this.$h(this.$resolveComponent('v-tree-radio'), {
-                        ...props,
-
-                        onChangeInput: (item) => {
-                            this.$emit('change-input', this.formattedValues[0]);
-                        },
-                    });
-                },
-
-                generateInputComponent(props) {
-                    switch (this.inputType) {
-                        case 'checkbox':
-                            return this.generateCheckboxComponent(props);
-
-                        case 'radio':
-                            return this.generateRadioComponent(props);
-
-                        default:
-                            return this.generateCheckboxComponent(props);
-                    }
-                },
-
-                generateTreeItemComponents(items, level = 1) {
-                    let treeItems = [];
-
-                    for (let key in items) {
-                        let hasChildren = Object.entries(items[key][this.childrenField]).length > 0;
-
-                        treeItems.push(
-                            this.$h(
-                                'div', {
-                                    class: [
-                                        this.collapse ? '' : 'active',
-                                        'v-tree-item inline-block w-full [&>.v-tree-item]:ltr:pl-6 [&>.v-tree-item]:rtl:pr-6 [&>.v-tree-item]:hidden [&.active>.v-tree-item]:block',
-                                        level === 1 && ! hasChildren
-                                            ? 'ltr:!pl-5 rtl:!pr-5'
-                                            : level > 1 && ! hasChildren
-                                            ? 'ltr:!pl-14 rtl:!pr-14'
-                                            : '',
-                                    ],
-                                }, [
-                                    this.generateToggleIconComponent({
-                                        class: [
-                                            hasChildren ? 'icon-sort-down' : '',
-                                            'text-xl rounded-md cursor-pointer transition-all hover:bg-gray-100'
-                                        ],
-                                    }),
-
-                                    this.generateFolderIconComponent({
-                                        class: [
-                                            hasChildren ? 'icon-folder' : 'icon-attribute',
-                                            'text-2xl cursor-pointer'
-                                        ],
-                                    }),
-
-                                    this.generateInputComponent({
-                                        id: this.getId(items[key]),
-                                        label: this.getLabel(items[key]),
-                                        name: this.nameField,
-                                        value: items[key][this.valueField],
-                                    }),
-
-                                    this.generateTreeItemComponents(items[key][this.childrenField], level + 1),
-                                ]
-                            )
-                        );
-                    }
-
-                    return treeItems;
-                },
-
-                generateTree() {
-                    return this.$h(
-                        'div', {
-                            class: [
-                                'v-tree-item-wrapper',
-                            ],
-                        }, [
-                            this.generateTreeItemComponents(this.formattedItems),
-                        ]
-                    );
-                },
-
                 searchInTree(items, value, ancestors = []) {
                     for (let key in items) {
                         if (items[key][this.valueField] === value) {
@@ -275,7 +164,6 @@
 
                 has(key) {
                     let foundValues = this.formattedValues.filter(value => value == key);
-
                     return foundValues.length > 0;
                 },
 
@@ -299,19 +187,18 @@
                     switch (this.selectionType) {
                         case 'individual':
                             this.handleIndividualSelectionType(item);
-
                             break;
 
                         case 'hierarchical':
                             this.handleHierarchicalSelectionType(item);
-
                             break;
 
                         default:
                             this.handleHierarchicalSelectionType(item);
-
                             break;
                     }
+
+                    this.$emit('change-input', this.formattedValues);
                 },
 
                 handleIndividualSelectionType(item) {
@@ -320,9 +207,7 @@
 
                 handleHierarchicalSelectionType(item) {
                     this.handleAncestors(item);
-
                     this.handleCurrent(item);
-
                     this.handleChildren(item);
 
                     if (! this.has(item[this.valueField])) {
@@ -331,7 +216,7 @@
                 },
 
                 handleAncestors(item) {
-                    if (item.ancestors.length) {
+                    if (item.ancestors && item.ancestors.length) {
                         item.ancestors.forEach((ancestor) => {
                             this.select(ancestor[this.valueField]);
                         });
@@ -344,7 +229,6 @@
 
                 handleChildren(item) {
                     let selectedChildrenCount = this.countSelectedChildren(item);
-
                     selectedChildrenCount ? this.unSelectAllChildren(item) : this.selectAllChildren(item);
                 },
 
@@ -366,7 +250,6 @@
                     if (typeof item[this.childrenField] === 'object') {
                         for (let childKey in item[this.childrenField]) {
                             this.select(item[this.childrenField][childKey][this.valueField]);
-
                             this.selectAllChildren(item[this.childrenField][childKey]);
                         }
                     }
@@ -376,18 +259,142 @@
                     if (typeof item[this.childrenField] === 'object') {
                         for (let childKey in item[this.childrenField]) {
                             this.unSelect(item[this.childrenField][childKey][this.valueField]);
-
                             this.unSelectAllChildren(item[this.childrenField][childKey]);
                         }
                     }
                 },
             },
+        });
 
-            render() {
-                return this.$h('div', {
-                    class: ['v-tree-container']
-                }, [this.generateTree()]);
-            }
+        // Tree Item Component
+        app.component('tree-item', {
+            name: 'tree-item',
+
+            template: `
+                <div>
+                    <!-- Parent Item Row -->
+                    <div class="flex items-center gap-2 py-1">
+                        <i 
+                            v-if="hasChildren"
+                            :class="toggleIconClasses"
+                        ></i>
+                        <span v-else class="w-5"></span>
+
+                        <i :class="folderIconClasses"></i>
+
+                        <component
+                            :is="inputComponent"
+                            :id="itemId"
+                            :label="itemLabel"
+                            :name="nameField"
+                            :value="item[valueField]"
+                            @change-input="onInputChange"
+                        />
+                    </div>
+
+                    <!-- Children Items (Nested with indentation) -->
+                    <div v-if="hasChildren" class="tree-children">
+                        <tree-item
+                            v-for="(child, key) in item[childrenField]"
+                            :key="key"
+                            :item="child"
+                            :level="level + 1"
+                            :collapse="collapse"
+                            :input-type="inputType"
+                            :name-field="nameField"
+                            :value-field="valueField"
+                            :id-field="idField"
+                            :label-field="labelField"
+                            :children-field="childrenField"
+                            :fallback-locale="fallbackLocale"
+                            @toggle-item="$emit('toggle-item', $event)"
+                        />
+                    </div>
+                </div>
+            `,
+
+            props: {
+                item: Object,
+                level: Number,
+                collapse: Boolean,
+                inputType: String,
+                nameField: String,
+                valueField: String,
+                idField: String,
+                labelField: String,
+                childrenField: String,
+                fallbackLocale: String,
+            },
+
+            computed: {
+                hasChildren() {
+                    return Object.entries(this.item[this.childrenField] || {}).length > 0;
+                },
+
+                toggleIconClasses() {
+                    return [
+                        'text-xl',
+                        'cursor-pointer',
+                        'transition-all',
+                        'hover:bg-gray-100',
+                        'rounded-md'
+                    ];
+                },
+
+                folderIconClasses() {
+                    return [
+                        this.hasChildren ? 'icon-folder' : 'icon-attribute',
+                        'text-2xl'
+                    ];
+                },
+
+                inputComponent() {
+                    return this.inputType === 'checkbox' ? 'v-tree-checkbox' : 'v-tree-radio';
+                },
+
+                itemId() {
+                    const timestamp = new Date().getTime().toString(36);
+                    const id = this.item[this.idField];
+                    return `${timestamp}_${id}`;
+                },
+
+                itemLabel() {
+                    return this.item[this.labelField]
+                        ? this.item[this.labelField]
+                        : this.item.translations.filter((translation) => translation.locale === this.fallbackLocale)[0][this.labelField];
+                }
+            },
+
+            methods: {
+                onInputChange(data) {
+                    this.$emit('toggle-item', data.value);
+                },
+
+                // Expose these methods so v-tree-checkbox can access them via this.$parent
+                has(key) {
+                    let root = this.$parent;
+                    while (root && root.$options.name !== 'v-tree-view') {
+                        root = root.$parent;
+                    }
+                    return root ? root.has(key) : false;
+                },
+
+                select(key) {
+                    let root = this.$parent;
+                    while (root && root.$options.name !== 'v-tree-view') {
+                        root = root.$parent;
+                    }
+                    if (root) root.select(key);
+                },
+
+                unSelect(key) {
+                    let root = this.$parent;
+                    while (root && root.$options.name !== 'v-tree-view') {
+                        root = root.$parent;
+                    }
+                    if (root) root.unSelect(key);
+                },
+            },
         });
     </script>
 @endPushOnce
