@@ -61,7 +61,7 @@ class CustomerBouncerMiddleware
         }
 
         if (
-            $role->permission_type !== 'all' 
+            $role->permission_type !== 'all'
             && empty($role->permissions)
         ) {
             return true;

@@ -81,7 +81,7 @@ class RegistrationController extends BaseRegistrationController
             $customer->custom_attributes
         );
 
-        $this->companyRoleRepository->create([
+        $role = $this->companyRoleRepository->create([
             'name'            => 'Administrator',
             'description'     => 'All permissions',
             'permission_type' => 'all',
@@ -90,6 +90,10 @@ class RegistrationController extends BaseRegistrationController
             'created_at'      => now(),
             'updated_at'      => now(),
         ]);
+
+        $customer->update(['company_role_id' => $role->id]);
+
+        $customer->companies()->attach($customer->id);
 
         if (isset($data['is_subscribed'])) {
             $subscription = $this->subscriptionRepository->findOneWhere(['email' => $data['email']]);
