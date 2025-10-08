@@ -2,10 +2,13 @@
 
 namespace Webkul\B2BSuite\Providers;
 
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use Webkul\B2BSuite\Http\Middleware\CustomerBouncerMiddleware;
+use Webkul\B2BSuite\Menu as B2BMenu;
+use Webkul\Core\Menu as CoreMenu;
 
 class B2BSuiteServiceProvider extends ServiceProvider
 {
@@ -38,6 +41,8 @@ class B2BSuiteServiceProvider extends ServiceProvider
         $this->registerServices();
 
         $this->registerFacades();
+
+        $this->app->bind(CoreMenu::class, B2BMenu::class);
     }
 
     /**
@@ -61,6 +66,8 @@ class B2BSuiteServiceProvider extends ServiceProvider
         include __DIR__.'/../Http/helpers.php';
 
         Route::middleware('web')->group(__DIR__.'/../Routes/web.php');
+
+        Route::aliasMiddleware('customer_bouncer', CustomerBouncerMiddleware::class);
 
         $this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
 

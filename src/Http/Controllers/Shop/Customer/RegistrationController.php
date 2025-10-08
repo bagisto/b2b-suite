@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use Webkul\B2BSuite\Http\Requests\CompanyRequest;
 use Webkul\B2BSuite\Repositories\CompanyAttributeRepository;
 use Webkul\B2BSuite\Repositories\CompanyAttributeValueRepository;
+use Webkul\B2BSuite\Repositories\CompanyRoleRepository;
 use Webkul\Core\Repositories\SubscribersListRepository;
 use Webkul\Customer\Repositories\CustomerGroupRepository;
 use Webkul\Customer\Repositories\CustomerRepository;
@@ -24,7 +25,8 @@ class RegistrationController extends BaseRegistrationController
         protected CustomerGroupRepository $customerGroupRepository,
         protected SubscribersListRepository $subscriptionRepository,
         protected CompanyAttributeRepository $companyAttributeRepository,
-        protected CompanyAttributeValueRepository $companyAttributeValueRepository
+        protected CompanyAttributeValueRepository $companyAttributeValueRepository,
+        protected CompanyRoleRepository $companyRoleRepository
     ) {}
 
     /**
@@ -78,6 +80,16 @@ class RegistrationController extends BaseRegistrationController
             $customer,
             $customer->custom_attributes
         );
+
+        $this->companyRoleRepository->create([
+            'name'            => 'Administrator',
+            'description'     => 'All permissions',
+            'permission_type' => 'all',
+            'permissions'     => null,
+            'customer_id'     => $customer->id,
+            'created_at'      => now(),
+            'updated_at'      => now(),
+        ]);
 
         if (isset($data['is_subscribed'])) {
             $subscription = $this->subscriptionRepository->findOneWhere(['email' => $data['email']]);

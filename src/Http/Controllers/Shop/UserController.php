@@ -10,10 +10,10 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Webkul\Admin\Mail\Customer\NewCustomerNotification;
 use Webkul\B2BSuite\DataGrids\Shop\UserDataGrid;
+use Webkul\B2BSuite\Repositories\CompanyRoleRepository;
 use Webkul\Core\Rules\PhoneNumber;
 use Webkul\Customer\Repositories\CustomerGroupRepository;
 use Webkul\Customer\Repositories\CustomerRepository;
-use Webkul\B2BSuite\Repositories\CompanyRoleRepository;
 use Webkul\Sales\Models\Order;
 use Webkul\Shop\Http\Controllers\Controller;
 

@@ -12,7 +12,6 @@ class B2BHelper
      */
     public function getCompanyByCustomer($customerId)
     {
-        dd($customerId);
         $companyUser = app(\Webkul\B2BSuite\Models\CompanyUser::class)
             ->where('user_id', $customerId)
             ->first();

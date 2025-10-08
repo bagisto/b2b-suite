@@ -2,11 +2,11 @@
 
 use Illuminate\Support\Facades\Route;
 use Webkul\B2BSuite\Http\Controllers\Shop\PurchaseOrderController;
+use Webkul\B2BSuite\Http\Controllers\Shop\QuickOrderController;
 use Webkul\B2BSuite\Http\Controllers\Shop\QuoteController;
 use Webkul\B2BSuite\Http\Controllers\Shop\RequisitionListController;
-use Webkul\B2BSuite\Http\Controllers\Shop\QuickOrderController;
-use Webkul\B2BSuite\Http\Controllers\Shop\UserController;
 use Webkul\B2BSuite\Http\Controllers\Shop\RoleController;
+use Webkul\B2BSuite\Http\Controllers\Shop\UserController;
 use Webkul\Core\Http\Middleware\NoCacheMiddleware;
 use Webkul\Shop\Http\Controllers\Customer\CustomerController;
 use Webkul\Shop\Http\Controllers\Customer\RegistrationController;
@@ -36,7 +36,7 @@ Route::prefix('companies')->group(function () {
 });
 
 Route::group(['middleware' => ['theme', 'locale', 'currency'], 'prefix' => 'customer'], function () {
-    Route::group(['middleware' => ['customer', NoCacheMiddleware::class], 'prefix' => 'account'], function () {
+    Route::group(['middleware' => ['customer', 'customer_bouncer', NoCacheMiddleware::class], 'prefix' => 'account'], function () {
 
         /**
          * Requisitions List Routes.

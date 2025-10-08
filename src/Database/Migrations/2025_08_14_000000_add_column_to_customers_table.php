@@ -22,7 +22,7 @@ return new class extends Migration
             }
 
             if (! Schema::hasColumn('customers', 'company_role_id')) {
-                $table->integer('company_role_id')->unsigned()->nullable();
+                $table->integer('company_role_id')->unsigned()->nullable()->after('customer_group_id');
                 $table->foreign('company_role_id')->references('id')->on('company_roles')->onDelete('set null');
             }
         });

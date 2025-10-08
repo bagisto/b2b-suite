@@ -2,7 +2,6 @@
 
 namespace Webkul\B2BSuite;
 
-use Illuminate\Support\Facades\Event;
 use Webkul\Checkout\Facades\Cart;
 use Webkul\Product\Repositories\ProductRepository;
 
@@ -13,10 +12,7 @@ class B2BSuite
      *
      * @return void
      */
-    public function __construct(
-        protected ProductRepository $productRepository,
-    ) {
-    }
+    public function __construct(protected ProductRepository $productRepository) {}
 
     /**
      * Process and add products to cart
@@ -36,13 +32,12 @@ class B2BSuite
 
             if (isset($cartData['product_id'])) {
                 $cart = Cart::addProduct($product, $cartData);
+
                 continue;
             }
 
             // Cart::addProduct($product, $item['quantity']);
         }
-
-        dd('isB2BCustomer');
     }
 
     public function prepareCartData($product, $item)
@@ -58,21 +53,21 @@ class B2BSuite
 
             case 'configurable':
                 $buyRequest = [
-                    'quantity' => $item['quantity'],
+                    'quantity'        => $item['quantity'],
                     'super_attribute' => $this->getSuperAttributes($product),
                 ];
                 break;
 
             case 'bundle':
                 $buyRequest = [
-                    'quantity' => $item['quantity'],
+                    'quantity'       => $item['quantity'],
                     'bundle_options' => $this->getBundleOptions($product),
                 ];
                 break;
 
             case 'downloadable':
                 $buyRequest = [
-                    'quantity' => $item['quantity'],
+                    'quantity'           => $item['quantity'],
                     'downloadable_links' => $this->getDownloadableLinks($product),
                 ];
                 break;

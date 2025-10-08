@@ -2,12 +2,12 @@
 
 namespace Webkul\B2BSuite\Http\Controllers\Shop;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
 use Webkul\B2BSuite\DataGrids\Shop\RoleDataGrid;
-use Webkul\Customer\Repositories\CustomerRepository;
 use Webkul\B2BSuite\Repositories\CompanyRoleRepository;
+use Webkul\Customer\Repositories\CustomerRepository;
 use Webkul\Shop\Http\Controllers\Controller;
 
 class RoleController extends Controller
@@ -174,7 +174,8 @@ class RoleController extends Controller
             Event::dispatch('customer.role.delete.after', $id);
 
             return new JsonResponse(['message' => trans('b2b_suite::app.shop.customers.account.roles.delete-success')]);
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+        }
 
         return new JsonResponse([
             'message' => trans(
