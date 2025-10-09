@@ -88,9 +88,9 @@ return [
         'route' => 'shop.customers.account.orders.cancel',
         'sort'  => 3,
     ], [
-        'key'   => 'orders.print-invoice',
+        'key'   => 'orders.print_invoice',
         'name'  => 'b2b_suite::app.shop.acl.print-invoice',
-        'route' => 'shop.customers.account.orders.print-invoice',
+        'route' => 'shop.customers.account.orders.print_invoice',
         'sort'  => 4,
     ],
     [
@@ -173,7 +173,7 @@ return [
         'route' => 'shop.customers.account.requisitions.list',
         'sort'  => 4,
     ], [
-        'key'   => 'requisitions.get-product',
+        'key'   => 'requisitions.get_product',
         'name'  => 'b2b_suite::app.shop.acl.get-product',
         'route' => 'shop.customers.account.requisitions.get_product',
         'sort'  => 5,
@@ -208,7 +208,7 @@ return [
         'route' => 'shop.customers.account.quotes.messages',
         'sort'  => 3,
     ], [
-        'key'   => 'quotes.get-product',
+        'key'   => 'quotes.get_product',
         'name'  => 'b2b_suite::app.shop.acl.get-product',
         'route' => 'shop.customers.account.quotes.get_product',
         'sort'  => 4,
@@ -223,13 +223,13 @@ return [
     |
     */
     [
-        'key'   => 'purchase-orders',
+        'key'   => 'purchase_orders',
         'name'  => 'b2b_suite::app.shop.acl.purchase-orders',
         'route' => 'shop.customers.account.purchase_orders.index',
         'sort'  => 10,
     ], [
-        'key'   => 'purchase-orders.view',
-        'name'  => 'admin::app.acl.view',
+        'key'   => 'purchase_orders.view',
+        'name'  => 'b2b_suite::app.shop.acl.view',
         'route' => 'shop.customers.account.purchase_orders.view',
         'sort'  => 1,
     ],
@@ -243,12 +243,12 @@ return [
     |
     */
     [
-        'key'   => 'quick-orders',
+        'key'   => 'quick_orders',
         'name'  => 'b2b_suite::app.shop.acl.quick-orders',
         'route' => 'shop.customers.account.quick_orders.index',
         'sort'  => 11,
     ], [
-        'key'   => 'quick-orders.view',
+        'key'   => 'quick_orders.view',
         'name'  => 'b2b_suite::app.shop.acl.view',
         'route' => 'shop.customers.account.quick_orders.index',
         'sort'  => 1,
@@ -266,22 +266,22 @@ return [
         'key'   => 'users',
         'name'  => 'b2b_suite::app.shop.acl.users',
         'route' => 'shop.customers.account.users.index',
-        'sort'  => 22,
+        'sort'  => 12,
     ], [
         'key'   => 'users.create',
         'name'  => 'b2b_suite::app.shop.acl.create',
         'route' => 'shop.customers.account.users.create',
-        'sort'  => 23,
+        'sort'  => 1,
     ], [
         'key'   => 'users.edit',
-        'name'  => 'admin::app.acl.edit',
+        'name'  => 'b2b_suite::app.shop.acl.edit',
         'route' => 'shop.customers.account.users.edit',
-        'sort'  => 24,
+        'sort'  => 2,
     ], [
         'key'   => 'users.delete',
-        'name'  => 'admin::app.acl.delete',
+        'name'  => 'b2b_suite::app.shop.acl.delete',
         'route' => 'shop.customers.account.users.delete',
-        'sort'  => 25,
+        'sort'  => 3,
     ],
 
     /*
@@ -296,21 +296,21 @@ return [
         'key'   => 'roles',
         'name'  => 'b2b_suite::app.shop.acl.roles',
         'route' => 'shop.customers.account.roles.index',
-        'sort'  => 26,
+        'sort'  => 13,
     ], [
         'key'   => 'roles.create',
         'name'  => 'b2b_suite::app.shop.acl.create',
         'route' => 'shop.customers.account.roles.create',
-        'sort'  => 27,
+        'sort'  => 1,
     ], [
         'key'   => 'roles.edit',
-        'name'  => 'admin::app.acl.edit',
+        'name'  => 'b2b_suite::app.shop.acl.edit',
         'route' => 'shop.customers.account.roles.edit',
-        'sort'  => 28,
+        'sort'  => 2,
     ], [
         'key'   => 'roles.delete',
-        'name'  => 'admin::app.acl.delete',
+        'name'  => 'b2b_suite::app.shop.acl.delete',
         'route' => 'shop.customers.account.roles.delete',
-        'sort'  => 29,
+        'sort'  => 3,
     ],
 ];

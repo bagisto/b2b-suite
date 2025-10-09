@@ -52,8 +52,9 @@ class Menu extends BaseMenu
                     )
                     ->filter(function ($item) {
                         $key = $item['key'];
-
-                        return customer_bouncer()->hasPermission($key);
+                        $hasPermission = customer_bouncer()->hasPermission($key);
+                        
+                        return $hasPermission;
                     })
                     ->toArray();
 
@@ -68,9 +69,14 @@ class Menu extends BaseMenu
             $this->prepareMenuItems();
         }
 
-        return collect($this->removeUnauthorizedMenuItem())->sortBy('sort');
+        $filtered = $this->removeUnauthorizedMenuItem();
+
+        return collect($filtered)->sortBy('sort');
     }
 
+    /**
+     * Add menu item.
+     */
     public function addItem(MenuItem $item): void
     {
         $this->items[$item->getKey()] = $item;
@@ -106,7 +112,6 @@ class Menu extends BaseMenu
             ));
         }
     }
-
     /**
      * Process sub menu items.
      */
@@ -116,6 +121,7 @@ class Menu extends BaseMenu
             ->sortBy('sort')
             ->filter(fn ($value) => is_array($value))
             ->map(function ($subMenuItem) {
+ 
                 $subSubMenuItems = $this->processSubMenuItems($subMenuItem);
 
                 return new MenuItem(
@@ -130,28 +136,33 @@ class Menu extends BaseMenu
     }
 
     /**
-     * Remove unauthorized menu item.
+     * Remove unauthorized menu items.
      */
     private function removeUnauthorizedMenuItem(): array
     {
-        return collect($this->items)->map(function ($item) {
+        $filtered = collect($this->items)->map(function ($item) {
+
             $this->removeChildrenUnauthorizedMenuItem($item);
 
             return $item;
         })->toArray();
+
+        return $filtered;
     }
 
     /**
-     * Remove unauthorized menuItem's children. This will handle all levels.
+     * Remove unauthorized menuItem's children (recursive).
      */
     private function removeChildrenUnauthorizedMenuItem(MenuItem &$menuItem): void
     {
-        if ($menuItem->haveChildren()) {
-            $firstChildrenItem = $menuItem->getChildren()->first();
-
-            $menuItem->route = $firstChildrenItem->getRoute();
-
-            $this->removeChildrenUnauthorizedMenuItem($firstChildrenItem);
+        if (! $menuItem->haveChildren()) {
+            return;
         }
+
+        $firstChild = $menuItem->getChildren()->first();
+
+        $menuItem->route = $firstChild->getRoute();
+
+        $this->removeChildrenUnauthorizedMenuItem($firstChild);
     }
 }
