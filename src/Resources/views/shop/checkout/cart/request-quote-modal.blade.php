@@ -50,6 +50,7 @@
                                     </x-shop::form.control-group.label>
 
                                     <x-shop::form.control-group.control
+                                        ref="quoteNameInput"
                                         type="text"
                                         class="px-4 py-3 max-md:!p-3 max-sm:!p-2"
                                         name="name"
@@ -70,6 +71,7 @@
                                     </x-shop::form.control-group.label>
 
                                     <x-shop::form.control-group.control
+                                        ref="descriptionInput"
                                         type="textarea"
                                         class="px-4 py-3 max-md:!p-3 max-sm:!p-2"
                                         name="description"
@@ -93,6 +95,7 @@
                                     <!-- File Upload Area -->
                                     <div class="relative max-h-[100px] overflow-auto rounded-lg border-2 border-dashed border-gray-300 p-6 text-center transition-colors hover:border-gray-400">
                                         <input
+                                            v-if="selectedFiles.length === 0"
                                             type="file"
                                             ref="fileInput"
                                             @change="handleFileSelect"
@@ -301,13 +304,11 @@
 
                 saveAsDraft() {
                     this.isDraftSaving = true;
-                    
-                    // Get form data
-                    const formData = new FormData();
-                    const quoteNameInput = document.querySelector('input[name="name"]');
-                    const descriptionInput = document.querySelector('textarea[name="description"]');
 
-                    if (!quoteNameInput?.value || !descriptionInput?.value) {
+                    const quoteName = this.$refs.quoteNameInput?.value?.trim() || '';
+                    const description = this.$refs.descriptionInput?.value?.trim() || '';
+
+                    if (!quoteName || !description) {
                         this.$emitter.emit('add-flash', {
                             type: 'warning',
                             message: '@lang("b2b_suite::app.shop.checkout.cart.required-fields-draft")'
@@ -317,14 +318,18 @@
                     }
 
                     const params = {
-                        name: quoteNameInput.value,
-                        description: descriptionInput.value
+                        name: quoteName,
+                        description: description
                     };
 
-                    this.submitQuoteRequest(params, () => {
-                        quoteNameInput.value = '';
-                        descriptionInput.value = '';
-                    }, 'draft');
+                    this.submitQuoteRequest(
+                        params,
+                        () => {
+                            if (this.$refs.quoteNameInput) this.$refs.quoteNameInput.value = '';
+                            if (this.$refs.descriptionInput) this.$refs.descriptionInput.value = '';
+                        },
+                        'draft'
+                    );
                 },
 
                 submitQuoteRequest(params, resetForm, status) {
