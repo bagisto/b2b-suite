@@ -165,4 +165,5 @@ class Menu extends BaseMenu
 
         $this->removeChildrenUnauthorizedMenuItem($firstChild);
     }
+
 }

@@ -51,7 +51,11 @@ class UserController extends Controller
      */
     public function create()
     {
-        $roles = $this->companyRoleRepository->all();
+        $customer = auth()->guard('customer')->user();
+        
+        $roles = $this->companyRoleRepository->findWhere([
+            'customer_id' => $customer->id
+        ]);
 
         return view('b2b_suite::shop.customers.account.users.create', compact('roles'));
     }
