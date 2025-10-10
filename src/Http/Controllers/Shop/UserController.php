@@ -3,7 +3,7 @@
 namespace Webkul\B2BSuite\Http\Controllers\Shop;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\Json\JsonResponse;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
@@ -246,7 +246,7 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(int $id): JsonResource
+    public function destroy(int $id): JsonResponse
     {
         $companyId = auth()->guard('customer')->user()->id;
 
@@ -259,7 +259,7 @@ class UserController extends Controller
             ! $user
             || ! $user->companies->contains($companyId)
         ) {
-            return new JsonResource([
+            return new JsonResponse([
                 'message' => trans('b2b_suite::app.shop.customers.account.users.un-auth-access'),
             ], 401);
         }
@@ -268,18 +268,18 @@ class UserController extends Controller
             if ($user->orders->whereIn('status', [Order::STATUS_PENDING, Order::STATUS_PROCESSING])->first()) {
                 session()->flash('error', trans('shop::app.customers.account.profile.index.order-pending'));
 
-                return new JsonResource([
+                return new JsonResponse([
                     'message' => trans('shop::app.customers.account.profile.index.order-pending'),
                 ], 422);
             }
 
             $this->customerRepository->delete($id);
 
-            return new JsonResource([
+            return new JsonResponse([
                 'message' => trans('b2b_suite::app.shop.customers.account.users.delete-success'),
             ]);
         } catch (\Exception $e) {
-            return new JsonResource([
+            return new JsonResponse([
                 'message' => trans('b2b_suite::app.shop.customers.account.users.delete-failed'),
             ], 500);
         }
