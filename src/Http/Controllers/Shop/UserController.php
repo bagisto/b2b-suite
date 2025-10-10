@@ -52,9 +52,13 @@ class UserController extends Controller
     public function create()
     {
         $customer = auth()->guard('customer')->user();
-        
+       
+        $currentRole = $this->companyRoleRepository->find($customer->company_role_id);
+
+        $companyAdminId = $currentRole->customer_id;
+
         $roles = $this->companyRoleRepository->findWhere([
-            'customer_id' => $customer->id
+            'customer_id' => $companyAdminId,
         ]);
 
         return view('b2b_suite::shop.customers.account.users.create', compact('roles'));
@@ -152,15 +156,15 @@ class UserController extends Controller
     public function edit($id)
     {
         $user = $this->customerRepository->find($id);
+        $loggedInCustomer = auth()->guard('customer')->user();
 
-        if (
-            ! $user
-            || ! $user->companies->contains(auth()->guard('customer')->user()->id)
-        ) {
-            abort(404);
-        }
+        $currentRole = $this->companyRoleRepository->find($loggedInCustomer->company_role_id);
 
-        $roles = $this->companyRoleRepository->all();
+        $companyAdminId = $currentRole->customer_id;
+
+        $roles = $this->companyRoleRepository->findWhere([
+            'customer_id' => $companyAdminId,
+        ]);
 
         return view('b2b_suite::shop.customers.account.users.edit', compact('user', 'roles'));
     }
