@@ -51,6 +51,7 @@ class UserDataGrid extends DataGrid
             )
             ->addSelect(DB::raw('CONCAT(' . $tablePrefix . 'customers.first_name, " ", ' . $tablePrefix . 'customers.last_name) as full_name'))
             ->where('customers.type', 'user')
+            ->where('customers.id', '!=', $customer->id)
             ->groupBy('customers.id');
 
         $queryBuilder = $queryBuilder->join('customer_companies', function ($join) use ($companyId) {

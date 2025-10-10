@@ -870,11 +870,11 @@ return [
                 ],
 
                 'users' => [
-                    'create-success' => 'Success: User created successfully.',
-                    'update-success' => 'Success: User updated successfully.',
-                    'delete-success' => 'Success: User deleted successfully.',
-                    'delete-failed'  => 'Warning: You cannot delete this user.',
-                    'edit-fail'      => 'Warning: You cannot edit this user.',
+                    'create-success' => 'User created successfully.',
+                    'update-success' => 'User updated successfully.',
+                    'delete-success' => 'User deleted successfully.',
+                    'delete-failed'  => 'You cannot delete this user.',
+                    'edit-fail'      => 'You cannot edit this user.',
                     'un-auth-access' => 'You are not authorized to access this action.',
 
                     'index' => [
