@@ -29,7 +29,7 @@ class QuoteRequest extends FormRequest
             'status'        => ['sometimes', 'required', 'in:draft,open,submitted,negotiation,ordered,cancelled,rejected,closed'],
             'cart_id'       => ['required'],
             'attachments'   => ['sometimes', 'array'],
-            'attachments.*' => ['mimes:bmp,jpeg,jpg,png,webp'],
+            'attachments.*' => ['mimes:doc,docx,xls,xlsx,pdf,txt,jpg,png,jpeg'],
         ];
     }
 }

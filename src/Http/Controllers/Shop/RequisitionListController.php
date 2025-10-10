@@ -306,6 +306,10 @@ class RequisitionListController extends Controller
 
         foreach ($requisitionItems as $item) {
             $additional = $item->additional ? json_decode($item->additional, true) : [];
+            
+            $additional['quantity'] = $item->qty ?? 1;
+            
+            $additional['product_id'] = $item->product_id;
 
             try {
                 Cart::addProduct($item->product, $additional);

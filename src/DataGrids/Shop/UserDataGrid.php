@@ -30,8 +30,13 @@ class UserDataGrid extends DataGrid
     public function prepareQueryBuilder()
     {
         $tablePrefix = DB::getTablePrefix();
-
         $customer = auth()->guard('customer')->user();
+
+        $companyId = $customer->type === 'company'
+            ? $customer->id
+            : DB::table('customer_companies')
+                ->where('customer_id', $customer->id)
+                ->value('company_id');
 
         $queryBuilder = DB::table('customers')
             ->leftJoin('customer_groups', 'customers.customer_group_id', '=', 'customer_groups.id')
@@ -42,24 +47,20 @@ class UserDataGrid extends DataGrid
                 'customers.gender',
                 'customers.status',
                 'customers.is_suspended',
-                'customer_groups.name as group',
+                'customer_groups.name as group'
             )
-            ->addSelect(DB::raw('CONCAT('.$tablePrefix.'customers.first_name, " ", '.$tablePrefix.'customers.last_name) as full_name'))
+            ->addSelect(DB::raw('CONCAT(' . $tablePrefix . 'customers.first_name, " ", ' . $tablePrefix . 'customers.last_name) as full_name'))
             ->where('customers.type', 'user')
             ->groupBy('customers.id');
 
-        if ($customer && $customer->type === 'user') {
-            $queryBuilder = $queryBuilder->whereRaw('0 = 1');
-        } else {
-            $queryBuilder = $queryBuilder->leftJoin('customer_companies', function ($join) use ($customer) {
-                $join->on('customers.id', '=', 'customer_companies.customer_id')
-                    ->where('customer_companies.company_id', $customer->id);
-            });
-        }
+        $queryBuilder = $queryBuilder->join('customer_companies', function ($join) use ($companyId) {
+            $join->on('customers.id', '=', 'customer_companies.customer_id')
+                ->where('customer_companies.company_id', $companyId);
+        });
 
         $this->addFilter('user_id', 'customers.id');
         $this->addFilter('email', 'customers.email');
-        $this->addFilter('full_name', DB::raw('CONCAT('.$tablePrefix.'customers.first_name, " ", '.$tablePrefix.'customers.last_name)'));
+        $this->addFilter('full_name', DB::raw('CONCAT(' . $tablePrefix . 'customers.first_name, " ", ' . $tablePrefix . 'customers.last_name)'));
         $this->addFilter('group', 'customer_groups.name');
         $this->addFilter('phone', 'customers.phone');
         $this->addFilter('status', 'customers.status');

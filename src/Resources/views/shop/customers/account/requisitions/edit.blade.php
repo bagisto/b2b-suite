@@ -603,7 +603,7 @@
                             this.$refs.updateRequisitionModal.close();
                             
                             if (response.data.redirect_url) {
-                                // window.location.href = response.data.redirect_url;
+                                window.location.href = response.data.redirect_url;
                             }
 
                             resetForm();

@@ -939,10 +939,10 @@ return [
                 ],
 
                 'roles' => [
-                    'create-success' => 'Success: Role created successfully.',
-                    'update-success' => 'Success: Role updated successfully.',
-                    'delete-success' => 'Success: Role deleted successfully.',
-                    'delete-failed'  => 'Warning: You cannot delete this role.',
+                    'create-success' => 'Role created successfully.',
+                    'update-success' => 'Role updated successfully.',
+                    'delete-success' => 'Role deleted successfully.',
+                    'delete-failed'  => 'You cannot delete this role.',
 
                     'index' => [
                         'title'   => 'Company Roles',

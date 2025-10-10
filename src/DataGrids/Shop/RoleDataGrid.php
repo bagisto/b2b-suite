@@ -14,13 +14,20 @@ class RoleDataGrid extends DataGrid
      */
     public function prepareQueryBuilder()
     {
+        $customer = auth()->guard('customer')->user();
+        $companyId = $customer->type === 'company'
+            ? $customer->id
+            : DB::table('customer_companies')
+                ->where('customer_id', $customer->id)
+                ->value('company_id');
+
         return DB::table('company_roles')
             ->select(
                 'company_roles.id as role_id',
                 'company_roles.name',
                 'company_roles.permission_type'
             )
-            ->where('company_roles.customer_id', auth()->guard('customer')->user()->id);
+            ->where('company_roles.customer_id', $companyId);
     }
 
     /**

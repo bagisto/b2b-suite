@@ -34,8 +34,10 @@
 
         {!! view_render_event('bagisto.admin.settings.roles.edit.edit_form_controls.before', ['role' => $role]) !!}
 
-        <x-shop::form :action="route('shop.customers.account.roles.update', $role->id)">
-
+        <x-shop::form
+             :action="route('shop.customers.account.roles.update', $role->id)"
+             method="PUT"
+        >
             <!-- Name -->
             <x-shop::form.control-group>
                 <x-shop::form.control-group.label class="required">

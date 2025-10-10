@@ -29,10 +29,14 @@ class CustomerBouncerMiddleware
         $roles = b2b_suite_acl()->getRoles();
 
         if (isset($roles[$routeName])) {
-            $aclKey = $roles[$routeName];
+            $aclKey = 'account.' . $roles[$routeName];
 
-            CustomerBouncer::allow($aclKey);
-        }
+            try {
+                CustomerBouncer::allow($aclKey);
+            } catch (\Exception $e) {
+                abort(401, 'Unauthorized action.');
+            }
+        } 
 
         return $next($request);
     }
@@ -61,7 +65,7 @@ class CustomerBouncerMiddleware
         }
 
         if (
-            $role->permission_type !== 'all' 
+            $role->permission_type !== 'all'
             && empty($role->permissions)
         ) {
             return true;
@@ -81,9 +85,13 @@ class CustomerBouncerMiddleware
         $currentRoute = Route::currentRouteName();
 
         if (isset($roles[$currentRoute])) {
-            $aclKey = $roles[$currentRoute];
+            $aclKey = 'account.' . $roles[$currentRoute];
 
-            CustomerBouncer::allow($aclKey);
+            try {
+                CustomerBouncer::allow($aclKey);
+            } catch (\Exception $e) {
+                abort(401, 'Unauthorized action.');
+            }
         }
     }
 }
