@@ -21,6 +21,11 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
     public function prepareQueryBuilder()
     {
         $tablePrefix = DB::getTablePrefix();
+        $currentAdmin = auth()->guard('customer')->user();
+
+        $companyId = DB::table('customer_companies')
+            ->where('customer_id', $currentAdmin->id)
+            ->value('company_id') ?? $currentAdmin->id;
 
         $queryBuilder = DB::table('customer_quotes')
             ->distinct()
@@ -49,7 +54,7 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
                 CustomerQuote::STATUS_ORDERED,
                 CustomerQuote::STATUS_COMPLETED,
             ])
-            ->where('customer_quotes.customer_id', auth()->guard('customer')->user()->id);
+            ->where('customer_quotes.company_id', $companyId);
 
         $this->addFilter('po_number', 'customer_quotes.po_number');
         $this->addFilter('name', 'customer_quotes.name');
@@ -103,6 +108,17 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
             'sortable'   => true,
             'closure'    => function ($row) {
                 return core()->formatPrice($row->base_total, core()->getCurrentCurrencyCode());
+            },
+        ]);
+
+        $this->addColumn([
+            'index'      => 'negotiated_total',
+            'label'      => trans('b2b_suite::app.shop.customers.account.quotes.index.datagrid.negotiated_total'),
+            'type'       => 'decimal',
+            'filterable' => true,
+            'sortable'   => true,
+            'closure'    => function ($row) {
+                return core()->formatPrice($row->negotiated_total, core()->getCurrentCurrencyCode());
             },
         ]);
 

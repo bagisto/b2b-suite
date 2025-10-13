@@ -121,7 +121,16 @@ class UserController extends Controller
 
         $customer = $this->customerRepository->create($data);
 
-        $customer->companies()->sync([auth()->guard('customer')->user()->id]);
+        $currentAdmin = $this->customerRepository->find(auth()->guard('customer')->user());
+
+        if ($currentAdmin->type === 'company') {
+            $companyAdminId = $currentAdmin->id;
+        } else {
+            $companyAdmin = $currentAdmin->companies()->first();
+            $companyAdminId = $companyAdmin ? $companyAdmin->id : $currentAdmin->id;
+        }
+
+        $customer->companies()->sync([$companyAdminId]);
 
         Event::dispatch('customer.create.after', $customer);
 

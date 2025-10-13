@@ -67,13 +67,23 @@ class RoleController extends Controller
 
         Event::dispatch('customer.role.create.before');
 
+        $currentAdmin = $this->customerRepository->find(auth()->guard('customer')->user()->id);
+
+        if ($currentAdmin->type === 'company') {
+            $companyId = $currentAdmin->id;
+        } else {
+            $company = $currentAdmin->companies()->first();
+
+            $companyId = $company ? $company->id : $currentAdmin->id;
+        }
+
         $data = array_merge(request()->only([
             'name',
             'description',
             'permission_type',
             'permissions',
         ]), [
-            'customer_id' => auth()->guard('customer')->user()->id,
+            'customer_id' => $companyId,
         ]);
 
         $role = $this->companyRoleRepository->create($data);

@@ -174,7 +174,7 @@ class UserDataGrid extends DataGrid
                     return '<p class="label-canceled">'.trans('b2b_suite::app.shop.customers.account.users.index.datagrid.suspended').'</p>';
                 }
 
-                return '-';
+                return '<p class="label-active">'.trans('b2b_suite::app.shop.customers.account.users.index.datagrid.not-suspended').'</p>';
             },
         ]);
     }

@@ -93,21 +93,36 @@ class QuoteController extends Controller
      */
     public function view($id)
     {
-        $customer = $this->customerRepository->find(auth()->guard('customer')->user()->id);
+        $currentAdmin = $this->customerRepository->find(auth()->guard('customer')->user()->id);
 
-        $quote = $this->customerQuoteRepository->with(['company', 'agent', 'attachments'])->findOneWhere([
-            'id'          => $id,
-            'customer_id' => $customer->id,
-            'state'       => CustomerQuote::STATE_QUOTATION,
-        ]);
+        $quoteConditions = [
+            'id'    => $id,
+            'state' => CustomerQuote::STATE_QUOTATION,
+        ];
+
+        if ($currentAdmin->type === 'company') {
+            $quoteConditions['company_id'] = $currentAdmin->id;
+        } else {
+            $company = $currentAdmin->companies()->first();
+
+            if ($company) {
+                $quoteConditions['company_id'] = $company->id;
+            } else {
+                $quoteConditions['customer_id'] = $currentAdmin->id;
+            }
+        }
+
+        $quote = $this->customerQuoteRepository->with(['company', 'agent', 'attachments'])->findOneWhere($quoteConditions);
 
         if (! $quote) {
-            abort(404);
+            session()->flash('error', trans('b2b_suite::app.shop.customers.account.quotes.not-found'));
+
+            return redirect()->route('shop.customers.account.quotes.index');
         }
 
         $isAdminLastQuotation = $this->customerQuoteMessageRepository->getLastQuotationMessage($quote->id, 'admin');
 
-        return view('b2b_suite::shop.customers.account.quotes.view', compact('customer', 'quote', 'isAdminLastQuotation'));
+        return view('b2b_suite::shop.customers.account.quotes.view', compact('currentAdmin', 'quote', 'isAdminLastQuotation'));
     }
 
     /**
@@ -178,7 +193,7 @@ class QuoteController extends Controller
                 'customer_id' => $customerId,
             ]);
 
-            if (! $quote || $quote->status != 'accepted') {
+            if (! $quote || $quote->status != CustomerQuote::STATUS_ACCEPTED) {
                 session()->flash('error', trans('b2b_suite::app.shop.customers.account.quotes.view.un-authorized-quote'));
 
                 return redirect()->back();
@@ -204,18 +219,16 @@ class QuoteController extends Controller
         $quote = $this->customerQuoteRepository->findOrFail($id);
         $attachment = $this->customerQuoteAttachmentRepository->findOrFail($attachmentId);
 
-        // Ensure the attachment belongs to the quote
         if ($attachment->customer_quote_id != $quote->id) {
-            abort(403, 'Unauthorized download.');
+            session()->flash('error', trans('b2b_suite::app.shop.customers.account.quotes.view.un-authorized-quote'));
         }
 
         $fileName = substr($attachment->path, strrpos($attachment->path, '/') + 1);
 
-        // Check if the file exists
         if (Storage::disk('public')->exists($attachment->path)) {
             return Storage::disk('public')->download($attachment->path, $fileName);
         } else {
-            abort(404, 'Attachment not found.');
+            session()->flash('error', trans('b2b_suite::app.shop.customers.account.quotes.view.no-attachment'));
         }
     }
 
@@ -224,18 +237,29 @@ class QuoteController extends Controller
      */
     public function submitQuote(Request $request, $id)
     {
-        $customerId = auth()->guard('customer')->user()->id;
+        $request->validate([
+            'items'   => ['required', 'array', 'min:1'],
+            'message' => 'required|string|max:1000',
+        ]);
+
+        $currentAdmin = $this->customerRepository->find(auth()->guard('customer')->user()->id);
 
         try {
-            $request->validate([
-                'items'   => ['required', 'array', 'min:1'],
-                'message' => 'required|string|max:1000',
-            ]);
+            $quoteConditions = ['id' => $id];
 
-            $quote = $this->customerQuoteRepository->findOneWhere([
-                'id'          => $id,
-                'customer_id' => $customerId,
-            ]);
+            if ($currentAdmin->type === 'company') {
+                $quoteConditions['company_id'] = $currentAdmin->id;
+            } else {
+                $company = $currentAdmin->companies()->first();
+
+                if ($company) {
+                    $quoteConditions['company_id'] = $company->id;
+                } else {
+                    $quoteConditions['customer_id'] = $currentAdmin->id;
+                }
+            }
+
+            $quote = $this->customerQuoteRepository->findOneWhere($quoteConditions);
 
             if (! $quote) {
                 session()->flash('error', trans('b2b_suite::app.shop.customers.account.quotes.view.un-authorized-quote'));
@@ -243,26 +267,26 @@ class QuoteController extends Controller
                 return redirect()->back();
             }
 
-            $quoteStatus = $quote->status == 'draft' ? 'open' : 'negotiation';
+            $quoteStatus = $quote->status === CustomerQuote::STATUS_DRAFT
+                ? CustomerQuote::STATUS_OPEN
+                : CustomerQuote::STATUS_NEGOTIATION;
 
             $message = $quote->messages()->create([
                 'message'    => $request->message,
                 'user_type'  => 'customer',
-                'user_id'    => $customerId,
+                'user_id'    => $currentAdmin->id,
                 'created_at' => now(),
             ]);
 
             $data = array_merge([
                 'status'     => $quoteStatus,
                 'message_id' => $message->id,
-            ], $request->only([
-                'items',
-                'message',
-            ]));
+            ], $request->only(['items', 'message']));
 
             $this->customerQuoteRepository->createOrUpdateMessageQuotation($data, $id);
 
-            return redirect()->route('shop.customers.account.quotes.view', $id)
+            return redirect()
+                ->route('shop.customers.account.quotes.view', $id)
                 ->with('success', trans('b2b_suite::app.shop.customers.account.quotes.view.quote-submitted'));
 
         } catch (\Exception $e) {
@@ -321,17 +345,30 @@ class QuoteController extends Controller
      */
     public function sendMessage(Request $request, $id)
     {
-        $customerId = auth()->guard('customer')->user()->id;
+        $currentAdmin = $this->customerRepository->find(auth()->guard('customer')->user()->id);
 
         try {
             $request->validate([
                 'message' => 'required|string|max:1000',
             ]);
 
-            $quote = $this->customerQuoteRepository->findOneWhere([
-                'id'          => $id,
-                'customer_id' => $customerId,
-            ]);
+            $quoteConditions = [
+                'id' => $id,
+            ];
+
+            if ($currentAdmin->type === 'company') {
+                $quoteConditions['company_id'] = $currentAdmin->id;
+            } else {
+                $company = $currentAdmin->companies()->first();
+
+                if ($company) {
+                    $quoteConditions['company_id'] = $company->id;
+                } else {
+                    $quoteConditions['customer_id'] = $currentAdmin->id;
+                }
+            }
+
+            $quote = $this->customerQuoteRepository->findOneWhere($quoteConditions);
 
             if (! $quote) {
                 session()->flash('error', trans('b2b_suite::app.shop.customers.account.quotes.view.un-authorized-quote'));
@@ -342,7 +379,7 @@ class QuoteController extends Controller
             $quote->messages()->create([
                 'message'    => $request->message,
                 'user_type'  => 'customer',
-                'user_id'    => $customerId,
+                'user_id'    => $currentAdmin->id,
                 'created_at' => now(),
             ]);
 
@@ -363,12 +400,23 @@ class QuoteController extends Controller
             'message' => 'required|string|max:1000',
         ]);
 
-        $customerId = auth()->guard('customer')->user()->id;
+        $currentAdmin = $this->customerRepository->find(auth()->guard('customer')->user()->id);
 
-        $quote = $this->customerQuoteRepository->findOneWhere([
-            'id'          => $id,
-            'customer_id' => $customerId,
-        ]);
+        $quoteConditions = ['id' => $id];
+
+        if ($currentAdmin->type === 'company') {
+            $quoteConditions['company_id'] = $currentAdmin->id;
+        } else {
+            $company = $currentAdmin->companies()->first();
+
+            if ($company) {
+                $quoteConditions['company_id'] = $company->id;
+            } else {
+                $quoteConditions['customer_id'] = $currentAdmin->id;
+            }
+        }
+
+        $quote = $this->customerQuoteRepository->findOneWhere($quoteConditions);
 
         if (! $quote) {
             session()->flash('error', trans('b2b_suite::app.shop.customers.account.quotes.view.un-authorized-quote'));
@@ -376,29 +424,32 @@ class QuoteController extends Controller
             return redirect()->back();
         }
 
-        $quote->status = 'accepted';
-
-        $quote->save();
+        $quote->update(['status' => CustomerQuote::STATUS_ACCEPTED]);
 
         $quote->messages()->create([
             'message'    => $request->message,
             'status'     => trans('b2b_suite::app.shop.customers.account.quotes.view.'.$quote->status),
             'user_type'  => 'customer',
-            'user_id'    => $customerId,
+            'user_id'    => $currentAdmin->id,
             'created_at' => now(),
         ]);
 
-        $isAdminLastQuotation = $this->customerQuoteMessageRepository->getLastQuotationMessage($quote->id, 'admin');
+        $isAdminLastQuotation = $this->customerQuoteMessageRepository
+            ->getLastQuotationMessage($quote->id, 'admin');
 
-        $this->customerQuoteQuotationRepository->updateOrCreate([
-            'message_id' => $isAdminLastQuotation?->id,
-            'quote_id'   => $quote->id,
-        ], [
-            'is_accepted' => 1,
-            'accepted_by' => 'customer',
-        ]);
+        $this->customerQuoteQuotationRepository->updateOrCreate(
+            [
+                'message_id' => $isAdminLastQuotation?->id,
+                'quote_id'   => $quote->id,
+            ],
+            [
+                'is_accepted' => 1,
+                'accepted_by' => 'customer',
+            ]
+        );
 
-        return redirect()->route('shop.customers.account.quotes.view', $id)
+        return redirect()
+            ->route('shop.customers.account.quotes.view', $id)
             ->with('success', trans('b2b_suite::app.shop.customers.account.quotes.view.quote-accepted'));
     }
 
@@ -407,17 +458,28 @@ class QuoteController extends Controller
      */
     public function rejectQuote(Request $request, $id)
     {
-        $customerId = auth()->guard('customer')->user()->id;
+        $request->validate([
+            'message' => 'required|string|max:1000',
+        ]);
+
+        $currentAdmin = $this->customerRepository->find(auth()->guard('customer')->user()->id);
 
         try {
-            $request->validate([
-                'message' => 'required|string|max:1000',
-            ]);
+            $quoteConditions = ['id' => $id];
 
-            $quote = $this->customerQuoteRepository->findOneWhere([
-                'id'          => $id,
-                'customer_id' => $customerId,
-            ]);
+            if ($currentAdmin->type === 'company') {
+                $quoteConditions['company_id'] = $currentAdmin->id;
+            } else {
+                $company = $currentAdmin->companies()->first();
+
+                if ($company) {
+                    $quoteConditions['company_id'] = $company->id;
+                } else {
+                    $quoteConditions['customer_id'] = $currentAdmin->id;
+                }
+            }
+
+            $quote = $this->customerQuoteRepository->findOneWhere($quoteConditions);
 
             if (! $quote) {
                 session()->flash('error', trans('b2b_suite::app.shop.customers.account.quotes.view.un-authorized-quote'));
@@ -425,19 +487,18 @@ class QuoteController extends Controller
                 return redirect()->back();
             }
 
-            $quote->status = 'rejected';
-
-            $quote->save();
+            $quote->update(['status' => CustomerQuote::STATUS_REJECTED]);
 
             $quote->messages()->create([
                 'message'    => $request->message,
                 'status'     => trans('b2b_suite::app.shop.customers.account.quotes.view.'.$quote->status),
                 'user_type'  => 'customer',
-                'user_id'    => auth()->guard('customer')->user()->id,
+                'user_id'    => $currentAdmin->id,
                 'created_at' => now(),
             ]);
 
-            return redirect()->route('shop.customers.account.quotes.view', $id)
+            return redirect()
+                ->route('shop.customers.account.quotes.view', $id)
                 ->with('success', trans('b2b_suite::app.shop.customers.account.quotes.view.quote-rejected'));
 
         } catch (\Exception $e) {

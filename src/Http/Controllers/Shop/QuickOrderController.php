@@ -145,10 +145,10 @@ class QuickOrderController extends Controller
             ->setSearchEngine($searchEngine)
             ->getAll($params);
 
-        if( $products->isEmpty() ) {
+        if ($products->isEmpty()) {
             $params = [
                 'index'      => $indexNames ?? null,
-                'sku'      => request('query'),
+                'sku'        => request('query'),
                 'sort'       => 'created_at',
                 'order'      => 'desc',
                 'channel_id' => $channelId,
