@@ -264,7 +264,7 @@ class QuoteController extends Controller
 
             $message = $quote->messages()->create([
                 'message'    => $request->message,
-                'status'     => trans('b2b_suite::app.shop.customers.account.quotes.view.' . $quote->status),
+                'status'     => trans('b2b_suite::app.shop.customers.account.quotes.view.'.$quote->status),
                 'user_type'  => 'admin',
                 'user_id'    => $adminId,
                 'created_at' => now(),
@@ -283,13 +283,13 @@ class QuoteController extends Controller
                     'accepted_by' => 'admin',
                 ]);
             }
-            
+
             return redirect()->route('admin.customers.quotes.view', $id)
                 ->with('success', trans('b2b_suite::app.admin.quotes.view.quote-accepted'));
 
         } catch (\Exception $e) {
             return redirect()->back()->withErrors([
-                'error' => trans('b2b_suite::app.admin.quotes.view.error-message')
+                'error' => trans('b2b_suite::app.admin.quotes.view.error-message'),
             ]);
         }
     }

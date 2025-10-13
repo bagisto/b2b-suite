@@ -49,7 +49,7 @@ class UserDataGrid extends DataGrid
                 'customers.is_suspended',
                 'customer_groups.name as group'
             )
-            ->addSelect(DB::raw('CONCAT(' . $tablePrefix . 'customers.first_name, " ", ' . $tablePrefix . 'customers.last_name) as full_name'))
+            ->addSelect(DB::raw('CONCAT('.$tablePrefix.'customers.first_name, " ", '.$tablePrefix.'customers.last_name) as full_name'))
             ->where('customers.type', 'user')
             ->where('customers.id', '!=', $customer->id)
             ->groupBy('customers.id');
@@ -61,7 +61,7 @@ class UserDataGrid extends DataGrid
 
         $this->addFilter('user_id', 'customers.id');
         $this->addFilter('email', 'customers.email');
-        $this->addFilter('full_name', DB::raw('CONCAT(' . $tablePrefix . 'customers.first_name, " ", ' . $tablePrefix . 'customers.last_name)'));
+        $this->addFilter('full_name', DB::raw('CONCAT('.$tablePrefix.'customers.first_name, " ", '.$tablePrefix.'customers.last_name)'));
         $this->addFilter('group', 'customer_groups.name');
         $this->addFilter('phone', 'customers.phone');
         $this->addFilter('status', 'customers.status');

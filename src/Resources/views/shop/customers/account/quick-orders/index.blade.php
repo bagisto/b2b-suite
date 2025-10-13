@@ -110,7 +110,7 @@
                                 <p class="break-all text-base font-semibold text-gray-800">
                                     @{{ product.name }}
                                 </p>
-                                <p class="text-gray-600">SKU: @{{ product.sku }}</p>
+                                <p class="text-gray-600">@lang('b2b_suite::app.shop.customers.account.quick-orders.sku') @{{ product.sku }}</p>
                                 <p class="font-semibold text-gray-800">@{{ product.formatted_price }}</p>
                             </div>
                         </div>
@@ -130,7 +130,7 @@
 
                 <!-- Selected Products -->
                 <div v-if="selectedProducts.length" class="mt-6 rounded-lg border p-4">
-                    <h3 class="mb-3 font-semibold">Selected Products</h3>
+                    <h3 class="mb-3 font-semibold">@lang('b2b_suite::app.shop.customers.account.quick-orders.selected-products')</h3>
 
                     <div
                         v-for="(product, index) in selectedProducts"
@@ -347,7 +347,10 @@
 
                     submitList() {
                         if (!this.selectedProducts.length && !this.uploadFile) {
-                            alert("Please add products to the list or upload a file.");
+                            this.$emitter.emit('add-flash', { 
+                                type: 'error', 
+                                message: '@lang("b2b_suite::app.shop.checkout.cart.request-failed")' 
+                            });
                             return;
                         }
 
@@ -372,13 +375,19 @@
                             const fileExtension = this.uploadFile.name.split('.').pop().toLowerCase();
 
                             if (!allowedTypes.includes(this.uploadFile.type) && fileExtension !== 'csv') {
-                                alert("Invalid file type. Only CSV files are allowed.");
+                                this.$emitter.emit('add-flash', { 
+                                    type: 'error', 
+                                    message: '@lang("b2b_suite::app.shop.checkout.cart.invalid-file-type")' 
+                                });
                                 return;
                             }
 
                             const maxSizeBytes = this.maxFileSizeMB * 1024 * 1024;
                             if (this.uploadFile.size > maxSizeBytes) {
-                                alert(`File size exceeds ${this.maxFileSizeMB} MB.`);
+                                this.$emitter.emit('add-flash', { 
+                                    type: 'error', 
+                                    message: '@lang("b2b_suite::app.shop.checkout.cart.file-size-exceeds")'.replace(':size', this.maxFileSizeMB) 
+                                });
                                 return;
                             }
                             
@@ -391,12 +400,28 @@
                             }
                         })
                         .then((response) => {
-                            if (response.data.redirect_url) {
-                                window.location.href = response.data.redirect_url;
-                            }
-                        })
+                                if (response.data.status) {
+                                    if (response.data.message) {
+                                        this.$emitter.emit('add-flash', { 
+                                            type: 'success', 
+                                            message: response.data.message 
+                                        });
+                                    }
+                                    if (response.data.redirect_url) {
+                                        window.location.href = response.data.redirect_url;
+                                    }
+                                } else if (response.data.message) {
+                                    this.$emitter.emit('add-flash', { 
+                                        type: 'error', 
+                                        message: response.data.message 
+                                    });
+                                }
+                            })
                         .catch((error) => {
-                            console.error(error);
+                            this.$emitter.emit('add-flash', { 
+                                type: 'error', 
+                                message: error.response?.data?.message || '@lang("b2b_suite::app.shop.checkout.cart.request-failed")' 
+                            });
                         });
                     }
                 }

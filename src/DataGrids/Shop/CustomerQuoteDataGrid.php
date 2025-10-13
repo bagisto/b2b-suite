@@ -46,7 +46,7 @@ class CustomerQuoteDataGrid extends DataGrid
                 'customer_quotes.created_at',
                 'customer_quotes.updated_at'
             )
-            ->addSelect(DB::raw('CONCAT(' . $tablePrefix . 'company.first_name, " ", ' . $tablePrefix . 'company.last_name) as company_name'))
+            ->addSelect(DB::raw('CONCAT('.$tablePrefix.'company.first_name, " ", '.$tablePrefix.'company.last_name) as company_name'))
             ->where('customer_quotes.soft_deleted', 0)
             ->where('customer_quotes.state', CustomerQuote::STATE_QUOTATION)
             ->whereIn('customer_quotes.status', [
@@ -64,7 +64,7 @@ class CustomerQuoteDataGrid extends DataGrid
         $this->addFilter('status', 'customer_quotes.status');
         $this->addFilter('base_total', 'customer_quotes.base_total');
         $this->addFilter('negotiated_total', 'customer_quotes.negotiated_total');
-        $this->addFilter('company_name', DB::raw('CONCAT(' . $tablePrefix . 'company.first_name, " ", ' . $tablePrefix . 'company.last_name)'));
+        $this->addFilter('company_name', DB::raw('CONCAT('.$tablePrefix.'company.first_name, " ", '.$tablePrefix.'company.last_name)'));
         $this->addFilter('created_at', 'customer_quotes.created_at');
 
         return $queryBuilder;

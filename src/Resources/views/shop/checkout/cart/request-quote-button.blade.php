@@ -22,7 +22,7 @@
         v-else
     >
         <p class="text-sm text-red-600">
-            {{ $minimumAmountMessage ?? __('b2b_suite::app.shop.checkout.cart.minimum-amount-required') }}
+            {{ $minimumAmountMessage ?? trans('b2b_suite::app.shop.checkout.cart.minimum-amount-required') }}
         </p>
     </div>
 

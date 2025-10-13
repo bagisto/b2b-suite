@@ -2,8 +2,8 @@
 
 namespace Webkul\B2BSuite\Http\Controllers\Shop;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
@@ -52,7 +52,7 @@ class UserController extends Controller
     public function create()
     {
         $customer = auth()->guard('customer')->user();
-       
+
         $currentRole = $this->companyRoleRepository->find($customer->company_role_id);
 
         $companyAdminId = $currentRole->customer_id;
