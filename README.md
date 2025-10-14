@@ -17,9 +17,9 @@ The **Bagisto B2B Ecommerce** is a comprehensive package designed to extend the 
 
 **Features include:**
 
-# Bagisto B2B Ecommerce Extension
+# Bagisto B2B Ecommerce
 
-The **Bagisto B2B Ecommerce Extension** enhances your Bagisto store with advanced Business-to-Business (B2B) features. It enables company-based purchasing, multi-user access, quote negotiation, and procurement management — empowering businesses to handle B2B workflows efficiently within a single platform.
+The **Bagisto B2B Ecommerce** enhances your Bagisto store with advanced Business-to-Business (B2B) features. It enables company-based purchasing, multi-user access, quote negotiation, and procurement management — empowering businesses to handle B2B workflows efficiently within a single platform.
 
 ## Key Features
 
