@@ -121,7 +121,7 @@ class UserController extends Controller
 
         $customer = $this->customerRepository->create($data);
 
-        $currentAdmin = $this->customerRepository->find(auth()->guard('customer')->user());
+        $currentAdmin = auth()->guard('customer')->user();
 
         if ($currentAdmin->type === 'company') {
             $companyAdminId = $currentAdmin->id;
@@ -242,7 +242,7 @@ class UserController extends Controller
                 }
             }
 
-            session()->flash('success', trans('b2b_suite::app.shop.customers.account.users.edit-success'));
+            session()->flash('success', trans('b2b_suite::app.shop.customers.account.users.update-success'));
 
             return redirect()->route('shop.customers.account.users.index');
         }

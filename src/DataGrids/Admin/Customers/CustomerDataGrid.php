@@ -53,6 +53,12 @@ class CustomerDataGrid extends DataGrid
             ->addSelect(DB::raw('COUNT(DISTINCT '.$tablePrefix.'addresses.id) as address_count'))
             ->addSelect(DB::raw('COUNT(DISTINCT '.$tablePrefix.'orders.id) as order_count'))
             ->addSelect(DB::raw('CONCAT('.$tablePrefix.'customers.first_name, " ", '.$tablePrefix.'customers.last_name) as full_name'))
+            ->addSelect(DB::raw('SUM(CASE 
+                                        WHEN '.$tablePrefix.'orders.status NOT IN ("canceled", "completed")
+                                        THEN '.$tablePrefix.'orders.base_grand_total_invoiced
+                                        ELSE 0
+                                    END
+                                ) as revenue'))
             ->where('customers.type', 'user')
             ->groupBy('customers.id');
 
@@ -165,12 +171,7 @@ class CustomerDataGrid extends DataGrid
             'index'       => 'revenue',
             'label'       => trans('admin::app.customers.customers.index.datagrid.revenue'),
             'type'        => 'integer',
-            'closure'     => function ($row) {
-                return app(OrderRepository::class)->scopeQuery(function ($q) use ($row) {
-                    return $q->whereNotIn('status', [Order::STATUS_CANCELED, Order::STATUS_COMPLETED])
-                        ->where('customer_id', $row->customer_id);
-                })->sum('base_grand_total_invoiced');
-            },
+            'sortable' => true,
         ]);
 
         $this->addColumn([

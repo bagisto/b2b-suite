@@ -270,9 +270,10 @@ return [
 
         'companies' => [
             'index' => [
-                'title'       => 'Companies',
-                'create-btn'  => 'Create Company',
-                'datagrid'    => [
+                'title'                 => 'Company',
+                'companies-placeholder' => 'Company name',
+                'create-btn'            => 'Create Company',
+                'datagrid'              => [
                     'id'            => 'ID',
                     'name'          => 'Name',
                     'email'         => 'Email',
@@ -633,6 +634,8 @@ return [
                     'request-quote-submit'    => 'Request A Quotation',
                     'default-message'         => 'Your quotation :status successfully.',
                     'create-success'          => 'Your quotation request has been created successfully.',
+                    'required-fields-draft'   => 'Please fill all required fields to save as draft.',
+
                 ],
             ],
         ],
