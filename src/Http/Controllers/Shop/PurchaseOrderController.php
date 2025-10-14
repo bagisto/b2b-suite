@@ -45,14 +45,31 @@ class PurchaseOrderController extends Controller
     {
         $customer = $this->customerRepository->find(auth()->guard('customer')->user()->id);
 
-        $quote = $this->customerQuoteRepository->with(['company', 'agent', 'attachments'])->findOneWhere([
-            'id'          => $id,
-            'customer_id' => $customer->id,
-            'state'       => CustomerQuote::STATE_PURCHASE_ORDER,
-        ]);
+        $quoteConditions = [
+            'id'    => $id,
+            'state' => CustomerQuote::STATE_PURCHASE_ORDER,
+        ];
+
+        if ($customer->type === 'company') {
+            $quoteConditions['company_id'] = $customer->id;
+        } else {
+            $company = $customer->companies()->first();
+
+            if ($company) {
+                $quoteConditions['company_id'] = $company->id;
+            } else {
+                $quoteConditions['customer_id'] = $customer->id;
+            }
+        }
+
+        $quote = $this->customerQuoteRepository
+            ->with(['company', 'agent', 'attachments'])
+            ->findOneWhere($quoteConditions);
 
         if (! $quote) {
-            abort(404);
+            session()->flash('error', trans('b2b_suite::app.shop.customers.account.quotes.view.un-authorized-quote'));
+
+            return redirect()->route('shop.customers.account.purchase_orders.index');
         }
 
         $isAdminLastQuotation = $this->customerQuoteMessageRepository->getLastQuotationMessage($quote->id, 'admin');

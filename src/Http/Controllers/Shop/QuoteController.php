@@ -185,15 +185,29 @@ class QuoteController extends Controller
      */
     public function updateCart($id)
     {
-        $customerId = auth()->guard('customer')->user()->id;
+        $currentAdmin = $this->customerRepository->find(auth()->guard('customer')->user()->id);
 
         try {
-            $quote = $this->customerQuoteRepository->findOneWhere([
-                'id'          => $id,
-                'customer_id' => $customerId,
-            ]);
+            $quoteConditions = [
+                'id'     => $id,
+                'status' => CustomerQuote::STATUS_ACCEPTED,
+            ];
 
-            if (! $quote || $quote->status != CustomerQuote::STATUS_ACCEPTED) {
+            if ($currentAdmin->type === 'company') {
+                $quoteConditions['company_id'] = $currentAdmin->id;
+            } else {
+                $company = $currentAdmin->companies()->first();
+
+                if ($company) {
+                    $quoteConditions['company_id'] = $company->id;
+                } else {
+                    $quoteConditions['customer_id'] = $currentAdmin->id;
+                }
+            }
+
+            $quote = $this->customerQuoteRepository->findOneWhere($quoteConditions);
+
+            if (! $quote) {
                 session()->flash('error', trans('b2b_suite::app.shop.customers.account.quotes.view.un-authorized-quote'));
 
                 return redirect()->back();
