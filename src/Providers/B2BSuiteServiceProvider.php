@@ -65,7 +65,9 @@ class B2BSuiteServiceProvider extends ServiceProvider
     {
         include __DIR__.'/../Http/helpers.php';
 
-        Route::middleware('web')->group(__DIR__.'/../Routes/web.php');
+        if (core()->getConfigData('b2b_suite.general.settings.active')) {
+            Route::middleware('web')->group(__DIR__.'/../Routes/web.php');
+        }
 
         Route::aliasMiddleware('customer_bouncer', CustomerBouncerMiddleware::class);
 
