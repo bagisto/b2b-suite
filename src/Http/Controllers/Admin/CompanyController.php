@@ -13,6 +13,7 @@ use Webkul\B2BSuite\Http\Requests\CompanyRequest;
 use Webkul\B2BSuite\Http\Resources\CustomerResource;
 use Webkul\B2BSuite\Repositories\CompanyAttributeGroupRepository;
 use Webkul\B2BSuite\Repositories\CompanyAttributeValueRepository;
+use Webkul\B2BSuite\Repositories\CompanyRoleRepository;
 use Webkul\B2BSuite\Repositories\CustomerFlatRepository;
 use Webkul\Customer\Repositories\CustomerRepository;
 
@@ -25,7 +26,8 @@ class CompanyController extends Controller
         protected CustomerRepository $customerRepository,
         protected CustomerFlatRepository $customerFlatRepository,
         protected CompanyAttributeGroupRepository $companyAttributeGroupRepository,
-        protected CompanyAttributeValueRepository $companyAttributeValueRepository
+        protected CompanyAttributeValueRepository $companyAttributeValueRepository,
+        protected CompanyRoleRepository $companyRoleRepository
     ) {}
 
     /**
@@ -129,6 +131,20 @@ class CompanyController extends Controller
             $customer,
             $customer->custom_attributes
         );
+
+        $role = $this->companyRoleRepository->create([
+            'name'            => 'Administrator',
+            'description'     => 'All permissions',
+            'permission_type' => 'all',
+            'permissions'     => null,
+            'customer_id'     => $customer->id,
+            'created_at'      => now(),
+            'updated_at'      => now(),
+        ]);
+
+        $customer->update(['company_role_id' => $role->id]);
+
+        $customer->companies()->attach($customer->id);
 
         Event::dispatch('customer.registration.after', $customer);
 
