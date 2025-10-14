@@ -60,6 +60,8 @@ class QuoteController extends Controller
 
         $quoteNumber = $this->customerQuoteRepository->generateQuotationNumber(null);
 
+        $defaultExpirationDays = core()->getConfigData('b2b_suite.quotes.settings.default_expiration_period') ?? 0;
+
         $data = array_merge([
             'quotation_number' => $quoteNumber['quotation_number'],
             'po_number'        => $quoteNumber['po_number'],
@@ -67,6 +69,7 @@ class QuoteController extends Controller
             'company_id'       => $customerCompany ? $customerCompany->id : null,
             'agent_id'         => $this->adminRepository->first()?->id ?? null,
             'customer_name'    => $customer->name,
+            'expiration_date'  => now()->addDays($defaultExpirationDays)->toDateString(),
         ], $quoteRequest->only([
             'name',
             'description',
