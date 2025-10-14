@@ -17,12 +17,9 @@ The **Bagisto B2B Ecommerce** is a comprehensive package designed to extend the 
 
 **Features include:**
 
-# Bagisto B2B Ecommerce
+# Bagisto B2B Suite Extension
 
-The **Bagisto B2B Ecommerce** enhances your Bagisto store with advanced Business-to-Business (B2B) features. It enables company-based purchasing, multi-user access, quote negotiation, and procurement management — empowering businesses to handle B2B workflows efficiently within a single platform.
-
-![Bagisto B2B Ecommerce Image](https://github.com/bagisto/temp-media/blob/master/b2b-ecommerce-main-banner.webp)
-
+The **Bagisto B2B Suite Extension** enhances your Bagisto store with advanced Business-to-Business (B2B) features. It enables company-based purchasing, multi-user access, quote negotiation, and procurement management — empowering businesses to handle B2B workflows efficiently within a single platform.
 
 ## Key Features
 
@@ -38,19 +35,16 @@ The **Bagisto B2B Ecommerce** enhances your Bagisto store with advanced Business
 * **Companies Management (Admin End)** – Admin can create companies and manage from backend.
 * **Purchase Orders (Admin End)** – Admins can view and manage all company purchase orders centrally.
 
-![Bagisto B2B Ecommerce Features Image](https://github.com/bagisto/temp-media/blob/master/b2b-ecommerce-feature-list.webp)
 
 ## Admin Configuration Options
 
-* **Enable B2B Ecommerce** – Toggle the B2B Ecommerce module on or off globally.
+* **Enable B2B Suite** – Toggle the B2B Suite module on or off globally.
 * **Allow Customer to Approve Quote** – Enable or restrict customers from finalizing quote approvals.
 * **Procurement Method** – Choose the preferred procurement workflow (e.g., PO-based or direct).
 * **Quotation Default Expiration Period** – Define how long a quotation remains valid by default.
 * **Quotation Email Template Options** – Manage email templates for quotation communication.
 * **Purchase Order Prefix** – Customize the prefix for purchase order numbers.
 * **Manage Number of Requisition Lists** – Limit how many requisition lists a company can maintain.
-
-![Bagisto B2B Ecommerce Features Image](https://github.com/bagisto/temp-media/blob/master/b2b-ecommerce-admin-feature-list.webp)
 
 ---
 

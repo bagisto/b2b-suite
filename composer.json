@@ -24,13 +24,7 @@
             "Webkul\\B2BSuite\\": "src/"
         }
     },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "Webkul\\B2BSuite\\Providers\\B2BSuiteServiceProvider"
-            ]
-        }
-    },
+   
     "minimum-stability": "stable",
     "prefer-stable": true
 }
