@@ -2,8 +2,8 @@
 
 namespace Webkul\B2BSuite\Http\Controllers\Shop;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
@@ -52,9 +52,13 @@ class UserController extends Controller
     public function create()
     {
         $customer = auth()->guard('customer')->user();
-        
+
+        $currentRole = $this->companyRoleRepository->find($customer->company_role_id);
+
+        $companyAdminId = $currentRole->customer_id;
+
         $roles = $this->companyRoleRepository->findWhere([
-            'customer_id' => $customer->id
+            'customer_id' => $companyAdminId,
         ]);
 
         return view('b2b_suite::shop.customers.account.users.create', compact('roles'));
@@ -117,7 +121,16 @@ class UserController extends Controller
 
         $customer = $this->customerRepository->create($data);
 
-        $customer->companies()->sync([auth()->guard('customer')->user()->id]);
+        $currentAdmin = $this->customerRepository->find(auth()->guard('customer')->user());
+
+        if ($currentAdmin->type === 'company') {
+            $companyAdminId = $currentAdmin->id;
+        } else {
+            $companyAdmin = $currentAdmin->companies()->first();
+            $companyAdminId = $companyAdmin ? $companyAdmin->id : $currentAdmin->id;
+        }
+
+        $customer->companies()->sync([$companyAdminId]);
 
         Event::dispatch('customer.create.after', $customer);
 
@@ -152,15 +165,15 @@ class UserController extends Controller
     public function edit($id)
     {
         $user = $this->customerRepository->find($id);
+        $loggedInCustomer = auth()->guard('customer')->user();
 
-        if (
-            ! $user
-            || ! $user->companies->contains(auth()->guard('customer')->user()->id)
-        ) {
-            abort(404);
-        }
+        $currentRole = $this->companyRoleRepository->find($loggedInCustomer->company_role_id);
 
-        $roles = $this->companyRoleRepository->all();
+        $companyAdminId = $currentRole->customer_id;
+
+        $roles = $this->companyRoleRepository->findWhere([
+            'customer_id' => $companyAdminId,
+        ]);
 
         return view('b2b_suite::shop.customers.account.users.edit', compact('user', 'roles'));
     }
@@ -242,7 +255,7 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(int $id): JsonResource
+    public function destroy(int $id): JsonResponse
     {
         $companyId = auth()->guard('customer')->user()->id;
 
@@ -255,7 +268,7 @@ class UserController extends Controller
             ! $user
             || ! $user->companies->contains($companyId)
         ) {
-            return new JsonResource([
+            return new JsonResponse([
                 'message' => trans('b2b_suite::app.shop.customers.account.users.un-auth-access'),
             ], 401);
         }
@@ -264,18 +277,18 @@ class UserController extends Controller
             if ($user->orders->whereIn('status', [Order::STATUS_PENDING, Order::STATUS_PROCESSING])->first()) {
                 session()->flash('error', trans('shop::app.customers.account.profile.index.order-pending'));
 
-                return new JsonResource([
+                return new JsonResponse([
                     'message' => trans('shop::app.customers.account.profile.index.order-pending'),
                 ], 422);
             }
 
             $this->customerRepository->delete($id);
 
-            return new JsonResource([
+            return new JsonResponse([
                 'message' => trans('b2b_suite::app.shop.customers.account.users.delete-success'),
             ]);
         } catch (\Exception $e) {
-            return new JsonResource([
+            return new JsonResponse([
                 'message' => trans('b2b_suite::app.shop.customers.account.users.delete-failed'),
             ], 500);
         }

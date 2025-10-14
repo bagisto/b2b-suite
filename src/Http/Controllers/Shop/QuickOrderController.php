@@ -42,25 +42,65 @@ class QuickOrderController extends Controller
      */
     public function store()
     {
-        $maxFileSizeMB = core()->getConfigData('b2b.catalog.quick_order.upload_file.max_size') ?? 2;
+        try {
+            $maxFileSizeMB = core()->getConfigData('b2b.catalog.quick_order.upload_file.max_size') ?? 2;
 
-        $this->validate(request(), [
-            'products'            => 'required_without:upload_file|array',
-            'products.*.sku'      => 'sometimes|string|distinct|exists:products,sku',
-            'products.*.quantity' => 'sometimes|numeric|min:1',
-            'upload_file'         => 'required_without:products|file|mimes:csv|max:'.($maxFileSizeMB * 1024),
-        ]);
+            $this->validate(request(), [
+                'products'            => 'required_without:upload_file|array',
+                'products.*.sku'      => 'sometimes|string|distinct|exists:products,sku',
+                'products.*.quantity' => 'sometimes|numeric|min:1',
+                'upload_file'         => 'required_without:products|file|mimes:csv|max:'.($maxFileSizeMB * 1024),
+            ]);
 
-        $data = request()->only('products', 'upload_file');
+            $data = request()->only('products', 'upload_file');
 
-        if (! empty($data['products'])) {
-            b2b_suite()->addProductsToCart($data['products']);
+            if (! empty($data['upload_file'])) {
+                $filePath = $data['upload_file']->getRealPath();
+                $rows = array_map('str_getcsv', file($filePath));
+                $header = array_map('trim', array_shift($rows));
+                $products = [];
+
+                foreach ($rows as $row) {
+                    $rowData = array_combine($header, $row);
+                    $sku = trim($rowData['sku'] ?? '');
+                    $quantity = (int) ($rowData['quantity'] ?? 1);
+
+                    if (! empty($sku)) {
+                        $products[] = [
+                            'sku'      => $sku,
+                            'quantity' => $quantity,
+                        ];
+                    }
+                }
+
+                $data['products'] = $products;
+            }
+
+            if (empty($data['products'])) {
+                return response()->json([
+                    'message' => trans('b2b_suite::app.shop.customers.account.quick-orders.no-products-found'),
+                ]);
+            }
+
+            try {
+                b2b_suite()->addProductsToCart($data['products']);
+
+                return response()->json([
+                    'status'       => 'success',
+                    'message'      => trans('b2b_suite::app.shop.customers.account.quick-orders.create-success'),
+                    'redirect_url' => route('shop.customers.account.quick_orders.index'),
+                ]);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'message' => trans('b2b_suite::app.shop.customers.account.quick-orders.something-went-wrong'),
+                ]);
+            }
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => trans('b2b_suite::app.shop.customers.account.quick-orders.no-products-found'),
+            ]);
         }
-
-        dd($data);
-        session()->flash('success', trans('b2b_suite::app.shop.customers.account.quick-orders.create-success'));
-
-        return redirect()->route('shop.customers.account.quick_orders.index');
     }
 
     /**
@@ -104,6 +144,20 @@ class QuickOrderController extends Controller
         $products = $this->productRepository
             ->setSearchEngine($searchEngine)
             ->getAll($params);
+
+        if ($products->isEmpty()) {
+            $params = [
+                'index'      => $indexNames ?? null,
+                'sku'        => request('query'),
+                'sort'       => 'created_at',
+                'order'      => 'desc',
+                'channel_id' => $channelId,
+            ];
+
+            $products = $this->productRepository
+                ->setSearchEngine($searchEngine)
+                ->getAll($params);
+        }
 
         return ProductResource::collection($products);
     }

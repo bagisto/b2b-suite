@@ -47,7 +47,7 @@ class CustomerBouncer
                 $permissions = ['account'];
             }
 
-            $permissions = array_map(fn($perm) => 'account.' . $perm, $permissions);
+            $permissions = array_map(fn ($perm) => 'account.'.$perm, $permissions);
             array_unshift($permissions, 'account');
 
             $hasPermission = in_array($permission, $permissions);

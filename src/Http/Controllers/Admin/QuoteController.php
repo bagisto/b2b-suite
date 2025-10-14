@@ -251,34 +251,47 @@ class QuoteController extends Controller
      */
     public function acceptQuote(Request $request, $id)
     {
-        $request->validate([
-            'message' => 'required|string|max:1000',
-        ]);
+        $adminId = auth()->guard('admin')->user()->id;
 
-        $quote = $this->customerQuoteRepository->findOrFail($id);
+        try {
+            $request->validate([
+                'message' => 'required|string|max:1000',
+            ]);
 
-        $quote->update(['status' => 'accepted']);
+            $quote = $this->customerQuoteRepository->findOrFail($id);
 
-        $quote->messages()->create([
-            'message'    => $request->message,
-            'status'     => trans('b2b_suite::app.shop.customers.account.quotes.view.'.$quote->status),
-            'user_type'  => 'admin',
-            'user_id'    => auth()->guard('admin')->user()->id,
-            'created_at' => now(),
-        ]);
+            $quote->update(['status' => 'accepted']);
 
-        $isAdminLastQuotation = $this->customerQuoteMessageRepository->getLastQuotationMessage($quote->id, 'admin');
+            $message = $quote->messages()->create([
+                'message'    => $request->message,
+                'status'     => trans('b2b_suite::app.shop.customers.account.quotes.view.'.$quote->status),
+                'user_type'  => 'admin',
+                'user_id'    => $adminId,
+                'created_at' => now(),
+            ]);
 
-        $this->customerQuoteQuotationRepository->updateOrCreate([
-            'message_id' => $isAdminLastQuotation?->id,
-            'quote_id'   => $quote->id,
-        ], [
-            'is_accepted' => 1,
-            'accepted_by' => 'admin',
-        ]);
+            $isAdminLastQuotation = $this->customerQuoteMessageRepository->getLastQuotationMessage($quote->id, 'admin');
 
-        return redirect()->route('admin.customers.quotes.view', $id)
-            ->with('success', trans('b2b_suite::app.admin.quotes.view.quote-accepted'));
+            $targetMessageId = $isAdminLastQuotation?->id ?? $message->id;
+
+            if ($targetMessageId) {
+                $this->customerQuoteQuotationRepository->updateOrCreate([
+                    'message_id' => $targetMessageId,
+                    'quote_id'   => $quote->id,
+                ], [
+                    'is_accepted' => 1,
+                    'accepted_by' => 'admin',
+                ]);
+            }
+
+            return redirect()->route('admin.customers.quotes.view', $id)
+                ->with('success', trans('b2b_suite::app.admin.quotes.view.quote-accepted'));
+
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors([
+                'error' => trans('b2b_suite::app.admin.quotes.view.error-message'),
+            ]);
+        }
     }
 
     /**

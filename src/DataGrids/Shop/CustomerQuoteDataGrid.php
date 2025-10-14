@@ -21,6 +21,11 @@ class CustomerQuoteDataGrid extends DataGrid
     public function prepareQueryBuilder()
     {
         $tablePrefix = DB::getTablePrefix();
+        $customer = auth()->guard('customer')->user();
+
+        $companyId = DB::table('customer_companies')
+            ->where('customer_id', $customer->id)
+            ->value('company_id') ?? $customer->id;
 
         $queryBuilder = DB::table('customer_quotes')
             ->distinct()
@@ -51,7 +56,7 @@ class CustomerQuoteDataGrid extends DataGrid
                 CustomerQuote::STATUS_ACCEPTED,
                 CustomerQuote::STATUS_REJECTED,
             ])
-            ->where('customer_quotes.customer_id', auth()->guard('customer')->user()->id);
+            ->where('customer_quotes.company_id', $companyId);
 
         $this->addFilter('quotation_number', 'customer_quotes.quotation_number');
         $this->addFilter('name', 'customer_quotes.name');

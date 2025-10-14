@@ -53,7 +53,7 @@ class Menu extends BaseMenu
                     ->filter(function ($item) {
                         $key = $item['key'];
                         $hasPermission = customer_bouncer()->hasPermission($key);
-                        
+
                         return $hasPermission;
                     })
                     ->toArray();
@@ -112,6 +112,7 @@ class Menu extends BaseMenu
             ));
         }
     }
+
     /**
      * Process sub menu items.
      */
@@ -121,7 +122,7 @@ class Menu extends BaseMenu
             ->sortBy('sort')
             ->filter(fn ($value) => is_array($value))
             ->map(function ($subMenuItem) {
- 
+
                 $subSubMenuItems = $this->processSubMenuItems($subMenuItem);
 
                 return new MenuItem(
@@ -165,5 +166,4 @@ class Menu extends BaseMenu
 
         $this->removeChildrenUnauthorizedMenuItem($firstChild);
     }
-
 }
