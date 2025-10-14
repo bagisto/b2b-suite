@@ -91,7 +91,7 @@ php artisan b2b-suite:install
 
 ### 4. License
 
-The B2B Ecommerce package is open-sourced software licensed under the **MIT License**.
+The B2B Ecommerce is open-sourced software licensed under the **MIT License**.
 
 ---
 
