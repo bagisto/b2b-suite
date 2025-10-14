@@ -21,6 +21,9 @@ The **Bagisto B2B Ecommerce** is a comprehensive package designed to extend the 
 
 The **Bagisto B2B Ecommerce** enhances your Bagisto store with advanced Business-to-Business (B2B) features. It enables company-based purchasing, multi-user access, quote negotiation, and procurement management — empowering businesses to handle B2B workflows efficiently within a single platform.
 
+![Bagisto B2B Ecommerce Image](https://github.com/bagisto/temp-media/blob/master/b2b-ecommerce-main-banner.webp)
+
+
 ## Key Features
 
 * **Company Registration** – Companies can easily register from the storefront and manage their organization profile.
@@ -35,6 +38,7 @@ The **Bagisto B2B Ecommerce** enhances your Bagisto store with advanced Business
 * **Companies Management (Admin End)** – Admin can create companies and manage from backend.
 * **Purchase Orders (Admin End)** – Admins can view and manage all company purchase orders centrally.
 
+![Bagisto B2B Ecommerce Features Image](https://github.com/bagisto/temp-media/blob/master/b2b-ecommerce-feature-list.webp)
 
 ## Admin Configuration Options
 
@@ -45,6 +49,8 @@ The **Bagisto B2B Ecommerce** enhances your Bagisto store with advanced Business
 * **Quotation Email Template Options** – Manage email templates for quotation communication.
 * **Purchase Order Prefix** – Customize the prefix for purchase order numbers.
 * **Manage Number of Requisition Lists** – Limit how many requisition lists a company can maintain.
+
+![Bagisto B2B Ecommerce Features Image](https://github.com/bagisto/temp-media/blob/master/b2b-ecommerce-admin-feature-list.webp)
 
 ---
 
