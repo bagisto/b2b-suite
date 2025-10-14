@@ -121,8 +121,8 @@ class UserController extends Controller
 
         $customer = $this->customerRepository->create($data);
 
-        $currentAdmin = $this->customerRepository->find(auth()->guard('customer')->user());
-
+        $currentAdmin = auth()->guard('customer')->user();
+        
         if ($currentAdmin->type === 'company') {
             $companyAdminId = $currentAdmin->id;
         } else {
