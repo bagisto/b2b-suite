@@ -925,6 +925,10 @@ return [
                         'dob'           => 'Date of Birth',
                         'role'          => 'Role',
                         'select-role'   => 'Select Role',
+                        'status'        => 'Status',
+                        'active'        => 'Active',
+                        'suspended'     => 'Suspended',
+                        'is-suspended'  => 'Is suspended',
                     ],
 
                     'edit' => [
@@ -943,6 +947,10 @@ return [
                         'dob'           => 'Date of Birth',
                         'role'          => 'Role',
                         'select-role'   => 'Select Role',
+                        'status'        => 'Status',
+                        'active'        => 'Active',
+                        'suspended'     => 'Suspended',
+                        'is-suspended'  => 'Is suspended',
                     ],
                 ],
 

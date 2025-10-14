@@ -97,6 +97,8 @@ class UserController extends Controller
             'image',
             'company_role_id',
         ]), [
+            'status'            => $request->has('status') ? 1 : 0,
+            'is_suspended'      => $request->has('is_suspended') ? 1 : 0,
             'type'              => 'user',
             'password'          => bcrypt($password),
             'api_token'         => Str::random(80),
@@ -206,8 +208,12 @@ class UserController extends Controller
             'phone',
             'image',
             'company_role_id',
+            'status',
+            'is_suspended',
         ]), [
-            'type' => 'user',
+            'type'         => 'user',
+            'status'       => $request->has('status') ? 1 : 0,
+            'is_suspended' => $request->has('is_suspended') ? 1 : 0,
         ]);
 
         if (

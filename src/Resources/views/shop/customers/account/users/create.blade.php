@@ -215,6 +215,41 @@
                 <x-shop::form.control-group.error control-name="company_role_id" />
             </x-shop::form.control-group>
 
+            <!-- Active Status -->
+            <x-shop::form.control-group>
+                <x-shop::form.control-group.label>
+                    @lang('b2b_suite::app.shop.customers.account.users.create.status')
+                </x-shop::form.control-group.label>
+
+                <x-shop::form.control-group.control
+                    type="switch"
+                    name="status"
+                    value="1"
+                    :checked="true"
+                    :label="trans('b2b_suite::app.shop.customers.account.users.create.active')"
+                />
+
+                <x-shop::form.control-group.error control-name="status" />
+            </x-shop::form.control-group>
+
+            <!-- Suspended -->
+            <x-shop::form.control-group>
+                <x-shop::form.control-group.label>
+                    @lang('b2b_suite::app.shop.customers.account.users.create.is-suspended')
+                </x-shop::form.control-group.label>
+
+                <x-shop::form.control-group.control
+                    type="switch"
+                    name="is_suspended"
+                    value="1"
+                    :checked="false"
+                    :label="trans('b2b_suite::app.shop.customers.account.users.create.suspended')"
+                />
+
+                <x-shop::form.control-group.error control-name="is_suspended" />
+            </x-shop::form.control-group>
+
+
             {!! view_render_event('bagisto.shop.customers.account.users.create_form_controls.role.after') !!}
 
             <button
