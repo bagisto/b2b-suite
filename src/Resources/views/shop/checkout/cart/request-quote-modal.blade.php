@@ -311,7 +311,7 @@
                     if (!quoteName || !description) {
                         this.$emitter.emit('add-flash', {
                             type: 'warning',
-                            message: '@lang("b2b_suite::app.shop.checkout.cart.required-fields-draft")'
+                            message: '@lang("b2b_suite::app.shop.checkout.cart.request-quote.required-fields-draft")'
                         });
                         this.isDraftSaving = false;
                         return;
