@@ -122,7 +122,7 @@ class UserController extends Controller
         $customer = $this->customerRepository->create($data);
 
         $currentAdmin = auth()->guard('customer')->user();
-        
+
         if ($currentAdmin->type === 'company') {
             $companyAdminId = $currentAdmin->id;
         } else {

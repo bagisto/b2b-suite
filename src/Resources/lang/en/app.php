@@ -273,7 +273,7 @@ return [
                 'title'                 => 'Company',
                 'companies-placeholder' => 'Company name',
                 'create-btn'            => 'Create Company',
-                'datagrid'    => [
+                'datagrid'              => [
                     'id'            => 'ID',
                     'name'          => 'Name',
                     'email'         => 'Email',

@@ -143,8 +143,8 @@ class Customer extends BaseCustomer
         }
 
         $parentValue = parent::getAttribute($key);
-        
-        if ($parentValue !== null || !isset($this->id)) {
+
+        if ($parentValue !== null || ! isset($this->id)) {
             return $parentValue;
         }
 
@@ -156,6 +156,7 @@ class Customer extends BaseCustomer
             if ($attribute) {
                 $customValue = $this->getCustomAttributeValue($attribute);
                 $this->attributes[$key] = $customValue;
+
                 return $customValue;
             }
         } catch (\Exception $e) {
@@ -171,7 +172,7 @@ class Customer extends BaseCustomer
      */
     public function getCustomAttributeValue($attribute): mixed
     {
-        if (!$attribute) {
+        if (! $attribute) {
             return null;
         }
 
@@ -180,7 +181,7 @@ class Customer extends BaseCustomer
             $channel = core()->getRequestedChannelCode();
 
             // Eager load attribute_values if not already loaded
-            if (!$this->relationLoaded('attribute_values')) {
+            if (! $this->relationLoaded('attribute_values')) {
                 $this->load('attribute_values');
             }
 
@@ -194,7 +195,7 @@ class Customer extends BaseCustomer
                         ->where('company_attribute_id', $attribute->id)
                         ->first();
 
-                    if (!$attributeValue || empty($attributeValue->{$attribute->column_name})) {
+                    if (! $attributeValue || empty($attributeValue->{$attribute->column_name})) {
                         $attributeValue = $this->attribute_values
                             ->where('channel', core()->getDefaultChannelCode())
                             ->where('locale', core()->getDefaultLocaleCodeFromDefaultChannel())
@@ -214,7 +215,7 @@ class Customer extends BaseCustomer
                         ->where('company_attribute_id', $attribute->id)
                         ->first();
 
-                    if (!$attributeValue || empty($attributeValue->{$attribute->column_name})) {
+                    if (! $attributeValue || empty($attributeValue->{$attribute->column_name})) {
                         $attributeValue = $this->attribute_values
                             ->where('locale', core()->getDefaultLocaleCodeFromDefaultChannel())
                             ->where('company_attribute_id', $attribute->id)
@@ -268,7 +269,7 @@ class Customer extends BaseCustomer
     {
         $attributes = parent::attributesToArray();
 
-        if (!isset($this->id)) {
+        if (! isset($this->id)) {
             return $attributes;
         }
 
@@ -282,7 +283,7 @@ class Customer extends BaseCustomer
                 }
 
                 // Don't override existing attributes with custom ones
-                if (!array_key_exists($attribute->code, $attributes)) {
+                if (! array_key_exists($attribute->code, $attributes)) {
                     $attributes[$attribute->code] = $this->getCustomAttributeValue($attribute);
                 }
             }
