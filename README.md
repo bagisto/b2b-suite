@@ -1,6 +1,6 @@
 <p align="center">
     <img src="https://bagisto.com/wp-content/themes/bagisto/images/logo.png" />
-    <h2 align="center">Bagisto B2B Suite</h2>
+    <h2 align="center">Open Source B2B Ecommerce Platform</h2>
 </p>
 
 
@@ -15,7 +15,7 @@
 
 ### 1. Introduction:
 
-The **Bagisto B2B Suite** is a comprehensive package designed to extend the Bagisto eCommerce platform with advanced Business-to-Business (B2B) capabilities. It introduces powerful **company management features, role-based permissions**, and seamless **company-customer relationships**, enabling businesses to operate in a more structured and professional B2B environment.
+The **Bagisto B2B Ecommerce** is a comprehensive package designed to extend the Bagisto eCommerce platform with advanced Business-to-Business (B2B) capabilities. It introduces powerful **company management features, role-based permissions**, and seamless **company-customer relationships**, enabling businesses to operate in a more structured and professional B2B environment.
 
 **Features include:**
 
@@ -54,7 +54,7 @@ php artisan b2b-suite:install
 
 ### 4. License
 
-The B2B Suite package is open-sourced software licensed under the **MIT License**.
+The B2B Ecommerce package is open-sourced software licensed under the **MIT License**.
 
 ---
 
