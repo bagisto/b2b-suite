@@ -6,7 +6,7 @@
 <div class="mt-6 flex gap-4 max-lg:flex-wrap max-md:grid max-md:max-w-full max-sm:w-full max-sm:p-2">
     @php
         $isDraft = $quote->state === 'quotation' && $quote->status === 'draft';
-        $isDraftOrCompletedStatus = in_array($quote->status, ['draft', 'completed']);
+        $isDraftOrCompletedStatus = in_array($quote->status, ['draft', 'purchase_order', 'expired','completed', 'accepted', 'rejected', 'ordered']);
         $isOpenOrNegotiation = in_array($quote->status, ['open', 'negotiation']);
         $canCustomerApprove = (bool) core()->getConfigData('b2b_suite.quotes.settings.can_customer_approve_quote');
         $isNegotiation = $quote->state === 'quotation' && $quote->status === 'negotiation';

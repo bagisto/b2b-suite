@@ -66,7 +66,7 @@ class CompanyController extends Controller
         $data = request()->all();
 
         $customers = $this->customerRepository->scopeQuery(function ($query) use ($data) {
-            return $query->where('type', $data['type'] ?? 'company')
+            return $query->whereIn('type', [$data['type'] ?? 'company', 'company'])
                 ->where(function ($q) use ($data) {
                     $q->where('email', 'like', '%'.urldecode($data['query']).'%')
                         ->orWhere(DB::raw('CONCAT(first_name, " ", last_name)'), 'like', '%'.urldecode($data['query']).'%');
