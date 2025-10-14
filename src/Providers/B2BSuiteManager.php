@@ -11,6 +11,8 @@ use Webkul\B2BSuite\Models\Customer;
 use Webkul\Customer\Contracts\Customer as CustomerContract;
 use Webkul\Shop\Http\Controllers\Customer\CustomerController as BaseShopCustomerController;
 use Webkul\Shop\Http\Controllers\Customer\RegistrationController as BaseRegistrationController;
+use Webkul\Shop\Http\Controllers\API\CartController as BaseCartController;
+use Webkul\B2BSuite\Http\Controllers\Shop\API\CartController as B2BCartController;
 
 final class B2BSuiteManager
 {
@@ -45,5 +47,7 @@ final class B2BSuiteManager
         $this->app->bind(BaseRegistrationController::class, RegistrationController::class);
 
         $this->app->bind(BaseShopCustomerController::class, ShopCustomerController::class);
+
+        $this->app->bind(BaseCartController::class, B2BCartController::class);
     }
 }
