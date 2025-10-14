@@ -270,8 +270,9 @@ return [
 
         'companies' => [
             'index' => [
-                'title'       => 'Companies',
-                'create-btn'  => 'Create Company',
+                'title'                 => 'Company',
+                'companies-placeholder' => 'Company name',
+                'create-btn'            => 'Create Company',
                 'datagrid'    => [
                     'id'            => 'ID',
                     'name'          => 'Name',

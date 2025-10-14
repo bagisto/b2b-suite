@@ -25,7 +25,7 @@
                             <!-- Companies Multi-Select -->
                             <x-admin::form.control-group class="mb-2.5">
                                 <x-admin::form.control-group.label>
-                                    @lang('admin::app.customers.customers.index.create.companies')
+                                    @lang('b2b_suite::app.admin.companies.index.title')
                                 </x-admin::form.control-group.label>
 
                                 <div class="relative">
@@ -36,8 +36,8 @@
                                         @focus="showCompanyDropdown = true"
                                         id="company_list"
                                         name="company_list"
-                                        :label="trans('admin::app.customers.customers.index.create.companies-placeholder')"
-                                        :placeholder="trans('admin::app.customers.customers.index.create.companies-placeholder')"
+                                        :label="trans('b2b_suite::app.admin.companies.index.companies-placeholder')"
+                                        :placeholder="trans('b2b_suite::app.admin.companies.index.companies-placeholder')"
                                     />
 
                                     <!-- Selected Companies Tags -->

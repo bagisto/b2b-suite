@@ -62,10 +62,10 @@ class Customer extends BaseCustomer
     public function fullAddress(): Attribute
     {
         $addressParts = array_filter([
-            implode(', ', array_filter(explode(PHP_EOL, $this->address))),
-            $this->city,
-            $this->state,
-            $this->postcode,
+            implode(', ', array_filter(explode(PHP_EOL, $this->address ?? ''))),
+            $this->city ?? '',
+            $this->state ?? '',
+            $this->postcode ?? '',
             $this->country ? "({$this->country})" : null,
         ]);
 
@@ -126,92 +126,115 @@ class Customer extends BaseCustomer
      */
     public function getAttribute($key): mixed
     {
-
-        if (
-            ! method_exists(static::class, $key)
-            && ! in_array($key, [
-                'pivot',
-                'parent_id',
-            ])
-            && ! isset($this->attributes[$key])
-        ) {
-            if (isset($this->id)) {
-                $attribute = $this->getAllCustomAttributes()
-                    ->where('code', $key)
-                    ->first();
-
-                $this->attributes[$key] = $this->getCustomAttributeValue($attribute);
-
-                return $this->getAttributeValue($key);
-            }
+        if (in_array($key, ['pivot', 'parent_id'])) {
+            return parent::getAttribute($key);
         }
 
-        return parent::getAttribute($key);
-    }
+        if (method_exists(static::class, $key)) {
+            return parent::getAttribute($key);
+        }
 
-    /**
-     * Get an product attribute value.
-     */
-    public function getCustomAttributeValue($attribute): mixed
-    {
-        if (! $attribute) {
+        if (array_key_exists($key, $this->attributes)) {
+            return parent::getAttribute($key);
+        }
+
+        if (array_key_exists($key, $this->relations)) {
+            return parent::getAttribute($key);
+        }
+
+        $parentValue = parent::getAttribute($key);
+        
+        if ($parentValue !== null || !isset($this->id)) {
+            return $parentValue;
+        }
+
+        try {
+            $attribute = $this->getAllCustomAttributes()
+                ->where('code', $key)
+                ->first();
+
+            if ($attribute) {
+                $customValue = $this->getCustomAttributeValue($attribute);
+                $this->attributes[$key] = $customValue;
+                return $customValue;
+            }
+        } catch (\Exception $e) {
+            // If there's any error getting custom attributes, just return null
             return null;
         }
 
-        $locale = core()->getRequestedLocaleCodeInRequestedChannel();
-
-        $channel = core()->getRequestedChannelCode();
-
-        if (empty($this->attribute_values->count())) {
-            $this->load('attribute_values');
-        }
-
-        if ($attribute->value_per_channel) {
-            if ($attribute->value_per_locale) {
-                $attributeValue = $this->attribute_values
-                    ->where('channel', $channel)
-                    ->where('locale', $locale)
-                    ->where('company_attribute_id', $attribute->id)
-                    ->first();
-
-                if (empty($attributeValue[$attribute->column_name])) {
-                    $attributeValue = $this->attribute_values
-                        ->where('channel', core()->getDefaultChannelCode())
-                        ->where('locale', core()->getDefaultLocaleCodeFromDefaultChannel())
-                        ->where('company_attribute_id', $attribute->id)
-                        ->first();
-                }
-            } else {
-                $attributeValue = $this->attribute_values
-                    ->where('channel', $channel)
-                    ->where('company_attribute_id', $attribute->id)
-                    ->first();
-            }
-        } else {
-            if ($attribute->value_per_locale) {
-                $attributeValue = $this->attribute_values
-                    ->where('locale', $locale)
-                    ->where('company_attribute_id', $attribute->id)
-                    ->first();
-
-                if (empty($attributeValue[$attribute->column_name])) {
-                    $attributeValue = $this->attribute_values
-                        ->where('locale', core()->getDefaultLocaleCodeFromDefaultChannel())
-                        ->where('company_attribute_id', $attribute->id)
-                        ->first();
-                }
-            } else {
-                $attributeValue = $this->attribute_values
-                    ->where('company_attribute_id', $attribute->id)
-                    ->first();
-            }
-        }
-
-        return $attributeValue[$attribute->column_name] ?? $attribute->default_value;
+        return null;
     }
 
     /**
-     * Check in all attributes.
+     * Get a custom attribute value.
+     */
+    public function getCustomAttributeValue($attribute): mixed
+    {
+        if (!$attribute) {
+            return null;
+        }
+
+        try {
+            $locale = core()->getRequestedLocaleCodeInRequestedChannel();
+            $channel = core()->getRequestedChannelCode();
+
+            // Eager load attribute_values if not already loaded
+            if (!$this->relationLoaded('attribute_values')) {
+                $this->load('attribute_values');
+            }
+
+            $attributeValue = null;
+
+            if ($attribute->value_per_channel) {
+                if ($attribute->value_per_locale) {
+                    $attributeValue = $this->attribute_values
+                        ->where('channel', $channel)
+                        ->where('locale', $locale)
+                        ->where('company_attribute_id', $attribute->id)
+                        ->first();
+
+                    if (!$attributeValue || empty($attributeValue->{$attribute->column_name})) {
+                        $attributeValue = $this->attribute_values
+                            ->where('channel', core()->getDefaultChannelCode())
+                            ->where('locale', core()->getDefaultLocaleCodeFromDefaultChannel())
+                            ->where('company_attribute_id', $attribute->id)
+                            ->first();
+                    }
+                } else {
+                    $attributeValue = $this->attribute_values
+                        ->where('channel', $channel)
+                        ->where('company_attribute_id', $attribute->id)
+                        ->first();
+                }
+            } else {
+                if ($attribute->value_per_locale) {
+                    $attributeValue = $this->attribute_values
+                        ->where('locale', $locale)
+                        ->where('company_attribute_id', $attribute->id)
+                        ->first();
+
+                    if (!$attributeValue || empty($attributeValue->{$attribute->column_name})) {
+                        $attributeValue = $this->attribute_values
+                            ->where('locale', core()->getDefaultLocaleCodeFromDefaultChannel())
+                            ->where('company_attribute_id', $attribute->id)
+                            ->first();
+                    }
+                } else {
+                    $attributeValue = $this->attribute_values
+                        ->where('company_attribute_id', $attribute->id)
+                        ->first();
+                }
+            }
+
+            return $attributeValue->{$attribute->column_name} ?? $attribute->default_value ?? null;
+        } catch (\Exception $e) {
+            return $attribute->default_value ?? null;
+        }
+    }
+
+    /**
+     * Get all custom attributes.
      */
     public function getAllCustomAttributes(): object
     {
@@ -221,7 +244,11 @@ class Customer extends BaseCustomer
             return $allAttributes;
         }
 
-        $allAttributes = core()->getSingletonInstance(CompanyAttributeRepository::class)->all();
+        try {
+            $allAttributes = core()->getSingletonInstance(CompanyAttributeRepository::class)->all();
+        } catch (\Exception $e) {
+            $allAttributes = collect([]);
+        }
 
         return $allAttributes;
     }
@@ -231,15 +258,7 @@ class Customer extends BaseCustomer
      */
     public function checkInAllAttributes(): object
     {
-        static $allAttributes;
-
-        if ($allAttributes) {
-            return $allAttributes;
-        }
-
-        $allAttributes = core()->getSingletonInstance(CompanyAttributeRepository::class)->all();
-
-        return $allAttributes;
+        return $this->getAllCustomAttributes();
     }
 
     /**
@@ -249,9 +268,12 @@ class Customer extends BaseCustomer
     {
         $attributes = parent::attributesToArray();
 
-        $hiddenAttributes = $this->getHidden();
+        if (!isset($this->id)) {
+            return $attributes;
+        }
 
-        if (isset($this->id)) {
+        try {
+            $hiddenAttributes = $this->getHidden();
             $familyAttributes = $this->getAllCustomAttributes();
 
             foreach ($familyAttributes as $attribute) {
@@ -259,8 +281,13 @@ class Customer extends BaseCustomer
                     continue;
                 }
 
-                $attributes[$attribute->code] = $this->getCustomAttributeValue($attribute);
+                // Don't override existing attributes with custom ones
+                if (!array_key_exists($attribute->code, $attributes)) {
+                    $attributes[$attribute->code] = $this->getCustomAttributeValue($attribute);
+                }
             }
+        } catch (\Exception $e) {
+            // If there's any error, just return the base attributes
         }
 
         return $attributes;
