@@ -5,14 +5,14 @@ namespace Webkul\B2BSuite\Providers;
 use Illuminate\Foundation\Application;
 use Webkul\Admin\Http\Controllers\Customers\CustomerController as BaseCustomerController;
 use Webkul\B2BSuite\Http\Controllers\Admin\CustomerController;
+use Webkul\B2BSuite\Http\Controllers\Shop\API\CartController as B2BCartController;
 use Webkul\B2BSuite\Http\Controllers\Shop\Customer\CustomerController as ShopCustomerController;
 use Webkul\B2BSuite\Http\Controllers\Shop\Customer\RegistrationController;
 use Webkul\B2BSuite\Models\Customer;
 use Webkul\Customer\Contracts\Customer as CustomerContract;
+use Webkul\Shop\Http\Controllers\API\CartController as BaseCartController;
 use Webkul\Shop\Http\Controllers\Customer\CustomerController as BaseShopCustomerController;
 use Webkul\Shop\Http\Controllers\Customer\RegistrationController as BaseRegistrationController;
-use Webkul\Shop\Http\Controllers\API\CartController as BaseCartController;
-use Webkul\B2BSuite\Http\Controllers\Shop\API\CartController as B2BCartController;
 
 final class B2BSuiteManager
 {

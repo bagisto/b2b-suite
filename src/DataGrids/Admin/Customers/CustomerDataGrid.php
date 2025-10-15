@@ -5,8 +5,6 @@ namespace Webkul\B2BSuite\DataGrids\Admin\Customers;
 use Illuminate\Support\Facades\DB;
 use Webkul\Customer\Repositories\CustomerGroupRepository;
 use Webkul\DataGrid\DataGrid;
-use Webkul\Sales\Models\Order;
-use Webkul\Sales\Repositories\OrderRepository;
 
 class CustomerDataGrid extends DataGrid
 {
@@ -171,7 +169,7 @@ class CustomerDataGrid extends DataGrid
             'index'       => 'revenue',
             'label'       => trans('admin::app.customers.customers.index.datagrid.revenue'),
             'type'        => 'integer',
-            'sortable' => true,
+            'sortable'    => true,
         ]);
 
         $this->addColumn([

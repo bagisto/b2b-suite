@@ -2,23 +2,16 @@
 
 namespace Webkul\B2BSuite\Http\Controllers\Shop\API;
 
-use Webkul\Shop\Http\Controllers\API\CartController as BaseCartController;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Http\Response;
+use Webkul\B2BSuite\Repositories\CustomerQuoteItemRepository;
 use Webkul\CartRule\Repositories\CartRuleCouponRepository;
 use Webkul\Checkout\Facades\Cart;
-use Webkul\Checkout\Models\CartAddress;
 use Webkul\Product\Repositories\ProductRepository;
-use Webkul\Shipping\Facades\Shipping;
+use Webkul\Shop\Http\Controllers\API\CartController as BaseCartController;
 use Webkul\Shop\Http\Resources\CartResource;
-use Webkul\Shop\Http\Resources\ProductResource;
-use Webkul\B2BSuite\Repositories\CustomerQuoteItemRepository;
-
 
 class CartController extends BaseCartController
 {
-
     /**
      * Create a new controller instance.
      *
