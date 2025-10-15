@@ -37,9 +37,7 @@ class InstallB2BSuite extends Command
      */
     public function handle()
     {
-        $this->call('migrate', [
-            '--path' => 'vendor/bagisto/b2b-suite/src/Database/Migrations',
-        ]);
+        $this->call('migrate');
 
         $this->call(DatabaseSeeder::class);
 
