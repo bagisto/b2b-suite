@@ -37,9 +37,7 @@ class InstallB2BSuite extends Command
      */
     public function handle()
     {
-        $this->call('migrate', [
-            '--path' => 'packages/Webkul/B2BSuite/src/Database/Migrations',
-        ]);
+        $this->call('migrate');
 
         $this->call(DatabaseSeeder::class);
 
