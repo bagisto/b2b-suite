@@ -52,6 +52,10 @@ The **Bagisto B2B Ecommerce** enhances your Bagisto store with advanced Business
 
 ---
 
+## 📖 Documentation & Demo
+
+- **User Guide:** [User Guide](https://webkul.com/blog/user-guide-b2b-ecommerce-platform/)
+- **Live Demo:** [Live Demo](https://demo.bagisto.com/b2b-suite/)
 
 ### 2. Requirements:
 
