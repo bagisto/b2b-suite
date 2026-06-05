@@ -43,7 +43,6 @@ class CartController extends BaseCartController
                 throw new \Exception(trans('shop::app.checkout.cart.inactive-add'));
             }
 
-            $customerId = auth()->guard('customer')->user()->id;
             $requestedQty = request()->input('quantity', 1);
             $cart = Cart::getCart();
 
