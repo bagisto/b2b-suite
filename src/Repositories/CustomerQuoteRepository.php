@@ -212,6 +212,12 @@ class CustomerQuoteRepository extends Repository
         foreach ($quote->items as $quoteItem) {
             $product = $this->productRepository->find($quoteItem->product_id);
 
+            $existingCartItem = $cart->items->where('product_id', $product->id)->first();
+
+            if ($existingCartItem) {
+                Cart::removeItem($existingCartItem->id);
+            }
+
             $additional = $quoteItem->additional ? json_decode($quoteItem->additional, true) : [];
 
             $data = array_merge($additional, [

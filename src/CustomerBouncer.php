@@ -22,6 +22,29 @@ class CustomerBouncer
     {
         $customer = auth()->guard('customer')->user();
 
+        if (! $customer) {
+            return false;
+        }
+
+        $b2bKeys = [
+            'account.requisitions',
+            'account.quotes',
+            'account.purchase_orders',
+            'account.quick_orders',
+            'account.users',
+            'account.roles',
+        ];
+
+        if (! $customer->company_role_id && $customer->type !== 'company') {
+            foreach ($b2bKeys as $b2bKey) {
+                if (str_contains($permission, $b2bKey)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         if ($customer->type === 'company') {
             $role = $this->roleRepo->findWhere(['customer_id' => $customer->id])->first();
         } else {

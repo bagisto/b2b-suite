@@ -43,6 +43,17 @@ class Menu extends BaseMenu
                 break;
 
             case self::CUSTOMER:
+                $customer = auth()->guard('customer')->user();
+
+                $b2bKeys = [
+                    'account.requisitions',
+                    'account.quotes',
+                    'account.purchase_orders',
+                    'account.quick_orders',
+                    'account.users',
+                    'account.roles',
+                ];
+
                 $canShowWishlist = ! (bool) core()->getConfigData('customer.settings.wishlist.wishlist_option');
                 $canShowGdpr = ! (bool) core()->getConfigData('general.gdpr.settings.enabled');
 
@@ -50,11 +61,14 @@ class Menu extends BaseMenu
                     ->reject(fn ($item) => ($item['key'] == 'account.wishlist' && $canShowWishlist) ||
                         ($item['key'] == 'account.gdpr_data_request' && $canShowGdpr)
                     )
-                    ->filter(function ($item) {
+                    ->filter(function ($item) use ($customer, $b2bKeys) {
                         $key = $item['key'];
-                        $hasPermission = customer_bouncer()->hasPermission($key);
 
-                        return $hasPermission;
+                        if (! $customer?->company_role_id && $customer?->type !== 'company') {
+                            return ! in_array($key, $b2bKeys);
+                        }
+
+                        return customer_bouncer()->hasPermission($key);
                     })
                     ->toArray();
 
@@ -165,5 +179,37 @@ class Menu extends BaseMenu
         $menuItem->route = $firstChild->getRoute();
 
         $this->removeChildrenUnauthorizedMenuItem($firstChild);
+    }
+
+    /**
+     * Get current active menu.
+     */
+    public function getCurrentActiveMenu(?string $area = null): ?MenuItem
+    {
+        $currentKey = implode('.', array_slice(explode('.', $this->currentKey), 0, 2));
+
+        return $this->findMatchingItem($this->getItems($area), $currentKey);
+    }
+
+    /**
+     * Finding the matching item.
+     */
+    private function findMatchingItem($items, $currentKey): ?MenuItem
+    {
+        foreach ($items as $item) {
+            if ($item->key == $currentKey) {
+                return $item;
+            }
+
+            if ($item->haveChildren()) {
+                $matchingChild = $this->findMatchingItem($item->getChildren(), $currentKey);
+
+                if ($matchingChild) {
+                    return $matchingChild;
+                }
+            }
+        }
+
+        return null;
     }
 }

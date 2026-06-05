@@ -74,7 +74,7 @@ class UserController extends Controller
         $this->validate($request, [
             'first_name'       => ['required'],
             'last_name'        => ['required'],
-            'email'            => 'email|unique:customers,email',
+            'user_email'       => 'email|unique:customers,email',
             'gender'           => 'required|in:Other,Male,Female',
             'date_of_birth'    => 'date|before:today',
             'image'            => 'array',
@@ -90,13 +90,13 @@ class UserController extends Controller
         $data = array_merge($request->only([
             'first_name',
             'last_name',
-            'email',
             'gender',
             'date_of_birth',
             'phone',
             'image',
             'company_role_id',
         ]), [
+            'email'             => $request->input('user_email'),
             'status'            => $request->has('status') ? 1 : 0,
             'is_suspended'      => $request->has('is_suspended') ? 1 : 0,
             'type'              => 'user',
@@ -190,7 +190,7 @@ class UserController extends Controller
         $this->validate($request, [
             'first_name'       => ['required'],
             'last_name'        => ['required'],
-            'email'            => 'email|unique:customers,email,'.$id,
+            'user_email'       => 'email|unique:customers,email,'.$id,
             'gender'           => 'required|in:Other,Male,Female',
             'date_of_birth'    => 'date|before:today',
             'image'            => 'array',
@@ -202,7 +202,6 @@ class UserController extends Controller
         $data = array_merge($request->only([
             'first_name',
             'last_name',
-            'email',
             'gender',
             'date_of_birth',
             'phone',
@@ -211,6 +210,7 @@ class UserController extends Controller
             'status',
             'is_suspended',
         ]), [
+            'email'        => $request->input('user_email'),
             'type'         => 'user',
             'status'       => $request->has('status') ? 1 : 0,
             'is_suspended' => $request->has('is_suspended') ? 1 : 0,

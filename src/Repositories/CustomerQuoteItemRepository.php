@@ -19,4 +19,21 @@ class CustomerQuoteItemRepository extends Repository
     {
         return $this->model->create($data);
     }
+
+    /**
+     * Check if a product has any accepted negotiated quote for a customer.
+     *
+     * @param  int  $productId
+     * @param  int  $customerId
+     * @return bool
+     */
+    public function hasAcceptedNegotiation($productId, $customerId): bool
+    {
+        return $this->model
+            ->join('customer_quotes', 'customer_quote_items.customer_quote_id', '=', 'customer_quotes.id')
+            ->where('customer_quote_items.product_id', $productId)
+            ->where('customer_quotes.customer_id', $customerId)
+            ->where('customer_quotes.status', 'accepted')
+            ->exists();
+    }
 }

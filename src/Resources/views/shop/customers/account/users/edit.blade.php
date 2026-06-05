@@ -105,14 +105,14 @@
 
                 <x-shop::form.control-group.control
                     type="text"
-                    name="email"
+                    name="user_email"
                     rules="required|email"
-                    value="{{ old('email') ?? $user->email }}"
+                    value="{{ old('user_email') ?? $user->email }}"
                     :label="trans('b2b_suite::app.shop.customers.account.users.edit.email')"
                     :placeholder="trans('b2b_suite::app.shop.customers.account.users.edit.email')"
                 />
 
-                <x-shop::form.control-group.error control-name="email" />
+                <x-shop::form.control-group.error control-name="user_email" />
             </x-shop::form.control-group>
 
             {!! view_render_event('bagisto.shop.customers.account.users.edit_form_controls.email.after', ['user' => $user]) !!}

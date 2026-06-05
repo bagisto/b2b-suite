@@ -271,7 +271,7 @@
                     selectedCompanies: [],
                     companySearchTerm: '',
                     showCompanyDropdown: false,
-                    isB2BEnabled: {{ core()->getConfigData('b2b_suite.general.settings.active') }}
+                    isB2BEnabled: {{ core()->getConfigData('b2b_suite.general.settings.active') ?? 0 }}
                 };
             },
 
@@ -297,7 +297,7 @@
 
                 async fetchCompanies() {
                     try {
-                        const response = await this.$axios.get("{{ route('admin.customers.companies.get') }}");
+                        const response = await this.$axios.get("{{ core()->getConfigData('b2b_suite.general.settings.active') ? route('admin.customers.companies.get') : '' }}");
                         this.allCompanies = response.data;
                         this.filteredCompanies = response.data;
                     } catch (error) {
