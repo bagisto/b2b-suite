@@ -68,7 +68,7 @@ The **Bagisto B2B Ecommerce** enhances your Bagisto store with advanced Business
 #### Step 1: Install via Composer
 
 ```bash
-composer require bagisto/b2b-suite:dev-master
+composer require bagisto/b2b-suite
 ```
 
 ### 2. Register the Service Provider
