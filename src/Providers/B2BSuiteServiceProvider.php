@@ -6,8 +6,13 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
+use Webkul\B2BSuite\Console\Commands\InstallB2BSuite;
+use Webkul\B2BSuite\Contracts\Company;
+use Webkul\B2BSuite\Contracts\CompanyFlat;
 use Webkul\B2BSuite\Http\Middleware\CustomerBouncerMiddleware;
 use Webkul\B2BSuite\Menu as B2BMenu;
+use Webkul\B2BSuite\Repositories\CompanyFlatRepository;
+use Webkul\B2BSuite\Repositories\CompanyRepository;
 use Webkul\Core\Menu as CoreMenu;
 
 class B2BSuiteServiceProvider extends ServiceProvider
@@ -36,24 +41,9 @@ class B2BSuiteServiceProvider extends ServiceProvider
             'bagisto-vite.viters'
         );
 
-        $this->mergeAuthConfigs();
-
         $this->registerServices();
 
         $this->app->bind(CoreMenu::class, B2BMenu::class);
-    }
-
-    /**
-     * Merge Auth Configs.
-     */
-    public function mergeAuthConfigs(): void
-    {
-        foreach (['guards', 'providers', 'passwords'] as $key) {
-            $this->mergeConfigFrom(
-                dirname(__DIR__).'/Config/company/auth/'.$key.'.php',
-                'auth.'.$key
-            );
-        }
     }
 
     /**
@@ -111,7 +101,7 @@ class B2BSuiteServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->commands([
-                \Webkul\B2BSuite\Console\Commands\InstallB2BSuite::class,
+                InstallB2BSuite::class,
             ]);
         }
     }
@@ -150,14 +140,13 @@ class B2BSuiteServiceProvider extends ServiceProvider
     protected function registerServices(): void
     {
         $this->app->bind(
-            \Webkul\B2BSuite\Contracts\Company::class,
-            \Webkul\B2BSuite\Repositories\CompanyRepository::class
+            Company::class,
+            CompanyRepository::class
         );
 
         $this->app->bind(
-            \Webkul\B2BSuite\Contracts\CompanyFlat::class,
-            \Webkul\B2BSuite\Repositories\CompanyFlatRepository::class
+            CompanyFlat::class,
+            CompanyFlatRepository::class
         );
     }
-
 }

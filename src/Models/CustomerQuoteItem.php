@@ -5,6 +5,7 @@ namespace Webkul\B2BSuite\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Webkul\B2BSuite\Contracts\CustomerQuoteItem as CustomerQuoteItemContract;
+use Webkul\Product\Models\Product;
 
 class CustomerQuoteItem extends Model implements CustomerQuoteItemContract
 {
@@ -39,6 +40,6 @@ class CustomerQuoteItem extends Model implements CustomerQuoteItemContract
 
     public function product(): BelongsTo
     {
-        return $this->belongsTo(\Webkul\Product\Models\Product::class, 'product_id');
+        return $this->belongsTo(Product::class, 'product_id');
     }
 }

@@ -47,7 +47,7 @@ class Customer extends BaseCustomer
     /**
      * The customers that belong to the company.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
     public function customers()
     {

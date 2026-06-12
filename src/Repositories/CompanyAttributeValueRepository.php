@@ -5,6 +5,7 @@ namespace Webkul\B2BSuite\Repositories;
 use Illuminate\Support\Facades\Storage;
 use Webkul\B2BSuite\Models\CompanyAttributeValue;
 use Webkul\Core\Eloquent\Repository;
+use Webkul\Customer\Contracts\Customer;
 
 class CompanyAttributeValueRepository extends Repository
 {
@@ -20,7 +21,7 @@ class CompanyAttributeValueRepository extends Repository
      * Save attribute values
      *
      * @param  array  $data
-     * @param  \Webkul\Customer\Contracts\Customer  $customer
+     * @param  Customer  $customer
      * @param  mixed  $attributes
      * @return void
      */
@@ -97,11 +98,11 @@ class CompanyAttributeValueRepository extends Repository
 
             if (! $attributeValue) {
                 $attributeValuesToInsert[] = array_merge($this->getAttributeTypeColumnValues($attribute, $data[$attribute->code]), [
-                    'customer_id'              => $customer->id,
-                    'company_attribute_id'     => $attribute->id,
-                    'channel'                  => $channel,
-                    'locale'                   => $locale,
-                    'unique_id'                => $uniqueId,
+                    'customer_id' => $customer->id,
+                    'company_attribute_id' => $attribute->id,
+                    'channel' => $channel,
+                    'locale' => $locale,
+                    'unique_id' => $uniqueId,
                 ]);
             } else {
                 $previousTextValue = $attributeValue->text_value;
@@ -129,7 +130,7 @@ class CompanyAttributeValueRepository extends Repository
 
                 $attributeValue = $this->update([
                     $attribute->column_name => $data[$attribute->code],
-                    'unique_id'             => $uniqueId,
+                    'unique_id' => $uniqueId,
                 ], $attributeValue->id);
             }
         }

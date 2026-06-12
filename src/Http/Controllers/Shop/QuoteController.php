@@ -6,6 +6,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\View\View;
 use Webkul\B2BSuite\DataGrids\Shop\CustomerQuoteDataGrid;
 use Webkul\B2BSuite\Http\Requests\QuoteRequest;
 use Webkul\B2BSuite\Models\CustomerQuote;
@@ -36,7 +37,7 @@ class QuoteController extends Controller
     /**
      * Populate the request for quote page.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function index()
     {
@@ -64,12 +65,12 @@ class QuoteController extends Controller
 
         $data = array_merge([
             'quotation_number' => $quoteNumber['quotation_number'],
-            'po_number'        => $quoteNumber['po_number'],
-            'customer_id'      => $customer->id,
-            'company_id'       => $customerCompany ? $customerCompany->id : null,
-            'agent_id'         => $this->adminRepository->first()?->id ?? null,
-            'customer_name'    => $customer->name,
-            'expiration_date'  => now()->addDays($defaultExpirationDays)->toDateString(),
+            'po_number' => $quoteNumber['po_number'],
+            'customer_id' => $customer->id,
+            'company_id' => $customerCompany ? $customerCompany->id : null,
+            'agent_id' => $this->adminRepository->first()?->id ?? null,
+            'customer_name' => $customer->name,
+            'expiration_date' => now()->addDays($defaultExpirationDays)->toDateString(),
         ], $quoteRequest->only([
             'name',
             'description',
@@ -84,7 +85,7 @@ class QuoteController extends Controller
         session()->flash('success', trans('b2b_suite::app.shop.checkout.cart.request-quote.create-success'));
 
         return new JsonResponse([
-            'data'         => $quote,
+            'data' => $quote,
             'redirect_url' => route('shop.customers.account.quotes.view', $quote->id),
         ]);
     }
@@ -92,14 +93,14 @@ class QuoteController extends Controller
     /**
      * For loading the edit form page.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function view($id)
     {
         $currentAdmin = $this->customerRepository->find(auth()->guard('customer')->user()->id);
 
         $quoteConditions = [
-            'id'    => $id,
+            'id' => $id,
             'state' => CustomerQuote::STATE_QUOTATION,
         ];
 
@@ -134,7 +135,7 @@ class QuoteController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'order_date'            => 'date|after_or_equal:today',
+            'order_date' => 'date|after_or_equal:today',
             'expected_arrival_date' => 'date|after_or_equal:order_date',
         ]);
 
@@ -160,7 +161,7 @@ class QuoteController extends Controller
      * AJAX endpoint for loading messages with pagination and filters
      *
      * @param  int  $id  Quote ID
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function getMessages($id, Request $request)
     {
@@ -192,7 +193,7 @@ class QuoteController extends Controller
 
         try {
             $quoteConditions = [
-                'id'     => $id,
+                'id' => $id,
                 'status' => CustomerQuote::STATUS_ACCEPTED,
             ];
 
@@ -255,7 +256,7 @@ class QuoteController extends Controller
     public function submitQuote(Request $request, $id)
     {
         $request->validate([
-            'items'   => ['required', 'array', 'min:1'],
+            'items' => ['required', 'array', 'min:1'],
             'message' => 'required|string|max:1000',
         ]);
 
@@ -289,14 +290,14 @@ class QuoteController extends Controller
                 : CustomerQuote::STATUS_NEGOTIATION;
 
             $message = $quote->messages()->create([
-                'message'    => $request->message,
-                'user_type'  => 'customer',
-                'user_id'    => $currentAdmin->id,
+                'message' => $request->message,
+                'user_type' => 'customer',
+                'user_id' => $currentAdmin->id,
                 'created_at' => now(),
             ]);
 
             $data = array_merge([
-                'status'     => $quoteStatus,
+                'status' => $quoteStatus,
                 'message_id' => $message->id,
             ], $request->only(['items', 'message']));
 
@@ -326,7 +327,7 @@ class QuoteController extends Controller
             ]);
 
             $quote = $this->customerQuoteRepository->findOneWhere([
-                'id'          => $id,
+                'id' => $id,
                 'customer_id' => $customerId,
             ]);
 
@@ -341,9 +342,9 @@ class QuoteController extends Controller
             $quote->save();
 
             $quote->messages()->create([
-                'message'    => $request->message,
-                'user_type'  => 'customer',
-                'user_id'    => $customerId,
+                'message' => $request->message,
+                'user_type' => 'customer',
+                'user_id' => $customerId,
                 'created_at' => now(),
             ]);
 
@@ -394,9 +395,9 @@ class QuoteController extends Controller
             }
 
             $quote->messages()->create([
-                'message'    => $request->message,
-                'user_type'  => 'customer',
-                'user_id'    => $currentAdmin->id,
+                'message' => $request->message,
+                'user_type' => 'customer',
+                'user_id' => $currentAdmin->id,
                 'created_at' => now(),
             ]);
 
@@ -444,10 +445,10 @@ class QuoteController extends Controller
         $quote->update(['status' => CustomerQuote::STATUS_ACCEPTED]);
 
         $quote->messages()->create([
-            'message'    => $request->message,
-            'status'     => trans('b2b_suite::app.shop.customers.account.quotes.view.'.$quote->status),
-            'user_type'  => 'customer',
-            'user_id'    => $currentAdmin->id,
+            'message' => $request->message,
+            'status' => trans('b2b_suite::app.shop.customers.account.quotes.view.'.$quote->status),
+            'user_type' => 'customer',
+            'user_id' => $currentAdmin->id,
             'created_at' => now(),
         ]);
 
@@ -457,7 +458,7 @@ class QuoteController extends Controller
         $this->customerQuoteQuotationRepository->updateOrCreate(
             [
                 'message_id' => $isAdminLastQuotation?->id,
-                'quote_id'   => $quote->id,
+                'quote_id' => $quote->id,
             ],
             [
                 'is_accepted' => 1,
@@ -507,10 +508,10 @@ class QuoteController extends Controller
             $quote->update(['status' => CustomerQuote::STATUS_REJECTED]);
 
             $quote->messages()->create([
-                'message'    => $request->message,
-                'status'     => trans('b2b_suite::app.shop.customers.account.quotes.view.'.$quote->status),
-                'user_type'  => 'customer',
-                'user_id'    => $currentAdmin->id,
+                'message' => $request->message,
+                'status' => trans('b2b_suite::app.shop.customers.account.quotes.view.'.$quote->status),
+                'user_type' => 'customer',
+                'user_id' => $currentAdmin->id,
                 'created_at' => now(),
             ]);
 

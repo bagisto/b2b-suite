@@ -43,7 +43,7 @@ class InstallB2BSuite extends Command
 
         $this->callSilently('vendor:publish', [
             '--provider' => B2BSuiteServiceProvider::class,
-            '--force'    => true,
+            '--force' => true,
         ]);
 
         $this->call('optimize:clear');

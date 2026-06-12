@@ -15,9 +15,9 @@ class CompanyTest extends TestCase
     public function test_company_creation()
     {
         $companyData = [
-            'name'   => 'Test Company',
-            'email'  => 'test@company.com',
-            'phone'  => '+1-555-0123',
+            'name' => 'Test Company',
+            'email' => 'test@company.com',
+            'phone' => '+1-555-0123',
             'status' => true,
         ];
 
@@ -37,10 +37,10 @@ class CompanyTest extends TestCase
     public function test_company_full_address()
     {
         $company = new Company([
-            'address'     => '123 Main St',
-            'city'        => 'Test City',
-            'state'       => 'TS',
-            'country'     => 'Test Country',
+            'address' => '123 Main St',
+            'city' => 'Test City',
+            'state' => 'TS',
+            'country' => 'Test Country',
             'postal_code' => '12345',
         ]);
 

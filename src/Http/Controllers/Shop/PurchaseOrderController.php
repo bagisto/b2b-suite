@@ -2,6 +2,7 @@
 
 namespace Webkul\B2BSuite\Http\Controllers\Shop;
 
+use Illuminate\View\View;
 use Webkul\B2BSuite\DataGrids\Shop\CustomerPurchaseOrderDataGrid;
 use Webkul\B2BSuite\Models\CustomerQuote;
 use Webkul\B2BSuite\Repositories\CustomerQuoteMessageRepository;
@@ -25,7 +26,7 @@ class PurchaseOrderController extends Controller
     /**
      * Populate the request for quote page.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function index()
     {
@@ -39,14 +40,14 @@ class PurchaseOrderController extends Controller
     /**
      * For loading the edit form page.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function view($id)
     {
         $customer = $this->customerRepository->find(auth()->guard('customer')->user()->id);
 
         $quoteConditions = [
-            'id'    => $id,
+            'id' => $id,
             'state' => CustomerQuote::STATE_PURCHASE_ORDER,
         ];
 

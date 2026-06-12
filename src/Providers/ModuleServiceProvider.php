@@ -2,6 +2,22 @@
 
 namespace Webkul\B2BSuite\Providers;
 
+use Webkul\B2BSuite\Models\CompanyAttribute;
+use Webkul\B2BSuite\Models\CompanyAttributeGroup;
+use Webkul\B2BSuite\Models\CompanyAttributeGroupTranslation;
+use Webkul\B2BSuite\Models\CompanyAttributeOption;
+use Webkul\B2BSuite\Models\CompanyAttributeOptionTranslation;
+use Webkul\B2BSuite\Models\CompanyAttributeTranslation;
+use Webkul\B2BSuite\Models\CompanyAttributeValue;
+use Webkul\B2BSuite\Models\CompanyFlat;
+use Webkul\B2BSuite\Models\CompanyRole;
+use Webkul\B2BSuite\Models\CustomerQuote;
+use Webkul\B2BSuite\Models\CustomerQuoteAttachment;
+use Webkul\B2BSuite\Models\CustomerQuoteItem;
+use Webkul\B2BSuite\Models\CustomerQuoteMessage;
+use Webkul\B2BSuite\Models\CustomerQuoteQuotation;
+use Webkul\B2BSuite\Models\CustomerRequisitionList;
+use Webkul\B2BSuite\Models\CustomerRequisitionListProduct;
 use Webkul\Core\Providers\CoreModuleServiceProvider;
 
 class ModuleServiceProvider extends CoreModuleServiceProvider
@@ -12,21 +28,21 @@ class ModuleServiceProvider extends CoreModuleServiceProvider
      * @var array
      */
     protected $models = [
-        \Webkul\B2BSuite\Models\CompanyFlat::class,
-        \Webkul\B2BSuite\Models\CompanyAttribute::class,
-        \Webkul\B2BSuite\Models\CompanyAttributeValue::class,
-        \Webkul\B2BSuite\Models\CompanyAttributeTranslation::class,
-        \Webkul\B2BSuite\Models\CompanyAttributeGroup::class,
-        \Webkul\B2BSuite\Models\CompanyAttributeOption::class,
-        \Webkul\B2BSuite\Models\CompanyAttributeOptionTranslation::class,
-        \Webkul\B2BSuite\Models\CompanyAttributeGroupTranslation::class,
-        \Webkul\B2BSuite\Models\CompanyRole::class,
-        \Webkul\B2BSuite\Models\CustomerQuote::class,
-        \Webkul\B2BSuite\Models\CustomerQuoteItem::class,
-        \Webkul\B2BSuite\Models\CustomerQuoteQuotation::class,
-        \Webkul\B2BSuite\Models\CustomerQuoteMessage::class,
-        \Webkul\B2BSuite\Models\CustomerQuoteAttachment::class,
-        \Webkul\B2BSuite\Models\CustomerRequisitionList::class,
-        \Webkul\B2BSuite\Models\CustomerRequisitionListProduct::class,
+        CompanyFlat::class,
+        CompanyAttribute::class,
+        CompanyAttributeValue::class,
+        CompanyAttributeTranslation::class,
+        CompanyAttributeGroup::class,
+        CompanyAttributeOption::class,
+        CompanyAttributeOptionTranslation::class,
+        CompanyAttributeGroupTranslation::class,
+        CompanyRole::class,
+        CustomerQuote::class,
+        CustomerQuoteItem::class,
+        CustomerQuoteQuotation::class,
+        CustomerQuoteMessage::class,
+        CustomerQuoteAttachment::class,
+        CustomerRequisitionList::class,
+        CustomerRequisitionListProduct::class,
     ];
 }

@@ -2,6 +2,7 @@
 
 namespace Webkul\B2BSuite\Repositories;
 
+use Carbon\Carbon;
 use Illuminate\Container\Container;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -60,11 +61,11 @@ class CustomerQuoteRepository extends Repository
         }
 
         $this->customerQuoteMessageRepository->create([
-            'quote_id'  => $quote->id,
-            'user_id'   => $data['customer_id'],
+            'quote_id' => $quote->id,
+            'user_id' => $data['customer_id'],
             'user_type' => isset($data['customer_id']) ? 'customer' : 'admin',
-            'message'   => $data['message'] ?? trans('b2b_suite::app.shop.checkout.cart.request-quote.default-message', [
-                'status'  => $quote->status,
+            'message' => $data['message'] ?? trans('b2b_suite::app.shop.checkout.cart.request-quote.default-message', [
+                'status' => $quote->status,
             ]),
         ]);
 
@@ -84,34 +85,34 @@ class CustomerQuoteRepository extends Repository
             return [
                 'items' => $cart->items->map(function ($item) use ($quote) {
                     return [
-                        'customer_quote_id'     => $quote->id,
-                        'product_id'            => $item->product_id,
-                        'type'                  => $item->product->type,
-                        'sku'                   => $item->product->sku,
-                        'name'                  => $item->product->name,
-                        'qty'                   => $item->quantity,
-                        'negotiated_qty'        => $item->quantity,
-                        'price'                 => $item->price,
-                        'base_price'            => $item->base_price,
-                        'total'                 => $item->total,
-                        'base_total'            => $item->base_total,
-                        'negotiated_price'      => $item->price,
+                        'customer_quote_id' => $quote->id,
+                        'product_id' => $item->product_id,
+                        'type' => $item->product->type,
+                        'sku' => $item->product->sku,
+                        'name' => $item->product->name,
+                        'qty' => $item->quantity,
+                        'negotiated_qty' => $item->quantity,
+                        'price' => $item->price,
+                        'base_price' => $item->base_price,
+                        'total' => $item->total,
+                        'base_total' => $item->base_total,
+                        'negotiated_price' => $item->price,
                         'base_negotiated_price' => $item->base_price,
-                        'negotiated_total'      => $item->total,
+                        'negotiated_total' => $item->total,
                         'base_negotiated_total' => $item->base_total,
-                        'note'                  => '',
-                        'status'                => $quote->status,
-                        'additional'            => json_encode($item->additional),
+                        'note' => '',
+                        'status' => $quote->status,
+                        'additional' => json_encode($item->additional),
                     ];
                 })->toArray(),
             ];
         }
 
         return [
-            'cart_id'               => $cart->id,
-            'total'                 => $cart->grand_total,
-            'base_total'            => $cart->base_grand_total,
-            'negotiated_total'      => $cart->grand_total,
+            'cart_id' => $cart->id,
+            'total' => $cart->grand_total,
+            'base_total' => $cart->base_grand_total,
+            'negotiated_total' => $cart->grand_total,
             'base_negotiated_total' => $cart->base_grand_total,
         ];
     }
@@ -119,15 +120,15 @@ class CustomerQuoteRepository extends Repository
     /**
      * Calculate expiration date based on configuration.
      */
-    private function calculateExpirationDate(): \Carbon\Carbon
+    private function calculateExpirationDate(): Carbon
     {
         $period = (int) core()->getConfigData('b2b_suite.quotes.settings.default_expiration_period', 30);
         $unit = core()->getConfigData('b2b_suite.quotes.settings.expiration_period_unit', 'days');
 
         return match ($unit) {
-            'weeks'  => now()->addWeeks($period),
+            'weeks' => now()->addWeeks($period),
             'months' => now()->addMonths($period),
-            default  => now()->addDays($period),
+            default => now()->addDays($period),
         };
     }
 
@@ -135,7 +136,7 @@ class CustomerQuoteRepository extends Repository
      * Upload.
      *
      * @param  array  $data
-     * @param  \Webkul\B2BSuite\Contracts\CustomerQuote  $quote
+     * @param  CustomerQuote  $quote
      */
     public function upload($data, $quote, string $uploadFileType): void
     {
@@ -161,10 +162,10 @@ class CustomerQuoteRepository extends Repository
 
                     $this->customerQuoteAttachmentRepository->create([
                         'customer_quote_id' => $quote->id,
-                        'name'              => $file->getClientOriginalName(),
-                        'path'              => $path,
-                        'mime_type'         => $file->getClientMimeType(),
-                        'size'              => $file->getSize(),
+                        'name' => $file->getClientOriginalName(),
+                        'path' => $path,
+                        'mime_type' => $file->getClientMimeType(),
+                        'size' => $file->getSize(),
                     ]);
                 } else {
                     if (is_numeric($index = $previousIds->search($indexOrModelId))) {
@@ -189,7 +190,7 @@ class CustomerQuoteRepository extends Repository
      * Update cart.
      *
      * @param  array  $data
-     * @return \Webkul\B2BSuite\Contracts\CustomerQuote $quote
+     * @return CustomerQuote $quote
      */
     public function updateCart($id)
     {
@@ -199,13 +200,13 @@ class CustomerQuoteRepository extends Repository
 
         if (! $cart) {
             $cart = $this->cartRepository->create([
-                'company_id'            => $quote?->customer?->company_id ?? null,
-                'is_guest'              => 1,
-                'channel_id'            => core()->getCurrentChannel()->id,
-                'global_currency_code'  => $baseCurrencyCode = core()->getBaseCurrencyCode(),
-                'base_currency_code'    => $baseCurrencyCode,
+                'company_id' => $quote?->customer?->company_id ?? null,
+                'is_guest' => 1,
+                'channel_id' => core()->getCurrentChannel()->id,
+                'global_currency_code' => $baseCurrencyCode = core()->getBaseCurrencyCode(),
+                'base_currency_code' => $baseCurrencyCode,
                 'channel_currency_code' => core()->getChannelBaseCurrencyCode(),
-                'cart_currency_code'    => core()->getCurrentCurrencyCode(),
+                'cart_currency_code' => core()->getCurrentCurrencyCode(),
             ]);
         }
 
@@ -221,9 +222,9 @@ class CustomerQuoteRepository extends Repository
             $additional = $quoteItem->additional ? json_decode($quoteItem->additional, true) : [];
 
             $data = array_merge($additional, [
-                'product_id'    => $product->id,
-                'quantity'      => $quoteItem->negotiated_qty,
-                'quote_id'      => $quote->id,
+                'product_id' => $product->id,
+                'quantity' => $quoteItem->negotiated_qty,
+                'quote_id' => $quote->id,
                 'quote_item_id' => $quoteItem->id,
             ]);
 
@@ -272,7 +273,7 @@ class CustomerQuoteRepository extends Repository
 
         return [
             'quotation_number' => $quotationNumber ?? $defaultNumber,
-            'po_number'        => $poNumber ?? $defaultNumber,
+            'po_number' => $poNumber ?? $defaultNumber,
         ];
     }
 
@@ -280,7 +281,7 @@ class CustomerQuoteRepository extends Repository
      * Create/Update message quotation.
      *
      * @param  int  $id
-     * @return \Webkul\B2BSuite\Contracts\CustomerQuote $quote
+     * @return CustomerQuote $quote
      */
     public function createOrUpdateMessageQuotation(array $data, $id)
     {
@@ -298,35 +299,35 @@ class CustomerQuoteRepository extends Repository
             $itemNegotiatedTotal += $negotiatedTotal;
 
             $this->customerQuoteItemRepository->update([
-                'negotiated_qty'        => $itemData['negotiated_qty'],
-                'negotiated_price'      => $itemData['negotiated_price'],
+                'negotiated_qty' => $itemData['negotiated_qty'],
+                'negotiated_price' => $itemData['negotiated_price'],
                 'base_negotiated_price' => core()->convertToBasePrice($itemData['negotiated_price'], core()->getBaseCurrencyCode()),
-                'negotiated_total'      => $negotiatedTotal,
+                'negotiated_total' => $negotiatedTotal,
                 'base_negotiated_total' => core()->convertToBasePrice($negotiatedTotal, core()->getBaseCurrencyCode()),
-                'note'                  => $data['message'] ?? trans('b2b_suite::app.shop.customers.account.quotes.view.item-updated', [
-                    'name'  => $quote->customer->name,
+                'note' => $data['message'] ?? trans('b2b_suite::app.shop.customers.account.quotes.view.item-updated', [
+                    'name' => $quote->customer->name,
                 ]),
-                'status'                => $data['status'] ?? $quote->status,
+                'status' => $data['status'] ?? $quote->status,
             ], $itemId);
 
             $this->customerQuoteQuotationRepository->updateOrCreate([
-                'message_id'    => $data['message_id'] ?? null,
-                'quote_id'      => $quote->id,
+                'message_id' => $data['message_id'] ?? null,
+                'quote_id' => $quote->id,
                 'quote_item_id' => $item->id,
             ], [
-                'sku'        => $item->sku,
-                'name'       => $item->name,
-                'qty'        => $itemData['negotiated_qty'],
-                'price'      => $itemData['negotiated_price'],
+                'sku' => $item->sku,
+                'name' => $item->name,
+                'qty' => $itemData['negotiated_qty'],
+                'price' => $itemData['negotiated_price'],
                 'base_price' => core()->convertToBasePrice($itemData['negotiated_price'], core()->getBaseCurrencyCode()),
-                'total'      => $negotiatedTotal,
+                'total' => $negotiatedTotal,
                 'base_total' => core()->convertToBasePrice($negotiatedTotal, core()->getBaseCurrencyCode()),
             ]);
         }
 
         $quote->update([
-            'status'                => $data['status'] ?? $quote->status,
-            'negotiated_total'      => $itemNegotiatedTotal,
+            'status' => $data['status'] ?? $quote->status,
+            'negotiated_total' => $itemNegotiatedTotal,
             'base_negotiated_total' => core()->convertToBasePrice($itemNegotiatedTotal, core()->getBaseCurrencyCode()),
         ]);
 

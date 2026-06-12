@@ -25,7 +25,6 @@ class CustomerQuoteItemRepository extends Repository
      *
      * @param  int  $productId
      * @param  int  $customerId
-     * @return bool
      */
     public function hasAcceptedNegotiation($productId, $customerId): bool
     {

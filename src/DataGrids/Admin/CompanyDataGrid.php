@@ -2,6 +2,7 @@
 
 namespace Webkul\B2BSuite\DataGrids\Admin;
 
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 use Webkul\DataGrid\DataGrid;
 
@@ -17,7 +18,7 @@ class CompanyDataGrid extends DataGrid
     /**
      * Prepare query builder.
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return Builder
      */
     public function prepareQueryBuilder()
     {
@@ -64,73 +65,73 @@ class CompanyDataGrid extends DataGrid
     public function prepareColumns()
     {
         $this->addColumn([
-            'index'      => 'customer_id',
-            'label'      => trans('b2b_suite::app.admin.companies.index.datagrid.id'),
-            'type'       => 'integer',
+            'index' => 'customer_id',
+            'label' => trans('b2b_suite::app.admin.companies.index.datagrid.id'),
+            'type' => 'integer',
             'searchable' => false,
             'filterable' => true,
-            'sortable'   => true,
+            'sortable' => true,
         ]);
 
         $this->addColumn([
-            'index'      => 'full_name',
-            'label'      => trans('b2b_suite::app.admin.companies.index.datagrid.name'),
-            'type'       => 'string',
+            'index' => 'full_name',
+            'label' => trans('b2b_suite::app.admin.companies.index.datagrid.name'),
+            'type' => 'string',
             'searchable' => true,
             'filterable' => true,
-            'sortable'   => true,
+            'sortable' => true,
         ]);
 
         $this->addColumn([
-            'index'      => 'business_name',
-            'label'      => trans('b2b_suite::app.admin.companies.index.datagrid.business-name'),
-            'type'       => 'string',
+            'index' => 'business_name',
+            'label' => trans('b2b_suite::app.admin.companies.index.datagrid.business-name'),
+            'type' => 'string',
             'searchable' => true,
             'filterable' => true,
-            'sortable'   => true,
+            'sortable' => true,
         ]);
 
         $this->addColumn([
-            'index'      => 'email',
-            'label'      => trans('b2b_suite::app.admin.companies.index.datagrid.email'),
-            'type'       => 'string',
+            'index' => 'email',
+            'label' => trans('b2b_suite::app.admin.companies.index.datagrid.email'),
+            'type' => 'string',
             'searchable' => true,
             'filterable' => true,
-            'sortable'   => true,
+            'sortable' => true,
         ]);
 
         $this->addColumn([
-            'index'      => 'phone',
-            'label'      => trans('b2b_suite::app.admin.companies.index.datagrid.phone'),
-            'type'       => 'string',
+            'index' => 'phone',
+            'label' => trans('b2b_suite::app.admin.companies.index.datagrid.phone'),
+            'type' => 'string',
             'searchable' => true,
             'filterable' => true,
-            'sortable'   => true,
+            'sortable' => true,
         ]);
 
         $this->addColumn([
-            'index'      => 'website_url',
-            'label'      => trans('b2b_suite::app.admin.companies.index.datagrid.website-url'),
-            'type'       => 'string',
+            'index' => 'website_url',
+            'label' => trans('b2b_suite::app.admin.companies.index.datagrid.website-url'),
+            'type' => 'string',
             'searchable' => true,
             'filterable' => true,
-            'sortable'   => true,
+            'sortable' => true,
         ]);
 
         $this->addColumn([
-            'index'      => 'vat_tax_id',
-            'label'      => trans('b2b_suite::app.admin.companies.index.datagrid.vat-tax-id'),
-            'type'       => 'string',
+            'index' => 'vat_tax_id',
+            'label' => trans('b2b_suite::app.admin.companies.index.datagrid.vat-tax-id'),
+            'type' => 'string',
             'searchable' => true,
             'filterable' => true,
-            'sortable'   => true,
+            'sortable' => true,
         ]);
 
         $this->addColumn([
-            'index'              => 'status',
-            'label'              => trans('b2b_suite::app.admin.companies.index.datagrid.status'),
-            'type'               => 'boolean',
-            'filterable'         => true,
+            'index' => 'status',
+            'label' => trans('b2b_suite::app.admin.companies.index.datagrid.status'),
+            'type' => 'boolean',
+            'filterable' => true,
             'filterable_options' => [
                 [
                     'label' => trans('b2b_suite::app.admin.companies.index.datagrid.active'),
@@ -141,8 +142,8 @@ class CompanyDataGrid extends DataGrid
                     'value' => 0,
                 ],
             ],
-            'sortable'   => true,
-            'closure'    => function ($row) {
+            'sortable' => true,
+            'closure' => function ($row) {
                 if ($row->status) {
                     return '<span class="label-active">'.trans('b2b_suite::app.admin.companies.index.datagrid.active').'</span>';
                 }
@@ -152,12 +153,12 @@ class CompanyDataGrid extends DataGrid
         ]);
 
         $this->addColumn([
-            'index'      => 'created_at',
-            'label'      => trans('b2b_suite::app.admin.companies.index.datagrid.created-at'),
-            'type'       => 'datetime',
+            'index' => 'created_at',
+            'label' => trans('b2b_suite::app.admin.companies.index.datagrid.created-at'),
+            'type' => 'datetime',
             'searchable' => false,
             'filterable' => true,
-            'sortable'   => true,
+            'sortable' => true,
         ]);
     }
 
@@ -170,11 +171,11 @@ class CompanyDataGrid extends DataGrid
     {
         if (bouncer()->hasPermission('b2b.companies.edit')) {
             $this->addAction([
-                'index'  => 'edit',
-                'icon'   => 'icon-edit',
-                'title'  => trans('b2b_suite::app.admin.companies.index.datagrid.edit'),
+                'index' => 'edit',
+                'icon' => 'icon-edit',
+                'title' => trans('b2b_suite::app.admin.companies.index.datagrid.edit'),
                 'method' => 'GET',
-                'url'    => function ($row) {
+                'url' => function ($row) {
                     return route('admin.b2b.companies.edit', $row->customer_id);
                 },
             ]);
@@ -182,11 +183,11 @@ class CompanyDataGrid extends DataGrid
 
         if (bouncer()->hasPermission('b2b.companies.delete')) {
             $this->addAction([
-                'index'  => 'delete',
-                'icon'   => 'icon-delete',
-                'title'  => trans('b2b_suite::app.admin.companies.index.datagrid.delete'),
+                'index' => 'delete',
+                'icon' => 'icon-delete',
+                'title' => trans('b2b_suite::app.admin.companies.index.datagrid.delete'),
                 'method' => 'DELETE',
-                'url'    => function ($row) {
+                'url' => function ($row) {
                     return route('admin.b2b.companies.delete', $row->customer_id);
                 },
             ]);
@@ -202,9 +203,9 @@ class CompanyDataGrid extends DataGrid
     {
         if (bouncer()->hasPermission('b2b.companies.edit')) {
             $this->addMassAction([
-                'title'   => trans('b2b_suite::app.admin.companies.index.datagrid.update-status'),
-                'method'  => 'POST',
-                'url'     => route('admin.b2b.companies.mass_update_status'),
+                'title' => trans('b2b_suite::app.admin.companies.index.datagrid.update-status'),
+                'method' => 'POST',
+                'url' => route('admin.b2b.companies.mass_update_status'),
                 'options' => [
                     [
                         'label' => trans('b2b_suite::app.admin.companies.index.datagrid.approve'),
@@ -220,10 +221,10 @@ class CompanyDataGrid extends DataGrid
 
         if (bouncer()->hasPermission('b2b.companies.delete')) {
             $this->addMassAction([
-                'icon'   => 'icon-delete',
-                'title'  => trans('b2b_suite::app.admin.companies.index.datagrid.mass-delete'),
+                'icon' => 'icon-delete',
+                'title' => trans('b2b_suite::app.admin.companies.index.datagrid.mass-delete'),
                 'method' => 'POST',
-                'url'    => route('admin.b2b.companies.mass_delete'),
+                'url' => route('admin.b2b.companies.mass_delete'),
             ]);
         }
     }

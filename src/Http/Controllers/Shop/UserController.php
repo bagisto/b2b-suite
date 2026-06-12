@@ -4,10 +4,12 @@ namespace Webkul\B2BSuite\Http\Controllers\Shop;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\View\View;
 use Webkul\Admin\Mail\Customer\NewCustomerNotification;
 use Webkul\B2BSuite\DataGrids\Shop\UserDataGrid;
 use Webkul\B2BSuite\Repositories\CompanyRoleRepository;
@@ -33,7 +35,7 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function index()
     {
@@ -47,7 +49,7 @@ class UserController extends Controller
     /**
      * Show the user create form.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function create()
     {
@@ -67,20 +69,20 @@ class UserController extends Controller
     /**
      * Method to store user's sign up form data to DB.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(Request $request)
     {
         $this->validate($request, [
-            'first_name'       => ['required'],
-            'last_name'        => ['required'],
-            'user_email'       => 'email|unique:customers,email',
-            'gender'           => 'required|in:Other,Male,Female',
-            'date_of_birth'    => 'date|before:today',
-            'image'            => 'array',
-            'image.*'          => 'mimes:bmp,jpeg,jpg,png,webp',
-            'phone'            => ['required', new PhoneNumber, 'unique:customers,phone'],
-            'company_role_id'  => ['required'],
+            'first_name' => ['required'],
+            'last_name' => ['required'],
+            'user_email' => 'email|unique:customers,email',
+            'gender' => 'required|in:Other,Male,Female',
+            'date_of_birth' => 'date|before:today',
+            'image' => 'array',
+            'image.*' => 'mimes:bmp,jpeg,jpg,png,webp',
+            'phone' => ['required', new PhoneNumber, 'unique:customers,phone'],
+            'company_role_id' => ['required'],
         ]);
 
         $customerGroup = core()->getConfigData('customer.settings.create_new_account_options.default_group');
@@ -96,16 +98,16 @@ class UserController extends Controller
             'image',
             'company_role_id',
         ]), [
-            'email'             => $request->input('user_email'),
-            'status'            => $request->has('status') ? 1 : 0,
-            'is_suspended'      => $request->has('is_suspended') ? 1 : 0,
-            'type'              => 'user',
-            'password'          => bcrypt($password),
-            'api_token'         => Str::random(80),
-            'is_verified'       => ! core()->getConfigData('customer.settings.email.verification'),
+            'email' => $request->input('user_email'),
+            'status' => $request->has('status') ? 1 : 0,
+            'is_suspended' => $request->has('is_suspended') ? 1 : 0,
+            'type' => 'user',
+            'password' => bcrypt($password),
+            'api_token' => Str::random(80),
+            'is_verified' => ! core()->getConfigData('customer.settings.email.verification'),
             'customer_group_id' => $this->customerGroupRepository->findOneWhere(['code' => $customerGroup])->id,
-            'channel_id'        => core()->getCurrentChannel()->id,
-            'token'             => md5(uniqid(rand(), true)),
+            'channel_id' => core()->getCurrentChannel()->id,
+            'token' => md5(uniqid(rand(), true)),
         ]);
 
         if (
@@ -162,7 +164,7 @@ class UserController extends Controller
     /**
      * For loading the edit form page.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function edit($id)
     {
@@ -183,20 +185,20 @@ class UserController extends Controller
     /**
      * Edit function for editing customer profile.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            'first_name'       => ['required'],
-            'last_name'        => ['required'],
-            'user_email'       => 'email|unique:customers,email,'.$id,
-            'gender'           => 'required|in:Other,Male,Female',
-            'date_of_birth'    => 'date|before:today',
-            'image'            => 'array',
-            'image.*'          => 'mimes:bmp,jpeg,jpg,png,webp',
-            'phone'            => ['required', new PhoneNumber, 'unique:customers,phone,'.$id],
-            'company_role_id'  => ['required'],
+            'first_name' => ['required'],
+            'last_name' => ['required'],
+            'user_email' => 'email|unique:customers,email,'.$id,
+            'gender' => 'required|in:Other,Male,Female',
+            'date_of_birth' => 'date|before:today',
+            'image' => 'array',
+            'image.*' => 'mimes:bmp,jpeg,jpg,png,webp',
+            'phone' => ['required', new PhoneNumber, 'unique:customers,phone,'.$id],
+            'company_role_id' => ['required'],
         ]);
 
         $data = array_merge($request->only([
@@ -210,9 +212,9 @@ class UserController extends Controller
             'status',
             'is_suspended',
         ]), [
-            'email'        => $request->input('user_email'),
-            'type'         => 'user',
-            'status'       => $request->has('status') ? 1 : 0,
+            'email' => $request->input('user_email'),
+            'type' => 'user',
+            'status' => $request->has('status') ? 1 : 0,
             'is_suspended' => $request->has('is_suspended') ? 1 : 0,
         ]);
 
@@ -266,8 +268,8 @@ class UserController extends Controller
         $companyId = auth()->guard('customer')->user()->id;
 
         $user = $this->customerRepository->findOneWhere([
-            'id'    => $id,
-            'type'  => 'user',
+            'id' => $id,
+            'type' => 'user',
         ]);
 
         if (

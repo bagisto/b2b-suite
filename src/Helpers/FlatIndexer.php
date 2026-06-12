@@ -4,6 +4,7 @@ namespace Webkul\B2BSuite\Helpers;
 
 use Illuminate\Support\Facades\Schema;
 use Webkul\B2BSuite\Repositories\CompanyFlatRepository;
+use Webkul\Customer\Contracts\Customer;
 use Webkul\Customer\Repositories\CustomerRepository;
 
 class FlatIndexer
@@ -28,7 +29,7 @@ class FlatIndexer
     /**
      * Refresh customer flat indices
      *
-     * @param  \Webkul\Customer\Contracts\Customer  $customer
+     * @param  Customer  $customer
      * @return void
      */
     public function refresh($customer)
@@ -41,7 +42,7 @@ class FlatIndexer
     /**
      * Creates customer flat
      *
-     * @param  \Webkul\Customer\Contracts\Customer  $customer
+     * @param  Customer  $customer
      * @return void
      */
     public function updateOrCreate($customer)
@@ -61,8 +62,8 @@ class FlatIndexer
                 foreach ($channel->locales as $locale) {
                     $customerFlat = $this->companyFlatRepository->updateOrCreate([
                         'customer_id' => $customer->id,
-                        'channel'     => $channel->code,
-                        'locale'      => $locale->code,
+                        'channel' => $channel->code,
+                        'locale' => $locale->code,
                     ], [
                         'email' => $customer->email,
                         'phone' => $customer->phone,
@@ -100,7 +101,7 @@ class FlatIndexer
                 if (request()->route()?->getName() == 'admin.customer.customers.update') {
                     $this->companyFlatRepository->deleteWhere([
                         'customer_id' => $customer->id,
-                        'channel'     => $channel->code,
+                        'channel' => $channel->code,
                     ]);
                 }
             }

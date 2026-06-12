@@ -33,8 +33,8 @@ class DatabaseSeeder extends Seeder
             $this->callWith($seeder, [
                 'parameters' => [
                     'default_locale' => app()->getLocale(),
-                    'locales'        => core()->getAllLocales()->pluck('code')->toArray(),
-                    'now'            => now()->toDateTimeString(),
+                    'locales' => core()->getAllLocales()->pluck('code')->toArray(),
+                    'now' => now()->toDateTimeString(),
                 ],
             ]);
         }

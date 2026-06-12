@@ -46,7 +46,7 @@ class B2BSuite
                 $buyRequest = [
                     'product_id' => $product->id,
                     'is_buy_now' => 0,
-                    'quantity'   => $item['quantity'] ?? 1,
+                    'quantity' => $item['quantity'] ?? 1,
                 ];
                 break;
 
@@ -56,9 +56,9 @@ class B2BSuite
                 $superAttributes = $this->getSuperAttributesForVariant($product, $variant);
 
                 $buyRequest = [
-                    'product_id'                   => $variant->id,
-                    'quantity'                     => $item['quantity'] ?? 1,
-                    'super_attribute'              => $superAttributes,
+                    'product_id' => $variant->id,
+                    'quantity' => $item['quantity'] ?? 1,
+                    'super_attribute' => $superAttributes,
                     'selected_configurable_option' => $variant->id,
                 ];
 
@@ -66,7 +66,7 @@ class B2BSuite
 
             case 'bundle':
                 $buyRequest = [
-                    'quantity'       => $item['quantity'],
+                    'quantity' => $item['quantity'],
                     'bundle_options' => $this->getBundleOptions($product),
                 ];
                 break;
@@ -74,8 +74,8 @@ class B2BSuite
             case 'grouped':
                 $buyRequest = [
                     'product_id' => $product->id,
-                    'quantity'   => $item['quantity'] ?? 1,
-                    'qty'        => $this->getGroupedProductQuantities($product, $item),
+                    'quantity' => $item['quantity'] ?? 1,
+                    'qty' => $this->getGroupedProductQuantities($product, $item),
                 ];
 
                 break;
@@ -83,15 +83,15 @@ class B2BSuite
             case 'downloadable':
                 $buyRequest = [
                     'product_id' => $product->id,
-                    'quantity'   => $item['quantity'],
-                    'links'      => $this->getDownloadableLinks($product),
+                    'quantity' => $item['quantity'],
+                    'links' => $this->getDownloadableLinks($product),
                 ];
                 break;
 
             default:
                 $buyRequest = [
                     'product_id' => $product->id,
-                    'quantity'   => $item['quantity'],
+                    'quantity' => $item['quantity'],
                 ];
                 break;
         }

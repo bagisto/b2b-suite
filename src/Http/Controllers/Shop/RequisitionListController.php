@@ -3,8 +3,10 @@
 namespace Webkul\B2BSuite\Http\Controllers\Shop;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
+use Illuminate\View\View;
 use Webkul\B2BSuite\DataGrids\Shop\CustomerRequisitionListDataGrid;
 use Webkul\B2BSuite\Http\Resources\RequisitionItemResource;
 use Webkul\B2BSuite\Models\CustomerRequisitionList;
@@ -31,7 +33,7 @@ class RequisitionListController extends Controller
     /**
      * Populate the request for quote page.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function index()
     {
@@ -62,7 +64,7 @@ class RequisitionListController extends Controller
             'description',
         ]), [
             'customer_id' => $customer->id,
-            'company_id'  => $customer->companies->first()->id,
+            'company_id' => $customer->companies->first()->id,
         ]);
 
         $requisition = $this->customerRequisitionRepository->create($data);
@@ -93,12 +95,12 @@ class RequisitionListController extends Controller
     /**
      * For editing the existing addresses of current logged in customer.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function edit(int $id)
     {
         $requisition = $this->customerRequisitionRepository->findOneWhere([
-            'id'          => $id,
+            'id' => $id,
             'customer_id' => auth()->guard('customer')->user()->id,
         ]);
 
@@ -112,15 +114,15 @@ class RequisitionListController extends Controller
     /**
      * Edit's the pre-made resource of customer called Address.
      *
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function update(int $id, Request $request)
     {
         $data = $this->validate($request, [
             'requisition_id' => 'required|integer',
-            'name'           => 'required|string|max:255',
-            'description'    => 'required|string|max:1000',
-            'is_default'     => 'sometimes',
+            'name' => 'required|string|max:255',
+            'description' => 'required|string|max:1000',
+            'is_default' => 'sometimes',
         ]);
 
         $customerId = auth()->guard('customer')->user()->id;
@@ -134,7 +136,7 @@ class RequisitionListController extends Controller
             'description',
         ]), [
             'customer_id' => $customer->id,
-            'company_id'  => $customer->companies->first()->id,
+            'company_id' => $customer->companies->first()->id,
         ]);
 
         $requisition = $this->customerRequisitionRepository->update($data, $id);
@@ -154,7 +156,7 @@ class RequisitionListController extends Controller
         session()->flash('success', trans('b2b_suite::app.shop.customers.account.requisitions.update-success'));
 
         return new JsonResponse([
-            'data'         => $requisition,
+            'data' => $requisition,
             'redirect_url' => route('shop.customers.account.requisitions.edit', $requisition->id),
         ]);
     }
@@ -165,7 +167,7 @@ class RequisitionListController extends Controller
     public function destroy(int $id): JsonResponse
     {
         $requisition = $this->customerRequisitionRepository->findOneWhere([
-            'id'          => $id,
+            'id' => $id,
             'customer_id' => auth()->guard('customer')->user()->id,
         ]);
 
@@ -180,7 +182,7 @@ class RequisitionListController extends Controller
         Event::dispatch('customer.requisitions.delete.after', $id);
 
         return new JsonResponse([
-            'message'      => trans('b2b_suite::app.shop.customers.account.requisitions.delete-success'),
+            'message' => trans('b2b_suite::app.shop.customers.account.requisitions.delete-success'),
             'redirect_url' => route('shop.customers.account.requisitions.index'),
         ]);
     }
@@ -203,16 +205,16 @@ class RequisitionListController extends Controller
     public function addProduct(): JsonResponse
     {
         $data = $this->validate(request(), [
-            'requisition_id'               => 'required|integer',
-            'product_id'                   => 'sometimes',
-            'cart_id'                      => 'sometimes',
+            'requisition_id' => 'required|integer',
+            'product_id' => 'sometimes',
+            'cart_id' => 'sometimes',
             'selected_configurable_option' => 'sometimes',
-            'quantity'                     => 'sometimes|integer|min:1',
+            'quantity' => 'sometimes|integer|min:1',
         ]);
 
         try {
             $requisition = $this->customerRequisitionRepository->findOneWhere([
-                'id'          => $data['requisition_id'],
+                'id' => $data['requisition_id'],
                 'customer_id' => auth()->guard('customer')->id(),
             ]);
 
@@ -240,22 +242,22 @@ class RequisitionListController extends Controller
     public function list(): JsonResponse
     {
         $requisitions = $this->customerRequisitionRepository->findWhere([
-            'status'      => CustomerRequisitionList::STATUS_ACTIVE,
+            'status' => CustomerRequisitionList::STATUS_ACTIVE,
             'customer_id' => auth()->guard('customer')->user()->id,
         ])
             ->sortByDesc('created_at')
             ->take(5)
             ->map(function ($requisition) {
                 return [
-                    'id'    => $requisition->id,
-                    'name'  => $requisition->name,
+                    'id' => $requisition->id,
+                    'name' => $requisition->name,
                 ];
             });
 
         $totalRequisition = $this->customerRequisitionRepository->count();
 
         return new JsonResponse([
-            'requisitions'   => $requisitions,
+            'requisitions' => $requisitions,
             'allow_new_list' => (int) core()->getConfigData('b2b_suite.general.settings.no_requisition_list') > $totalRequisition,
         ]);
     }
@@ -266,7 +268,7 @@ class RequisitionListController extends Controller
     public function getItems(): JsonResponse
     {
         $requisition = $this->customerRequisitionRepository->findOneWhere([
-            'id'          => request()->id,
+            'id' => request()->id,
             'customer_id' => auth()->guard('customer')->user()->id,
         ]);
 
@@ -286,13 +288,13 @@ class RequisitionListController extends Controller
     {
         $this->validate(request(), [
             'requisition_id' => 'required|exists:customer_requisition_lists,id',
-            'ids'            => 'required|array',
+            'ids' => 'required|array',
         ]);
 
         $data = request()->all();
 
         $requisition = $this->customerRequisitionRepository->with(['items'])->findOneWhere([
-            'id'          => $data['requisition_id'],
+            'id' => $data['requisition_id'],
             'customer_id' => auth()->guard('customer')->user()->id,
         ]);
 
@@ -329,14 +331,14 @@ class RequisitionListController extends Controller
     {
         $this->validate(request(), [
             'requisition_id' => 'required|exists:customer_requisition_lists,id',
-            'qty'            => 'array',
+            'qty' => 'array',
         ]);
 
         try {
             $data = request()->all();
 
             $requisition = $this->customerRequisitionRepository->with(['items'])->findOneWhere([
-                'id'          => $data['requisition_id'],
+                'id' => $data['requisition_id'],
                 'customer_id' => auth()->guard('customer')->user()->id,
             ]);
 
@@ -354,8 +356,8 @@ class RequisitionListController extends Controller
                 $additional = $item->additional ? json_decode($item->additional, true) : [];
 
                 $item->update([
-                    'qty'        => $qty,
-                    'total'      => $item->price * $qty,
+                    'qty' => $qty,
+                    'total' => $item->price * $qty,
                     'base_total' => $item->base_price * $qty,
                     'additional' => $additional ? json_encode(array_merge($additional, ['quantity' => $qty])) : null,
                 ]);
@@ -365,7 +367,7 @@ class RequisitionListController extends Controller
             $updatedItems = $requisition->items()->get();
 
             return new JsonResponse([
-                'data'    => RequisitionItemResource::collection($updatedItems),
+                'data' => RequisitionItemResource::collection($updatedItems),
                 'message' => trans('b2b_suite::app.shop.customers.account.requisitions.item-updated'),
             ]);
         } catch (\Exception $exception) {
@@ -381,12 +383,12 @@ class RequisitionListController extends Controller
     public function destroyItems(): JsonResponse
     {
         $this->validate(request(), [
-            'requisition_id'       => 'required|exists:customer_requisition_lists,id',
+            'requisition_id' => 'required|exists:customer_requisition_lists,id',
             'requisition_item_ids' => 'required|array',
         ]);
 
         $requisition = $this->customerRequisitionRepository->findOneWhere([
-            'id'          => request()->input('requisition_id'),
+            'id' => request()->input('requisition_id'),
             'customer_id' => auth()->guard('customer')->user()->id,
         ]);
 
@@ -404,7 +406,7 @@ class RequisitionListController extends Controller
         $updatedItems = $requisition->items()->get();
 
         return new JsonResponse([
-            'data'    => RequisitionItemResource::collection($updatedItems),
+            'data' => RequisitionItemResource::collection($updatedItems),
             'message' => trans('b2b_suite::app.shop.customers.account.requisitions.success-remove'),
         ]);
     }

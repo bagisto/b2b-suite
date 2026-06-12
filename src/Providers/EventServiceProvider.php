@@ -53,19 +53,19 @@ class EventServiceProvider extends ServiceProvider
     {
         $templates = [
             [
-                'event'    => 'bagisto.shop.layout.head.after',
+                'event' => 'bagisto.shop.layout.head.after',
                 'template' => 'b2b_suite::components.layouts.scripts',
             ],
             [
-                'event'    => 'bagisto.shop.checkout.cart.summary.proceed_to_checkout.before',
+                'event' => 'bagisto.shop.checkout.cart.summary.proceed_to_checkout.before',
                 'template' => 'b2b_suite::shop.checkout.cart.request-quote-button',
             ],
             [
-                'event'    => 'bagisto.shop.products.view.additional_actions.before',
+                'event' => 'bagisto.shop.products.view.additional_actions.before',
                 'template' => 'b2b_suite::shop.customers.account.requisitions.list-modal',
             ],
             [
-                'event'    => 'bagisto.shop.checkout.cart.continue_shopping.before',
+                'event' => 'bagisto.shop.checkout.cart.continue_shopping.before',
                 'template' => 'b2b_suite::shop.customers.account.requisitions.list-modal',
             ],
         ];

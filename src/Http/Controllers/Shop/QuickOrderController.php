@@ -2,8 +2,11 @@
 
 namespace Webkul\B2BSuite\Http\Controllers\Shop;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\View\View;
 use Webkul\Admin\Http\Resources\ProductResource;
 use Webkul\B2BSuite\Repositories\CompanyRoleRepository;
 use Webkul\Customer\Repositories\CustomerGroupRepository;
@@ -28,7 +31,7 @@ class QuickOrderController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function index()
     {
@@ -38,7 +41,7 @@ class QuickOrderController extends Controller
     /**
      * Method to store user's sign up form data to DB.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store()
     {
@@ -46,10 +49,10 @@ class QuickOrderController extends Controller
             $maxFileSizeMB = core()->getConfigData('b2b.catalog.quick_order.upload_file.max_size') ?? 2;
 
             $this->validate(request(), [
-                'products'            => 'required_without:upload_file|array',
-                'products.*.sku'      => 'sometimes|string|distinct|exists:products,sku',
+                'products' => 'required_without:upload_file|array',
+                'products.*.sku' => 'sometimes|string|distinct|exists:products,sku',
                 'products.*.quantity' => 'sometimes|numeric|min:1',
-                'upload_file'         => 'required_without:products|file|mimes:csv|max:'.($maxFileSizeMB * 1024),
+                'upload_file' => 'required_without:products|file|mimes:csv|max:'.($maxFileSizeMB * 1024),
             ]);
 
             $data = request()->only('products', 'upload_file');
@@ -67,7 +70,7 @@ class QuickOrderController extends Controller
 
                     if (! empty($sku)) {
                         $products[] = [
-                            'sku'      => $sku,
+                            'sku' => $sku,
                             'quantity' => $quantity,
                         ];
                     }
@@ -86,8 +89,8 @@ class QuickOrderController extends Controller
                 b2b_suite()->addProductsToCart($data['products']);
 
                 return response()->json([
-                    'status'       => 'success',
-                    'message'      => trans('b2b_suite::app.shop.customers.account.quick-orders.create-success'),
+                    'status' => 'success',
+                    'message' => trans('b2b_suite::app.shop.customers.account.quick-orders.create-success'),
                     'redirect_url' => route('shop.customers.account.quick_orders.index'),
                 ]);
             } catch (\Exception $e) {
@@ -106,7 +109,7 @@ class QuickOrderController extends Controller
     /**
      * Result of search product.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function search()
     {
@@ -134,10 +137,10 @@ class QuickOrderController extends Controller
         $channelId = $this->customerRepository->find(auth()->guard('customer')->user()->id)->channel_id ?? null;
 
         $params = [
-            'index'      => $indexNames ?? null,
-            'name'       => request('query'),
-            'sort'       => 'created_at',
-            'order'      => 'desc',
+            'index' => $indexNames ?? null,
+            'name' => request('query'),
+            'sort' => 'created_at',
+            'order' => 'desc',
             'channel_id' => $channelId,
         ];
 
@@ -147,10 +150,10 @@ class QuickOrderController extends Controller
 
         if ($products->isEmpty()) {
             $params = [
-                'index'      => $indexNames ?? null,
-                'sku'        => request('query'),
-                'sort'       => 'created_at',
-                'order'      => 'desc',
+                'index' => $indexNames ?? null,
+                'sku' => request('query'),
+                'sort' => 'created_at',
+                'order' => 'desc',
                 'channel_id' => $channelId,
             ];
 
@@ -165,7 +168,7 @@ class QuickOrderController extends Controller
     /**
      * Fetch products by skus.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function fetchBySkus(Request $request)
     {

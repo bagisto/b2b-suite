@@ -55,7 +55,7 @@ class CompanyRequest extends FormRequest
                 'email',
                 Rule::unique('customers', 'email')->ignore($customerId),
             ],
-            'phone'  => [
+            'phone' => [
                 'required',
                 new PhoneNumber,
                 Rule::unique('customers', 'phone')->ignore($customerId),

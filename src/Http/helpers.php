@@ -24,7 +24,7 @@ if (! function_exists('b2b_suite')) {
     /**
      * B2BSuite helper.
      *
-     * @return \Webkul\B2BSuite\B2BSuite
+     * @return Webkul\B2BSuite\B2BSuite
      */
     function b2b_suite()
     {

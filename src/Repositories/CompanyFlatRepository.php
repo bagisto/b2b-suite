@@ -123,8 +123,8 @@ class CompanyFlatRepository extends Repository
             foreach ($channels as $channel) {
                 $flatData = array_merge($data, [
                     'customer_id' => $customerId,
-                    'locale'      => $locale->code,
-                    'channel'     => $channel->code,
+                    'locale' => $locale->code,
+                    'channel' => $channel->code,
                 ]);
 
                 $this->createOrUpdate($flatData);

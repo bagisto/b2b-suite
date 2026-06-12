@@ -4,7 +4,9 @@ namespace Webkul\B2BSuite\Http\Controllers\Shop;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Event;
+use Illuminate\View\View;
 use Webkul\B2BSuite\DataGrids\Shop\RoleDataGrid;
 use Webkul\B2BSuite\Repositories\CompanyRoleRepository;
 use Webkul\Customer\Repositories\CustomerRepository;
@@ -25,7 +27,7 @@ class RoleController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function index()
     {
@@ -39,7 +41,7 @@ class RoleController extends Controller
     /**
      * Show the user create form.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function create()
     {
@@ -49,14 +51,14 @@ class RoleController extends Controller
     /**
      * Method to store user's sign up form data to DB.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store()
     {
         $this->validate(request(), [
-            'name'            => 'required',
+            'name' => 'required',
             'permission_type' => 'required|in:all,custom',
-            'description'     => 'required',
+            'description' => 'required',
         ]);
 
         if (request('permission_type') == 'custom') {
@@ -98,7 +100,7 @@ class RoleController extends Controller
     /**
      * For loading the edit form page.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function edit($id)
     {
@@ -110,14 +112,14 @@ class RoleController extends Controller
     /**
      * Edit function for editing customer profile.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(Request $request, $id)
     {
         $this->validate(request(), [
-            'name'            => 'required',
+            'name' => 'required',
             'permission_type' => 'required|in:all,custom',
-            'description'     => 'required',
+            'description' => 'required',
         ]);
 
         /**
@@ -163,7 +165,7 @@ class RoleController extends Controller
 
         if ($role->customers->count() >= 1) {
             return new JsonResponse(['message' => trans('admin::app.settings.roles.being-used', [
-                'name'   => 'admin::app.settings.roles.index.title',
+                'name' => 'admin::app.settings.roles.index.title',
                 'source' => 'admin::app.settings.roles.index.admin-user',
             ])], 400);
         }

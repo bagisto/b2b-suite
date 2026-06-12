@@ -2,9 +2,11 @@
 
 namespace Webkul\B2BSuite\Http\Controllers\Shop\Customer;
 
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\View\View;
 use Webkul\B2BSuite\Http\Requests\CompanyRequest;
 use Webkul\B2BSuite\Repositories\CompanyAttributeGroupRepository;
 use Webkul\B2BSuite\Repositories\CompanyAttributeRepository;
@@ -33,7 +35,7 @@ class CustomerController extends BaseCustomerController
     /**
      * Taking the customer to profile details page.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function index()
     {
@@ -54,7 +56,7 @@ class CustomerController extends BaseCustomerController
     /**
      * For loading the edit form page.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function edit()
     {
@@ -71,7 +73,7 @@ class CustomerController extends BaseCustomerController
 
         return view('b2b_suite::shop.companies.account.profile.edit')
             ->with([
-                'customer'        => $customer,
+                'customer' => $customer,
                 'attributeGroups' => $attributeGroups,
             ]);
     }
@@ -79,16 +81,16 @@ class CustomerController extends BaseCustomerController
     /**
      * Edit function for editing customer profile.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function modify(CompanyRequest $request, int $id)
     {
         $this->validate($request, [
-            'new_password'                => 'confirmed|min:6|required_with:current_password',
+            'new_password' => 'confirmed|min:6|required_with:current_password',
             '`new_password_confirmation`' => 'required_with:new_password',
-            'current_password'            => 'required_with:new_password',
-            'image'                       => 'array',
-            'image.*'                     => 'mimes:bmp,jpeg,jpg,png,webp',
+            'current_password' => 'required_with:new_password',
+            'image' => 'array',
+            'image.*' => 'mimes:bmp,jpeg,jpg,png,webp',
         ]);
 
         $isPasswordChanged = false;
@@ -101,7 +103,7 @@ class CustomerController extends BaseCustomerController
 
         $data = array_merge([
             'is_verified' => 1,
-            'channel_id'  => core()->getCurrentChannel()->id,
+            'channel_id' => core()->getCurrentChannel()->id,
         ], $request->only([
             'first_name',
             'last_name',
@@ -163,16 +165,16 @@ class CustomerController extends BaseCustomerController
 
                 if ($subscription) {
                     $this->subscriptionRepository->update([
-                        'customer_id'   => $customer->id,
+                        'customer_id' => $customer->id,
                         'is_subscribed' => 1,
                     ], $subscription->id);
                 } else {
                     $this->subscriptionRepository->create([
-                        'email'         => $data['email'],
-                        'customer_id'   => $customer->id,
-                        'channel_id'    => core()->getCurrentChannel()->id,
+                        'email' => $data['email'],
+                        'customer_id' => $customer->id,
+                        'channel_id' => core()->getCurrentChannel()->id,
                         'is_subscribed' => 1,
-                        'token'         => $token = uniqid(),
+                        'token' => $token = uniqid(),
                     ]);
                 }
             } else {
@@ -180,7 +182,7 @@ class CustomerController extends BaseCustomerController
 
                 if ($subscription) {
                     $this->subscriptionRepository->update([
-                        'customer_id'   => $customer->id,
+                        'customer_id' => $customer->id,
                         'is_subscribed' => 0,
                     ], $subscription->id);
                 }

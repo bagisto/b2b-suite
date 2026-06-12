@@ -26,11 +26,11 @@ class CompanyAttributeOptionTableSeeder extends Seeder
             return collect($parameters['locales'])->map(function ($locale) use ($option) {
                 return [
                     'company_attribute_option_id' => $option['id'],
-                    'label'                       => trans(
+                    'label' => trans(
                         key: $option['name'],
                         locale: $locale
                     ),
-                    'locale'                      => $locale,
+                    'locale' => $locale,
                 ];
             });
         })->toArray();

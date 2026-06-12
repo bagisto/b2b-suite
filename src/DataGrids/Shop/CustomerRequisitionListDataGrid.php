@@ -51,41 +51,41 @@ class CustomerRequisitionListDataGrid extends DataGrid
     public function prepareColumns()
     {
         $this->addColumn([
-            'index'      => 'requisition_id',
-            'label'      => trans('b2b_suite::app.shop.customers.account.requisitions.index.datagrid.id'),
-            'type'       => 'string',
+            'index' => 'requisition_id',
+            'label' => trans('b2b_suite::app.shop.customers.account.requisitions.index.datagrid.id'),
+            'type' => 'string',
             'searchable' => false,
             'filterable' => true,
-            'sortable'   => true,
+            'sortable' => true,
         ]);
 
         $this->addColumn([
-            'index'      => 'name',
-            'label'      => trans('b2b_suite::app.shop.customers.account.requisitions.index.datagrid.name'),
-            'type'       => 'string',
+            'index' => 'name',
+            'label' => trans('b2b_suite::app.shop.customers.account.requisitions.index.datagrid.name'),
+            'type' => 'string',
             'searchable' => true,
             'filterable' => true,
-            'sortable'   => true,
+            'sortable' => true,
         ]);
 
         $this->addColumn([
-            'index'      => 'description',
-            'label'      => trans('b2b_suite::app.shop.customers.account.requisitions.index.datagrid.description'),
-            'type'       => 'string',
+            'index' => 'description',
+            'label' => trans('b2b_suite::app.shop.customers.account.requisitions.index.datagrid.description'),
+            'type' => 'string',
             'filterable' => true,
-            'sortable'   => true,
-            'closure'    => function ($row) {
+            'sortable' => true,
+            'closure' => function ($row) {
                 return strlen($row->description) > 50 ? substr($row->description, 0, 50).'...' : $row->description;
             },
         ]);
 
         $this->addColumn([
-            'index'      => 'items_count',
-            'label'      => trans('b2b_suite::app.shop.customers.account.requisitions.index.datagrid.items'),
-            'type'       => 'string',
+            'index' => 'items_count',
+            'label' => trans('b2b_suite::app.shop.customers.account.requisitions.index.datagrid.items'),
+            'type' => 'string',
             'filterable' => true,
-            'sortable'   => true,
-            'closure'    => function ($row) {
+            'sortable' => true,
+            'closure' => function ($row) {
                 return DB::table('customer_requisition_list_products')
                     ->where('requisition_list_id', $row->requisition_id)
                     ->count();
@@ -93,12 +93,12 @@ class CustomerRequisitionListDataGrid extends DataGrid
         ]);
 
         $this->addColumn([
-            'index'              => 'status',
-            'label'              => trans('b2b_suite::app.shop.customers.account.requisitions.index.datagrid.status'),
-            'type'               => 'string',
-            'searchable'         => true,
-            'filterable'         => true,
-            'filterable_type'    => 'dropdown',
+            'index' => 'status',
+            'label' => trans('b2b_suite::app.shop.customers.account.requisitions.index.datagrid.status'),
+            'type' => 'string',
+            'searchable' => true,
+            'filterable' => true,
+            'filterable_type' => 'dropdown',
             'filterable_options' => [
                 [
                     'label' => trans('b2b_suite::app.shop.customers.account.requisitions.index.datagrid.active'),
@@ -109,8 +109,8 @@ class CustomerRequisitionListDataGrid extends DataGrid
                     'value' => CustomerRequisitionList::STATUS_INACTIVE,
                 ],
             ],
-            'sortable'   => true,
-            'closure'    => function ($row) {
+            'sortable' => true,
+            'closure' => function ($row) {
                 switch ($row->status) {
                     case CustomerRequisitionList::STATUS_ACTIVE:
                         return '<p class="label-active">'.trans('b2b_suite::app.shop.customers.account.requisitions.index.datagrid.active').'</p>';
@@ -122,12 +122,12 @@ class CustomerRequisitionListDataGrid extends DataGrid
         ]);
 
         $this->addColumn([
-            'index'              => 'is_default',
-            'label'              => trans('b2b_suite::app.shop.customers.account.requisitions.index.datagrid.is-default'),
-            'type'               => 'string',
-            'searchable'         => true,
-            'filterable'         => true,
-            'filterable_type'    => 'dropdown',
+            'index' => 'is_default',
+            'label' => trans('b2b_suite::app.shop.customers.account.requisitions.index.datagrid.is-default'),
+            'type' => 'string',
+            'searchable' => true,
+            'filterable' => true,
+            'filterable_type' => 'dropdown',
             'filterable_options' => [
                 [
                     'label' => trans('b2b_suite::app.shop.customers.account.requisitions.index.datagrid.text-yes'),
@@ -138,8 +138,8 @@ class CustomerRequisitionListDataGrid extends DataGrid
                     'value' => CustomerRequisitionList::STATUS_NO,
                 ],
             ],
-            'sortable'   => true,
-            'closure'    => function ($row) {
+            'sortable' => true,
+            'closure' => function ($row) {
                 if ($row->is_default == CustomerRequisitionList::STATUS_YES) {
                     return '<p class="label-active">'.trans('b2b_suite::app.shop.customers.account.requisitions.index.datagrid.text-yes').'</p>';
                 }
@@ -149,12 +149,12 @@ class CustomerRequisitionListDataGrid extends DataGrid
         ]);
 
         $this->addColumn([
-            'index'           => 'updated_at',
-            'label'           => trans('b2b_suite::app.shop.customers.account.requisitions.index.datagrid.updated-at'),
-            'type'            => 'datetime',
-            'filterable'      => true,
+            'index' => 'updated_at',
+            'label' => trans('b2b_suite::app.shop.customers.account.requisitions.index.datagrid.updated-at'),
+            'type' => 'datetime',
+            'filterable' => true,
             'filterable_type' => 'datetime_range',
-            'sortable'        => true,
+            'sortable' => true,
         ]);
     }
 
@@ -166,20 +166,20 @@ class CustomerRequisitionListDataGrid extends DataGrid
     public function prepareActions()
     {
         $this->addAction([
-            'icon'   => 'icon-bin',
-            'title'  => trans('b2b_suite::app.shop.customers.account.requisitions.index.datagrid.delete'),
+            'icon' => 'icon-bin',
+            'title' => trans('b2b_suite::app.shop.customers.account.requisitions.index.datagrid.delete'),
             'method' => 'POST',
-            'url'    => function ($row) {
+            'url' => function ($row) {
                 return route('shop.customers.account.requisitions.delete', $row->requisition_id);
             },
         ]);
 
         $this->addAction([
-            'index'  => 'edit',
-            'icon'   => 'icon-edit',
-            'title'  => trans('b2b_suite::app.shop.customers.account.requisitions.index.datagrid.edit'),
+            'index' => 'edit',
+            'icon' => 'icon-edit',
+            'title' => trans('b2b_suite::app.shop.customers.account.requisitions.index.datagrid.edit'),
             'method' => 'GET',
-            'url'    => function ($row) {
+            'url' => function ($row) {
                 return route('shop.customers.account.requisitions.edit', $row->requisition_id);
             },
         ]);

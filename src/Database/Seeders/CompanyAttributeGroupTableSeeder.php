@@ -16,55 +16,55 @@ class CompanyAttributeGroupTableSeeder extends Seeder
 
         $attributeGroups = [
             [
-                'id'              => 1,
-                'code'            => 'general',
-                'admin_name'      => trans(
+                'id' => 1,
+                'code' => 'general',
+                'admin_name' => trans(
                     key: 'b2b_suite::app.seeders.company-attribute-groups.general',
                     locale: $parameters['default_locale']
                 ),
-                'column'          => 1,
+                'column' => 1,
                 'is_user_defined' => 0,
-                'position'        => 1,
+                'position' => 1,
             ], [
-                'id'              => 2,
-                'code'            => 'address',
-                'admin_name'      => trans(
+                'id' => 2,
+                'code' => 'address',
+                'admin_name' => trans(
                     key: 'b2b_suite::app.seeders.company-attribute-groups.address',
                     locale: $parameters['default_locale']
                 ),
-                'column'          => 1,
+                'column' => 1,
                 'is_user_defined' => 0,
-                'position'        => 2,
+                'position' => 2,
             ], [
-                'id'              => 3,
-                'code'            => 'meta_description',
-                'admin_name'      => trans(
+                'id' => 3,
+                'code' => 'meta_description',
+                'admin_name' => trans(
                     key: 'b2b_suite::app.seeders.company-attribute-groups.meta-description',
                     locale: $parameters['default_locale']
                 ),
-                'column'          => 2,
+                'column' => 2,
                 'is_user_defined' => 0,
-                'position'        => 1,
+                'position' => 1,
             ], [
-                'id'              => 4,
-                'code'            => 'policies',
-                'admin_name'      => trans(
+                'id' => 4,
+                'code' => 'policies',
+                'admin_name' => trans(
                     key: 'b2b_suite::app.seeders.company-attribute-groups.policies',
                     locale: $parameters['default_locale']
                 ),
-                'column'          => 1,
+                'column' => 1,
                 'is_user_defined' => 0,
-                'position'        => 3,
+                'position' => 3,
             ], [
-                'id'              => 5,
-                'code'            => 'social_links',
-                'admin_name'      => trans(
+                'id' => 5,
+                'code' => 'social_links',
+                'admin_name' => trans(
                     key: 'b2b_suite::app.seeders.company-attribute-groups.social-links',
                     locale: $parameters['default_locale']
                 ),
-                'column'          => 2,
+                'column' => 2,
                 'is_user_defined' => 0,
-                'position'        => 2,
+                'position' => 2,
             ],
         ];
 
@@ -76,8 +76,8 @@ class CompanyAttributeGroupTableSeeder extends Seeder
 
                 return [
                     'company_attribute_group_id' => $group['id'],
-                    'locale'                     => $locale,
-                    'name'                       => trans(
+                    'locale' => $locale,
+                    'name' => trans(
                         key: "b2b_suite::app.seeders.company-attribute-groups.$translationKey",
                         locale: $locale
                     ),

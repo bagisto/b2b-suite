@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Webkul\B2BSuite\Contracts\CustomerQuote as CustomerQuoteContract;
 use Webkul\Checkout\Models\Cart;
+use Webkul\User\Models\Admin;
 
 class CustomerQuote extends Model implements CustomerQuoteContract
 {
@@ -90,14 +91,14 @@ class CustomerQuote extends Model implements CustomerQuoteContract
      * @var array
      */
     protected static $statusLabel = [
-        self::STATUS_DRAFT       => 'Draft',
-        self::STATUS_OPEN        => 'Open',
+        self::STATUS_DRAFT => 'Draft',
+        self::STATUS_OPEN => 'Open',
         self::STATUS_NEGOTIATION => 'Negotiation',
-        self::STATUS_ACCEPTED    => 'Accepted',
-        self::STATUS_ORDERED     => 'Ordered',
-        self::STATUS_EXPIRED     => 'Expired',
-        self::STATUS_REJECTED    => 'Rejected',
-        self::STATUS_COMPLETED   => 'Completed',
+        self::STATUS_ACCEPTED => 'Accepted',
+        self::STATUS_ORDERED => 'Ordered',
+        self::STATUS_EXPIRED => 'Expired',
+        self::STATUS_REJECTED => 'Rejected',
+        self::STATUS_COMPLETED => 'Completed',
     ];
 
     /**
@@ -128,7 +129,7 @@ class CustomerQuote extends Model implements CustomerQuoteContract
 
     public function agent(): BelongsTo
     {
-        return $this->belongsTo(\Webkul\User\Models\Admin::class, 'agent_id');
+        return $this->belongsTo(Admin::class, 'agent_id');
     }
 
     public function cart(): BelongsTo

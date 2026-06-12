@@ -33,7 +33,7 @@ class CartController extends BaseCartController
         $this->validate(request(), [
             'product_id' => 'required|integer|exists:products,id',
             'is_buy_now' => 'integer|in:0,1',
-            'quantity'   => 'integer|min:1',
+            'quantity' => 'integer|min:1',
         ]);
 
         $product = $this->productRepository->with('parent')->findOrFail(request()->input('product_id'));
@@ -71,13 +71,13 @@ class CartController extends BaseCartController
             $cart = Cart::addProduct($product, request()->all());
 
             return new JsonResource(array_merge([
-                'data'    => new CartResource($cart),
+                'data' => new CartResource($cart),
                 'message' => trans('shop::app.checkout.cart.item-add-to-cart'),
             ], $response));
         } catch (\Exception $exception) {
             return response()->json([
                 'redirect_uri' => route('shop.product_or_category.index', $product->url_key),
-                'message'      => $exception->getMessage(),
+                'message' => $exception->getMessage(),
             ], Response::HTTP_BAD_REQUEST);
         }
     }
@@ -118,7 +118,7 @@ class CartController extends BaseCartController
             Cart::updateItems($data);
 
             return new JsonResource([
-                'data'    => new CartResource(Cart::getCart()),
+                'data' => new CartResource(Cart::getCart()),
                 'message' => trans('shop::app.checkout.cart.index.quantity-update'),
             ]);
 

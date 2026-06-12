@@ -4,7 +4,9 @@ namespace Webkul\B2BSuite\Http\Controllers\Admin;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Event;
+use Illuminate\View\View;
 use Webkul\Admin\Http\Controllers\Controller;
 use Webkul\Admin\Http\Requests\MassDestroyRequest;
 use Webkul\Admin\Http\Requests\MassUpdateRequest;
@@ -36,7 +38,7 @@ class QuoteController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function index()
     {
@@ -52,7 +54,7 @@ class QuoteController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function create(int $cartId)
     {
@@ -74,7 +76,7 @@ class QuoteController extends Controller
 
         if ($cart?->company_id) {
             $company = $this->customerRepository->findOneWhere([
-                'id'   => $cart->company_id,
+                'id' => $cart->company_id,
                 'type' => 'company',
             ]);
         }
@@ -87,7 +89,7 @@ class QuoteController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(QuoteRequest $quoteRequest)
     {
@@ -96,7 +98,7 @@ class QuoteController extends Controller
         $cart = $this->cartRepository->find((int) $quoteRequest->cart_id);
 
         $company = $this->customerRepository->findOneWhere([
-            'id'   => $cart->company_id,
+            'id' => $cart->company_id,
             'type' => 'company',
         ]);
 
@@ -108,12 +110,12 @@ class QuoteController extends Controller
 
         $data = array_merge([
             'quotation_number' => $quoteNumber['quotation_number'],
-            'po_number'        => $quoteNumber['po_number'],
-            'customer_id'      => $customer->id,
-            'company_id'       => $company,
-            'agent_id'         => auth()->guard('admin')->user()->id,
-            'customer_name'    => $customer->name,
-            'cart'             => $cart,
+            'po_number' => $quoteNumber['po_number'],
+            'customer_id' => $customer->id,
+            'company_id' => $company,
+            'agent_id' => auth()->guard('admin')->user()->id,
+            'customer_name' => $customer->name,
+            'cart' => $cart,
         ], $quoteRequest->only([
             'name',
             'description',
@@ -137,7 +139,7 @@ class QuoteController extends Controller
     /**
      * Show the form for viewing the specified resource.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function view(int $id)
     {
@@ -150,7 +152,7 @@ class QuoteController extends Controller
      * AJAX endpoint for loading messages with pagination and filters
      *
      * @param  int  $id  Quote ID
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function getMessages($id, Request $request)
     {
@@ -192,9 +194,9 @@ class QuoteController extends Controller
             }
 
             $quote->messages()->create([
-                'message'    => $request->message,
-                'user_type'  => 'admin',
-                'user_id'    => auth()->guard('admin')->user()->id,
+                'message' => $request->message,
+                'user_type' => 'admin',
+                'user_id' => auth()->guard('admin')->user()->id,
                 'created_at' => now(),
             ]);
 
@@ -213,21 +215,21 @@ class QuoteController extends Controller
     {
         try {
             $request->validate([
-                'items'   => ['required', 'array', 'min:1'],
+                'items' => ['required', 'array', 'min:1'],
                 'message' => 'required|string|max:1000',
             ]);
 
             $quote = $this->customerQuoteRepository->findOrFail($id);
 
             $message = $quote->messages()->create([
-                'message'    => $request->message,
-                'user_type'  => 'admin',
-                'user_id'    => auth()->guard('admin')->user()->id,
+                'message' => $request->message,
+                'user_type' => 'admin',
+                'user_id' => auth()->guard('admin')->user()->id,
                 'created_at' => now(),
             ]);
 
             $data = array_merge([
-                'status'     => CustomerQuote::STATUS_NEGOTIATION,
+                'status' => CustomerQuote::STATUS_NEGOTIATION,
                 'message_id' => $message->id,
             ], $request->only([
                 'items',
@@ -263,10 +265,10 @@ class QuoteController extends Controller
             $quote->update(['status' => 'accepted']);
 
             $message = $quote->messages()->create([
-                'message'    => $request->message,
-                'status'     => trans('b2b_suite::app.shop.customers.account.quotes.view.'.$quote->status),
-                'user_type'  => 'admin',
-                'user_id'    => $adminId,
+                'message' => $request->message,
+                'status' => trans('b2b_suite::app.shop.customers.account.quotes.view.'.$quote->status),
+                'user_type' => 'admin',
+                'user_id' => $adminId,
                 'created_at' => now(),
             ]);
 
@@ -277,7 +279,7 @@ class QuoteController extends Controller
             if ($targetMessageId) {
                 $this->customerQuoteQuotationRepository->updateOrCreate([
                     'message_id' => $targetMessageId,
-                    'quote_id'   => $quote->id,
+                    'quote_id' => $quote->id,
                 ], [
                     'is_accepted' => 1,
                     'accepted_by' => 'admin',
@@ -317,10 +319,10 @@ class QuoteController extends Controller
             $quote->save();
 
             $quote->messages()->create([
-                'message'    => $request->message,
-                'status'     => trans('b2b_suite::app.admin.quotes.view.'.$quote->status),
-                'user_type'  => 'admin',
-                'user_id'    => auth()->guard('admin')->user()->id,
+                'message' => $request->message,
+                'status' => trans('b2b_suite::app.admin.quotes.view.'.$quote->status),
+                'user_type' => 'admin',
+                'user_id' => auth()->guard('admin')->user()->id,
                 'created_at' => now(),
             ]);
 
@@ -337,7 +339,7 @@ class QuoteController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(QuoteRequest $request, int $id)
     {
@@ -420,7 +422,7 @@ class QuoteController extends Controller
     /**
      * Mass update quote.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function massUpdate(MassUpdateRequest $massUpdateRequest)
     {

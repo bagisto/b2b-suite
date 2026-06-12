@@ -48,9 +48,9 @@ class CompanyAttributeController extends Controller
     {
         return view('b2b_suite::admin.company-attributes.create')
             ->with([
-                'locales'        => core()->getAllLocales(),
+                'locales' => core()->getAllLocales(),
                 'attributeTypes' => AttributeTypeEnum::getValues(),
-                'validations'    => ValidationEnum::getValues(),
+                'validations' => ValidationEnum::getValues(),
             ]);
     }
 
@@ -60,9 +60,9 @@ class CompanyAttributeController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'code'          => ['required', 'not_in:type,company_attributes', 'unique:company_attributes,code', new Code],
-            'admin_name'    => 'required',
-            'type'          => 'required',
+            'code' => ['required', 'not_in:type,company_attributes', 'unique:company_attributes,code', new Code],
+            'admin_name' => 'required',
+            'type' => 'required',
             'default_value' => 'in:0,1',
         ]);
 
@@ -87,10 +87,10 @@ class CompanyAttributeController extends Controller
 
         return view('b2b_suite::admin.company-attributes.edit')
             ->with([
-                'attribute'      => $attribute,
-                'locales'        => core()->getAllLocales(),
+                'attribute' => $attribute,
+                'locales' => core()->getAllLocales(),
                 'attributeTypes' => AttributeTypeEnum::getValues(),
-                'validations'    => ValidationEnum::getValues(),
+                'validations' => ValidationEnum::getValues(),
             ]);
     }
 
@@ -100,9 +100,9 @@ class CompanyAttributeController extends Controller
     public function update(Request $request, int $id): RedirectResponse
     {
         $request->validate([
-            'code'          => ['required', 'not_in:type,company_attributes', 'unique:company_attributes,code,'.$id, new Code],
-            'admin_name'    => 'required',
-            'type'          => 'required',
+            'code' => ['required', 'not_in:type,company_attributes', 'unique:company_attributes,code,'.$id, new Code],
+            'admin_name' => 'required',
+            'type' => 'required',
             'default_value' => 'in:0,1',
         ]);
 
@@ -139,7 +139,7 @@ class CompanyAttributeController extends Controller
             return new JsonResponse([
                 'message' => trans('b2b_suite::app.admin.company-attributes.delete-success'),
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
         }
 
         return new JsonResponse([
@@ -203,7 +203,7 @@ class CompanyAttributeController extends Controller
         // Ensure we have the right structure for the frontend
         $localesArray = $locales->map(function ($locale) {
             return [
-                'id'   => $locale->id,
+                'id' => $locale->id,
                 'code' => $locale->code,
                 'name' => $locale->name,
             ];
@@ -212,8 +212,8 @@ class CompanyAttributeController extends Controller
         return view('b2b_suite::admin.company-attributes.mapping')
             ->with([
                 'customAttributes' => $customAttributes,
-                'attributeGroups'  => $attributeGroups,
-                'locales'          => $localesArray,
+                'attributeGroups' => $attributeGroups,
+                'locales' => $localesArray,
             ]);
     }
 
@@ -223,13 +223,13 @@ class CompanyAttributeController extends Controller
     public function updateMapping(Request $request): RedirectResponse
     {
         $request->validate([
-            'attribute_groups'                                => 'required|array',
-            'attribute_groups.*.code'                         => 'required|string|max:255',
-            'attribute_groups.*.admin_name'                   => 'required|string|max:255',
-            'attribute_groups.*.position'                     => 'nullable|integer',
-            'attribute_groups.*.column'                       => 'required|integer|in:1,2',
-            'attribute_groups.*.custom_attributes'            => 'array',
-            'attribute_groups.*.custom_attributes.*.id'       => 'required',
+            'attribute_groups' => 'required|array',
+            'attribute_groups.*.code' => 'required|string|max:255',
+            'attribute_groups.*.admin_name' => 'required|string|max:255',
+            'attribute_groups.*.position' => 'nullable|integer',
+            'attribute_groups.*.column' => 'required|integer|in:1,2',
+            'attribute_groups.*.custom_attributes' => 'array',
+            'attribute_groups.*.custom_attributes.*.id' => 'required',
             'attribute_groups.*.custom_attributes.*.position' => 'required|integer',
         ]);
 

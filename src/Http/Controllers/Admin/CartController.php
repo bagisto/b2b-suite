@@ -54,7 +54,7 @@ class CartController extends Controller
             $cart->save();
 
             return new JsonResource([
-                'data'         => new CartResource($cart),
+                'data' => new CartResource($cart),
                 'redirect_url' => route('admin.b2b.quotes.create', $cart->id),
             ]);
         }
@@ -63,12 +63,12 @@ class CartController extends Controller
 
         try {
             $cart = Cart::createCart([
-                'customer'  => $customer,
+                'customer' => $customer,
                 'is_active' => false,
             ]);
 
             return new JsonResource([
-                'data'         => new CartResource($cart),
+                'data' => new CartResource($cart),
                 'redirect_url' => route('admin.b2b.quotes.create', $cart->id),
             ]);
         } catch (\Exception $exception) {
@@ -99,7 +99,7 @@ class CartController extends Controller
             Cart::addProduct($product, $params);
 
             return new JsonResource([
-                'data'    => new CartResource(Cart::getCart()),
+                'data' => new CartResource(Cart::getCart()),
                 'message' => trans('admin::app.sales.orders.create.cart.success-add-to-cart'),
             ]);
         } catch (\Exception $exception) {
@@ -127,7 +127,7 @@ class CartController extends Controller
         Cart::collectTotals();
 
         return new JsonResource([
-            'data'    => new CartResource(Cart::getCart()),
+            'data' => new CartResource(Cart::getCart()),
             'message' => trans('admin::app.sales.orders.create.cart.success-remove'),
         ]);
     }
@@ -145,7 +145,7 @@ class CartController extends Controller
             Cart::updateItems(request()->input());
 
             return new JsonResource([
-                'data'    => new CartResource(Cart::getCart()),
+                'data' => new CartResource(Cart::getCart()),
                 'message' => trans('admin::app.sales.orders.create.cart.success-update'),
             ]);
         } catch (\Exception $exception) {

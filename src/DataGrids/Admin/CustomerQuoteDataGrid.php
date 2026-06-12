@@ -75,72 +75,72 @@ class CustomerQuoteDataGrid extends DataGrid
     public function prepareColumns()
     {
         $this->addColumn([
-            'index'      => 'quotation_number',
-            'label'      => trans('b2b_suite::app.admin.quotes.index.datagrid.quote-id'),
-            'type'       => 'string',
+            'index' => 'quotation_number',
+            'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.quote-id'),
+            'type' => 'string',
             'searchable' => false,
             'filterable' => true,
-            'sortable'   => true,
+            'sortable' => true,
         ]);
 
         $this->addColumn([
-            'index'      => 'name',
-            'label'      => trans('b2b_suite::app.admin.quotes.index.datagrid.name'),
-            'type'       => 'string',
+            'index' => 'name',
+            'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.name'),
+            'type' => 'string',
             'searchable' => true,
             'filterable' => true,
-            'sortable'   => true,
+            'sortable' => true,
         ]);
 
         $this->addColumn([
-            'index'      => 'company_name',
-            'label'      => trans('b2b_suite::app.admin.quotes.index.datagrid.company'),
-            'type'       => 'string',
+            'index' => 'company_name',
+            'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.company'),
+            'type' => 'string',
             'searchable' => true,
             'filterable' => true,
-            'sortable'   => true,
+            'sortable' => true,
         ]);
 
         $this->addColumn([
-            'index'      => 'customer_name',
-            'label'      => trans('b2b_suite::app.admin.quotes.index.datagrid.customer'),
-            'type'       => 'string',
+            'index' => 'customer_name',
+            'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.customer'),
+            'type' => 'string',
             'searchable' => true,
             'filterable' => true,
-            'sortable'   => true,
+            'sortable' => true,
         ]);
 
         $this->addColumn([
-            'index'      => 'agent_name',
-            'label'      => trans('b2b_suite::app.admin.quotes.index.datagrid.agent'),
-            'type'       => 'string',
+            'index' => 'agent_name',
+            'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.agent'),
+            'type' => 'string',
             'searchable' => true,
             'filterable' => true,
-            'sortable'   => true,
+            'sortable' => true,
         ]);
 
         $this->addColumn([
-            'index'      => 'base_total',
-            'label'      => trans('b2b_suite::app.admin.quotes.index.datagrid.base_total'),
-            'type'       => 'decimal',
+            'index' => 'base_total',
+            'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.base_total'),
+            'type' => 'decimal',
             'filterable' => true,
-            'sortable'   => true,
+            'sortable' => true,
         ]);
 
         $this->addColumn([
-            'index'      => 'negotiated_total',
-            'label'      => trans('b2b_suite::app.admin.quotes.index.datagrid.negotiated_total'),
-            'type'       => 'decimal',
+            'index' => 'negotiated_total',
+            'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.negotiated_total'),
+            'type' => 'decimal',
             'filterable' => true,
-            'sortable'   => true,
+            'sortable' => true,
         ]);
 
         $this->addColumn([
-            'index'      => 'items',
-            'label'      => trans('b2b_suite::app.admin.quotes.index.datagrid.items'),
-            'type'       => 'string',
+            'index' => 'items',
+            'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.items'),
+            'type' => 'string',
             'exportable' => false,
-            'closure'    => function ($value) {
+            'closure' => function ($value) {
                 $quote = app(CustomerQuoteRepository::class)->with('items')->find($value->quote_id);
 
                 return view('b2b_suite::admin.quotes.items', compact('quote'))->render();
@@ -148,12 +148,12 @@ class CustomerQuoteDataGrid extends DataGrid
         ]);
 
         $this->addColumn([
-            'index'              => 'status',
-            'label'              => trans('b2b_suite::app.admin.quotes.index.datagrid.status'),
-            'type'               => 'string',
-            'searchable'         => true,
-            'filterable'         => true,
-            'filterable_type'    => 'dropdown',
+            'index' => 'status',
+            'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.status'),
+            'type' => 'string',
+            'searchable' => true,
+            'filterable' => true,
+            'filterable_type' => 'dropdown',
             'filterable_options' => [
                 [
                     'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.draft'),
@@ -180,8 +180,8 @@ class CustomerQuoteDataGrid extends DataGrid
                     'value' => CustomerQuote::STATUS_REJECTED,
                 ],
             ],
-            'sortable'   => true,
-            'closure'    => function ($row) {
+            'sortable' => true,
+            'closure' => function ($row) {
                 $html = '';
 
                 if ($row->soft_deleted) {
@@ -211,21 +211,21 @@ class CustomerQuoteDataGrid extends DataGrid
         ]);
 
         $this->addColumn([
-            'index'           => 'created_at',
-            'label'           => trans('b2b_suite::app.admin.quotes.index.datagrid.created-at'),
-            'type'            => 'datetime',
-            'filterable'      => true,
+            'index' => 'created_at',
+            'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.created-at'),
+            'type' => 'datetime',
+            'filterable' => true,
             'filterable_type' => 'datetime_range',
-            'sortable'        => true,
+            'sortable' => true,
         ]);
 
         $this->addColumn([
-            'index'           => 'expiration_date',
-            'label'           => trans('b2b_suite::app.admin.quotes.index.datagrid.expiration-date'),
-            'type'            => 'date',
-            'filterable'      => true,
+            'index' => 'expiration_date',
+            'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.expiration-date'),
+            'type' => 'date',
+            'filterable' => true,
             'filterable_type' => 'date_range',
-            'sortable'        => true,
+            'sortable' => true,
         ]);
     }
 
@@ -238,11 +238,11 @@ class CustomerQuoteDataGrid extends DataGrid
     {
         if (bouncer()->hasPermission('b2b.quotes.view')) {
             $this->addAction([
-                'index'  => 'view',
-                'icon'   => 'icon-view',
-                'title'  => trans('b2b_suite::app.admin.quotes.index.datagrid.view'),
+                'index' => 'view',
+                'icon' => 'icon-view',
+                'title' => trans('b2b_suite::app.admin.quotes.index.datagrid.view'),
                 'method' => 'GET',
-                'url'    => function ($row) {
+                'url' => function ($row) {
                     return route('admin.b2b.quotes.view', $row->quote_id);
                 },
             ]);
@@ -258,19 +258,19 @@ class CustomerQuoteDataGrid extends DataGrid
     {
         if (bouncer()->hasPermission('b2b.quotes.delete')) {
             $this->addMassAction([
-                'icon'   => 'icon-delete',
-                'title'  => trans('b2b_suite::app.admin.quotes.index.datagrid.mass-delete'),
+                'icon' => 'icon-delete',
+                'title' => trans('b2b_suite::app.admin.quotes.index.datagrid.mass-delete'),
                 'method' => 'POST',
-                'url'    => route('admin.b2b.quotes.mass_delete'),
+                'url' => route('admin.b2b.quotes.mass_delete'),
             ]);
         }
 
         if (bouncer()->hasPermission('b2b.quotes.edit')) {
             $this->addMassAction([
-                'icon'    => 'icon-edit',
-                'title'   => trans('b2b_suite::app.admin.quotes.index.datagrid.mass-update'),
-                'method'  => 'POST',
-                'url'     => route('admin.b2b.quotes.mass_update'),
+                'icon' => 'icon-edit',
+                'title' => trans('b2b_suite::app.admin.quotes.index.datagrid.mass-update'),
+                'method' => 'POST',
+                'url' => route('admin.b2b.quotes.mass_update'),
                 'options' => [
                     [
                         'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.draft'),

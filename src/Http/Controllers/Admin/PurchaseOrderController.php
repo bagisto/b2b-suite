@@ -2,6 +2,7 @@
 
 namespace Webkul\B2BSuite\Http\Controllers\Admin;
 
+use Illuminate\View\View;
 use Webkul\Admin\Http\Controllers\Controller;
 use Webkul\B2BSuite\DataGrids\Admin\CustomerPurchaseOrderDataGrid;
 use Webkul\B2BSuite\Repositories\CustomerQuoteRepository;
@@ -18,7 +19,7 @@ class PurchaseOrderController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function index()
     {
@@ -32,7 +33,7 @@ class PurchaseOrderController extends Controller
     /**
      * Show the form for viewing the specified resource.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function view(int $id)
     {

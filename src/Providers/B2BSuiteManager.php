@@ -3,8 +3,6 @@
 namespace Webkul\B2BSuite\Providers;
 
 use Illuminate\Foundation\Application;
-use Webkul\Admin\Http\Controllers\Customers\CustomerController as BaseCustomerController;
-use Webkul\B2BSuite\Http\Controllers\Admin\CustomerController;
 use Webkul\B2BSuite\Http\Controllers\Shop\API\CartController as B2BCartController;
 use Webkul\B2BSuite\Http\Controllers\Shop\Customer\CustomerController as ShopCustomerController;
 use Webkul\B2BSuite\Http\Controllers\Shop\Customer\RegistrationController;
@@ -42,7 +40,6 @@ final class B2BSuiteManager
      */
     private function registerControllers(): void
     {
-        $this->app->bind(BaseCustomerController::class, CustomerController::class);
 
         $this->app->bind(BaseRegistrationController::class, RegistrationController::class);
 

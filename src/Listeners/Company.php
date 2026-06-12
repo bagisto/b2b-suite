@@ -3,6 +3,7 @@
 namespace Webkul\B2BSuite\Listeners;
 
 use Webkul\B2BSuite\Helpers\FlatIndexer;
+use Webkul\Customer\Contracts\Customer;
 
 class Company
 {
@@ -16,7 +17,7 @@ class Company
     /**
      * Update or create customer indices
      *
-     * @param  \Webkul\Customer\Contracts\Customer  $customer
+     * @param  Customer  $customer
      * @return void
      */
     public function afterUpdate($customer)

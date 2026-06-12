@@ -14,8 +14,8 @@ use Webkul\B2BSuite\Http\Requests\CompanyRequest;
 use Webkul\B2BSuite\Http\Resources\CustomerResource;
 use Webkul\B2BSuite\Repositories\CompanyAttributeGroupRepository;
 use Webkul\B2BSuite\Repositories\CompanyAttributeValueRepository;
-use Webkul\B2BSuite\Repositories\CompanyRoleRepository;
 use Webkul\B2BSuite\Repositories\CompanyFlatRepository;
+use Webkul\B2BSuite\Repositories\CompanyRoleRepository;
 use Webkul\Customer\Repositories\CustomerRepository;
 
 class CompanyController extends Controller
@@ -52,8 +52,8 @@ class CompanyController extends Controller
             ->findWhere(['type' => 'company'])
             ->map(function ($company) {
                 return [
-                    'id'    => $company->id,
-                    'name'  => $company->first_name.' '.$company->last_name,
+                    'id' => $company->id,
+                    'name' => $company->first_name.' '.$company->last_name,
                     'email' => $company->email,
                 ];
             });
@@ -104,14 +104,14 @@ class CompanyController extends Controller
         $password = rand(100000, 10000000);
 
         $data = array_merge([
-            'password'    => bcrypt($password),
+            'password' => bcrypt($password),
             'is_verified' => 1,
             /**
              * Companies created from the admin are active by default; the
              * create form may still override this via the status control.
              */
-            'status'      => $request->input('status') !== null ? (int) (bool) $request->input('status') : 1,
-            'channel_id'  => core()->getCurrentChannel()->id,
+            'status' => $request->input('status') !== null ? (int) (bool) $request->input('status') : 1,
+            'channel_id' => core()->getCurrentChannel()->id,
         ], $request->only([
             'first_name',
             'last_name',
@@ -138,13 +138,13 @@ class CompanyController extends Controller
         );
 
         $role = $this->companyRoleRepository->create([
-            'name'            => 'Administrator',
-            'description'     => 'All permissions',
+            'name' => 'Administrator',
+            'description' => 'All permissions',
             'permission_type' => 'all',
-            'permissions'     => null,
-            'customer_id'     => $customer->id,
-            'created_at'      => now(),
-            'updated_at'      => now(),
+            'permissions' => null,
+            'customer_id' => $customer->id,
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
 
         $customer->update(['company_role_id' => $role->id]);
@@ -184,8 +184,8 @@ class CompanyController extends Controller
 
         $data = array_merge([
             'is_verified' => 1,
-            'status'      => (int) (bool) $request->input('status'),
-            'channel_id'  => core()->getCurrentChannel()->id,
+            'status' => (int) (bool) $request->input('status'),
+            'channel_id' => core()->getCurrentChannel()->id,
         ], $request->only([
             'first_name',
             'last_name',
