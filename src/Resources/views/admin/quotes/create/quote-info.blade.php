@@ -1,6 +1,6 @@
 <!-- Quote Create Form -->
 <x-admin::form
-    :action="route('admin.customers.quotes.store', $cart->id)"
+    :action="route('admin.b2b.quotes.store', $cart->id)"
     enctype="multipart/form-data"
 >
     <div class="box-shadow rounded bg-white dark:bg-gray-900">

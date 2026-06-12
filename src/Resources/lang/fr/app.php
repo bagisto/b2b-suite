@@ -956,7 +956,6 @@ return [
             'last-name'             => 'Nom de famille',
             'email'                 => 'E-mail',
             'phone'                 => 'Téléphone',
-            'slug'                  => 'Limace',
             'business-name'         => 'Nom de l\'entreprise',
             'website-url'           => 'URL du site Web',
             'vat-tax-id'            => 'Numéro d\'identification fiscale TVA',

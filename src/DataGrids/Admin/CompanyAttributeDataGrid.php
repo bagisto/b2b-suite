@@ -191,24 +191,24 @@ class CompanyAttributeDataGrid extends DataGrid
      */
     public function prepareActions(): void
     {
-        if (bouncer()->hasPermission('b2b_suite.company_attributes.edit')) {
+        if (bouncer()->hasPermission('b2b.attributes.edit')) {
             $this->addAction([
                 'icon'   => 'icon-edit',
                 'title'  => trans('b2b_suite::app.admin.company-attributes.index.datagrid.edit'),
                 'method' => 'GET',
                 'url'    => function ($row) {
-                    return route('admin.customers.attributes.edit', $row->id);
+                    return route('admin.b2b.attributes.edit', $row->id);
                 },
             ]);
         }
 
-        if (bouncer()->hasPermission('b2b_suite.company_attributes.delete')) {
+        if (bouncer()->hasPermission('b2b.attributes.delete')) {
             $this->addAction([
                 'icon'   => 'icon-delete',
                 'title'  => trans('b2b_suite::app.admin.company-attributes.index.datagrid.delete'),
                 'method' => 'DELETE',
                 'url'    => function ($row) {
-                    return route('admin.customers.attributes.delete', $row->id);
+                    return route('admin.b2b.attributes.delete', $row->id);
                 },
             ]);
         }
@@ -219,12 +219,12 @@ class CompanyAttributeDataGrid extends DataGrid
      */
     public function prepareMassActions(): void
     {
-        if (bouncer()->hasPermission('b2b_suite.company_attributes.delete')) {
+        if (bouncer()->hasPermission('b2b.attributes.delete')) {
             $this->addMassAction([
                 'icon'   => 'icon-delete',
                 'title'  => trans('b2b_suite::app.admin.company-attributes.index.datagrid.delete'),
                 'method' => 'POST',
-                'url'    => route('admin.customers.attributes.mass_delete'),
+                'url'    => route('admin.b2b.attributes.mass_delete'),
             ]);
         }
     }

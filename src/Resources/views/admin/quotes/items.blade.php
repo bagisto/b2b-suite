@@ -29,7 +29,7 @@
     @endforeach
 
     @if ($restCount >= 1)
-        <a href="{{ route('admin.customers.quotes.view', $quote->id) }}">
+        <a href="{{ route('admin.b2b.quotes.view', $quote->id) }}">
             <div class="flex h-[65px] w-[65px] items-center rounded bg-gray-50 dark:bg-gray-800">
                 <p class="px-1.5 py-1.5 text-center text-xs font-bold text-gray-600 dark:text-gray-300">
                     @lang('b2b_suite::app.admin.quotes.index.datagrid.product-count', ['count' => $restCount])

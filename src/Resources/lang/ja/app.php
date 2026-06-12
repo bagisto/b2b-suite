@@ -956,7 +956,6 @@ return [
             'last-name'             => '苗字',
             'email'                 => '電子メール',
             'phone'                 => '電話',
-            'slug'                  => 'ナメクジ',
             'business-name'         => '商号',
             'website-url'           => 'ウェブサイトのURL',
             'vat-tax-id'            => 'VAT 納税者番号',

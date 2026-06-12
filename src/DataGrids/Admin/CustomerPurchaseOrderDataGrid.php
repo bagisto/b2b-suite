@@ -222,14 +222,14 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
      */
     public function prepareActions()
     {
-        if (bouncer()->hasPermission('customers.purchase_orders.view')) {
+        if (bouncer()->hasPermission('b2b.purchase-orders.view')) {
             $this->addAction([
                 'index'  => 'view',
                 'icon'   => 'icon-view',
                 'title'  => trans('b2b_suite::app.admin.purchase-orders.index.datagrid.view'),
                 'method' => 'GET',
                 'url'    => function ($row) {
-                    return route('admin.customers.purchase_orders.view', $row->quote_id);
+                    return route('admin.b2b.purchase_orders.view', $row->quote_id);
                 },
             ]);
         }

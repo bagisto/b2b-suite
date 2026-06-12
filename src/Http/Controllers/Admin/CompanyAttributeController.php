@@ -72,7 +72,7 @@ class CompanyAttributeController extends Controller
 
         Event::dispatch('b2b_suite.company_attribute.create.after', $attribute);
 
-        return to_route('admin.customers.attributes.index')
+        return to_route('admin.b2b.attributes.index')
             ->withSuccess(trans('b2b_suite::app.admin.company-attributes.create-success'));
     }
 
@@ -112,7 +112,7 @@ class CompanyAttributeController extends Controller
 
         Event::dispatch('b2b_suite.company_attribute.update.after', $attribute);
 
-        return to_route('admin.customers.attributes.index')
+        return to_route('admin.b2b.attributes.index')
             ->withSuccess(trans('b2b_suite::app.admin.company-attributes.update-success'));
     }
 
@@ -235,7 +235,7 @@ class CompanyAttributeController extends Controller
 
         $this->companyAttributeGroupRepository->updateMapping($request->all());
 
-        return to_route('admin.customers.attributes.index')
+        return to_route('admin.b2b.attributes.index')
             ->withSuccess(trans('b2b_suite::app.admin.company-attributes.mapping.update-success'));
     }
 }

@@ -267,7 +267,7 @@
                     quote: this.initialQuote,
                     customerName: '{{ $quote->customer->name }}',
                     messages: [],
-                    messageUrl: '{{ route('admin.customers.quotes.messages', $quote->id) }}',
+                    messageUrl: '{{ route('admin.b2b.quotes.messages', $quote->id) }}',
                     loading: false,
                     filters: {
                         has_quotations: '',

@@ -956,7 +956,6 @@ return [
             'last-name'             => 'Cognoms',
             'email'                 => 'Correu electrònic',
             'phone'                 => 'Telèfon',
-            'slug'                  => 'Llimac',
             'business-name'         => 'Nom de l\'empresa',
             'website-url'           => 'URL del lloc web',
             'vat-tax-id'            => 'NIF fiscal IVA',

@@ -956,7 +956,6 @@ return [
             'last-name'             => 'Nachname',
             'email'                 => 'E-Mail',
             'phone'                 => 'Telefon',
-            'slug'                  => 'Schnecke',
             'business-name'         => 'Firmenname',
             'website-url'           => 'Website-URL',
             'vat-tax-id'            => 'Umsatzsteuer-Identifikationsnummer',

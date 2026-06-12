@@ -8,13 +8,14 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Webkul\Admin\Http\Controllers\Controller;
 use Webkul\Admin\Http\Requests\MassDestroyRequest;
+use Webkul\Admin\Http\Requests\MassUpdateRequest;
 use Webkul\B2BSuite\DataGrids\Admin\CompanyDataGrid;
 use Webkul\B2BSuite\Http\Requests\CompanyRequest;
 use Webkul\B2BSuite\Http\Resources\CustomerResource;
 use Webkul\B2BSuite\Repositories\CompanyAttributeGroupRepository;
 use Webkul\B2BSuite\Repositories\CompanyAttributeValueRepository;
 use Webkul\B2BSuite\Repositories\CompanyRoleRepository;
-use Webkul\B2BSuite\Repositories\CustomerFlatRepository;
+use Webkul\B2BSuite\Repositories\CompanyFlatRepository;
 use Webkul\Customer\Repositories\CustomerRepository;
 
 class CompanyController extends Controller
@@ -24,7 +25,7 @@ class CompanyController extends Controller
      */
     public function __construct(
         protected CustomerRepository $customerRepository,
-        protected CustomerFlatRepository $customerFlatRepository,
+        protected CompanyFlatRepository $customerFlatRepository,
         protected CompanyAttributeGroupRepository $companyAttributeGroupRepository,
         protected CompanyAttributeValueRepository $companyAttributeValueRepository,
         protected CompanyRoleRepository $companyRoleRepository
@@ -105,6 +106,11 @@ class CompanyController extends Controller
         $data = array_merge([
             'password'    => bcrypt($password),
             'is_verified' => 1,
+            /**
+             * Companies created from the admin are active by default; the
+             * create form may still override this via the status control.
+             */
+            'status'      => $request->input('status') !== null ? (int) (bool) $request->input('status') : 1,
             'channel_id'  => core()->getCurrentChannel()->id,
         ], $request->only([
             'first_name',
@@ -115,7 +121,6 @@ class CompanyController extends Controller
             'phone',
             'customer_group_id',
             'channel_id',
-            'slug',
             'type',
             'company_role_id',
         ]));
@@ -148,7 +153,7 @@ class CompanyController extends Controller
 
         Event::dispatch('customer.registration.after', $customer);
 
-        return to_route('admin.customers.companies.index')
+        return to_route('admin.b2b.companies.index')
             ->withSuccess(trans('b2b_suite::app.admin.companies.create-success'));
     }
 
@@ -179,6 +184,7 @@ class CompanyController extends Controller
 
         $data = array_merge([
             'is_verified' => 1,
+            'status'      => (int) (bool) $request->input('status'),
             'channel_id'  => core()->getCurrentChannel()->id,
         ], $request->only([
             'first_name',
@@ -189,7 +195,6 @@ class CompanyController extends Controller
             'phone',
             'customer_group_id',
             'channel_id',
-            'slug',
             'type',
             'company_role_id',
         ]));
@@ -198,7 +203,13 @@ class CompanyController extends Controller
             $data['customer_group_id'] = core()->getGuestCustomerGroup()->id;
         }
 
+        $wasPending = ! $customer->status;
+
         $customer->update($data);
+
+        if ($wasPending && $customer->status) {
+            Event::dispatch('b2b.company.approved', $customer);
+        }
 
         $this->companyAttributeValueRepository->saveValues(
             $request->all(),
@@ -210,8 +221,49 @@ class CompanyController extends Controller
 
         Event::dispatch('customer.update.after', $customer);
 
-        return to_route('admin.customers.companies.index')
+        return to_route('admin.b2b.companies.index')
             ->withSuccess(trans('b2b_suite::app.admin.companies.update-success'));
+    }
+
+    /**
+     * Approve (activate) or disable a single company.
+     *
+     * A pending company has `status = 0`, which Bagisto uses to block login,
+     * checkout and protected routes. Approving sets `status = 1`.
+     */
+    public function updateStatus($id): JsonResponse
+    {
+        $company = $this->customerRepository->findOrFail($id);
+
+        $status = (int) (bool) request()->input('status', 1);
+
+        $company->update(['status' => $status]);
+
+        Event::dispatch('b2b.company.'.($status ? 'approved' : 'disabled'), $company);
+
+        return new JsonResponse([
+            'message' => trans('b2b_suite::app.admin.companies.'.($status ? 'approve-success' : 'disable-success')),
+        ]);
+    }
+
+    /**
+     * Mass approve/disable companies.
+     */
+    public function massUpdateStatus(MassUpdateRequest $massUpdateRequest): JsonResponse
+    {
+        $status = (int) (bool) $massUpdateRequest->input('value');
+
+        $companies = $this->customerRepository->findWhereIn('id', $massUpdateRequest->input('indices'));
+
+        foreach ($companies as $company) {
+            $company->update(['status' => $status]);
+
+            Event::dispatch('b2b.company.'.($status ? 'approved' : 'disabled'), $company);
+        }
+
+        return new JsonResponse([
+            'message' => trans('b2b_suite::app.admin.companies.mass-update-status-success'),
+        ]);
     }
 
     /**

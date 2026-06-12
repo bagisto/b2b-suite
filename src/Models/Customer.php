@@ -31,7 +31,6 @@ class Customer extends BaseCustomer
         'status',
         'is_verified',
         'is_suspended',
-        'slug',
         'type',
         'company_role_id',
     ];
@@ -77,9 +76,9 @@ class Customer extends BaseCustomer
     /**
      * Get the customer's flat information.
      */
-    public function customer_flats(): HasMany
+    public function company_flats(): HasMany
     {
-        return $this->hasMany(CustomerFlatProxy::modelClass());
+        return $this->hasMany(CompanyFlatProxy::modelClass());
     }
 
     /**

@@ -3,23 +3,23 @@
 namespace Webkul\B2BSuite\Repositories;
 
 use Illuminate\Support\Facades\Event;
-use Webkul\B2BSuite\Contracts\CustomerFlat as CustomerFlatContract;
+use Webkul\B2BSuite\Contracts\CompanyFlat as CompanyFlatContract;
 use Webkul\Core\Eloquent\Repository;
 
-class CustomerFlatRepository extends Repository
+class CompanyFlatRepository extends Repository
 {
     /**
      * Specify Model class name
      */
     public function model(): string
     {
-        return CustomerFlatContract::class;
+        return CompanyFlatContract::class;
     }
 
     /**
      * Create customer flat record.
      */
-    public function create(array $data): CustomerFlatContract
+    public function create(array $data): CompanyFlatContract
     {
         Event::dispatch('customer.flat.create.before');
 
@@ -33,7 +33,7 @@ class CustomerFlatRepository extends Repository
     /**
      * Update customer flat record.
      */
-    public function update(array $data, $id, $attribute = 'id'): CustomerFlatContract
+    public function update(array $data, $id, $attribute = 'id'): CompanyFlatContract
     {
         Event::dispatch('customer.flat.update.before', $id);
 
@@ -63,7 +63,7 @@ class CustomerFlatRepository extends Repository
     /**
      * Get customer flat by customer ID and locale.
      */
-    public function findByCustomerAndLocale(int $customerId, string $locale): ?CustomerFlatContract
+    public function findByCustomerAndLocale(int $customerId, string $locale): ?CompanyFlatContract
     {
         return $this->model
             ->where('customer_id', $customerId)
@@ -74,7 +74,7 @@ class CustomerFlatRepository extends Repository
     /**
      * Get customer flat by customer ID, locale and channel.
      */
-    public function findByCustomerLocaleAndChannel(int $customerId, string $locale, string $channel): ?CustomerFlatContract
+    public function findByCustomerLocaleAndChannel(int $customerId, string $locale, string $channel): ?CompanyFlatContract
     {
         return $this->model
             ->where('customer_id', $customerId)
@@ -96,7 +96,7 @@ class CustomerFlatRepository extends Repository
     /**
      * Create or update customer flat record.
      */
-    public function createOrUpdate(array $data): CustomerFlatContract
+    public function createOrUpdate(array $data): CompanyFlatContract
     {
         $customerFlat = $this->findByCustomerLocaleAndChannel(
             $data['customer_id'],

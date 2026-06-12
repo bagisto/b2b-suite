@@ -4,7 +4,7 @@
     </x-slot>
 
     <!-- Input Form -->
-    <x-admin::form :action="route('admin.customers.attributes.update_mapping')">
+    <x-admin::form :action="route('admin.b2b.attributes.update_mapping')">
         <!-- Page Header -->
         <div class="flex items-center justify-between gap-4 max-sm:flex-wrap">
             <p class="text-xl font-bold text-gray-800 dark:text-white">
@@ -13,7 +13,7 @@
 
             <div class="flex items-center gap-x-2.5">
                 <a
-                    href="{{ route('admin.customers.attributes.index') }}"
+                    href="{{ route('admin.b2b.attributes.index') }}"
                     class="transparent-button hover:bg-gray-200 dark:text-white dark:hover:bg-gray-800"
                 >
                     @lang('b2b_suite::app.admin.company-attributes.mapping.back-btn')

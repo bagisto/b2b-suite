@@ -1009,7 +1009,6 @@ return [
             'last-name'             => 'Soy isim',
             'email'                 => 'E-posta',
             'phone'                 => 'Telefon',
-            'slug'                  => 'Sümüklüböcek',
             'business-name'         => 'İşletme Adı',
             'website-url'           => 'Web sitesi URL\'si',
             'vat-tax-id'            => 'KDV Vergi Numarası',

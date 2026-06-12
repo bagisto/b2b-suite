@@ -10,8 +10,8 @@
         </p>
 
         <div class="flex items-center gap-x-2.5">
-            @if (bouncer()->hasPermission('b2b_suite.companies.create'))
-                <a href="{{ route('admin.customers.companies.create') }}">
+            @if (bouncer()->hasPermission('b2b.companies.create'))
+                <a href="{{ route('admin.b2b.companies.create') }}">
                     <div class="primary-button">
                         @lang('b2b_suite::app.admin.companies.index.create-btn')
                     </div>
@@ -22,7 +22,7 @@
 
     {!! view_render_event('bagisto.admin.b2b_suite.companies.list.before') !!}
 
-    <x-admin::datagrid :src="route('admin.customers.companies.index')" />
+    <x-admin::datagrid :src="route('admin.b2b.companies.index')" />
 
     {!! view_render_event('bagisto.admin.b2b_suite.companies.list.after') !!}
 

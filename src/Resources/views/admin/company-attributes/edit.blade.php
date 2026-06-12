@@ -3,11 +3,11 @@
         @lang('b2b_suite::app.admin.company-attributes.edit.title')
     </x-slot>
 
-    {!! view_render_event('bagisto.admin.customers.attributes.edit.before', ['attribute' => $attribute]) !!}
+    {!! view_render_event('bagisto.admin.b2b.attributes.edit.before', ['attribute' => $attribute]) !!}
 
     <!-- Input Form -->
     <x-admin::form
-        :action="route('admin.customers.attributes.update', $attribute->id)"
+        :action="route('admin.b2b.attributes.update', $attribute->id)"
         enctype="multipart/form-data"
         method="PUT"
     >
@@ -19,7 +19,7 @@
             <div class="flex items-center gap-x-2.5">
                 <!-- Back Button -->
                 <a
-                    href="{{ route('admin.customers.attributes.index') }}"
+                    href="{{ route('admin.b2b.attributes.index') }}"
                     class="transparent-button hover:bg-gray-200 dark:text-white dark:hover:bg-gray-800"
                 >
                     @lang('b2b_suite::app.admin.company-attributes.edit.back-btn')
@@ -42,7 +42,7 @@
         </v-edit-attributes>
     </x-admin::form>
 
-    {!! view_render_event('bagisto.admin.customers.attributes.edit.after', ['attribute' => $attribute]) !!}
+    {!! view_render_event('bagisto.admin.b2b.attributes.edit.after', ['attribute' => $attribute]) !!}
 
     @pushOnce('scripts')
         <script
@@ -54,7 +54,7 @@
                 <!-- Left Sub Component -->
                 <div class="flex flex-1 flex-col gap-2 overflow-auto max-xl:flex-auto">
 
-                    {!! view_render_event('bagisto.admin.customers.attributes.edit.card.label.before', ['attribute' => $attribute]) !!}
+                    {!! view_render_event('bagisto.admin.b2b.attributes.edit.card.label.before', ['attribute' => $attribute]) !!}
 
                     <!-- Label -->
                     <div class="box-shadow rounded bg-white p-4 dark:bg-gray-900">
@@ -99,7 +99,7 @@
                         @endforeach
                     </div>
 
-                    {!! view_render_event('bagisto.admin.customers.attributes.edit.card.label.after', ['attribute' => $attribute]) !!}
+                    {!! view_render_event('bagisto.admin.b2b.attributes.edit.card.label.after', ['attribute' => $attribute]) !!}
 
                     <!-- Options -->
                     <div
@@ -345,7 +345,7 @@
 
                 <!-- Right Sub Component -->
                 <div class="flex w-[360px] max-w-full flex-col gap-2 max-sm:w-full">
-                    {!! view_render_event('bagisto.admin.customers.attributes.edit.card.accordion.general.before', ['attribute' => $attribute]) !!}
+                    {!! view_render_event('bagisto.admin.b2b.attributes.edit.card.accordion.general.before', ['attribute' => $attribute]) !!}
 
                     <!-- General -->
                     <x-admin::accordion>
@@ -467,9 +467,9 @@
                         </x-slot>
                     </x-admin::accordion>
 
-                    {!! view_render_event('bagisto.admin.customers.attributes.edit.card.accordion.general.after', ['attribute' => $attribute]) !!}
+                    {!! view_render_event('bagisto.admin.b2b.attributes.edit.card.accordion.general.after', ['attribute' => $attribute]) !!}
 
-                    {!! view_render_event('bagisto.admin.customers.attributes.edit.card.accordion.validations.before', ['attribute' => $attribute]) !!}
+                    {!! view_render_event('bagisto.admin.b2b.attributes.edit.card.accordion.validations.before', ['attribute' => $attribute]) !!}
 
                     <!-- Validations -->
                     <x-admin::accordion>
@@ -590,9 +590,9 @@
                         </x-slot>
                     </x-admin::accordion>
 
-                    {!! view_render_event('bagisto.admin.customers.attributes.edit.card.accordion.validations.after', ['attribute' => $attribute]) !!}
+                    {!! view_render_event('bagisto.admin.b2b.attributes.edit.card.accordion.validations.after', ['attribute' => $attribute]) !!}
 
-                    {!! view_render_event('bagisto.admin.customers.attributes.edit.card.accordion.configuration.before', ['attribute' => $attribute]) !!}
+                    {!! view_render_event('bagisto.admin.b2b.attributes.edit.card.accordion.configuration.before', ['attribute' => $attribute]) !!}
 
                     <!-- Configurations -->
                     <x-admin::accordion>
@@ -688,7 +688,7 @@
                         </x-slot>
                     </x-admin::accordion>
 
-                    {!! view_render_event('bagisto.admin.customers.attributes.edit.card.accordion.configuration.configuration.after', ['attribute' => $attribute]) !!}
+                    {!! view_render_event('bagisto.admin.b2b.attributes.edit.card.accordion.configuration.configuration.after', ['attribute' => $attribute]) !!}
                 </div>
             </div>
 

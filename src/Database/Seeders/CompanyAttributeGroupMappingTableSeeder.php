@@ -32,10 +32,6 @@ class CompanyAttributeGroupMappingTableSeeder extends Seeder
                 'company_attribute_group_id'  => 1,
                 'position'                    => 4,
             ], [
-                'company_attribute_id'        => 5,
-                'company_attribute_group_id'  => 1,
-                'position'                    => 5,
-            ], [
                 'company_attribute_id'        => 6,
                 'company_attribute_group_id'  => 1,
                 'position'                    => 6,
@@ -124,36 +120,6 @@ class CompanyAttributeGroupMappingTableSeeder extends Seeder
                 'company_attribute_group_id'  => 5,
                 'position'                    => 3,
             ],
-
-            // /**
-            //  * Settings Group Attributes
-            //  */
-            // [
-            //     'company_attribute_id'        => 23,
-            //     'company_attribute_group_id'  => 6,
-            //     'position'                    => 1,
-            // ],
-            // [
-            //     'company_attribute_id'        => 24,
-            //     'company_attribute_group_id'  => 6,
-            //     'position'                    => 2,
-            // ], [
-            //     'company_attribute_id'        => 25,
-            //     'company_attribute_group_id'  => 6,
-            //     'position'                    => 3,
-            // ], [
-            //     'company_attribute_id'        => 26,
-            //     'company_attribute_group_id'  => 6,
-            //     'position'                    => 4,
-            // ], [
-            //     'company_attribute_id'        => 27,
-            //     'company_attribute_group_id'  => 6,
-            //     'position'                    => 5,
-            // ], [
-            //     'company_attribute_id'        => 28,
-            //     'company_attribute_group_id'  => 6,
-            //     'position'                    => 6,
-            // ],
         ]);
     }
 }

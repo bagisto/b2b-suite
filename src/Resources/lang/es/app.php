@@ -956,7 +956,6 @@ return [
             'last-name'             => 'Apellido',
             'email'                 => 'Correo electrónico',
             'phone'                 => 'Teléfono',
-            'slug'                  => 'Babosa',
             'business-name'         => 'Nombre comercial',
             'website-url'           => 'URL del sitio web',
             'vat-tax-id'            => 'Número de identificación fiscal del IVA',

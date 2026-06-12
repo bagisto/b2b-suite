@@ -12,7 +12,7 @@ class ModuleServiceProvider extends CoreModuleServiceProvider
      * @var array
      */
     protected $models = [
-        \Webkul\B2BSuite\Models\CustomerFlat::class,
+        \Webkul\B2BSuite\Models\CompanyFlat::class,
         \Webkul\B2BSuite\Models\CompanyAttribute::class,
         \Webkul\B2BSuite\Models\CompanyAttributeValue::class,
         \Webkul\B2BSuite\Models\CompanyAttributeTranslation::class,

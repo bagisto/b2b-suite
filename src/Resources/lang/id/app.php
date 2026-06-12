@@ -956,7 +956,6 @@ return [
             'last-name'             => 'Nama Belakang',
             'email'                 => 'E-mail',
             'phone'                 => 'Telepon',
-            'slug'                  => 'Siput',
             'business-name'         => 'Nama Bisnis',
             'website-url'           => 'URL situs web',
             'vat-tax-id'            => 'Nomor Pajak PPN',

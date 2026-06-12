@@ -65,16 +65,6 @@ class CompanyAttributeGroupTableSeeder extends Seeder
                 'column'          => 2,
                 'is_user_defined' => 0,
                 'position'        => 2,
-                // ], [
-                //     'id'              => 6,
-                //     'code'            => 'settings',
-                //     'admin_name'      => trans(
-                //         key: 'b2b_suite::app.seeders.company-attribute-groups.settings',
-                //         locale: $parameters['default_locale']
-                //     ),
-                //     'column'          => 2,
-                //     'is_user_defined' => 0,
-                //     'position'        => 3,
             ],
         ];
 

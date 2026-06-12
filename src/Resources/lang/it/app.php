@@ -956,7 +956,6 @@ return [
             'last-name'             => 'Cognome',
             'email'                 => 'E-mail',
             'phone'                 => 'Telefono',
-            'slug'                  => 'Lumaca',
             'business-name'         => 'Nome dell\'azienda',
             'website-url'           => 'URL del sito web',
             'vat-tax-id'            => 'Partita IVA',

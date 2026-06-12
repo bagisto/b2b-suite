@@ -13,23 +13,23 @@ use Webkul\B2BSuite\Http\Controllers\Admin\QuoteController;
  * ----------------------------------------------------
  */
 Route::controller(CompanyAttributeController::class)->prefix('attributes')->group(function () {
-    Route::get('', 'index')->name('admin.customers.attributes.index');
+    Route::get('', 'index')->name('admin.b2b.attributes.index');
 
-    Route::get('create', 'create')->name('admin.customers.attributes.create');
+    Route::get('create', 'create')->name('admin.b2b.attributes.create');
 
-    Route::post('', 'store')->name('admin.customers.attributes.store');
+    Route::post('', 'store')->name('admin.b2b.attributes.store');
 
-    Route::get('edit/{id}', 'edit')->name('admin.customers.attributes.edit');
+    Route::get('edit/{id}', 'edit')->name('admin.b2b.attributes.edit');
 
-    Route::put('edit/{id}', 'update')->name('admin.customers.attributes.update');
+    Route::put('edit/{id}', 'update')->name('admin.b2b.attributes.update');
 
-    Route::delete('delete/{id}', 'destroy')->name('admin.customers.attributes.delete');
+    Route::delete('delete/{id}', 'destroy')->name('admin.b2b.attributes.delete');
 
-    Route::post('mass-delete', 'massDestroy')->name('admin.customers.attributes.mass_delete');
+    Route::post('mass-delete', 'massDestroy')->name('admin.b2b.attributes.mass_delete');
 
-    Route::get('mapping', 'editMapping')->name('admin.customers.attributes.edit_mapping');
+    Route::get('mapping', 'editMapping')->name('admin.b2b.attributes.edit_mapping');
 
-    Route::post('mapping', 'updateMapping')->name('admin.customers.attributes.update_mapping');
+    Route::post('mapping', 'updateMapping')->name('admin.b2b.attributes.update_mapping');
 });
 
 /**
@@ -38,23 +38,27 @@ Route::controller(CompanyAttributeController::class)->prefix('attributes')->grou
  * ----------------------------------------------------
  */
 Route::controller(CompanyController::class)->prefix('companies')->group(function () {
-    Route::get('', 'index')->name('admin.customers.companies.index');
+    Route::get('', 'index')->name('admin.b2b.companies.index');
 
-    Route::get('companies', 'get')->name('admin.customers.companies.get');
+    Route::get('fetch', 'get')->name('admin.b2b.companies.get');
 
-    Route::get('search', 'search')->name('admin.customers.companies.search');
+    Route::get('search', 'search')->name('admin.b2b.companies.search');
 
-    Route::get('create', 'create')->name('admin.customers.companies.create');
+    Route::get('create', 'create')->name('admin.b2b.companies.create');
 
-    Route::post('create', 'store')->name('admin.customers.companies.store');
+    Route::post('create', 'store')->name('admin.b2b.companies.store');
 
-    Route::get('edit/{id}', 'edit')->name('admin.customers.companies.edit');
+    Route::get('edit/{id}', 'edit')->name('admin.b2b.companies.edit');
 
-    Route::put('edit/{id}', 'update')->name('admin.customers.companies.update');
+    Route::put('edit/{id}', 'update')->name('admin.b2b.companies.update');
 
-    Route::delete('edit/{id}', 'destroy')->name('admin.customers.companies.delete');
+    Route::post('{id}/status', 'updateStatus')->name('admin.b2b.companies.update_status');
 
-    Route::post('mass-delete', 'massDestroy')->name('admin.customers.companies.mass_delete');
+    Route::delete('edit/{id}', 'destroy')->name('admin.b2b.companies.delete');
+
+    Route::post('mass-delete', 'massDestroy')->name('admin.b2b.companies.mass_delete');
+
+    Route::post('mass-update-status', 'massUpdateStatus')->name('admin.b2b.companies.mass_update_status');
 });
 
 /**
@@ -63,39 +67,27 @@ Route::controller(CompanyController::class)->prefix('companies')->group(function
  * ----------------------------------------------------
  */
 Route::controller(QuoteController::class)->prefix('quotes')->group(function () {
-    Route::get('', 'index')->name('admin.customers.quotes.index');
+    Route::get('', 'index')->name('admin.b2b.quotes.index');
 
-    Route::get('create/{cartId}', 'create')->name('admin.customers.quotes.create');
+    Route::get('create/{cartId}', 'create')->name('admin.b2b.quotes.create');
 
-    Route::post('create/{cartId}', 'store')->name('admin.customers.quotes.store');
+    Route::post('create/{cartId}', 'store')->name('admin.b2b.quotes.store');
 
-    Route::get('{id}', 'view')->name('admin.customers.quotes.view');
+    Route::get('{id}', 'view')->name('admin.b2b.quotes.view');
 
-    Route::get('/quotes/{id}/messages', 'getMessages')->name('admin.customers.quotes.messages');
+    Route::get('{id}/messages', 'getMessages')->name('admin.b2b.quotes.messages');
 
-    Route::post('{id}/send-message', 'sendMessage')->name('admin.customers.quotes.send_message');
+    Route::post('{id}/send-message', 'sendMessage')->name('admin.b2b.quotes.send_message');
 
-    Route::post('{id}/reject-quote', 'rejectQuote')->name('admin.customers.quotes.reject_quote');
+    Route::post('{id}/reject-quote', 'rejectQuote')->name('admin.b2b.quotes.reject_quote');
 
-    Route::post('{id}/submit', 'submitQuote')->name('admin.customers.quotes.submit_quote');
+    Route::post('{id}/submit', 'submitQuote')->name('admin.b2b.quotes.submit_quote');
 
-    Route::post('{id}/accept-quote', 'acceptQuote')->name('admin.customers.quotes.accept_quote');
+    Route::post('{id}/accept-quote', 'acceptQuote')->name('admin.b2b.quotes.accept_quote');
 
-    // Route::get('send-by-mail/{id}', 'sendByMail')->name('admin.customers.quotes.send_by_mail');
+    Route::post('mass-delete', 'massDestroy')->name('admin.b2b.quotes.mass_delete');
 
-    // Route::get('print-order/{id}', 'printOrder')->name('admin.customers.quotes.print_order');
-
-    // Route::post('{id}/delete', 'deleteQuote')->name('admin.customers.quotes.delete_quote');
-
-    // Route::get('edit/{id}', 'edit')->name('admin.customers.quotes.edit');
-
-    // Route::put('edit/{id}', 'update')->name('admin.customers.quotes.update');
-
-    // Route::delete('delete/{id}', 'destroy')->name('admin.customers.quotes.delete');
-
-    Route::post('mass-delete', 'massDestroy')->name('admin.customers.quotes.mass_delete');
-
-    Route::post('mass-update', 'massUpdate')->name('admin.customers.quotes.mass_update');
+    Route::post('mass-update', 'massUpdate')->name('admin.b2b.quotes.mass_update');
 });
 
 /**
@@ -104,19 +96,19 @@ Route::controller(QuoteController::class)->prefix('quotes')->group(function () {
  * ----------------------------------------------------
  */
 Route::controller(PurchaseOrderController::class)->prefix('purchase-orders')->group(function () {
-    Route::get('', 'index')->name('admin.customers.purchase_orders.index');
+    Route::get('', 'index')->name('admin.b2b.purchase_orders.index');
 
-    Route::get('{id}', 'view')->name('admin.customers.purchase_orders.view');
+    Route::get('{id}', 'view')->name('admin.b2b.purchase_orders.view');
 });
 
 Route::controller(CartController::class)->prefix('cart')->group(function () {
-    Route::get('{id}', 'index')->name('admin.customers.cart.index');
+    Route::get('{id}', 'index')->name('admin.b2b.cart.index');
 
-    Route::post('create', 'store')->name('admin.customers.cart.store');
+    Route::post('create', 'store')->name('admin.b2b.cart.store');
 
-    Route::post('{id}/items', 'storeItem')->name('admin.customers.cart.items.store');
+    Route::post('{id}/items', 'storeItem')->name('admin.b2b.cart.items.store');
 
-    Route::put('{id}/items', 'updateItem')->name('admin.customers.cart.items.update');
+    Route::put('{id}/items', 'updateItem')->name('admin.b2b.cart.items.update');
 
-    Route::delete('{id}/items', 'destroyItem')->name('admin.customers.cart.items.destroy');
+    Route::delete('{id}/items', 'destroyItem')->name('admin.b2b.cart.items.destroy');
 });

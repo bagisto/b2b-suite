@@ -21,7 +21,7 @@
                 </span>
                 
                 <div class="cursor-pointer text-blue-600 text-gray-900 transition-all hover:underline dark:text-white">
-                    <a href="{{ route('admin.customers.companies.edit', $company->id) }}">{{ $company->name ?? '-' }}</a>
+                    <a href="{{ route('admin.b2b.companies.edit', $company->id) }}">{{ $company->name ?? '-' }}</a>
                 </div>
             </div>
 
@@ -196,7 +196,7 @@
 
                     let self = this;
 
-                    this.$axios.get("{{ route('admin.customers.companies.search') }}", {
+                    this.$axios.get("{{ route('admin.b2b.companies.search') }}", {
                             params: {
                                 query: this.searchTerm,
                                 type: 'company'
@@ -212,7 +212,7 @@
                 },
 
                 selectCompany(company) {
-                    this.$axios.post("{{ route('admin.customers.cart.store') }}", {cart_id: this.cart.id, company_id: company.id})
+                    this.$axios.post("{{ route('admin.b2b.cart.store') }}", {cart_id: this.cart.id, company_id: company.id})
                         .then(function(response) {
                             window.location.href = response.data.redirect_url;
                         })

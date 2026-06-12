@@ -29,6 +29,15 @@ return [
                 'channel_based' => true,
                 'locale_based'  => false,
             ], [
+                'name'          => 'require_company_approval',
+                'title'         => 'b2b_suite::app.admin.configuration.index.b2b-suite.general.settings.require-company-approval',
+                'info'          => 'b2b_suite::app.admin.configuration.index.b2b-suite.general.settings.require-company-approval-info',
+                'depends'       => 'active:1',
+                'type'          => 'boolean',
+                'default'       => true,
+                'channel_based' => true,
+                'locale_based'  => false,
+            ], [
                 'name'          => 'no_requisition_list',
                 'title'         => 'b2b_suite::app.admin.configuration.index.b2b-suite.general.settings.no-requisition-list',
                 'depends'       => 'active:1',

@@ -55,7 +55,7 @@ class CartController extends Controller
 
             return new JsonResource([
                 'data'         => new CartResource($cart),
-                'redirect_url' => route('admin.customers.quotes.create', $cart->id),
+                'redirect_url' => route('admin.b2b.quotes.create', $cart->id),
             ]);
         }
 
@@ -69,7 +69,7 @@ class CartController extends Controller
 
             return new JsonResource([
                 'data'         => new CartResource($cart),
-                'redirect_url' => route('admin.customers.quotes.create', $cart->id),
+                'redirect_url' => route('admin.b2b.quotes.create', $cart->id),
             ]);
         } catch (\Exception $exception) {
             return new JsonResource([

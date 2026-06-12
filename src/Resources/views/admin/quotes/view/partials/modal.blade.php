@@ -1,4 +1,4 @@
-<x-admin::form action="{{ route('admin.customers.quotes.'.(isset($action) ? $action.'_quote' : 'send_message'), $quote->id) }}">
+<x-admin::form action="{{ route('admin.b2b.quotes.'.(isset($action) ? $action.'_quote' : 'send_message'), $quote->id) }}">
     <x-admin::modal>
         <x-slot:toggle>
             <div class="{{ $buttonClass ?? 'primary-button' }} ">

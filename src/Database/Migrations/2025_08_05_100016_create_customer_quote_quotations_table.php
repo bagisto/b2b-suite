@@ -16,20 +16,15 @@ return new class extends Migration
             $table->integer('message_id')->unsigned();
             $table->integer('quote_id')->unsigned();
             $table->integer('quote_item_id')->unsigned();
-
             $table->string('sku');
             $table->string('name');
             $table->integer('qty')->default(1);
-
             $table->decimal('price', 18, 4)->default(0);
             $table->decimal('base_price', 18, 4)->default(0);
-
             $table->decimal('total', 18, 4)->default(0);
             $table->decimal('base_total', 18, 4)->default(0);
-
             $table->boolean('is_accepted')->default(false);
-            $table->string('accepted_by'); // 'customer' or 'admin'
-
+            $table->string('accepted_by');
             $table->timestamps();
 
             $table->foreign('quote_id')->references('id')->on('customer_quotes')->onDelete('cascade');

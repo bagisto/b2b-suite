@@ -40,8 +40,6 @@ class B2BSuiteServiceProvider extends ServiceProvider
 
         $this->registerServices();
 
-        $this->registerFacades();
-
         $this->app->bind(CoreMenu::class, B2BMenu::class);
     }
 
@@ -162,13 +160,4 @@ class B2BSuiteServiceProvider extends ServiceProvider
         );
     }
 
-    /**
-     * Register facades.
-     */
-    protected function registerFacades(): void
-    {
-        // $this->app->singleton('b2b', function () {
-        //     return new \Webkul\B2BSuite\Helpers\B2BHelper;
-        // });
-    }
 }

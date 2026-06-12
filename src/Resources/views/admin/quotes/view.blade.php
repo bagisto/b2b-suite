@@ -6,7 +6,7 @@
     <!-- Header -->
     <div class="grid">
         <div class="flex items-center justify-between gap-4 max-sm:flex-wrap">
-            {!! view_render_event('bagisto.admin.customers.quote.title.before', ['quote' => $quote]) !!}
+            {!! view_render_event('bagisto.admin.b2b.quote.title.before', ['quote' => $quote]) !!}
 
             <div class="flex items-center gap-2.5">
                 <p class="text-xl font-bold leading-6 text-gray-800 dark:text-white">
@@ -19,11 +19,11 @@
                 </span>
             </div>
 
-            {!! view_render_event('bagisto.admin.customers.quote.title.after', ['quote' => $quote]) !!}
+            {!! view_render_event('bagisto.admin.b2b.quote.title.after', ['quote' => $quote]) !!}
 
             <!-- Back Button -->
             <a
-                href="{{ route('admin.customers.quotes.index') }}"
+                href="{{ route('admin.b2b.quotes.index') }}"
                 class="transparent-button hover:bg-gray-200 dark:text-white dark:hover:bg-gray-800"
             >
                 @lang('b2b_suite::app.admin.quotes.view.back-btn')
@@ -36,7 +36,7 @@
         <div class="mt-3.5 flex gap-2.5 max-xl:flex-wrap">
             <!-- Left Component -->
             <div class="flex flex-1 flex-col gap-2 max-xl:flex-auto">
-                {!! view_render_event('bagisto.admin.customers.quote.left_component.before', ['quote' => $quote]) !!}
+                {!! view_render_event('bagisto.admin.b2b.quote.left_component.before', ['quote' => $quote]) !!}
 
                 <!-- Quote Information -->
                 @include('b2b_suite::admin.quotes.view.quote-information')

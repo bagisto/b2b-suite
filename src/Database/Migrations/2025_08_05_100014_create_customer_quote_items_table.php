@@ -19,23 +19,16 @@ return new class extends Migration
             $table->string('sku');
             $table->string('name');
             $table->integer('qty')->default(1);
-
             $table->decimal('price', 18, 4)->default(0);
             $table->decimal('base_price', 18, 4)->default(0);
-
             $table->decimal('total', 18, 4)->default(0);
             $table->decimal('base_total', 18, 4)->default(0);
-
             $table->integer('negotiated_qty')->default(1);
-
             $table->decimal('negotiated_price', 18, 4)->default(0);
             $table->decimal('base_negotiated_price', 18, 4)->default(0);
-
             $table->decimal('negotiated_total', 18, 4)->default(0);
             $table->decimal('base_negotiated_total', 18, 4)->default(0);
-
             $table->text('note')->nullable();
-
             $table->enum('status', ['draft', 'open', 'negotiation', 'accepted', 'ordered', 'expired', 'rejected', 'completed'])->default('draft');
             $table->json('additional')->nullable();
             $table->timestamps();

@@ -956,7 +956,6 @@ return [
             'last-name'             => 'Achternaam',
             'email'                 => 'E-mail',
             'phone'                 => 'Telefoon',
-            'slug'                  => 'Naaktslak',
             'business-name'         => 'Bedrijfsnaam',
             'website-url'           => 'Website-URL',
             'vat-tax-id'            => 'Btw-belastingnummer',

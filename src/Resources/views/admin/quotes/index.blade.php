@@ -10,11 +10,11 @@
         </p>
 
         <div class="flex items-center gap-x-2.5">
-            <x-admin::datagrid.export src="{{ route('admin.customers.quotes.index') }}" />
+            <x-admin::datagrid.export src="{{ route('admin.b2b.quotes.index') }}" />
             
-            {!! view_render_event('bagisto.admin.customers.quotes.create.before') !!}
+            {!! view_render_event('bagisto.admin.b2b.quotes.create.before') !!}
 
-            @if (bouncer()->hasPermission('customers.quotes.create'))
+            @if (bouncer()->hasPermission('b2b.quotes.create'))
                 <button
                     class="primary-button"
                     @click="$refs.selectCustomerComponent.openDrawer()"
@@ -23,13 +23,13 @@
                 </button>
             @endif
 
-            {!! view_render_event('bagisto.admin.customers.quotes.create.after') !!}
+            {!! view_render_event('bagisto.admin.b2b.quotes.create.after') !!}
         </div>
     </div>
 
     <v-customer-search ref="selectCustomerComponent"></v-customer-search>
 
-    <x-admin::datagrid :src="route('admin.customers.quotes.index')" :isMultiRow="true">
+    <x-admin::datagrid :src="route('admin.b2b.quotes.index')" :isMultiRow="true">
         <template #header="{
             isLoading,
             available,
@@ -157,7 +157,7 @@
                         >
                         </div>
 
-                        <a :href=`{{ route('admin.customers.quotes.view', '') }}/${record.quote_id}`>
+                        <a :href=`{{ route('admin.b2b.quotes.index') }}/${record.quote_id}`>
                             <span class="icon-view rtl:icon-sort-left cursor-pointer p-1.5 text-2xl hover:rounded-md hover:bg-gray-200 ltr:ml-1 rtl:mr-1 dark:hover:bg-gray-800"></span>
                         </a>
                     </div>
@@ -305,7 +305,7 @@
 
                         let self = this;
 
-                        this.$axios.get("{{ route('admin.customers.companies.search') }}", {
+                        this.$axios.get("{{ route('admin.b2b.companies.search') }}", {
                                 params: {
                                     query: this.searchTerm,
                                     type: 'user'
@@ -321,7 +321,7 @@
                     },
 
                     createCart(customer) {
-                        this.$axios.post("{{ route('admin.customers.cart.store') }}", {customer_id: customer.id})
+                        this.$axios.post("{{ route('admin.b2b.cart.store') }}", {customer_id: customer.id})
                             .then(function(response) {
                                 window.location.href = response.data.redirect_url;
                             })

@@ -13,22 +13,17 @@ return new class extends Migration
     {
         Schema::create('customer_requisition_list_products', function (Blueprint $table) {
             $table->increments('id');
-
             $table->integer('requisition_list_id')->unsigned();
             $table->integer('product_id')->unsigned();
             $table->integer('variant_id')->unsigned()->nullable();
-
             $table->string('type');
             $table->string('sku');
             $table->string('name');
             $table->integer('qty')->default(1);
-
             $table->decimal('price', 18, 4)->default(0);
             $table->decimal('base_price', 18, 4)->default(0);
-
             $table->decimal('total', 18, 4)->default(0);
             $table->decimal('base_total', 18, 4)->default(0);
-
             $table->json('additional')->nullable();
 
             $table->foreign('requisition_list_id', 'bag_customer_requisition_list_id_foreign')->references('id')->on('customer_requisition_lists')->onDelete('cascade');

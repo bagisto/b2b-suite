@@ -68,10 +68,6 @@ class EventServiceProvider extends ServiceProvider
                 'event'    => 'bagisto.shop.checkout.cart.continue_shopping.before',
                 'template' => 'b2b_suite::shop.customers.account.requisitions.list-modal',
             ],
-            [
-                // 'event'    => 'bagisto.shop.components.products.card.compare_option.after',
-                // 'template' => 'b2b_suite::shop.customers.account.requisitions.list-modal',
-            ],
         ];
 
         /**

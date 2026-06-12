@@ -1014,7 +1014,6 @@ return [
             'last-name'             => '姓',
             'email'                 => '电子邮件',
             'phone'                 => '电话',
-            'slug'                  => '蛞蝓',
             'business-name'         => '公司名称',
             'website-url'           => '网站网址',
             'vat-tax-id'            => '增值税税号',

@@ -10,11 +10,11 @@
         </p>
 
         <div class="flex items-center gap-x-2.5">
-            <x-admin::datagrid.export src="{{ route('admin.customers.purchase_orders.index') }}" />
+            <x-admin::datagrid.export src="{{ route('admin.b2b.purchase_orders.index') }}" />
         </div>
     </div>
 
-    <x-admin::datagrid :src="route('admin.customers.purchase_orders.index')" :isMultiRow="true">
+    <x-admin::datagrid :src="route('admin.b2b.purchase_orders.index')" :isMultiRow="true">
         <template #header="{
             isLoading,
             available,
@@ -142,7 +142,7 @@
                         >
                         </div>
 
-                        <a :href=`{{ route('admin.customers.purchase_orders.view', '') }}/${record.quote_id}`>
+                        <a :href=`{{ route('admin.b2b.purchase_orders.index') }}/${record.quote_id}`>
                             <span class="icon-view rtl:icon-sort-left cursor-pointer p-1.5 text-2xl hover:rounded-md hover:bg-gray-200 ltr:ml-1 rtl:mr-1 dark:hover:bg-gray-800"></span>
                         </a>
                     </div>

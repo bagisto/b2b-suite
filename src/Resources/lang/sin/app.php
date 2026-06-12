@@ -1001,7 +1001,6 @@ return [
             'last-name'             => 'Last Name',
             'email'                 => 'Email',
             'phone'                 => 'Phone',
-            'slug'                  => 'Slug',
             'business-name'         => 'Business Name',
             'website-url'           => 'Website URL',
             'vat-tax-id'            => 'VAT Tax ID',

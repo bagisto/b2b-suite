@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('customer_quote_messages', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('quote_id')->unsigned();
-            $table->integer('user_id')->unsigned(); // can be customer or admin
-            $table->string('user_type'); // 'customer' or 'admin'
+            $table->integer('user_id')->unsigned();
+            $table->string('user_type');
             $table->text('message');
             $table->string('status')->nullable();
             $table->timestamps();

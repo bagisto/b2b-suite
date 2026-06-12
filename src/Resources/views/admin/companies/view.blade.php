@@ -9,14 +9,14 @@
         <div class="page-header">
             <div class="page-title">
                 <h1>
-                    <i class="icon angle-left-icon back-link" onclick="history.length > 1 ? history.go(-1) : window.location = '{{ route('admin.customers.companies.index') }}'"></i>
+                    <i class="icon angle-left-icon back-link" onclick="history.length > 1 ? history.go(-1) : window.location = '{{ route('admin.b2b.companies.index') }}'"></i>
                     {{ __('b2b_suite::app.admin.companies.view.title') }} - {{ $company->name }}
                 </h1>
             </div>
 
             <div class="page-action">
-                @if (bouncer()->hasPermission('b2b_suite.companies.edit'))
-                    <a href="{{ route('admin.customers.companies.dit', $company->id) }}" class="btn btn-lg btn-primary">
+                @if (bouncer()->hasPermission('b2b.companies.edit'))
+                    <a href="{{ route('admin.b2b.companies.dit', $company->id) }}" class="btn btn-lg btn-primary">
                         {{ __('admin::app.admin.edit') }}
                     </a>
                 @endif

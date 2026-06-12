@@ -59,7 +59,7 @@ class QuoteController extends Controller
         $cart = $this->cartRepository->find($cartId);
 
         if (! $cart) {
-            return redirect()->route('admin.customers.quotes.index');
+            return redirect()->route('admin.b2b.quotes.index');
         }
 
         $cart = new CartResource($cart);
@@ -131,7 +131,7 @@ class QuoteController extends Controller
 
         session()->flash('success', __('b2b_suite::app.admin.quotes.index.create-success'));
 
-        return redirect()->route('admin.customers.quotes.index');
+        return redirect()->route('admin.b2b.quotes.index');
     }
 
     /**
@@ -198,7 +198,7 @@ class QuoteController extends Controller
                 'created_at' => now(),
             ]);
 
-            return redirect()->route('admin.customers.quotes.view', $id)
+            return redirect()->route('admin.b2b.quotes.view', $id)
                 ->with('success', trans('b2b_suite::app.admin.quotes.view.success-message'));
         } catch (\Exception $e) {
             return redirect()->back()
@@ -236,7 +236,7 @@ class QuoteController extends Controller
 
             $this->customerQuoteRepository->createOrUpdateMessageQuotation($data, $id);
 
-            return redirect()->route('admin.customers.quotes.view', $id)
+            return redirect()->route('admin.b2b.quotes.view', $id)
                 ->with('success', trans('b2b_suite::app.admin.quotes.view.quote-submitted'));
 
         } catch (\Exception $e) {
@@ -284,7 +284,7 @@ class QuoteController extends Controller
                 ]);
             }
 
-            return redirect()->route('admin.customers.quotes.view', $id)
+            return redirect()->route('admin.b2b.quotes.view', $id)
                 ->with('success', trans('b2b_suite::app.admin.quotes.view.quote-accepted'));
 
         } catch (\Exception $e) {
@@ -324,7 +324,7 @@ class QuoteController extends Controller
                 'created_at' => now(),
             ]);
 
-            return redirect()->route('admin.customers.quotes.view', $id)
+            return redirect()->route('admin.b2b.quotes.view', $id)
                 ->with('success', trans('b2b_suite::app.admin.quotes.view.quote-rejected'));
 
         } catch (\Exception $e) {
@@ -363,7 +363,7 @@ class QuoteController extends Controller
 
         session()->flash('success', __('b2b_suite::app.admin.quotes.index.update-success'));
 
-        return redirect()->route('admin.customers.quotes.index');
+        return redirect()->route('admin.b2b.quotes.index');
     }
 
     /**

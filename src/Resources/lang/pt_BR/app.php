@@ -956,7 +956,6 @@ return [
             'last-name'             => 'Sobrenome',
             'email'                 => 'E-mail',
             'phone'                 => 'Telefone',
-            'slug'                  => 'Lesma',
             'business-name'         => 'Nome comercial',
             'website-url'           => 'URL do site',
             'vat-tax-id'            => 'ID fiscal do IVA',

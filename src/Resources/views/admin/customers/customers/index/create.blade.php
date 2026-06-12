@@ -297,7 +297,7 @@
 
                 async fetchCompanies() {
                     try {
-                        const response = await this.$axios.get("{{ core()->getConfigData('b2b_suite.general.settings.active') ? route('admin.customers.companies.get') : '' }}");
+                        const response = await this.$axios.get("{{ core()->getConfigData('b2b_suite.general.settings.active') ? route('admin.b2b.companies.get') : '' }}");
                         this.allCompanies = response.data;
                         this.filteredCompanies = response.data;
                     } catch (error) {

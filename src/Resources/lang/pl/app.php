@@ -956,7 +956,6 @@ return [
             'last-name'             => 'Nazwisko',
             'email'                 => 'E-mail',
             'phone'                 => 'Telefon',
-            'slug'                  => 'Ślimak',
             'business-name'         => 'Nazwa firmy',
             'website-url'           => 'Adres URL witryny',
             'vat-tax-id'            => 'Identyfikator podatkowy VAT',

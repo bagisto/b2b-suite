@@ -3,14 +3,14 @@
         @lang('b2b_suite::app.admin.company-attributes.create.title')
     </x-slot>
 
-    {!! view_render_event('bagisto.admin.customers.attributes.create.before') !!}
+    {!! view_render_event('bagisto.admin.b2b.attributes.create.before') !!}
 
     <!-- Input Form -->
     <x-admin::form
-        :action="route('admin.customers.attributes.store')"
+        :action="route('admin.b2b.attributes.store')"
         enctype="multipart/form-data"
     >
-        {!! view_render_event('bagisto.admin.customers.attributes.create.create_form_controls.before') !!}
+        {!! view_render_event('bagisto.admin.b2b.attributes.create.create_form_controls.before') !!}
 
         <!-- Actions Buttons -->
         <div class="flex items-center justify-between gap-4 max-sm:flex-wrap">
@@ -21,7 +21,7 @@
             <div class="flex items-center gap-x-2.5">
                 <!-- Back Button -->
                 <a
-                    href="{{ route('admin.customers.attributes.index') }}"
+                    href="{{ route('admin.b2b.attributes.index') }}"
                     class="transparent-button hover:bg-gray-200 dark:text-white dark:hover:bg-gray-800"
                 >
                     @lang('b2b_suite::app.admin.company-attributes.create.back-btn')
@@ -43,10 +43,10 @@
             <x-admin::shimmer.catalog.attributes />
         </v-create-attributes>
 
-        {!! view_render_event('bagisto.admin.customers.attributes.create_form_controls.after') !!}
+        {!! view_render_event('bagisto.admin.b2b.attributes.create_form_controls.after') !!}
     </x-admin::form>
 
-    {!! view_render_event('bagisto.admin.customers.attributes.create.after') !!}
+    {!! view_render_event('bagisto.admin.b2b.attributes.create.after') !!}
 
     @pushOnce('scripts')
         <script
@@ -56,7 +56,7 @@
             <!-- Body Content -->
             <div class="mt-3.5 flex gap-2.5 max-xl:flex-wrap">
 
-                {!! view_render_event('bagisto.admin.customers.attributes.create.card.label.before') !!}
+                {!! view_render_event('bagisto.admin.b2b.attributes.create.card.label.before') !!}
 
                 <!-- Left Sub Component -->
                 <div class="flex flex-1 flex-col gap-2 overflow-auto max-xl:flex-auto">
@@ -282,9 +282,9 @@
                     </div>
                 </div>
 
-                {!! view_render_event('bagisto.admin.customers.attributes.create.card.label.after') !!}
+                {!! view_render_event('bagisto.admin.b2b.attributes.create.card.label.after') !!}
 
-                {!! view_render_event('bagisto.admin.customers.attributes.create.card.general.before') !!}
+                {!! view_render_event('bagisto.admin.b2b.attributes.create.card.general.before') !!}
 
                 <!-- Right Sub Component -->
                 <div class="flex w-[360px] max-w-full flex-col gap-2">
@@ -544,7 +544,7 @@
                     </x-admin::accordion>
                 </div>
 
-                {!! view_render_event('bagisto.admin.customers.attributes.create.card.general.after') !!}
+                {!! view_render_event('bagisto.admin.b2b.attributes.create.card.general.after') !!}
 
             </div>
 

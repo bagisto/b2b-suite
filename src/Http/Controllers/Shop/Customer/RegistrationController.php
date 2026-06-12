@@ -53,17 +53,24 @@ class RegistrationController extends BaseRegistrationController
     {
         $customerGroup = core()->getConfigData('customer.settings.create_new_account_options.default_group');
 
+        /**
+         * When company approval is required, the company registers in a pending state
+         * (status = 0). Bagisto blocks login for inactive customers, so the company
+         * cannot log in or transact until an admin approves (activates) the account.
+         */
+        $requireApproval = (bool) core()->getConfigData('b2b_suite.general.settings.require_company_approval');
+
         $data = array_merge($request->only([
             'first_name',
             'last_name',
             'email',
-            'slug',
             'phone',
             'password_confirmation',
             'is_subscribed',
         ]), [
             'password'                  => bcrypt(request()->input('password')),
             'api_token'                 => Str::random(80),
+            'status'                    => $requireApproval ? 0 : 1,
             'is_verified'               => ! core()->getConfigData('customer.settings.email.verification'),
             'customer_group_id'         => $this->customerGroupRepository->findOneWhere(['code' => $customerGroup])->id,
             'channel_id'                => core()->getCurrentChannel()->id,
@@ -121,7 +128,11 @@ class RegistrationController extends BaseRegistrationController
 
         Event::dispatch('customer.registration.after', $customer);
 
-        if (core()->getConfigData('emails.general.notifications.emails.general.notifications.verification')) {
+        Event::dispatch('b2b.company.registered', $customer);
+
+        if ($requireApproval) {
+            session()->flash('success', trans('b2b_suite::app.shop.companies.signup-form.success-pending-approval'));
+        } elseif (core()->getConfigData('emails.general.notifications.emails.general.notifications.verification')) {
             session()->flash('success', trans('shop::app.customers.signup-form.success-verify'));
         } else {
             session()->flash('success', trans('shop::app.customers.signup-form.success'));

@@ -236,14 +236,14 @@ class CustomerQuoteDataGrid extends DataGrid
      */
     public function prepareActions()
     {
-        if (bouncer()->hasPermission('customers.quotes.view')) {
+        if (bouncer()->hasPermission('b2b.quotes.view')) {
             $this->addAction([
                 'index'  => 'view',
                 'icon'   => 'icon-view',
                 'title'  => trans('b2b_suite::app.admin.quotes.index.datagrid.view'),
                 'method' => 'GET',
                 'url'    => function ($row) {
-                    return route('admin.customers.quotes.view', $row->quote_id);
+                    return route('admin.b2b.quotes.view', $row->quote_id);
                 },
             ]);
         }
@@ -256,21 +256,21 @@ class CustomerQuoteDataGrid extends DataGrid
      */
     public function prepareMassActions()
     {
-        if (bouncer()->hasPermission('customers.quotes.delete')) {
+        if (bouncer()->hasPermission('b2b.quotes.delete')) {
             $this->addMassAction([
                 'icon'   => 'icon-delete',
                 'title'  => trans('b2b_suite::app.admin.quotes.index.datagrid.mass-delete'),
                 'method' => 'POST',
-                'url'    => route('admin.customers.quotes.mass_delete'),
+                'url'    => route('admin.b2b.quotes.mass_delete'),
             ]);
         }
 
-        if (bouncer()->hasPermission('customers.quotes.edit')) {
+        if (bouncer()->hasPermission('b2b.quotes.edit')) {
             $this->addMassAction([
                 'icon'    => 'icon-edit',
                 'title'   => trans('b2b_suite::app.admin.quotes.index.datagrid.mass-update'),
                 'method'  => 'POST',
-                'url'     => route('admin.customers.quotes.mass_update'),
+                'url'     => route('admin.b2b.quotes.mass_update'),
                 'options' => [
                     [
                         'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.draft'),

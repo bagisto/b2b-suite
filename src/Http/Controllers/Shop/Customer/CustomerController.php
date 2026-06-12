@@ -111,7 +111,6 @@ class CustomerController extends BaseCustomerController
             'phone',
             'customer_group_id',
             'channel_id',
-            'slug',
             'type',
             'company_role_id',
             'new_password',

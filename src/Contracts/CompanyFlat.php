@@ -2,4 +2,4 @@
 
 namespace Webkul\B2BSuite\Contracts;
 
-interface CustomerFlat {}
+interface CompanyFlat {}

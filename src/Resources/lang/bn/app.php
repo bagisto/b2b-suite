@@ -956,7 +956,6 @@ return [
             'last-name'             => 'পদবি',
             'email'                 => 'ইমেইল',
             'phone'                 => 'ফোন',
-            'slug'                  => 'স্লাগ',
             'business-name'         => 'ব্যবসার নাম',
             'website-url'           => 'ওয়েবসাইট URL',
             'vat-tax-id'            => 'ভ্যাট ট্যাক্স আইডি',

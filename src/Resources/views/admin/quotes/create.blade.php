@@ -14,7 +14,7 @@
         <div class="flex items-center gap-x-2.5">
             <!-- Back Button -->
             <a
-                href="{{ route('admin.customers.quotes.index') }}"
+                href="{{ route('admin.b2b.quotes.index') }}"
                 class="transparent-button hover:bg-gray-200 dark:text-white dark:hover:bg-gray-800"
             >
                 @lang('b2b_suite::app.admin.quotes.create.back-btn')

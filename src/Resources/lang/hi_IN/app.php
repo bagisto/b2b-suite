@@ -956,7 +956,6 @@ return [
             'last-name'             => 'उपनाम',
             'email'                 => 'ईमेल',
             'phone'                 => 'फ़ोन',
-            'slug'                  => 'काउंटर',
             'business-name'         => 'व्यवसाय का नाम',
             'website-url'           => 'वेबसाइट यूआरएल',
             'vat-tax-id'            => 'वैट टैक्स आईडी',

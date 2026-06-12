@@ -14,7 +14,7 @@ class CompanyAttributeValue extends Model implements CompanyAttributeValueContra
      *
      * @var string
      */
-    protected $table = 'customer_attribute_values';
+    protected $table = 'company_attribute_values';
 
     /**
      * The attributes that are mass assignable.

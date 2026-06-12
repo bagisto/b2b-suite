@@ -14,21 +14,6 @@ class CompanyAttributeOptionTableSeeder extends Seeder
 
         DB::table('company_attribute_option_translations')->truncate();
 
-        // $attributeOptions = collect(config('product_types'))
-        //     ->values()
-        //     ->map(function ($type, $index) {
-        //         return [
-        //             'id'                     => $index + 1,
-        //             'name'                   => $type['name'],
-        //             'admin_name'             => trans(
-        //                 key: $type['name'],
-        //                 locale: app()->getLocale()
-        //             ),
-        //             'sort_order'             => $index + 1,
-        //             'company_attribute_id'   => 22,
-        //         ];
-        //     })
-        //     ->toArray();
         $attributeOptions = [];
 
         DB::table('company_attribute_options')->insert(

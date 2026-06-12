@@ -24,33 +24,33 @@ class CompanyDataGrid extends DataGrid
         $tablePrefix = DB::getTablePrefix();
 
         /**
-         * Query Builder to fetch records from `customer_flat` table
+         * Query Builder to fetch records from `company_flat` table
          */
-        $queryBuilder = DB::table('customer_flat')
+        $queryBuilder = DB::table('company_flat')
             ->distinct()
-            ->leftJoin('customers', 'customer_flat.customer_id', '=', 'customers.id')
+            ->leftJoin('customers', 'company_flat.customer_id', '=', 'customers.id')
             ->select(
-                'customer_flat.customer_id',
-                'customer_flat.email',
-                'customer_flat.phone',
-                'customer_flat.business_name',
-                'customer_flat.website_url',
-                'customer_flat.vat_tax_id',
+                'company_flat.customer_id',
+                'company_flat.email',
+                'company_flat.phone',
+                'company_flat.business_name',
+                'company_flat.website_url',
+                'company_flat.vat_tax_id',
                 'customers.status',
-                'customer_flat.created_at',
-                'customer_flat.updated_at'
+                'company_flat.created_at',
+                'company_flat.updated_at'
             )
-            ->addSelect(DB::raw('CONCAT('.$tablePrefix.'customer_flat.first_name, " ", '.$tablePrefix.'customer_flat.last_name) as full_name'))
+            ->addSelect(DB::raw('CONCAT('.$tablePrefix.'company_flat.first_name, " ", '.$tablePrefix.'company_flat.last_name) as full_name'))
             ->where('customers.type', 'company')
-            ->where('customer_flat.locale', app()->getLocale());
+            ->where('company_flat.locale', app()->getLocale());
 
-        $this->addFilter('customer_id', 'customer_flat.customer_id');
-        $this->addFilter('full_name', DB::raw('CONCAT('.$tablePrefix.'customer_flat.first_name, " ", '.$tablePrefix.'customer_flat.last_name)'));
-        $this->addFilter('email', 'customer_flat.email');
-        $this->addFilter('phone', 'customer_flat.phone');
-        $this->addFilter('business_name', 'customer_flat.business_name');
-        $this->addFilter('website_url', 'customer_flat.website_url');
-        $this->addFilter('vat_tax_id', 'customer_flat.vat_tax_id');
+        $this->addFilter('customer_id', 'company_flat.customer_id');
+        $this->addFilter('full_name', DB::raw('CONCAT('.$tablePrefix.'company_flat.first_name, " ", '.$tablePrefix.'company_flat.last_name)'));
+        $this->addFilter('email', 'company_flat.email');
+        $this->addFilter('phone', 'company_flat.phone');
+        $this->addFilter('business_name', 'company_flat.business_name');
+        $this->addFilter('website_url', 'company_flat.website_url');
+        $this->addFilter('vat_tax_id', 'company_flat.vat_tax_id');
         $this->addFilter('status', 'customers.status');
 
         return $queryBuilder;
@@ -137,11 +137,18 @@ class CompanyDataGrid extends DataGrid
                     'value' => 1,
                 ],
                 [
-                    'label' => trans('b2b_suite::app.admin.companies.index.datagrid.disable'),
+                    'label' => trans('b2b_suite::app.admin.companies.index.datagrid.pending'),
                     'value' => 0,
                 ],
             ],
             'sortable'   => true,
+            'closure'    => function ($row) {
+                if ($row->status) {
+                    return '<span class="label-active">'.trans('b2b_suite::app.admin.companies.index.datagrid.active').'</span>';
+                }
+
+                return '<span class="label-pending">'.trans('b2b_suite::app.admin.companies.index.datagrid.pending').'</span>';
+            },
         ]);
 
         $this->addColumn([
@@ -161,26 +168,26 @@ class CompanyDataGrid extends DataGrid
      */
     public function prepareActions()
     {
-        if (bouncer()->hasPermission('customer.companies.edit')) {
+        if (bouncer()->hasPermission('b2b.companies.edit')) {
             $this->addAction([
                 'index'  => 'edit',
                 'icon'   => 'icon-edit',
                 'title'  => trans('b2b_suite::app.admin.companies.index.datagrid.edit'),
                 'method' => 'GET',
                 'url'    => function ($row) {
-                    return route('admin.customers.companies.edit', $row->customer_id);
+                    return route('admin.b2b.companies.edit', $row->customer_id);
                 },
             ]);
         }
 
-        if (bouncer()->hasPermission('customer.companies.delete')) {
+        if (bouncer()->hasPermission('b2b.companies.delete')) {
             $this->addAction([
                 'index'  => 'delete',
                 'icon'   => 'icon-delete',
                 'title'  => trans('b2b_suite::app.admin.companies.index.datagrid.delete'),
                 'method' => 'DELETE',
                 'url'    => function ($row) {
-                    return route('admin.customers.companies.delete', $row->customer_id);
+                    return route('admin.b2b.companies.delete', $row->customer_id);
                 },
             ]);
         }
@@ -193,12 +200,30 @@ class CompanyDataGrid extends DataGrid
      */
     public function prepareMassActions()
     {
-        if (bouncer()->hasPermission('customer.companies.delete')) {
+        if (bouncer()->hasPermission('b2b.companies.edit')) {
+            $this->addMassAction([
+                'title'   => trans('b2b_suite::app.admin.companies.index.datagrid.update-status'),
+                'method'  => 'POST',
+                'url'     => route('admin.b2b.companies.mass_update_status'),
+                'options' => [
+                    [
+                        'label' => trans('b2b_suite::app.admin.companies.index.datagrid.approve'),
+                        'value' => 1,
+                    ],
+                    [
+                        'label' => trans('b2b_suite::app.admin.companies.index.datagrid.disable'),
+                        'value' => 0,
+                    ],
+                ],
+            ]);
+        }
+
+        if (bouncer()->hasPermission('b2b.companies.delete')) {
             $this->addMassAction([
                 'icon'   => 'icon-delete',
                 'title'  => trans('b2b_suite::app.admin.companies.index.datagrid.mass-delete'),
                 'method' => 'POST',
-                'url'    => route('admin.customers.companies.mass_delete'),
+                'url'    => route('admin.b2b.companies.mass_delete'),
             ]);
         }
     }

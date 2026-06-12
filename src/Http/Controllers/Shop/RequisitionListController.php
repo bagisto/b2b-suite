@@ -179,8 +179,6 @@ class RequisitionListController extends Controller
 
         Event::dispatch('customer.requisitions.delete.after', $id);
 
-        // session()->flash('success', trans('b2b_suite::app.shop.customers.account.requisitions.delete-success'));
-
         return new JsonResponse([
             'message'      => trans('b2b_suite::app.shop.customers.account.requisitions.delete-success'),
             'redirect_url' => route('shop.customers.account.requisitions.index'),

@@ -50,14 +50,6 @@ class CompanyAttributeTableSeeder extends Seeder
                 'is_visible_on_sign_up' => 1,
             ],
             [
-                'id'                    => 5,
-                'code'                  => 'slug',
-                'type'                  => 'text',
-                'is_required'           => 1,
-                'is_unique'             => 1,
-                'is_visible_on_sign_up' => 1,
-            ],
-            [
                 'id'                    => 6,
                 'code'                  => 'business_name',
                 'type'                  => 'text',
@@ -168,34 +160,6 @@ class CompanyAttributeTableSeeder extends Seeder
                 'code'                  => 'youtube',
                 'type'                  => 'text',
             ],
-            // [
-            //     'id'                    => 23,
-            //     'code'                  => 'commission_enable',
-            //     'type'                  => 'boolean',
-            //     'is_required'           => 1,
-            // ],
-            // [
-            //     'id'                    => 24,
-            //     'code'                  => 'commission_percentage',
-            //     'type'                  => 'float',
-            // ],
-            // [
-            //     'id'                    => 25,
-            //     'code'                  => 'min_order_amount',
-            //     'type'                  => 'price',
-            //     'value_per_channel'     => 1,
-            // ],
-            // [
-            //     'id'                    => 26,
-            //     'code'                  => 'google_analytics_id',
-            //     'type'                  => 'text',
-            // ],
-            // [
-            //     'id'                    => 27,
-            //     'code'                  => 'allowed_product_types',
-            //     'type'                  => 'multiselect',
-            //     'is_required'           => 1,
-            // ],
         ];
 
         $attributes = collect($attributes)->map(function ($attribute) use ($parameters) {

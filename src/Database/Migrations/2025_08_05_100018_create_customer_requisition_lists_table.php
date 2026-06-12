@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('customer_requisition_lists', function (Blueprint $table) {
             $table->increments('id');
-
             $table->string('name');
             $table->text('description')->nullable();
             $table->integer('company_id')->unsigned();
@@ -22,13 +21,11 @@ return new class extends Migration
             $table->boolean('is_default')->default(false);
             $table->timestamps();
 
-            // Foreign key constraints
-            $table->foreign('company_id')->references('id')->on('customers')->onDelete('cascade');
-            $table->foreign('customer_id')->references('id')->on('customers')->onDelete('cascade');
-
             $table->index(['customer_id', 'status']);
             $table->index(['company_id', 'status']);
             $table->index('is_default');
+            $table->foreign('company_id')->references('id')->on('customers')->onDelete('cascade');
+            $table->foreign('customer_id')->references('id')->on('customers')->onDelete('cascade');
         });
     }
 

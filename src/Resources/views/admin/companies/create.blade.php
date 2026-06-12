@@ -3,14 +3,14 @@
         @lang('b2b_suite::app.admin.companies.create.title')
     </x-slot>
 
-    {!! view_render_event('bagisto.admin.customers.companies.create.before') !!}
+    {!! view_render_event('bagisto.admin.b2b.companies.create.before') !!}
 
     <!-- Input Form -->
     <x-admin::form
-        :action="route('admin.customers.companies.store')"
+        :action="route('admin.b2b.companies.store')"
         enctype="multipart/form-data"
     >
-        {!! view_render_event('bagisto.admin.customers.companies.create.create_form_controls.before') !!}
+        {!! view_render_event('bagisto.admin.b2b.companies.create.create_form_controls.before') !!}
 
         <!-- Actions Buttons -->
         <div class="flex items-center justify-between gap-4 max-sm:flex-wrap">
@@ -21,7 +21,7 @@
             <div class="flex items-center gap-x-2.5">
                 <!-- Back Button -->
                 <a
-                    href="{{ route('admin.customers.companies.index') }}"
+                    href="{{ route('admin.b2b.companies.index') }}"
                     class="transparent-button hover:bg-gray-200 dark:text-white dark:hover:bg-gray-800"
                 >
                     @lang('b2b_suite::app.admin.layouts.back-btn')
@@ -60,6 +60,37 @@
 
             <!-- Right Column -->
             <div class="flex w-[360px] max-w-full flex-col gap-2">
+                <!-- Approval / Status -->
+                <x-admin::accordion>
+                    <x-slot:header>
+                        <p class="p-2.5 text-base font-semibold text-gray-800 dark:text-white">
+                            @lang('b2b_suite::app.admin.companies.edit.approval-status')
+                        </p>
+                    </x-slot>
+
+                    <x-slot:content>
+                        <x-admin::form.control-group>
+                            <x-admin::form.control-group.label>
+                                @lang('b2b_suite::app.admin.companies.edit.status')
+                            </x-admin::form.control-group.label>
+
+                            <x-admin::form.control-group.control
+                                type="select"
+                                name="status"
+                                :value="old('status', '1')"
+                                rules="required"
+                                :label="trans('b2b_suite::app.admin.companies.edit.status')"
+                            >
+                                <option value="1">@lang('b2b_suite::app.admin.companies.edit.active')</option>
+
+                                <option value="0">@lang('b2b_suite::app.admin.companies.edit.pending')</option>
+                            </x-admin::form.control-group.control>
+
+                            <x-admin::form.control-group.error control-name="status" />
+                        </x-admin::form.control-group>
+                    </x-slot>
+                </x-admin::accordion>
+
                 @foreach($attributeGroups->where('column', 2) as $group)
                     <x-admin::accordion>
                         <x-slot:header>
@@ -78,8 +109,8 @@
             </div>
         </div>
 
-        {!! view_render_event('bagisto.admin.customers.companies.create.create_form_controls.after') !!}
+        {!! view_render_event('bagisto.admin.b2b.companies.create.create_form_controls.after') !!}
     </x-admin::form>
 
-    {!! view_render_event('bagisto.admin.customers.companies.create.after') !!}
+    {!! view_render_event('bagisto.admin.b2b.companies.create.after') !!}
 </x-admin::layouts>
