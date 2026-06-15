@@ -1,6 +1,6 @@
 <x-admin::layouts>
     <x-slot:title>
-        @lang('b2b_suite::app.admin.quotes.view.title', ['id' => $quote->quotation_number])
+        @lang('b2b::app.admin.quotes.view.title', ['id' => $quote->quotation_number])
     </x-slot>
 
     <!-- Header -->
@@ -10,25 +10,70 @@
 
             <div class="flex items-center gap-2.5">
                 <p class="text-xl font-bold leading-6 text-gray-800 dark:text-white">
-                    @lang('b2b_suite::app.admin.quotes.view.title', ['id' => $quote->quotation_number])
+                    @lang('b2b::app.admin.quotes.view.title', ['id' => $quote->quotation_number])
                 </p>
 
                 <!-- Order Status -->
                 <span class="label-pending mx-1.5 text-sm">
-                    @lang("b2b_suite::app.admin.quotes.view.$quote->status")
+                    @lang("b2b::app.admin.quotes.view.$quote->status")
                 </span>
             </div>
 
             {!! view_render_event('bagisto.admin.b2b.quote.title.after', ['quote' => $quote]) !!}
 
-            <!-- Back Button -->
-            <a
-                href="{{ route('admin.b2b.quotes.index') }}"
-                class="transparent-button hover:bg-gray-200 dark:text-white dark:hover:bg-gray-800"
-            >
-                @lang('b2b_suite::app.admin.quotes.view.back-btn')
-            </a>
+            <div class="flex items-center gap-x-2.5">
+                @if ($quote->order_id)
+                    <!-- View the placed order -->
+                    <a
+                        href="{{ route('admin.sales.orders.view', $quote->order_id) }}"
+                        class="primary-button"
+                    >
+                        @lang('b2b::app.admin.quotes.view.view-btn')
+                    </a>
+                @endif
+
+                <!-- Back Button -->
+                <a
+                    href="{{ route('admin.b2b.quotes.index') }}"
+                    class="transparent-button hover:bg-gray-200 dark:text-white dark:hover:bg-gray-800"
+                >
+                    @lang('b2b::app.admin.quotes.view.back-btn')
+                </a>
+            </div>
         </div>
+    </div>
+
+    @php
+        $isOpenOrNegotiation = in_array($quote->status, ['open', 'negotiation']);
+        $isOpenOrNegotiationOrRejected = in_array($quote->status, ['open', 'negotiation', 'rejected']);
+        $isOrderedOrCompletedOrRejected = in_array($quote->status, ['ordered', 'completed', 'rejected']);
+    @endphp
+
+    <!-- Quote Actions -->
+    <div class="mt-4 flex flex-wrap items-center justify-end gap-2.5">
+        @if ($isOpenOrNegotiation)
+            <!-- Accept Quote (available as soon as the customer sends the quote) -->
+            @include('b2b::admin.quotes.view.partials.modal', [
+                'action'     => 'accept',
+                'buttonText' => 'btn-accept-quote',
+            ])
+        @endif
+
+        @if ($isOpenOrNegotiationOrRejected)
+            <!-- Send Offer (price negotiation) -->
+            @include('b2b::admin.quotes.view.partials.modal', [
+                'action'     => 'submit',
+                'buttonText' => 'btn-submit-quote',
+            ])
+        @endif
+
+        @if (! $isOrderedOrCompletedOrRejected)
+            <!-- Reject Quote -->
+            @include('b2b::admin.quotes.view.partials.modal', [
+                'action'     => 'reject',
+                'buttonText' => 'btn-reject-quote',
+            ])
+        @endif
     </div>
 
     <div class="mt-5 flex-wrap items-center justify-between gap-x-1 gap-y-2">
@@ -39,10 +84,10 @@
                 {!! view_render_event('bagisto.admin.b2b.quote.left_component.before', ['quote' => $quote]) !!}
 
                 <!-- Quote Information -->
-                @include('b2b_suite::admin.quotes.view.quote-information')
+                @include('b2b::admin.quotes.view.quote-information')
 
                 <!-- Quote Items -->
-                @include('b2b_suite::admin.quotes.view.items')
+                @include('b2b::admin.quotes.view.items')
             </div>
 
             <!-- Right Component -->
@@ -50,14 +95,14 @@
                 {!! view_render_event('bagisto.admin.sales.order.right_component.before', ['quote' => $quote]) !!}
 
                 <!-- Company Information -->
-                @include('b2b_suite::admin.quotes.view.company-information')
+                @include('b2b::admin.quotes.view.company-information')
 
                 <!-- Quote Attachments -->
-                @include('b2b_suite::admin.quotes.view.attachments')
+                @include('b2b::admin.quotes.view.attachments')
             </div>
         </div>
                 
         <!-- Quote Messages -->
-        @include('b2b_suite::admin.quotes.view.messages', ['quote' => $quote])
+        @include('b2b::admin.quotes.view.messages', ['quote' => $quote])
     </div>
 </x-admin::layouts>

@@ -242,7 +242,7 @@
 
             @if($value && isset($company))
                 <div class="mt-2 text-xs text-gray-600 dark:text-gray-300">
-                    <p>@lang('b2b_suite::app.admin.companies.current-file'): {{ $value }}</p>
+                    <p>@lang('b2b::app.admin.companies.current-file'): {{ $value }}</p>
                 </div>
             @endif
 
@@ -268,7 +268,7 @@
             @if($value && isset($company))
                 <div class="mt-2">
                     <img src="{{ Storage::url($value) }}" alt="{{ $attribute->admin_name }}" class="h-20 w-20 rounded border">
-                    <p class="text-xs text-gray-600 dark:text-gray-300">@lang('b2b_suite::app.admin.companies.current-image')</p>
+                    <p class="text-xs text-gray-600 dark:text-gray-300">@lang('b2b::app.admin.companies.current-image')</p>
                 </div>
             @endif
 

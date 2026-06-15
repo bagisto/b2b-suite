@@ -35,7 +35,7 @@ class QuickOrderController extends Controller
      */
     public function index()
     {
-        return view('b2b_suite::shop.customers.account.quick-orders.index');
+        return view('b2b::shop.customers.account.quick-orders.index');
     }
 
     /**
@@ -81,27 +81,27 @@ class QuickOrderController extends Controller
 
             if (empty($data['products'])) {
                 return response()->json([
-                    'message' => trans('b2b_suite::app.shop.customers.account.quick-orders.no-products-found'),
+                    'message' => trans('b2b::app.shop.customers.account.quick-orders.no-products-found'),
                 ]);
             }
 
             try {
-                b2b_suite()->addProductsToCart($data['products']);
+                b2b()->addProductsToCart($data['products']);
 
                 return response()->json([
                     'status' => 'success',
-                    'message' => trans('b2b_suite::app.shop.customers.account.quick-orders.create-success'),
+                    'message' => trans('b2b::app.shop.customers.account.quick-orders.create-success'),
                     'redirect_url' => route('shop.customers.account.quick_orders.index'),
                 ]);
             } catch (\Exception $e) {
                 return response()->json([
-                    'message' => trans('b2b_suite::app.shop.customers.account.quick-orders.something-went-wrong'),
+                    'message' => trans('b2b::app.shop.customers.account.quick-orders.something-went-wrong'),
                 ]);
             }
 
         } catch (\Exception $e) {
             return response()->json([
-                'message' => trans('b2b_suite::app.shop.customers.account.quick-orders.no-products-found'),
+                'message' => trans('b2b::app.shop.customers.account.quick-orders.no-products-found'),
             ]);
         }
     }

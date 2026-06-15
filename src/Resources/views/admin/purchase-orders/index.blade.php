@@ -1,12 +1,12 @@
 <x-admin::layouts>
     <!-- Page Title -->
     <x-slot:title>
-        @lang('b2b_suite::app.admin.purchase-orders.index.title')
+        @lang('b2b::app.admin.purchase-orders.index.title')
     </x-slot>
 
     <div class="flex items-center justify-between gap-4 max-sm:flex-wrap">
         <p class="py-3 text-xl font-bold text-gray-800 dark:text-white">
-            @lang('b2b_suite::app.admin.purchase-orders.index.title')
+            @lang('b2b::app.admin.purchase-orders.index.title')
         </p>
 
         <div class="flex items-center gap-x-2.5">
@@ -85,7 +85,7 @@
                         <div class="flex gap-2.5">
                             <div class="flex flex-col gap-1.5">
                                 <p class="text-base font-semibold text-gray-800 dark:text-white">
-                                    @{{ "@lang('b2b_suite::app.admin.quotes.index.datagrid.id')".replace(':id', record.po_number) }}
+                                    @{{ "@lang('b2b::app.admin.quotes.index.datagrid.id')".replace(':id', record.po_number) }}
                                 </p>
 
                                 <p class="text-base text-gray-800 dark:text-white">

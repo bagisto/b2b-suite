@@ -1,6 +1,6 @@
 <x-admin::layouts>
     <x-slot:title>
-        @lang('b2b_suite::app.admin.company-attributes.mapping.title')
+        @lang('b2b::app.admin.company-attributes.mapping.title')
     </x-slot>
 
     <!-- Input Form -->
@@ -8,7 +8,7 @@
         <!-- Page Header -->
         <div class="flex items-center justify-between gap-4 max-sm:flex-wrap">
             <p class="text-xl font-bold text-gray-800 dark:text-white">
-                @lang('b2b_suite::app.admin.company-attributes.mapping.title')
+                @lang('b2b::app.admin.company-attributes.mapping.title')
             </p>
 
             <div class="flex items-center gap-x-2.5">
@@ -16,14 +16,14 @@
                     href="{{ route('admin.b2b.attributes.index') }}"
                     class="transparent-button hover:bg-gray-200 dark:text-white dark:hover:bg-gray-800"
                 >
-                    @lang('b2b_suite::app.admin.company-attributes.mapping.back-btn')
+                    @lang('b2b::app.admin.company-attributes.mapping.back-btn')
                 </a>
 
                 <button 
                     type="submit" 
                     class="primary-button"
                 >
-                    @lang('b2b_suite::app.admin.company-attributes.mapping.save-btn')
+                    @lang('b2b::app.admin.company-attributes.mapping.save-btn')
                 </button>
             </div>
         </div>
@@ -50,11 +50,11 @@
                     <!-- Panel Header -->
                     <div class="flex flex-col gap-2">
                         <p class="text-base font-semibold text-gray-800 dark:text-white">
-                            @lang('b2b_suite::app.admin.company-attributes.mapping.groups')
+                            @lang('b2b::app.admin.company-attributes.mapping.groups')
                         </p>
 
                         <p class="text-xs font-medium text-gray-500 dark:text-gray-300">
-                            @lang('b2b_suite::app.admin.company-attributes.mapping.groups-info')
+                            @lang('b2b::app.admin.company-attributes.mapping.groups-info')
                         </p>
                     </div>
                     
@@ -65,7 +65,7 @@
                             class="transparent-button text-red-600"
                             @click="deleteGroup"
                         >
-                            @lang('b2b_suite::app.admin.company-attributes.mapping.delete-group-btn')
+                            @lang('b2b::app.admin.company-attributes.mapping.delete-group-btn')
                         </div>
 
                         <!-- Add Group Button -->
@@ -73,7 +73,7 @@
                             class="secondary-button"
                             @click="$refs.addGroupDrawer.open()"
                         >
-                            @lang('b2b_suite::app.admin.company-attributes.mapping.add-group-btn')
+                            @lang('b2b::app.admin.company-attributes.mapping.add-group-btn')
                         </div>
                     </div>
                 </div>
@@ -87,13 +87,13 @@
                             <p class="font-semibold leading-6 text-gray-600 dark:text-gray-300">
                                 @{{
                                     column == 1
-                                    ? "@lang('b2b_suite::app.admin.company-attributes.mapping.main-column')"
-                                    : "@lang('b2b_suite::app.admin.company-attributes.mapping.right-column')"
+                                    ? "@lang('b2b::app.admin.company-attributes.mapping.main-column')"
+                                    : "@lang('b2b::app.admin.company-attributes.mapping.right-column')"
                                 }}
                             </p>
                             
                             <p class="text-xs font-medium text-gray-800 dark:text-white">
-                                @lang('b2b_suite::app.admin.company-attributes.mapping.edit-group-info')
+                                @lang('b2b::app.admin.company-attributes.mapping.edit-group-info')
                             </p>
                         </div>
 
@@ -153,7 +153,7 @@
                                                     :name="'attribute_groups[' + element.id + '][admin_name]'"
                                                     v-model="element.admin_name"
                                                     class="group_node w-full rounded border border-gray-300 bg-gray-50 px-2.5 py-1.5 text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
-                                                    placeholder="@lang('b2b_suite::app.admin.company-attributes.mapping.admin-name')"
+                                                    placeholder="@lang('b2b::app.admin.company-attributes.mapping.admin-name')"
                                                 />
 
                                                 <!-- Localized Names -->
@@ -243,11 +243,11 @@
                         <!-- Unassigned Attributes Header -->
                         <div class="mb-4 flex flex-col">
                             <p class="font-semibold leading-6 text-gray-600 dark:text-gray-300">
-                                @lang('b2b_suite::app.admin.company-attributes.mapping.unassigned-attributes')
+                                @lang('b2b::app.admin.company-attributes.mapping.unassigned-attributes')
                             </p>
 
                             <p class="text-xs font-medium text-gray-800 dark:text-white">
-                                @lang('b2b_suite::app.admin.company-attributes.mapping.unassigned-attributes-info')
+                                @lang('b2b::app.admin.company-attributes.mapping.unassigned-attributes-info')
                             </p>
                         </div>
 
@@ -287,14 +287,14 @@
                             <x-slot:header>
                                 <div class="flex items-center justify-between">
                                     <p class="text-xl font-medium dark:text-white">
-                                        @lang('b2b_suite::app.admin.company-attributes.mapping.add-group-title')
+                                        @lang('b2b::app.admin.company-attributes.mapping.add-group-title')
                                     </p>
 
                                     <button
                                         class="primary-button ltr:mr-11 rtl:ml-11"
                                         type="submit"
                                     >
-                                        @lang('b2b_suite::app.admin.company-attributes.mapping.add-group-btn')
+                                        @lang('b2b::app.admin.company-attributes.mapping.add-group-btn')
                                     </button>
                                 </div>
                             </x-slot>
@@ -304,15 +304,15 @@
                                 <div class="flex gap-2.5">
                                     <x-admin::form.control-group class="flex-1">
                                         <x-admin::form.control-group.label class="required">
-                                            @lang('b2b_suite::app.admin.company-attributes.mapping.code')
+                                            @lang('b2b::app.admin.company-attributes.mapping.code')
                                         </x-admin::form.control-group.label>
 
                                         <x-admin::form.control-group.control
                                             type="text"
                                             name="code"
                                             rules="required"
-                                            :label="trans('b2b_suite::app.admin.company-attributes.mapping.code')"
-                                            :placeholder="trans('b2b_suite::app.admin.company-attributes.mapping.code')"
+                                            :label="trans('b2b::app.admin.company-attributes.mapping.code')"
+                                            :placeholder="trans('b2b::app.admin.company-attributes.mapping.code')"
                                         />
 
                                         <x-admin::form.control-group.error control-name="code" />
@@ -320,26 +320,26 @@
 
                                     <x-admin::form.control-group class="flex-1">
                                         <x-admin::form.control-group.label class="required">
-                                            @lang('b2b_suite::app.admin.company-attributes.mapping.column')
+                                            @lang('b2b::app.admin.company-attributes.mapping.column')
                                         </x-admin::form.control-group.label>
 
                                         <x-admin::form.control-group.control
                                             type="select"
                                             name="column"
                                             rules="required"
-                                            :label="trans('b2b_suite::app.admin.company-attributes.mapping.column')"
+                                            :label="trans('b2b::app.admin.company-attributes.mapping.column')"
                                         >
                                             <!-- Default Option -->
                                             <option value="">
-                                                @lang('b2b_suite::app.admin.company-attributes.mapping.select-group')
+                                                @lang('b2b::app.admin.company-attributes.mapping.select-group')
                                             </option>
 
                                             <option value="1">
-                                                @lang('b2b_suite::app.admin.company-attributes.mapping.main-column')
+                                                @lang('b2b::app.admin.company-attributes.mapping.main-column')
                                             </option>
 
                                             <option value="2">
-                                                @lang('b2b_suite::app.admin.company-attributes.mapping.right-column')
+                                                @lang('b2b::app.admin.company-attributes.mapping.right-column')
                                             </option>
                                         </x-admin::form.control-group.control>
 
@@ -349,15 +349,15 @@
 
                                 <x-admin::form.control-group>
                                     <x-admin::form.control-group.label class="required">
-                                        @lang('b2b_suite::app.admin.company-attributes.mapping.admin-name')
+                                        @lang('b2b::app.admin.company-attributes.mapping.admin-name')
                                     </x-admin::form.control-group.label>
 
                                     <x-admin::form.control-group.control
                                         type="text"
                                         name="admin_name"
                                         rules="required"
-                                        :label="trans('b2b_suite::app.admin.company-attributes.mapping.admin-name')"
-                                        :placeholder="trans('b2b_suite::app.admin.company-attributes.mapping.admin-name')"
+                                        :label="trans('b2b::app.admin.company-attributes.mapping.admin-name')"
+                                        :placeholder="trans('b2b::app.admin.company-attributes.mapping.admin-name')"
                                     />
 
                                     <x-admin::form.control-group.error control-name="name" />
@@ -474,7 +474,7 @@
                         if (this.dropReverted) {
                             this.$emitter.emit('add-flash', {
                                 type: 'warning',
-                                message: "@lang('b2b_suite::app.admin.company-attributes.mapping.removal-not-possible')"
+                                message: "@lang('b2b::app.admin.company-attributes.mapping.removal-not-possible')"
                             });
                         }
                     },
@@ -512,13 +512,13 @@
                         if (isGroupCodeAlreadyExists || isGroupNameAlreadyExists) {
                             if (isGroupCodeAlreadyExists) {
                                 setErrors({'code': [
-                                    "@lang('b2b_suite::app.admin.company-attributes.mapping.group-code-already-exists')"
+                                    "@lang('b2b::app.admin.company-attributes.mapping.group-code-already-exists')"
                                 ]});
                             }
 
                             if (isGroupNameAlreadyExists) {
                                 setErrors({'admin_name': [
-                                    "@lang('b2b_suite::app.admin.company-attributes.mapping.group-name-already-exists')"
+                                    "@lang('b2b::app.admin.company-attributes.mapping.group-name-already-exists')"
                                 ]});
                             }
 
@@ -561,7 +561,7 @@
                                 if (! this.selectedGroup.id) {
                                     this.$emitter.emit('add-flash', {
                                         type: 'warning',
-                                        message: "@lang('b2b_suite::app.admin.company-attributes.mapping.select-group')"
+                                        message: "@lang('b2b::app.admin.company-attributes.mapping.select-group')"
                                     });
 
                                     return;
@@ -570,7 +570,7 @@
                                 if (this.isGroupContainsSystemAttributes(this.selectedGroup)) {
                                     this.$emitter.emit('add-flash', {
                                         type: 'warning',
-                                        message: "@lang('b2b_suite::app.admin.company-attributes.mapping.group-contains-system-attributes')"
+                                        message: "@lang('b2b::app.admin.company-attributes.mapping.group-contains-system-attributes')"
                                     });
 
                                     return;

@@ -176,7 +176,7 @@ class CompanyAttributeTableSeeder extends Seeder
                 'value_per_channel' => 0,
                 'enable_editor' => 0,
                 'admin_name' => trans(
-                    key: "b2b_suite::app.seeders.company-attributes.$translationKey",
+                    key: "b2b::app.seeders.company-attributes.$translationKey",
                     locale: app()->getLocale()
                 ),
                 'created_at' => $parameters['now'],
@@ -194,7 +194,7 @@ class CompanyAttributeTableSeeder extends Seeder
                     'company_attribute_id' => $attribute['id'],
                     'locale' => $locale,
                     'name' => trans(
-                        key: "b2b_suite::app.seeders.company-attributes.$translationKey",
+                        key: "b2b::app.seeders.company-attributes.$translationKey",
                         locale: $locale
                     ),
                 ];

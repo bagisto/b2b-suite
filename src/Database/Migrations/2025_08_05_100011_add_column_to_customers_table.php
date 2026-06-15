@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('customers', function (Blueprint $table) {
             if (! Schema::hasColumn('customers', 'type')) {
-                $table->enum('type', ['user', 'company'])->default('company')->after('email');
+                $table->enum('type', ['user', 'company'])->default('user')->after('email');
 
                 $table->index(['type']);
             }

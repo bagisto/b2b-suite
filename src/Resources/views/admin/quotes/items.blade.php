@@ -20,7 +20,7 @@
                         <img src="{{ bagisto_asset('images/product-placeholders/front.svg') }}">
                         
                         <p class="absolute bottom-1.5 w-full text-center text-[6px] font-semibold text-gray-400"> 
-                            @lang('b2b_suite::app.admin.quotes.index.datagrid.product-image') 
+                            @lang('b2b::app.admin.quotes.index.datagrid.product-image') 
                         </p>
                     </div>
                 @endif
@@ -32,7 +32,7 @@
         <a href="{{ route('admin.b2b.quotes.view', $quote->id) }}">
             <div class="flex h-[65px] w-[65px] items-center rounded bg-gray-50 dark:bg-gray-800">
                 <p class="px-1.5 py-1.5 text-center text-xs font-bold text-gray-600 dark:text-gray-300">
-                    @lang('b2b_suite::app.admin.quotes.index.datagrid.product-count', ['count' => $restCount])
+                    @lang('b2b::app.admin.quotes.index.datagrid.product-count', ['count' => $restCount])
                 </p>
             </div>
         </a>

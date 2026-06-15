@@ -48,7 +48,7 @@ class QuoteController extends Controller
 
         $groups = $this->customerGroupRepository->findWhere([['code', '<>', 'guest']]);
 
-        return view('b2b_suite::admin.quotes.index', compact('groups'));
+        return view('b2b::admin.quotes.index', compact('groups'));
     }
 
     /**
@@ -83,7 +83,7 @@ class QuoteController extends Controller
 
         $user = auth()->guard('admin')->user();
 
-        return view('b2b_suite::admin.quotes.create', compact('cart', 'statusLabels', 'company', 'user'));
+        return view('b2b::admin.quotes.create', compact('cart', 'statusLabels', 'company', 'user'));
     }
 
     /**
@@ -131,7 +131,7 @@ class QuoteController extends Controller
 
         Event::dispatch('b2b.quote.create.after', $quote);
 
-        session()->flash('success', __('b2b_suite::app.admin.quotes.index.create-success'));
+        session()->flash('success', __('b2b::app.admin.quotes.index.create-success'));
 
         return redirect()->route('admin.b2b.quotes.index');
     }
@@ -145,7 +145,7 @@ class QuoteController extends Controller
     {
         $quote = $this->customerQuoteRepository->findOrFail($id);
 
-        return view('b2b_suite::admin.quotes.view', compact('quote'));
+        return view('b2b::admin.quotes.view', compact('quote'));
     }
 
     /**
@@ -169,7 +169,7 @@ class QuoteController extends Controller
             $query->where('user_type', $request->get('user_type'));
         }
 
-        $messages = $query->orderBy('created_at', 'desc')
+        $messages = $query->orderBy('created_at', 'asc')
             ->paginate(10);
 
         return response()->json($messages);
@@ -193,18 +193,31 @@ class QuoteController extends Controller
                 $quote->save();
             }
 
-            $quote->messages()->create([
+            $message = $quote->messages()->create([
                 'message' => $request->message,
                 'user_type' => 'admin',
                 'user_id' => auth()->guard('admin')->user()->id,
                 'created_at' => now(),
             ]);
 
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => trans('b2b::app.admin.quotes.view.success-message'),
+                    'data' => $message,
+                ]);
+            }
+
             return redirect()->route('admin.b2b.quotes.view', $id)
-                ->with('success', trans('b2b_suite::app.admin.quotes.view.success-message'));
+                ->with('success', trans('b2b::app.admin.quotes.view.success-message'));
         } catch (\Exception $e) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => trans('b2b::app.admin.quotes.view.error-message'),
+                ], 500);
+            }
+
             return redirect()->back()
-                ->withErrors(['error' => trans('b2b_suite::app.admin.quotes.view.error-message')]);
+                ->withErrors(['error' => trans('b2b::app.admin.quotes.view.error-message')]);
         }
     }
 
@@ -239,7 +252,7 @@ class QuoteController extends Controller
             $this->customerQuoteRepository->createOrUpdateMessageQuotation($data, $id);
 
             return redirect()->route('admin.b2b.quotes.view', $id)
-                ->with('success', trans('b2b_suite::app.admin.quotes.view.quote-submitted'));
+                ->with('success', trans('b2b::app.admin.quotes.view.quote-submitted'));
 
         } catch (\Exception $e) {
             session()->flash('error', $e->getMessage());
@@ -266,7 +279,7 @@ class QuoteController extends Controller
 
             $message = $quote->messages()->create([
                 'message' => $request->message,
-                'status' => trans('b2b_suite::app.shop.customers.account.quotes.view.'.$quote->status),
+                'status' => trans('b2b::app.shop.customers.account.quotes.view.'.$quote->status),
                 'user_type' => 'admin',
                 'user_id' => $adminId,
                 'created_at' => now(),
@@ -287,11 +300,11 @@ class QuoteController extends Controller
             }
 
             return redirect()->route('admin.b2b.quotes.view', $id)
-                ->with('success', trans('b2b_suite::app.admin.quotes.view.quote-accepted'));
+                ->with('success', trans('b2b::app.admin.quotes.view.quote-accepted'));
 
         } catch (\Exception $e) {
             return redirect()->back()->withErrors([
-                'error' => trans('b2b_suite::app.admin.quotes.view.error-message'),
+                'error' => trans('b2b::app.admin.quotes.view.error-message'),
             ]);
         }
     }
@@ -309,7 +322,7 @@ class QuoteController extends Controller
             $quote = $this->customerQuoteRepository->findOrFail($id);
 
             if (in_array($quote->status, [CustomerQuote::STATUS_COMPLETED, CustomerQuote::STATUS_REJECTED])) {
-                session()->flash('error', trans('b2b_suite::app.admin.quotes.view.un-authorized-quote'));
+                session()->flash('error', trans('b2b::app.admin.quotes.view.un-authorized-quote'));
 
                 return redirect()->back();
             }
@@ -320,14 +333,14 @@ class QuoteController extends Controller
 
             $quote->messages()->create([
                 'message' => $request->message,
-                'status' => trans('b2b_suite::app.admin.quotes.view.'.$quote->status),
+                'status' => trans('b2b::app.admin.quotes.view.'.$quote->status),
                 'user_type' => 'admin',
                 'user_id' => auth()->guard('admin')->user()->id,
                 'created_at' => now(),
             ]);
 
             return redirect()->route('admin.b2b.quotes.view', $id)
-                ->with('success', trans('b2b_suite::app.admin.quotes.view.quote-rejected'));
+                ->with('success', trans('b2b::app.admin.quotes.view.quote-rejected'));
 
         } catch (\Exception $e) {
             session()->flash('error', $e->getMessage());
@@ -363,7 +376,7 @@ class QuoteController extends Controller
 
         Event::dispatch('b2b.quote.update.after', $quote);
 
-        session()->flash('success', __('b2b_suite::app.admin.quotes.index.update-success'));
+        session()->flash('success', __('b2b::app.admin.quotes.index.update-success'));
 
         return redirect()->route('admin.b2b.quotes.index');
     }
@@ -383,13 +396,13 @@ class QuoteController extends Controller
             Event::dispatch('b2b.quote.delete.after', $id);
 
             return new JsonResponse([
-                'message' => trans('b2b_suite::app.admin.quotes.index.delete-success'),
+                'message' => trans('b2b::app.admin.quotes.index.delete-success'),
             ]);
         } catch (\Exception $e) {
         }
 
         return new JsonResponse([
-            'message' => trans('b2b_suite::app.admin.quotes.index.delete-failed'),
+            'message' => trans('b2b::app.admin.quotes.index.delete-failed'),
         ], 500);
     }
 
@@ -410,11 +423,11 @@ class QuoteController extends Controller
             }
 
             return new JsonResponse([
-                'message' => trans('b2b_suite::app.admin.quotes.index.index.mass-delete-success'),
+                'message' => trans('b2b::app.admin.quotes.index.index.mass-delete-success'),
             ]);
         } catch (\Exception $exception) {
             return new JsonResponse([
-                'message' => trans('b2b_suite::app.admin.quotes.index.delete-failed'),
+                'message' => trans('b2b::app.admin.quotes.index.delete-failed'),
             ], 500);
         }
     }
@@ -442,7 +455,7 @@ class QuoteController extends Controller
             }
 
             return new JsonResponse([
-                'message' => trans('b2b_suite::app.admin.quotes.index.update-success'),
+                'message' => trans('b2b::app.admin.quotes.index.update-success'),
             ]);
         } catch (\Exception $e) {
             return new JsonResponse([

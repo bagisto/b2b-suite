@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Webkul\B2BSuite\Http\Controllers\Admin\CartController;
 use Webkul\B2BSuite\Http\Controllers\Admin\CompanyAttributeController;
+use Webkul\B2BSuite\Http\Controllers\Admin\CompanyCatalogController;
 use Webkul\B2BSuite\Http\Controllers\Admin\CompanyController;
 use Webkul\B2BSuite\Http\Controllers\Admin\PurchaseOrderController;
 use Webkul\B2BSuite\Http\Controllers\Admin\QuoteController;
@@ -99,6 +100,29 @@ Route::controller(PurchaseOrderController::class)->prefix('purchase-orders')->gr
     Route::get('', 'index')->name('admin.b2b.purchase_orders.index');
 
     Route::get('{id}', 'view')->name('admin.b2b.purchase_orders.view');
+});
+
+/**
+ * ----------------------------------------------------
+ * All the company catalog routes will be defined here
+ * ----------------------------------------------------
+ */
+Route::controller(CompanyCatalogController::class)->prefix('company-catalogs')->group(function () {
+    Route::get('', 'index')->name('admin.b2b.company_catalogs.index');
+
+    Route::get('companies', 'companies')->name('admin.b2b.company_catalogs.companies');
+
+    Route::get('products', 'products')->name('admin.b2b.company_catalogs.products');
+
+    Route::get('create', 'create')->name('admin.b2b.company_catalogs.create');
+
+    Route::post('create', 'store')->name('admin.b2b.company_catalogs.store');
+
+    Route::get('edit/{id}', 'edit')->name('admin.b2b.company_catalogs.edit');
+
+    Route::put('edit/{id}', 'update')->name('admin.b2b.company_catalogs.update');
+
+    Route::delete('delete/{id}', 'destroy')->name('admin.b2b.company_catalogs.delete');
 });
 
 Route::controller(CartController::class)->prefix('cart')->group(function () {

@@ -5,13 +5,13 @@
         <thead class="bg-gray-100">
             <tr>
                 <th class="px-4 py-2">
-                    @lang('b2b_suite::app.admin.quotes.view.name')
+                    @lang('b2b::app.admin.quotes.view.name')
                 </th>
                 <th class="px-4 py-2">
-                    @lang('b2b_suite::app.admin.quotes.view.negotiated-price')
+                    @lang('b2b::app.admin.quotes.view.negotiated-price')
                 </th>
                 <th class="px-4 py-2">
-                    @lang('b2b_suite::app.admin.quotes.view.quantity')
+                    @lang('b2b::app.admin.quotes.view.quantity')
                 </th>
             </tr>
         </thead>
@@ -35,7 +35,7 @@
                                 </a>
                             @else
                                 <div class="flex h-[60px] w-[60px] items-center justify-center rounded border border-gray-300 bg-zinc-100 text-xs font-medium text-zinc-500">
-                                    @lang('b2b_suite::app.admin.quotes.view.product-not-found')
+                                    @lang('b2b::app.admin.quotes.view.product-not-found')
                                 </div>
                             @endif
                             {{ $item->name }}
@@ -50,8 +50,8 @@
                                 name="items[{{ $item->id }}][negotiated_price]"
                                 :value="old('items.'.$item->id.'.negotiated_price') ?? $item->negotiated_price"
                                 rules="required|decimal:4"
-                                :label="trans('b2b_suite::app.admin.quotes.view.negotiated-price')"
-                                :placeholder="trans('b2b_suite::app.admin.quotes.view.negotiated-price')"
+                                :label="trans('b2b::app.admin.quotes.view.negotiated-price')"
+                                :placeholder="trans('b2b::app.admin.quotes.view.negotiated-price')"
                             />
 
                             <x-shop::form.control-group.error control-name="items[{{ $item->id }}][negotiated_price]" />
@@ -67,8 +67,8 @@
                                 name="items[{{ $item->id }}][negotiated_qty]"
                                 :value="old('items.'.$item->id.'.negotiated_qty') ?? $item->negotiated_qty"
                                 rules="required|numeric|min:1"
-                                :label="trans('b2b_suite::app.admin.quotes.view.quantity')"
-                                :placeholder="trans('b2b_suite::app.admin.quotes.view.quantity')"
+                                :label="trans('b2b::app.admin.quotes.view.quantity')"
+                                :placeholder="trans('b2b::app.admin.quotes.view.quantity')"
                             />
 
                             <x-shop::form.control-group.error control-name="items[{{ $item->id }}][negotiated_qty]" />

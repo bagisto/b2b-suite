@@ -27,7 +27,7 @@ class PurchaseOrderController extends Controller
             return datagrid(CustomerPurchaseOrderDataGrid::class)->process();
         }
 
-        return view('b2b_suite::admin.purchase-orders.index');
+        return view('b2b::admin.purchase-orders.index');
     }
 
     /**
@@ -39,6 +39,6 @@ class PurchaseOrderController extends Controller
     {
         $quote = $this->customerQuoteRepository->findOrFail($id);
 
-        return view('b2b_suite::admin.purchase-orders.view', compact('quote'));
+        return view('b2b::admin.purchase-orders.view', compact('quote'));
     }
 }

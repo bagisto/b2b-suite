@@ -1,12 +1,12 @@
 <x-admin::layouts>
     <!-- Page Title -->
     <x-slot:title>
-        @lang('b2b_suite::app.admin.quotes.index.title')
+        @lang('b2b::app.admin.quotes.index.title')
     </x-slot>
 
     <div class="flex items-center justify-between gap-4 max-sm:flex-wrap">
         <p class="py-3 text-xl font-bold text-gray-800 dark:text-white">
-            @lang('b2b_suite::app.admin.quotes.index.title')
+            @lang('b2b::app.admin.quotes.index.title')
         </p>
 
         <div class="flex items-center gap-x-2.5">
@@ -19,7 +19,7 @@
                     class="primary-button"
                     @click="$refs.selectCustomerComponent.openDrawer()"
                 >
-                    @lang('b2b_suite::app.admin.quotes.index.create-btn')
+                    @lang('b2b::app.admin.quotes.index.create-btn')
                 </button>
             @endif
 
@@ -100,7 +100,7 @@
                         <div class="flex gap-2.5">
                             <div class="flex flex-col gap-1.5">
                                 <p class="text-base font-semibold text-gray-800 dark:text-white">
-                                    @{{ "@lang('b2b_suite::app.admin.quotes.index.datagrid.id')".replace(':id', record.quotation_number) }}
+                                    @{{ "@lang('b2b::app.admin.quotes.index.datagrid.id')".replace(':id', record.quotation_number) }}
                                 </p>
 
                                 <p class="text-base text-gray-800 dark:text-white">

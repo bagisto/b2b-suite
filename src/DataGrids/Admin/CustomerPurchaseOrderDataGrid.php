@@ -72,7 +72,7 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
     {
         $this->addColumn([
             'index' => 'po_number',
-            'label' => trans('b2b_suite::app.admin.purchase-orders.index.datagrid.id'),
+            'label' => trans('b2b::app.admin.purchase-orders.index.datagrid.id'),
             'type' => 'integer',
             'searchable' => false,
             'filterable' => true,
@@ -81,7 +81,7 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
 
         $this->addColumn([
             'index' => 'name',
-            'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.name'),
+            'label' => trans('b2b::app.admin.quotes.index.datagrid.name'),
             'type' => 'string',
             'searchable' => true,
             'filterable' => true,
@@ -90,7 +90,7 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
 
         $this->addColumn([
             'index' => 'company_name',
-            'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.company'),
+            'label' => trans('b2b::app.admin.quotes.index.datagrid.company'),
             'type' => 'string',
             'searchable' => true,
             'filterable' => true,
@@ -99,7 +99,7 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
 
         $this->addColumn([
             'index' => 'company_email',
-            'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.company-email'),
+            'label' => trans('b2b::app.admin.quotes.index.datagrid.company-email'),
             'type' => 'string',
             'searchable' => true,
             'filterable' => true,
@@ -108,7 +108,7 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
 
         $this->addColumn([
             'index' => 'customer_name',
-            'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.customer'),
+            'label' => trans('b2b::app.admin.quotes.index.datagrid.customer'),
             'type' => 'string',
             'searchable' => true,
             'filterable' => true,
@@ -117,7 +117,7 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
 
         $this->addColumn([
             'index' => 'customer_email',
-            'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.customer-email'),
+            'label' => trans('b2b::app.admin.quotes.index.datagrid.customer-email'),
             'type' => 'string',
             'searchable' => true,
             'filterable' => true,
@@ -126,7 +126,7 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
 
         $this->addColumn([
             'index' => 'agent_name',
-            'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.agent'),
+            'label' => trans('b2b::app.admin.quotes.index.datagrid.agent'),
             'type' => 'string',
             'searchable' => true,
             'filterable' => true,
@@ -135,7 +135,7 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
 
         $this->addColumn([
             'index' => 'base_total',
-            'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.base_total'),
+            'label' => trans('b2b::app.admin.quotes.index.datagrid.base_total'),
             'type' => 'decimal',
             'filterable' => true,
             'sortable' => true,
@@ -143,7 +143,7 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
 
         $this->addColumn([
             'index' => 'negotiated_total',
-            'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.negotiated_total'),
+            'label' => trans('b2b::app.admin.quotes.index.datagrid.negotiated_total'),
             'type' => 'decimal',
             'filterable' => true,
             'sortable' => true,
@@ -151,30 +151,30 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
 
         $this->addColumn([
             'index' => 'items',
-            'label' => trans('b2b_suite::app.admin.purchase-orders.index.datagrid.items'),
+            'label' => trans('b2b::app.admin.purchase-orders.index.datagrid.items'),
             'type' => 'string',
             'exportable' => false,
             'closure' => function ($value) {
                 $quote = app(CustomerQuoteRepository::class)->with('items')->find($value->quote_id);
 
-                return view('b2b_suite::admin.quotes.items', compact('quote'))->render();
+                return view('b2b::admin.quotes.items', compact('quote'))->render();
             },
         ]);
 
         $this->addColumn([
             'index' => 'status',
-            'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.status'),
+            'label' => trans('b2b::app.admin.quotes.index.datagrid.status'),
             'type' => 'string',
             'searchable' => true,
             'filterable' => true,
             'filterable_type' => 'dropdown',
             'filterable_options' => [
                 [
-                    'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.ordered'),
+                    'label' => trans('b2b::app.admin.quotes.index.datagrid.ordered'),
                     'value' => CustomerQuote::STATUS_ORDERED,
                 ],
                 [
-                    'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.completed'),
+                    'label' => trans('b2b::app.admin.quotes.index.datagrid.completed'),
                     'value' => CustomerQuote::STATUS_COMPLETED,
                 ],
             ],
@@ -183,22 +183,22 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
                 $html = '';
 
                 if ($row->soft_deleted) {
-                    $html = '<p class="label-canceled">'.trans('b2b_suite::app.admin.quotes.index.datagrid.deleted').'</p>';
+                    $html = '<p class="label-canceled">'.trans('b2b::app.admin.quotes.index.datagrid.deleted').'</p>';
                 }
 
                 switch ($row->status) {
                     case CustomerQuote::STATUS_ORDERED:
-                        return '<div class="flex flex-row gap-1"><p class="label-active">'.trans('b2b_suite::app.admin.quotes.index.datagrid.ordered').'</p>'.$html.'</div>';
+                        return '<div class="flex flex-row gap-1"><p class="label-active">'.trans('b2b::app.admin.quotes.index.datagrid.ordered').'</p>'.$html.'</div>';
 
                     case CustomerQuote::STATUS_COMPLETED:
-                        return '<div class="flex flex-row gap-1"><p class="label-canceled">'.trans('b2b_suite::app.admin.quotes.index.datagrid.completed').'</p>'.$html.'</div>';
+                        return '<div class="flex flex-row gap-1"><p class="label-completed">'.trans('b2b::app.admin.quotes.index.datagrid.completed').'</p>'.$html.'</div>';
                 }
             },
         ]);
 
         $this->addColumn([
             'index' => 'created_at',
-            'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.created-at'),
+            'label' => trans('b2b::app.admin.quotes.index.datagrid.created-at'),
             'type' => 'datetime',
             'filterable' => true,
             'filterable_type' => 'datetime_range',
@@ -207,7 +207,7 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
 
         $this->addColumn([
             'index' => 'expiration_date',
-            'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.expiration-date'),
+            'label' => trans('b2b::app.admin.quotes.index.datagrid.expiration-date'),
             'type' => 'date',
             'filterable' => true,
             'filterable_type' => 'date_range',
@@ -226,7 +226,7 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
             $this->addAction([
                 'index' => 'view',
                 'icon' => 'icon-view',
-                'title' => trans('b2b_suite::app.admin.purchase-orders.index.datagrid.view'),
+                'title' => trans('b2b::app.admin.purchase-orders.index.datagrid.view'),
                 'method' => 'GET',
                 'url' => function ($row) {
                     return route('admin.b2b.purchase_orders.view', $row->quote_id);

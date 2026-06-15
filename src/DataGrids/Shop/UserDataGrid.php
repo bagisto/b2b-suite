@@ -79,14 +79,14 @@ class UserDataGrid extends DataGrid
     {
         $this->addColumn([
             'index' => 'user_id',
-            'label' => trans('b2b_suite::app.shop.customers.account.users.index.datagrid.id'),
+            'label' => trans('b2b::app.shop.customers.account.users.index.datagrid.id'),
             'type' => 'integer',
             'filterable' => true,
         ]);
 
         $this->addColumn([
             'index' => 'full_name',
-            'label' => trans('b2b_suite::app.shop.customers.account.users.index.datagrid.name'),
+            'label' => trans('b2b::app.shop.customers.account.users.index.datagrid.name'),
             'type' => 'string',
             'searchable' => true,
             'filterable' => true,
@@ -95,7 +95,7 @@ class UserDataGrid extends DataGrid
 
         $this->addColumn([
             'index' => 'email',
-            'label' => trans('b2b_suite::app.shop.customers.account.users.index.datagrid.email'),
+            'label' => trans('b2b::app.shop.customers.account.users.index.datagrid.email'),
             'type' => 'string',
             'searchable' => true,
             'filterable' => true,
@@ -104,48 +104,48 @@ class UserDataGrid extends DataGrid
 
         $this->addColumn([
             'index' => 'phone',
-            'label' => trans('b2b_suite::app.shop.customers.account.users.index.datagrid.phone'),
+            'label' => trans('b2b::app.shop.customers.account.users.index.datagrid.phone'),
             'type' => 'integer',
             'filterable' => true,
         ]);
 
         $this->addColumn([
             'index' => 'status',
-            'label' => trans('b2b_suite::app.shop.customers.account.users.index.datagrid.status'),
+            'label' => trans('b2b::app.shop.customers.account.users.index.datagrid.status'),
             'type' => 'string',
             'searchable' => true,
             'filterable' => true,
             'filterable_type' => 'dropdown',
             'filterable_options' => [
                 [
-                    'label' => trans('b2b_suite::app.shop.customers.account.users.index.datagrid.active'),
+                    'label' => trans('b2b::app.shop.customers.account.users.index.datagrid.active'),
                     'value' => 1,
                 ],
                 [
-                    'label' => trans('b2b_suite::app.shop.customers.account.users.index.datagrid.inactive'),
+                    'label' => trans('b2b::app.shop.customers.account.users.index.datagrid.inactive'),
                     'value' => 0,
                 ],
             ],
             'sortable' => true,
             'closure' => function ($row) {
                 if ($row->status) {
-                    return '<p class="label-active">'.trans('b2b_suite::app.shop.customers.account.users.index.datagrid.active').'</p>';
+                    return '<p class="label-active">'.trans('b2b::app.shop.customers.account.users.index.datagrid.active').'</p>';
                 }
 
-                return '<p class="label-canceled">'.trans('b2b_suite::app.shop.customers.account.users.index.datagrid.inactive').'</p>';
+                return '<p class="label-canceled">'.trans('b2b::app.shop.customers.account.users.index.datagrid.inactive').'</p>';
             },
         ]);
 
         $this->addColumn([
             'index' => 'gender',
-            'label' => trans('b2b_suite::app.shop.customers.account.users.index.datagrid.gender'),
+            'label' => trans('b2b::app.shop.customers.account.users.index.datagrid.gender'),
             'type' => 'string',
             'sortable' => true,
         ]);
 
         $this->addColumn([
             'index' => 'group',
-            'label' => trans('b2b_suite::app.shop.customers.account.users.index.datagrid.group'),
+            'label' => trans('b2b::app.shop.customers.account.users.index.datagrid.group'),
             'type' => 'string',
             'filterable' => true,
             'filterable_type' => 'dropdown',
@@ -154,28 +154,28 @@ class UserDataGrid extends DataGrid
 
         $this->addColumn([
             'index' => 'is_suspended',
-            'label' => trans('b2b_suite::app.shop.customers.account.users.index.datagrid.is-suspended'),
+            'label' => trans('b2b::app.shop.customers.account.users.index.datagrid.is-suspended'),
             'type' => 'string',
             'searchable' => true,
             'filterable' => true,
             'filterable_type' => 'dropdown',
             'filterable_options' => [
                 [
-                    'label' => trans('b2b_suite::app.shop.customers.account.users.index.datagrid.suspended'),
+                    'label' => trans('b2b::app.shop.customers.account.users.index.datagrid.suspended'),
                     'value' => 1,
                 ],
                 [
-                    'label' => trans('b2b_suite::app.shop.customers.account.users.index.datagrid.not-suspended'),
+                    'label' => trans('b2b::app.shop.customers.account.users.index.datagrid.not-suspended'),
                     'value' => 0,
                 ],
             ],
             'sortable' => true,
             'closure' => function ($row) {
                 if ($row->is_suspended) {
-                    return '<p class="label-canceled">'.trans('b2b_suite::app.shop.customers.account.users.index.datagrid.suspended').'</p>';
+                    return '<p class="label-canceled">'.trans('b2b::app.shop.customers.account.users.index.datagrid.suspended').'</p>';
                 }
 
-                return '<p class="label-active">'.trans('b2b_suite::app.shop.customers.account.users.index.datagrid.not-suspended').'</p>';
+                return '<p class="label-active">'.trans('b2b::app.shop.customers.account.users.index.datagrid.not-suspended').'</p>';
             },
         ]);
     }
@@ -189,7 +189,7 @@ class UserDataGrid extends DataGrid
     {
         $this->addAction([
             'icon' => 'icon-bin',
-            'title' => trans('b2b_suite::app.shop.customers.account.users.index.datagrid.delete'),
+            'title' => trans('b2b::app.shop.customers.account.users.index.datagrid.delete'),
             'method' => 'POST',
             'url' => function ($row) {
                 return route('shop.customers.account.users.delete', $row->user_id);
@@ -198,7 +198,7 @@ class UserDataGrid extends DataGrid
 
         $this->addAction([
             'icon' => 'icon-edit',
-            'title' => trans('b2b_suite::app.shop.customers.account.users.index.datagrid.edit'),
+            'title' => trans('b2b::app.shop.customers.account.users.index.datagrid.edit'),
             'method' => 'GET',
             'url' => function ($row) {
                 return route('shop.customers.account.users.edit', $row->user_id);

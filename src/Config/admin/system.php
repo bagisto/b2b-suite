@@ -5,33 +5,33 @@ return [
      * B2B Suite.
      */
     [
-        'key' => 'b2b_suite',
-        'name' => 'b2b_suite::app.admin.configuration.index.b2b-suite.title',
-        'info' => 'b2b_suite::app.admin.configuration.index.b2b-suite.info',
-        'sort' => 10,
+        'key' => 'b2b',
+        'name' => 'b2b::app.admin.configuration.index.b2b.title',
+        'info' => 'b2b::app.admin.configuration.index.b2b.info',
+        'sort' => 2,
     ], [
-        'key' => 'b2b_suite.general',
-        'name' => 'b2b_suite::app.admin.configuration.index.b2b-suite.general.title',
-        'info' => 'b2b_suite::app.admin.configuration.index.b2b-suite.general.info',
+        'key' => 'b2b.general',
+        'name' => 'b2b::app.admin.configuration.index.b2b.general.title',
+        'info' => 'b2b::app.admin.configuration.index.b2b.general.info',
         'icon' => 'settings/store.svg',
         'sort' => 1,
     ], [
-        'key' => 'b2b_suite.general.settings',
-        'name' => 'b2b_suite::app.admin.configuration.index.b2b-suite.general.settings.title',
-        'info' => 'b2b_suite::app.admin.configuration.index.b2b-suite.general.settings.info',
+        'key' => 'b2b.general.settings',
+        'name' => 'b2b::app.admin.configuration.index.b2b.general.settings.title',
+        'info' => 'b2b::app.admin.configuration.index.b2b.general.settings.info',
         'sort' => 1,
         'fields' => [
             [
                 'name' => 'active',
-                'title' => 'b2b_suite::app.admin.configuration.index.b2b-suite.general.settings.active',
+                'title' => 'b2b::app.admin.configuration.index.b2b.general.settings.active',
                 'type' => 'boolean',
                 'default' => false,
                 'channel_based' => true,
                 'locale_based' => false,
             ], [
                 'name' => 'require_company_approval',
-                'title' => 'b2b_suite::app.admin.configuration.index.b2b-suite.general.settings.require-company-approval',
-                'info' => 'b2b_suite::app.admin.configuration.index.b2b-suite.general.settings.require-company-approval-info',
+                'title' => 'b2b::app.admin.configuration.index.b2b.general.settings.require-company-approval',
+                'info' => 'b2b::app.admin.configuration.index.b2b.general.settings.require-company-approval-info',
                 'depends' => 'active:1',
                 'type' => 'boolean',
                 'default' => true,
@@ -39,7 +39,7 @@ return [
                 'locale_based' => false,
             ], [
                 'name' => 'no_requisition_list',
-                'title' => 'b2b_suite::app.admin.configuration.index.b2b-suite.general.settings.no-requisition-list',
+                'title' => 'b2b::app.admin.configuration.index.b2b.general.settings.no-requisition-list',
                 'depends' => 'active:1',
                 'validation' => 'required_if:active,1|numeric|min:1',
                 'type' => 'number',
@@ -48,63 +48,63 @@ return [
             ],
         ],
     ], [
-        'key' => 'b2b_suite.quotes',
-        'name' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.title',
-        'info' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.info',
+        'key' => 'b2b.quotes',
+        'name' => 'b2b::app.admin.configuration.index.b2b.quotes.title',
+        'info' => 'b2b::app.admin.configuration.index.b2b.quotes.info',
         'icon' => 'settings/store.svg',
         'sort' => 2,
     ], [
-        'key' => 'b2b_suite.quotes.settings',
-        'name' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.settings.title',
-        'info' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.settings.info',
+        'key' => 'b2b.quotes.settings',
+        'name' => 'b2b::app.admin.configuration.index.b2b.quotes.settings.title',
+        'info' => 'b2b::app.admin.configuration.index.b2b.quotes.settings.info',
         'sort' => 1,
         'fields' => [
             [
                 'name' => 'procurement_method',
-                'title' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.settings.procurement-method.title',
+                'title' => 'b2b::app.admin.configuration.index.b2b.quotes.settings.procurement-method.title',
                 'type' => 'select',
-                'info' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.settings.procurement-method.info',
+                'info' => 'b2b::app.admin.configuration.index.b2b.quotes.settings.procurement-method.info',
                 'options' => [
                     [
                         'name' => 'manual ',
-                        'title' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.settings.procurement-method.manual',
+                        'title' => 'b2b::app.admin.configuration.index.b2b.quotes.settings.procurement-method.manual',
                         'value' => 'manual',
                     ], [
                         'name' => 'automatic',
-                        'title' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.settings.procurement-method.automatic',
+                        'title' => 'b2b::app.admin.configuration.index.b2b.quotes.settings.procurement-method.automatic',
                         'value' => 'automatic',
                     ],
                 ],
             ], [
                 'name' => 'min_quantity',
-                'title' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.settings.min-quantity',
+                'title' => 'b2b::app.admin.configuration.index.b2b.quotes.settings.min-quantity',
                 'depends' => 'procurement_method:automatic',
                 'validation' => 'required_if:procurement_method,automatic|numeric|min:1',
                 'type' => 'number',
             ], [
                 'name' => 'quote_prefix',
-                'title' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.settings.quote-prefix',
+                'title' => 'b2b::app.admin.configuration.index.b2b.quotes.settings.quote-prefix',
                 'type' => 'text',
-                'info' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.settings.quote-prefix-info',
+                'info' => 'b2b::app.admin.configuration.index.b2b.quotes.settings.quote-prefix-info',
                 'validation' => 'required|max:6',
                 'default_value' => 'QO',
             ], [
                 'name' => 'po_prefix',
-                'title' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.settings.po-prefix',
+                'title' => 'b2b::app.admin.configuration.index.b2b.quotes.settings.po-prefix',
                 'type' => 'text',
-                'info' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.settings.po-prefix-info',
+                'info' => 'b2b::app.admin.configuration.index.b2b.quotes.settings.po-prefix-info',
                 'validation' => 'required|max:6',
                 'default_value' => 'PO',
             ], [
                 'name' => 'default_padding',
-                'title' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.settings.default-padding',
+                'title' => 'b2b::app.admin.configuration.index.b2b.quotes.settings.default-padding',
                 'type' => 'number',
-                'info' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.settings.default-padding-info',
+                'info' => 'b2b::app.admin.configuration.index.b2b.quotes.settings.default-padding-info',
                 'validation' => 'required',
                 'default_value' => 9,
             ], [
                 'name' => 'minimum_amount',
-                'title' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.settings.minimum-amount',
+                'title' => 'b2b::app.admin.configuration.index.b2b.quotes.settings.minimum-amount',
                 'type' => 'text',
                 'validation' => 'numeric|min:0',
                 'default' => '0',
@@ -113,7 +113,7 @@ return [
             ],
             [
                 'name' => 'minimum_amount_message',
-                'title' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.settings.minimum-amount-message',
+                'title' => 'b2b::app.admin.configuration.index.b2b.quotes.settings.minimum-amount-message',
                 'type' => 'textarea',
                 'default' => 'The cart total must meet the minimum amount before a quote can be requested.',
                 'channel_based' => true,
@@ -121,7 +121,7 @@ return [
             ],
             [
                 'name' => 'default_expiration_period',
-                'title' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.settings.default-expiration-period',
+                'title' => 'b2b::app.admin.configuration.index.b2b.quotes.settings.default-expiration-period',
                 'type' => 'text',
                 'validation' => 'numeric|min:1',
                 'default' => '30',
@@ -130,19 +130,19 @@ return [
             ],
             [
                 'name' => 'expiration_period_unit',
-                'title' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.settings.expiration-period-unit',
+                'title' => 'b2b::app.admin.configuration.index.b2b.quotes.settings.expiration-period-unit',
                 'type' => 'select',
                 'options' => [
                     [
-                        'title' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.settings.days',
+                        'title' => 'b2b::app.admin.configuration.index.b2b.quotes.settings.days',
                         'value' => 'days',
                     ],
                     [
-                        'title' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.settings.weeks',
+                        'title' => 'b2b::app.admin.configuration.index.b2b.quotes.settings.weeks',
                         'value' => 'weeks',
                     ],
                     [
-                        'title' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.settings.months',
+                        'title' => 'b2b::app.admin.configuration.index.b2b.quotes.settings.months',
                         'value' => 'months',
                     ],
                 ],
@@ -152,7 +152,7 @@ return [
             ],
             [
                 'name' => 'supported_file_formats',
-                'title' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.settings.supported-file-formats',
+                'title' => 'b2b::app.admin.configuration.index.b2b.quotes.settings.supported-file-formats',
                 'type' => 'text',
                 'default' => 'doc,docx,xls,xlsx,pdf,txt,jpg,png,jpeg',
                 'channel_based' => true,
@@ -160,7 +160,7 @@ return [
             ],
             [
                 'name' => 'maximum_file_size',
-                'title' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.settings.maximum-file-size',
+                'title' => 'b2b::app.admin.configuration.index.b2b.quotes.settings.maximum-file-size',
                 'type' => 'text',
                 'validation' => 'numeric|min:1',
                 'default' => '10',
@@ -169,73 +169,73 @@ return [
             ],
             [
                 'name' => 'can_customer_approve_quote',
-                'title' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.settings.approve-quote-title',
-                'info' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.settings.approve-quote-info',
+                'title' => 'b2b::app.admin.configuration.index.b2b.quotes.settings.approve-quote-title',
+                'info' => 'b2b::app.admin.configuration.index.b2b.quotes.settings.approve-quote-info',
                 'type' => 'boolean',
                 'default' => false,
             ],
         ],
     ], [
-        'key' => 'b2b_suite.quotes.email_option',
-        'name' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.email-options.title',
-        'info' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.email-options.info',
+        'key' => 'b2b.quotes.email_option',
+        'name' => 'b2b::app.admin.configuration.index.b2b.quotes.email-options.title',
+        'info' => 'b2b::app.admin.configuration.index.b2b.quotes.email-options.info',
         'sort' => 3,
         'fields' => [
             [
                 'name' => 'quotation_template',
-                'title' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.email-options.quotation-template.title',
+                'title' => 'b2b::app.admin.configuration.index.b2b.quotes.email-options.quotation-template.title',
                 'type' => 'select',
                 'options' => [
                     [
-                        'title' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.email-options.quotation-template.default',
+                        'title' => 'b2b::app.admin.configuration.index.b2b.quotes.email-options.quotation-template.default',
                         'value' => 1,
                     ], [
-                        'title' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.email-options.quotation-template.pickup-order',
+                        'title' => 'b2b::app.admin.configuration.index.b2b.quotes.email-options.quotation-template.pickup-order',
                         'value' => 2,
                     ], [
-                        'title' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.email-options.quotation-template.pickup-order-guest',
+                        'title' => 'b2b::app.admin.configuration.index.b2b.quotes.email-options.quotation-template.pickup-order-guest',
                         'value' => 3,
                     ],
                 ],
             ], [
                 'name' => 'purchase_order_template',
-                'title' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.email-options.purchase-order-template.title',
+                'title' => 'b2b::app.admin.configuration.index.b2b.quotes.email-options.purchase-order-template.title',
                 'type' => 'select',
                 'options' => [
                     [
-                        'title' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.email-options.purchase-order-template.default',
+                        'title' => 'b2b::app.admin.configuration.index.b2b.quotes.email-options.purchase-order-template.default',
                         'value' => 1,
                     ], [
-                        'title' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.email-options.purchase-order-template.pickup-order',
+                        'title' => 'b2b::app.admin.configuration.index.b2b.quotes.email-options.purchase-order-template.pickup-order',
                         'value' => 2,
                     ], [
-                        'title' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.email-options.purchase-order-template.pickup-order-guest',
+                        'title' => 'b2b::app.admin.configuration.index.b2b.quotes.email-options.purchase-order-template.pickup-order-guest',
                         'value' => 3,
                     ],
                 ],
             ], [
                 'name' => 'cancel_order_template',
-                'title' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.email-options.cancel-order-template.title',
+                'title' => 'b2b::app.admin.configuration.index.b2b.quotes.email-options.cancel-order-template.title',
                 'type' => 'select',
                 'options' => [
                     [
-                        'title' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.email-options.cancel-order-template.default',
+                        'title' => 'b2b::app.admin.configuration.index.b2b.quotes.email-options.cancel-order-template.default',
                         'value' => 1,
                     ], [
-                        'title' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.email-options.cancel-order-template.pickup-order',
+                        'title' => 'b2b::app.admin.configuration.index.b2b.quotes.email-options.cancel-order-template.pickup-order',
                         'value' => 2,
                     ], [
-                        'title' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.email-options.cancel-order-template.pickup-order-guest',
+                        'title' => 'b2b::app.admin.configuration.index.b2b.quotes.email-options.cancel-order-template.pickup-order-guest',
                         'value' => 3,
                     ],
                 ],
             ], [
                 'name' => 'mail_from_address',
-                'title' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.email-options.from-address',
+                'title' => 'b2b::app.admin.configuration.index.b2b.quotes.email-options.from-address',
                 'type' => 'text',
             ], [
                 'name' => 'mail_from_title',
-                'title' => 'b2b_suite::app.admin.configuration.index.b2b-suite.quotes.email-options.from-name',
+                'title' => 'b2b::app.admin.configuration.index.b2b.quotes.email-options.from-name',
                 'type' => 'text',
             ],
         ],

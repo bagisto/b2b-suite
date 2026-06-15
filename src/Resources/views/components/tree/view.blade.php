@@ -5,10 +5,10 @@
 
 @if ($inputType == 'checkbox')
     <!-- Tree Checkbox Component -->
-    <x-b2b_suite::tree.checkbox />
+    <x-b2b::tree.checkbox />
 @else
     <!-- Tree Radio Component -->
-    <x-b2b_suite::tree.radio />
+    <x-b2b::tree.radio />
 @endif
 
 <v-tree-view
@@ -16,7 +16,7 @@
     input-type="{{ $inputType }}"
     selection-type="{{ $selectionType }}"
 >
-    <x-b2b_suite::shimmer.tree />
+    <x-b2b::shimmer.tree />
 </v-tree-view>
 
 @pushOnce('scripts')

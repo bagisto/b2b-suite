@@ -75,7 +75,7 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
     {
         $this->addColumn([
             'index' => 'po_number',
-            'label' => trans('b2b_suite::app.shop.customers.account.purchase-orders.index.datagrid.id'),
+            'label' => trans('b2b::app.shop.customers.account.purchase-orders.index.datagrid.id'),
             'type' => 'string',
             'searchable' => false,
             'filterable' => true,
@@ -84,7 +84,7 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
 
         $this->addColumn([
             'index' => 'name',
-            'label' => trans('b2b_suite::app.shop.customers.account.quotes.index.datagrid.name'),
+            'label' => trans('b2b::app.shop.customers.account.quotes.index.datagrid.name'),
             'type' => 'string',
             'searchable' => true,
             'filterable' => true,
@@ -93,7 +93,7 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
 
         $this->addColumn([
             'index' => 'company_name',
-            'label' => trans('b2b_suite::app.shop.customers.account.quotes.index.datagrid.company'),
+            'label' => trans('b2b::app.shop.customers.account.quotes.index.datagrid.company'),
             'type' => 'string',
             'searchable' => true,
             'filterable' => true,
@@ -102,7 +102,7 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
 
         $this->addColumn([
             'index' => 'base_total',
-            'label' => trans('b2b_suite::app.shop.customers.account.quotes.index.datagrid.base_total'),
+            'label' => trans('b2b::app.shop.customers.account.quotes.index.datagrid.base_total'),
             'type' => 'decimal',
             'filterable' => true,
             'sortable' => true,
@@ -113,7 +113,7 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
 
         $this->addColumn([
             'index' => 'negotiated_total',
-            'label' => trans('b2b_suite::app.shop.customers.account.quotes.index.datagrid.negotiated_total'),
+            'label' => trans('b2b::app.shop.customers.account.quotes.index.datagrid.negotiated_total'),
             'type' => 'decimal',
             'filterable' => true,
             'sortable' => true,
@@ -124,18 +124,18 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
 
         $this->addColumn([
             'index' => 'status',
-            'label' => trans('b2b_suite::app.shop.customers.account.quotes.index.datagrid.status'),
+            'label' => trans('b2b::app.shop.customers.account.quotes.index.datagrid.status'),
             'type' => 'string',
             'searchable' => true,
             'filterable' => true,
             'filterable_type' => 'dropdown',
             'filterable_options' => [
                 [
-                    'label' => trans('b2b_suite::app.shop.customers.account.quotes.index.datagrid.ordered'),
+                    'label' => trans('b2b::app.shop.customers.account.quotes.index.datagrid.ordered'),
                     'value' => CustomerQuote::STATUS_ORDERED,
                 ],
                 [
-                    'label' => trans('b2b_suite::app.shop.customers.account.quotes.index.datagrid.completed'),
+                    'label' => trans('b2b::app.shop.customers.account.quotes.index.datagrid.completed'),
                     'value' => CustomerQuote::STATUS_COMPLETED,
                 ],
             ],
@@ -143,17 +143,17 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
             'closure' => function ($row) {
                 switch ($row->status) {
                     case CustomerQuote::STATUS_ORDERED:
-                        return '<p class="label-active">'.trans('b2b_suite::app.shop.customers.account.quotes.index.datagrid.ordered').'</p>';
+                        return '<p class="label-active">'.trans('b2b::app.shop.customers.account.quotes.index.datagrid.ordered').'</p>';
 
                     case CustomerQuote::STATUS_COMPLETED:
-                        return '<p class="label-canceled">'.trans('b2b_suite::app.shop.customers.account.quotes.index.datagrid.completed').'</p>';
+                        return '<p class="label-completed">'.trans('b2b::app.shop.customers.account.quotes.index.datagrid.completed').'</p>';
                 }
             },
         ]);
 
         $this->addColumn([
             'index' => 'created_at',
-            'label' => trans('b2b_suite::app.shop.customers.account.quotes.index.datagrid.created-at'),
+            'label' => trans('b2b::app.shop.customers.account.quotes.index.datagrid.created-at'),
             'type' => 'datetime',
             'filterable' => true,
             'filterable_type' => 'datetime_range',
@@ -171,7 +171,7 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
         $this->addAction([
             'index' => 'edit',
             'icon' => 'icon-eye',
-            'title' => trans('b2b_suite::app.admin.quotes.index.datagrid.view'),
+            'title' => trans('b2b::app.admin.quotes.index.datagrid.view'),
             'method' => 'GET',
             'url' => function ($row) {
                 return route('shop.customers.account.purchase_orders.view', $row->quote_id);

@@ -45,7 +45,7 @@ class RequisitionListController extends Controller
 
         $totalRequisitionList = $this->customerRequisitionRepository->findByField('customer_id', $customerId);
 
-        return view('b2b_suite::shop.customers.account.requisitions.index')->with('totalRequisition', $totalRequisitionList->count());
+        return view('b2b::shop.customers.account.requisitions.index')->with('totalRequisition', $totalRequisitionList->count());
     }
 
     /**
@@ -83,7 +83,7 @@ class RequisitionListController extends Controller
 
         Event::dispatch('customer.requisitions.create.after', $requisition);
 
-        session()->flash('success', trans('b2b_suite::app.shop.customers.account.requisitions.create-success'));
+        session()->flash('success', trans('b2b::app.shop.customers.account.requisitions.create-success'));
 
         return new JsonResponse([
             'redirect_url' => ! request()->input('product_id')
@@ -108,7 +108,7 @@ class RequisitionListController extends Controller
             abort(404);
         }
 
-        return view('b2b_suite::shop.customers.account.requisitions.edit')->with('requisition', $requisition);
+        return view('b2b::shop.customers.account.requisitions.edit')->with('requisition', $requisition);
     }
 
     /**
@@ -153,7 +153,7 @@ class RequisitionListController extends Controller
 
         Event::dispatch('customer.requisitions.update.after', $requisition);
 
-        session()->flash('success', trans('b2b_suite::app.shop.customers.account.requisitions.update-success'));
+        session()->flash('success', trans('b2b::app.shop.customers.account.requisitions.update-success'));
 
         return new JsonResponse([
             'data' => $requisition,
@@ -182,7 +182,7 @@ class RequisitionListController extends Controller
         Event::dispatch('customer.requisitions.delete.after', $id);
 
         return new JsonResponse([
-            'message' => trans('b2b_suite::app.shop.customers.account.requisitions.delete-success'),
+            'message' => trans('b2b::app.shop.customers.account.requisitions.delete-success'),
             'redirect_url' => route('shop.customers.account.requisitions.index'),
         ]);
     }
@@ -220,14 +220,14 @@ class RequisitionListController extends Controller
 
             if (! $requisition) {
                 return response()->json([
-                    'message' => trans('b2b_suite::app.shop.customers.account.requisitions.not-found'),
+                    'message' => trans('b2b::app.shop.customers.account.requisitions.not-found'),
                 ], 404);
             }
 
             $this->customerRequisitionRepository->saveItems($requisition, $data);
 
             return new JsonResponse([
-                'message' => trans('b2b_suite::app.shop.customers.account.requisitions.add-product-success'),
+                'message' => trans('b2b::app.shop.customers.account.requisitions.add-product-success'),
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -258,7 +258,7 @@ class RequisitionListController extends Controller
 
         return new JsonResponse([
             'requisitions' => $requisitions,
-            'allow_new_list' => (int) core()->getConfigData('b2b_suite.general.settings.no_requisition_list') > $totalRequisition,
+            'allow_new_list' => (int) core()->getConfigData('b2b.general.settings.no_requisition_list') > $totalRequisition,
         ]);
     }
 
@@ -317,7 +317,7 @@ class RequisitionListController extends Controller
             }
         }
 
-        session()->flash('success', trans('b2b_suite::app.shop.customers.account.requisitions.move-to-cart-success'));
+        session()->flash('success', trans('b2b::app.shop.customers.account.requisitions.move-to-cart-success'));
 
         return new JsonResponse([
             'redirect_url' => route('shop.checkout.cart.index'),
@@ -368,7 +368,7 @@ class RequisitionListController extends Controller
 
             return new JsonResponse([
                 'data' => RequisitionItemResource::collection($updatedItems),
-                'message' => trans('b2b_suite::app.shop.customers.account.requisitions.item-updated'),
+                'message' => trans('b2b::app.shop.customers.account.requisitions.item-updated'),
             ]);
         } catch (\Exception $exception) {
             return new JsonResponse([
@@ -407,7 +407,7 @@ class RequisitionListController extends Controller
 
         return new JsonResponse([
             'data' => RequisitionItemResource::collection($updatedItems),
-            'message' => trans('b2b_suite::app.shop.customers.account.requisitions.success-remove'),
+            'message' => trans('b2b::app.shop.customers.account.requisitions.success-remove'),
         ]);
     }
 }

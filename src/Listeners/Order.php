@@ -18,7 +18,7 @@ class Order extends Base
      */
     public function afterCreated(OrderContract $order)
     {
-        if (! (bool) core()->getConfigData('b2b_suite.general.settings.active')) {
+        if (! (bool) core()->getConfigData('b2b.general.settings.active')) {
             return;
         }
 
@@ -56,7 +56,7 @@ class Order extends Base
         $order = app('Webkul\Sales\Repositories\OrderRepository')->find($invoiceOrShipment->order->id);
 
         if (
-            ! (bool) core()->getConfigData('b2b_suite.general.settings.active')
+            ! (bool) core()->getConfigData('b2b.general.settings.active')
             || $order->status != SalesOrder::STATUS_COMPLETED
         ) {
             return;

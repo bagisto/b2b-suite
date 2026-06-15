@@ -40,7 +40,7 @@ class RoleDataGrid extends DataGrid
     {
         $this->addColumn([
             'index' => 'role_id',
-            'label' => trans('b2b_suite::app.shop.customers.account.roles.index.datagrid.id'),
+            'label' => trans('b2b::app.shop.customers.account.roles.index.datagrid.id'),
             'type' => 'integer',
             'filterable' => true,
             'sortable' => true,
@@ -48,7 +48,7 @@ class RoleDataGrid extends DataGrid
 
         $this->addColumn([
             'index' => 'name',
-            'label' => trans('b2b_suite::app.shop.customers.account.roles.index.datagrid.name'),
+            'label' => trans('b2b::app.shop.customers.account.roles.index.datagrid.name'),
             'type' => 'string',
             'searchable' => true,
             'filterable' => true,
@@ -57,18 +57,18 @@ class RoleDataGrid extends DataGrid
 
         $this->addColumn([
             'index' => 'permission_type',
-            'label' => trans('b2b_suite::app.shop.customers.account.roles.index.datagrid.permission-type'),
+            'label' => trans('b2b::app.shop.customers.account.roles.index.datagrid.permission-type'),
             'type' => 'string',
             'searchable' => true,
             'filterable' => true,
             'filterable_type' => 'dropdown',
             'filterable_options' => [
                 [
-                    'label' => trans('b2b_suite::app.shop.customers.account.roles.index.datagrid.custom'),
+                    'label' => trans('b2b::app.shop.customers.account.roles.index.datagrid.custom'),
                     'value' => 'custom',
                 ],
                 [
-                    'label' => trans('b2b_suite::app.shop.customers.account.roles.index.datagrid.all'),
+                    'label' => trans('b2b::app.shop.customers.account.roles.index.datagrid.all'),
                     'value' => 'all',
                 ],
             ],
@@ -85,7 +85,7 @@ class RoleDataGrid extends DataGrid
     {
         $this->addAction([
             'icon' => 'icon-bin',
-            'title' => trans('b2b_suite::app.shop.customers.account.roles.index.datagrid.delete'),
+            'title' => trans('b2b::app.shop.customers.account.roles.index.datagrid.delete'),
             'method' => 'POST',
             'url' => function ($row) {
                 return route('shop.customers.account.roles.delete', $row->role_id);
@@ -94,7 +94,7 @@ class RoleDataGrid extends DataGrid
 
         $this->addAction([
             'icon' => 'icon-edit',
-            'title' => trans('b2b_suite::app.shop.customers.account.roles.index.datagrid.edit'),
+            'title' => trans('b2b::app.shop.customers.account.roles.index.datagrid.edit'),
             'method' => 'GET',
             'url' => function ($row) {
                 return route('shop.customers.account.roles.edit', $row->role_id);

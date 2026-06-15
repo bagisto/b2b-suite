@@ -4,8 +4,6 @@ namespace Webkul\B2BSuite\Http\Controllers\Shop\Customer;
 
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Webkul\B2BSuite\Http\Requests\CompanyRequest;
 use Webkul\B2BSuite\Repositories\CompanyAttributeGroupRepository;
@@ -39,39 +37,47 @@ class CustomerController extends BaseCustomerController
      */
     public function index()
     {
-        $customer = $this->customerRepository->find(auth()->guard('customer')->user()->id);
-
-        if (
-            ! (bool) core()->getConfigData('b2b_suite.general.settings.active')
-            || $customer->type != 'company'
-        ) {
-            return view('shop::customers.account.profile.index', compact('customer'));
-        }
-
-        $attributes = $this->companyAttributeRepository->getSignUpAttributes();
-
-        return view('shop::customers.account.profile.index', compact('customer'));
+        return parent::index();
     }
 
     /**
      * For loading the edit form page.
      *
+     * The personal account edit form is the core form for every customer
+     * (company basic info included). Company-specific mapped attributes are
+     * edited on the dedicated Company Profile page (see companyProfile()).
+     *
      * @return View
      */
     public function edit()
     {
+        return parent::edit();
+    }
+
+    /**
+     * Dedicated Company Profile page — renders the mapped company attributes
+     * exactly as configured in the admin (grouped by column/position).
+     *
+     * @return View
+     */
+    public function companyProfile()
+    {
         $customer = $this->customerRepository->find(auth()->guard('customer')->user()->id);
 
         if (
-            ! (bool) core()->getConfigData('b2b_suite.general.settings.active')
+            ! (bool) core()->getConfigData('b2b.general.settings.active')
             || $customer->type != 'company'
         ) {
-            return view('shop::customers.account.profile.edit', compact('customer'));
+            abort(404);
         }
 
-        $attributeGroups = $this->companyAttributeGroupRepository->with('custom_attributes')->all();
+        $attributeGroups = $this->companyAttributeGroupRepository->with([
+            'custom_attributes' => function ($query) {
+                $query->orderBy('pivot_position', 'asc');
+            },
+        ])->orderBy('column', 'asc')->orderBy('position', 'asc')->get();
 
-        return view('b2b_suite::shop.companies.account.profile.edit')
+        return view('b2b::shop.companies.account.profile.index')
             ->with([
                 'customer' => $customer,
                 'attributeGroups' => $attributeGroups,
@@ -85,129 +91,40 @@ class CustomerController extends BaseCustomerController
      */
     public function modify(CompanyRequest $request, int $id)
     {
-        $this->validate($request, [
-            'new_password' => 'confirmed|min:6|required_with:current_password',
-            '`new_password_confirmation`' => 'required_with:new_password',
-            'current_password' => 'required_with:new_password',
-            'image' => 'array',
-            'image.*' => 'mimes:bmp,jpeg,jpg,png,webp',
-        ]);
-
-        $isPasswordChanged = false;
-
         $id = auth()->guard('customer')->user()->id;
-
-        Event::dispatch('customer.update.before', $id);
 
         $customer = $this->customerRepository->findOrFail($id);
 
-        $data = array_merge([
-            'is_verified' => 1,
-            'channel_id' => core()->getCurrentChannel()->id,
-        ], $request->only([
+        Event::dispatch('customer.update.before', $id);
+
+        /**
+         * Only the column-backed company attributes are written to the customers
+         * table; everything else is persisted as company attribute values. Account
+         * credentials (password) and the avatar live on the core profile edit form.
+         */
+        $data = $request->only([
             'first_name',
             'last_name',
             'gender',
             'email',
             'date_of_birth',
             'phone',
-            'customer_group_id',
-            'channel_id',
-            'type',
             'company_role_id',
-            'new_password',
-            'new_password_confirmation',
-            'current_password',
-            'image',
-            'subscribed_to_news_letter',
-        ]));
+        ]);
 
-        if (
-            core()->getCurrentChannel()->theme === 'default'
-            && ! isset($data['image'])
-        ) {
-            $data['image']['image_0'] = '';
-        }
+        $this->customerRepository->update($data, $id);
 
-        if (! empty($data['current_password'])) {
-            if (Hash::check($data['current_password'], auth()->guard('customer')->user()->password)) {
-                $isPasswordChanged = true;
+        $this->companyAttributeValueRepository->saveValues(
+            $request->all(),
+            $customer,
+            $customer->custom_attributes
+        );
 
-                $data['password'] = bcrypt($data['new_password']);
-            } else {
-                session()->flash('warning', trans('shop::app.customers.account.profile.index.unmatched'));
+        $customer = $customer->refresh();
 
-                return redirect()->back();
-            }
-        } else {
-            unset($data['new_password']);
-        }
+        Event::dispatch('customer.update.after', $customer);
 
-        Event::dispatch('customer.update.before', $id);
-
-        if ($customer = $this->customerRepository->update($data, auth()->guard('customer')->user()->id)) {
-            if ($isPasswordChanged) {
-                Event::dispatch('customer.password.update.after', $customer);
-            }
-
-            $this->companyAttributeValueRepository->saveValues(
-                $request->all(),
-                $customer,
-                $customer->custom_attributes
-            );
-
-            $customer = $customer->refresh();
-
-            Event::dispatch('customer.update.after', $customer);
-
-            if ($data['subscribed_to_news_letter']) {
-                $subscription = $this->subscriptionRepository->findOneWhere(['email' => $data['email']]);
-
-                if ($subscription) {
-                    $this->subscriptionRepository->update([
-                        'customer_id' => $customer->id,
-                        'is_subscribed' => 1,
-                    ], $subscription->id);
-                } else {
-                    $this->subscriptionRepository->create([
-                        'email' => $data['email'],
-                        'customer_id' => $customer->id,
-                        'channel_id' => core()->getCurrentChannel()->id,
-                        'is_subscribed' => 1,
-                        'token' => $token = uniqid(),
-                    ]);
-                }
-            } else {
-                $subscription = $this->subscriptionRepository->findOneWhere(['email' => $data['email']]);
-
-                if ($subscription) {
-                    $this->subscriptionRepository->update([
-                        'customer_id' => $customer->id,
-                        'is_subscribed' => 0,
-                    ], $subscription->id);
-                }
-            }
-
-            if (request()->hasFile('image')) {
-                $this->customerRepository->uploadImages($data, $customer);
-            } else {
-                if (isset($data['image'])) {
-                    if (! empty($data['image'])) {
-                        Storage::delete((string) $customer->image);
-                    }
-
-                    $customer->image = null;
-
-                    $customer->save();
-                }
-            }
-
-            return to_route('shop.customers.account.profile.index')
-                ->withSuccess(trans('shop::app.customers.account.profile.index.edit-success'));
-        }
-
-        session()->flash('success', trans('shop::app.customer.account.profile.edit-fail'));
-
-        return redirect()->back('shop.customers.account.profile.edit');
+        return to_route('shop.companies.account.profile.index')
+            ->withSuccess(trans('shop::app.customers.account.profile.index.edit-success'));
     }
 }

@@ -36,18 +36,24 @@ class CustomerQuoteDataGrid extends DataGrid
                 'customer_quotes.base_total',
                 'customer_quotes.negotiated_total',
                 'customer_quotes.status',
+                'customer_quotes.order_id',
                 'customer_quotes.soft_deleted',
                 'customer_quotes.created_at',
                 'customer_quotes.expiration_date'
             )
             ->addSelect(DB::raw('CONCAT('.$tablePrefix.'customer.first_name, " ", '.$tablePrefix.'customer.last_name) as customer_name'))
             ->addSelect(DB::raw('CONCAT('.$tablePrefix.'company.first_name, " ", '.$tablePrefix.'company.last_name) as company_name'))
-            ->where('customer_quotes.state', CustomerQuote::STATE_QUOTATION)
+            ->whereIn('customer_quotes.state', [
+                CustomerQuote::STATE_QUOTATION,
+                CustomerQuote::STATE_PURCHASE_ORDER,
+            ])
             ->whereIn('customer_quotes.status', [
                 CustomerQuote::STATUS_OPEN,
                 CustomerQuote::STATUS_NEGOTIATION,
                 CustomerQuote::STATUS_ACCEPTED,
                 CustomerQuote::STATUS_REJECTED,
+                CustomerQuote::STATUS_ORDERED,
+                CustomerQuote::STATUS_COMPLETED,
             ])
             ->where(function ($query) {
                 $query->where('customer_quotes.status', '!=', CustomerQuote::STATUS_DRAFT)
@@ -76,7 +82,7 @@ class CustomerQuoteDataGrid extends DataGrid
     {
         $this->addColumn([
             'index' => 'quotation_number',
-            'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.quote-id'),
+            'label' => trans('b2b::app.admin.quotes.index.datagrid.quote-id'),
             'type' => 'string',
             'searchable' => false,
             'filterable' => true,
@@ -85,7 +91,7 @@ class CustomerQuoteDataGrid extends DataGrid
 
         $this->addColumn([
             'index' => 'name',
-            'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.name'),
+            'label' => trans('b2b::app.admin.quotes.index.datagrid.name'),
             'type' => 'string',
             'searchable' => true,
             'filterable' => true,
@@ -94,7 +100,7 @@ class CustomerQuoteDataGrid extends DataGrid
 
         $this->addColumn([
             'index' => 'company_name',
-            'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.company'),
+            'label' => trans('b2b::app.admin.quotes.index.datagrid.company'),
             'type' => 'string',
             'searchable' => true,
             'filterable' => true,
@@ -103,7 +109,7 @@ class CustomerQuoteDataGrid extends DataGrid
 
         $this->addColumn([
             'index' => 'customer_name',
-            'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.customer'),
+            'label' => trans('b2b::app.admin.quotes.index.datagrid.customer'),
             'type' => 'string',
             'searchable' => true,
             'filterable' => true,
@@ -112,7 +118,7 @@ class CustomerQuoteDataGrid extends DataGrid
 
         $this->addColumn([
             'index' => 'agent_name',
-            'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.agent'),
+            'label' => trans('b2b::app.admin.quotes.index.datagrid.agent'),
             'type' => 'string',
             'searchable' => true,
             'filterable' => true,
@@ -121,7 +127,7 @@ class CustomerQuoteDataGrid extends DataGrid
 
         $this->addColumn([
             'index' => 'base_total',
-            'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.base_total'),
+            'label' => trans('b2b::app.admin.quotes.index.datagrid.base_total'),
             'type' => 'decimal',
             'filterable' => true,
             'sortable' => true,
@@ -129,7 +135,7 @@ class CustomerQuoteDataGrid extends DataGrid
 
         $this->addColumn([
             'index' => 'negotiated_total',
-            'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.negotiated_total'),
+            'label' => trans('b2b::app.admin.quotes.index.datagrid.negotiated_total'),
             'type' => 'decimal',
             'filterable' => true,
             'sortable' => true,
@@ -137,47 +143,55 @@ class CustomerQuoteDataGrid extends DataGrid
 
         $this->addColumn([
             'index' => 'items',
-            'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.items'),
+            'label' => trans('b2b::app.admin.quotes.index.datagrid.items'),
             'type' => 'string',
             'exportable' => false,
             'closure' => function ($value) {
                 $quote = app(CustomerQuoteRepository::class)->with('items')->find($value->quote_id);
 
-                return view('b2b_suite::admin.quotes.items', compact('quote'))->render();
+                return view('b2b::admin.quotes.items', compact('quote'))->render();
             },
         ]);
 
         $this->addColumn([
             'index' => 'status',
-            'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.status'),
+            'label' => trans('b2b::app.admin.quotes.index.datagrid.status'),
             'type' => 'string',
             'searchable' => true,
             'filterable' => true,
             'filterable_type' => 'dropdown',
             'filterable_options' => [
                 [
-                    'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.draft'),
+                    'label' => trans('b2b::app.admin.quotes.index.datagrid.draft'),
                     'value' => CustomerQuote::STATUS_DRAFT,
                 ],
                 [
-                    'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.open'),
+                    'label' => trans('b2b::app.admin.quotes.index.datagrid.open'),
                     'value' => CustomerQuote::STATUS_OPEN,
                 ],
                 [
-                    'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.accepted'),
+                    'label' => trans('b2b::app.admin.quotes.index.datagrid.accepted'),
                     'value' => CustomerQuote::STATUS_ACCEPTED,
                 ],
                 [
-                    'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.negotiation'),
+                    'label' => trans('b2b::app.admin.quotes.index.datagrid.negotiation'),
                     'value' => CustomerQuote::STATUS_NEGOTIATION,
                 ],
                 [
-                    'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.expired'),
+                    'label' => trans('b2b::app.admin.quotes.index.datagrid.expired'),
                     'value' => CustomerQuote::STATUS_EXPIRED,
                 ],
                 [
-                    'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.rejected'),
+                    'label' => trans('b2b::app.admin.quotes.index.datagrid.rejected'),
                     'value' => CustomerQuote::STATUS_REJECTED,
+                ],
+                [
+                    'label' => trans('b2b::app.admin.quotes.index.datagrid.ordered'),
+                    'value' => CustomerQuote::STATUS_ORDERED,
+                ],
+                [
+                    'label' => trans('b2b::app.admin.quotes.index.datagrid.completed'),
+                    'value' => CustomerQuote::STATUS_COMPLETED,
                 ],
             ],
             'sortable' => true,
@@ -185,34 +199,40 @@ class CustomerQuoteDataGrid extends DataGrid
                 $html = '';
 
                 if ($row->soft_deleted) {
-                    $html = '<p class="label-canceled">'.trans('b2b_suite::app.admin.quotes.index.datagrid.deleted').'</p>';
+                    $html = '<p class="label-canceled">'.trans('b2b::app.admin.quotes.index.datagrid.deleted').'</p>';
                 }
 
                 switch ($row->status) {
                     case CustomerQuote::STATUS_DRAFT:
-                        return '<div class="flex flex-row gap-1"><p class="label-info">'.trans('b2b_suite::app.admin.quotes.index.datagrid.draft').'</p>'.$html.'</div>';
+                        return '<div class="flex flex-row gap-1"><p class="label-info">'.trans('b2b::app.admin.quotes.index.datagrid.draft').'</p>'.$html.'</div>';
 
                     case CustomerQuote::STATUS_OPEN:
-                        return '<div class="flex flex-row gap-1"><p class="label-pending">'.trans('b2b_suite::app.admin.quotes.index.datagrid.open').'</p>'.$html.'</div>';
+                        return '<div class="flex flex-row gap-1"><p class="label-pending">'.trans('b2b::app.admin.quotes.index.datagrid.open').'</p>'.$html.'</div>';
 
                     case CustomerQuote::STATUS_ACCEPTED:
-                        return '<div class="flex flex-row gap-1"><p class="label-processing">'.trans('b2b_suite::app.admin.quotes.index.datagrid.accepted').'</p>'.$html.'</div>';
+                        return '<div class="flex flex-row gap-1"><p class="label-processing">'.trans('b2b::app.admin.quotes.index.datagrid.accepted').'</p>'.$html.'</div>';
 
                     case CustomerQuote::STATUS_NEGOTIATION:
-                        return '<div class="flex flex-row gap-1"><p class="label-closed">'.trans('b2b_suite::app.admin.quotes.index.datagrid.negotiation').'</p>'.$html.'</div>';
+                        return '<div class="flex flex-row gap-1"><p class="label-closed">'.trans('b2b::app.admin.quotes.index.datagrid.negotiation').'</p>'.$html.'</div>';
 
                     case CustomerQuote::STATUS_EXPIRED:
-                        return '<div class="flex flex-row gap-1"><p class="label-canceled">'.trans('b2b_suite::app.admin.quotes.index.datagrid.expired').'</p>'.$html.'</div>';
+                        return '<div class="flex flex-row gap-1"><p class="label-canceled">'.trans('b2b::app.admin.quotes.index.datagrid.expired').'</p>'.$html.'</div>';
 
                     case CustomerQuote::STATUS_REJECTED:
-                        return '<div class="flex flex-row gap-1"><p class="label-canceled">'.trans('b2b_suite::app.admin.quotes.index.datagrid.rejected').'</p>'.$html.'</div>';
+                        return '<div class="flex flex-row gap-1"><p class="label-canceled">'.trans('b2b::app.admin.quotes.index.datagrid.rejected').'</p>'.$html.'</div>';
+
+                    case CustomerQuote::STATUS_ORDERED:
+                        return '<div class="flex flex-row gap-1"><p class="label-completed">'.trans('b2b::app.admin.quotes.index.datagrid.ordered').'</p>'.$html.'</div>';
+
+                    case CustomerQuote::STATUS_COMPLETED:
+                        return '<div class="flex flex-row gap-1"><p class="label-active">'.trans('b2b::app.admin.quotes.index.datagrid.completed').'</p>'.$html.'</div>';
                 }
             },
         ]);
 
         $this->addColumn([
             'index' => 'created_at',
-            'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.created-at'),
+            'label' => trans('b2b::app.admin.quotes.index.datagrid.created-at'),
             'type' => 'datetime',
             'filterable' => true,
             'filterable_type' => 'datetime_range',
@@ -221,7 +241,7 @@ class CustomerQuoteDataGrid extends DataGrid
 
         $this->addColumn([
             'index' => 'expiration_date',
-            'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.expiration-date'),
+            'label' => trans('b2b::app.admin.quotes.index.datagrid.expiration-date'),
             'type' => 'date',
             'filterable' => true,
             'filterable_type' => 'date_range',
@@ -240,7 +260,7 @@ class CustomerQuoteDataGrid extends DataGrid
             $this->addAction([
                 'index' => 'view',
                 'icon' => 'icon-view',
-                'title' => trans('b2b_suite::app.admin.quotes.index.datagrid.view'),
+                'title' => trans('b2b::app.admin.quotes.index.datagrid.view'),
                 'method' => 'GET',
                 'url' => function ($row) {
                     return route('admin.b2b.quotes.view', $row->quote_id);
@@ -259,7 +279,7 @@ class CustomerQuoteDataGrid extends DataGrid
         if (bouncer()->hasPermission('b2b.quotes.delete')) {
             $this->addMassAction([
                 'icon' => 'icon-delete',
-                'title' => trans('b2b_suite::app.admin.quotes.index.datagrid.mass-delete'),
+                'title' => trans('b2b::app.admin.quotes.index.datagrid.mass-delete'),
                 'method' => 'POST',
                 'url' => route('admin.b2b.quotes.mass_delete'),
             ]);
@@ -268,33 +288,33 @@ class CustomerQuoteDataGrid extends DataGrid
         if (bouncer()->hasPermission('b2b.quotes.edit')) {
             $this->addMassAction([
                 'icon' => 'icon-edit',
-                'title' => trans('b2b_suite::app.admin.quotes.index.datagrid.mass-update'),
+                'title' => trans('b2b::app.admin.quotes.index.datagrid.mass-update'),
                 'method' => 'POST',
                 'url' => route('admin.b2b.quotes.mass_update'),
                 'options' => [
                     [
-                        'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.draft'),
+                        'label' => trans('b2b::app.admin.quotes.index.datagrid.draft'),
                         'value' => 'draft',
                     ], [
-                        'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.open'),
+                        'label' => trans('b2b::app.admin.quotes.index.datagrid.open'),
                         'value' => 'open',
                     ], [
-                        'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.accepted'),
+                        'label' => trans('b2b::app.admin.quotes.index.datagrid.accepted'),
                         'value' => 'accepted',
                     ], [
-                        'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.negotiation'),
+                        'label' => trans('b2b::app.admin.quotes.index.datagrid.negotiation'),
                         'value' => 'negotiation',
                     ], [
-                        'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.ordered'),
+                        'label' => trans('b2b::app.admin.quotes.index.datagrid.ordered'),
                         'value' => 'ordered',
                     ], [
-                        'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.cancelled'),
+                        'label' => trans('b2b::app.admin.quotes.index.datagrid.cancelled'),
                         'value' => 'cancelled',
                     ], [
-                        'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.rejected'),
+                        'label' => trans('b2b::app.admin.quotes.index.datagrid.rejected'),
                         'value' => 'rejected',
                     ], [
-                        'label' => trans('b2b_suite::app.admin.quotes.index.datagrid.closed'),
+                        'label' => trans('b2b::app.admin.quotes.index.datagrid.closed'),
                         'value' => 'closed',
                     ],
                 ],

@@ -1,13 +1,13 @@
 <x-shop::layouts.account>
     <!-- Page Title -->
     <x-slot:title>
-        @lang('b2b_suite::app.shop.customers.account.requisitions.edit.title' , ['id' => $requisition->id])
+        @lang('b2b::app.shop.customers.account.requisitions.edit.title' , ['id' => $requisition->id])
     </x-slot>
 
     <!-- Breadcrumbs -->
     @if ((core()->getConfigData('general.general.breadcrumbs.shop')))
         @section('breadcrumbs')
-            <x-shop::breadcrumbs name="profile.edit" />
+            <x-shop::breadcrumbs name="requisitions.edit" />
         @endSection
     @endif
 
@@ -15,44 +15,43 @@
         <x-shop::layouts.account.navigation />
     </div>
 
-    <div class="flex-auto">
-    
+    <div class="flex-auto max-md:px-4">
+
         {!! view_render_event('bagisto.shop.customers.account.requisition.edit.before', ['requisition' => $requisition]) !!}
 
         <!-- Page Header -->
-        <div class="grid gap-2.5">
-            <div class="flex items-center justify-between gap-4 max-sm:flex-wrap">
-                <h2 class="text-2xl font-medium max-md:text-xl max-sm:text-base ltr:ml-2.5 md:ltr:ml-0 rtl:mr-2.5 md:rtl:mr-0">
-                    @lang('b2b_suite::app.shop.customers.account.requisitions.edit.title' , ['id' => $requisition->id])
-                
-                    <!-- Default Label -->
-                    @if ($requisition->is_default)
-                        <span class="label-pending p-2 text-white ltr:ml-2.5 rtl:mr-2.5">
-                            @lang('b2b_suite::app.shop.customers.account.requisitions.edit.default-label')
-                        </span>
-                    @endif
-                </h2>
+        <div class="flex items-center justify-between gap-4 max-sm:flex-wrap">
+            <div class="flex items-center gap-2.5">
+                <!-- Back Button (mobile) -->
+                <a
+                    class="grid md:hidden"
+                    href="{{ route('shop.customers.account.requisitions.index') }}"
+                >
+                    <span class="icon-arrow-left rtl:icon-arrow-right text-2xl"></span>
+                </a>
 
-                <div class="flex items-center gap-x-2.5">
-                    <!-- Back Button -->
-                    <a
-                        href="{{ route('shop.customers.account.requisitions.index') }}"
-                        class="transparent-button px-5 py-2.5"
-                    >
-                        @lang('b2b_suite::app.shop.customers.account.requisitions.edit.btn-back')
-                    </a>
-                </div>
+                <h2 class="text-2xl font-medium max-md:text-xl max-sm:text-base">
+                    @lang('b2b::app.shop.customers.account.requisitions.edit.title' , ['id' => $requisition->id])
+                </h2>
             </div>
+
+            <!-- Back Button (desktop) -->
+            <a
+                href="{{ route('shop.customers.account.requisitions.index') }}"
+                class="transparent-button px-5 py-2.5 hover:bg-gray-100 max-md:hidden dark:hover:bg-gray-800"
+            >
+                @lang('b2b::app.shop.customers.account.requisitions.edit.btn-back')
+            </a>
         </div>
 
-        <div class="container mt-4 px-[60px] max-lg:px-8 max-md:px-4">
+        <div class="mt-6 max-md:mt-4">
             <v-requisition-lists ref="vRequisition">
-                <x-shop::shimmer.checkout.cart :count="3" />    
+                <x-shop::shimmer.checkout.cart :count="3" />
             </v-requisition-lists>
         </div>
-    
+
         {!! view_render_event('bagisto.shop.customers.account.requisition.edit.after', ['requisition' => $requisition]) !!}
-    
+
     </div>
 
     @pushOnce('scripts')
@@ -60,28 +59,47 @@
             type="text/x-template"
             id="v-requisition-lists-template"
         >
-            <div>
-                <div class="mt-4 border-b border-zinc-200 pb-6">
-                    <div class="flex flex-wrap justify-between gap-2">
-                        <h2 
-                            class="text-xl font-medium"
-                            v-text="requisition.name"
-                        ></h2>
+            <div class="b2b-requisition-detail grid gap-6 max-md:gap-4">
+                <!-- List Information Card -->
+                <div class="rounded-xl border border-zinc-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900 max-md:p-4">
+                    <div class="flex flex-wrap items-start justify-between gap-4">
+                        <div class="flex items-start gap-4 max-sm:gap-3">
+                            <span class="icon-cart grid h-12 w-12 shrink-0 place-items-center rounded-full bg-blue-50 text-2xl text-blue-600 dark:bg-gray-800 dark:text-blue-400 max-sm:h-10 max-sm:w-10 max-sm:text-xl"></span>
 
-                        <!-- Update Create Option Item Modal -->
-                        <div
-                            class="cursor-pointer text-sm font-medium text-blue-600 hover:underline"
+                            <div class="grid gap-1">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <h2
+                                        class="text-xl font-semibold text-gray-900 dark:text-white max-sm:text-base"
+                                        v-text="requisition.name"
+                                    ></h2>
+
+                                    <!-- Default Label -->
+                                    <span
+                                        v-if="requisition.is_default"
+                                        class="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/40 dark:text-green-400"
+                                    >
+                                        @lang('b2b::app.shop.customers.account.requisitions.edit.default-label')
+                                    </span>
+                                </div>
+
+                                <p
+                                    class="text-sm text-gray-500 dark:text-gray-300"
+                                    v-text="requisition.description"
+                                ></p>
+                            </div>
+                        </div>
+
+                        <!-- Rename Requisition -->
+                        <button
+                            type="button"
+                            class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3.5 py-2 text-sm font-medium text-gray-700 transition-all hover:border-zinc-300 hover:bg-gray-50 hover:text-gray-900 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white"
                             @click="$refs.updateRequisitionModal.open()"
                         >
-                            @lang('b2b_suite::app.shop.customers.account.requisitions.edit.link-rename')
-                        </div>
-                    </div>
+                            <span class="icon-edit text-lg"></span>
 
-                    <p 
-                        class="mt-2 text-sm text-gray-600"
-                        v-text="requisition.description"
-                    >
-                    </p>
+                            @lang('b2b::app.shop.customers.account.requisitions.edit.link-rename')
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Add Option Form Modal -->
@@ -89,7 +107,7 @@
                     v-slot="{ meta, errors, handleSubmit }"
                     as="div"
                 >
-                    <form 
+                    <form
                         @submit="handleSubmit($event, updateRequisition)"
                         ref="updateRequisitionForm"
                     >
@@ -97,7 +115,7 @@
                             <!-- Option Form Modal Header -->
                             <x-slot:header>
                                 <p class="text-lg font-bold text-gray-800 dark:text-white">
-                                    @lang('b2b_suite::app.shop.customers.account.requisitions.edit.edit-title')
+                                    @lang('b2b::app.shop.customers.account.requisitions.edit.edit-title')
                                 </p>
                             </x-slot>
 
@@ -109,10 +127,10 @@
                                     name="requisition_id"
                                     ::value="requisition.id"
                                 />
-                                
+
                                 <x-shop::form.control-group>
                                     <x-shop::form.control-group.label class="required">
-                                        @lang('b2b_suite::app.shop.customers.account.requisitions.edit.name')
+                                        @lang('b2b::app.shop.customers.account.requisitions.edit.name')
                                     </x-shop::form.control-group.label>
 
                                     <x-shop::form.control-group.control
@@ -120,7 +138,7 @@
                                         name="name"
                                         rules="required"
                                         ::value="requisition.name"
-                                        :label="trans('b2b_suite::app.shop.customers.account.requisitions.edit.name')"
+                                        :label="trans('b2b::app.shop.customers.account.requisitions.edit.name')"
                                     />
 
                                     <x-shop::form.control-group.error control-name="name" />
@@ -128,7 +146,7 @@
 
                                 <x-shop::form.control-group>
                                     <x-shop::form.control-group.label class="required">
-                                        @lang('b2b_suite::app.shop.customers.account.requisitions.edit.description')
+                                        @lang('b2b::app.shop.customers.account.requisitions.edit.description')
                                     </x-shop::form.control-group.label>
 
                                     <x-shop::form.control-group.control
@@ -137,13 +155,13 @@
                                         rows="4"
                                         rules="required"
                                         ::value="requisition.description"
-                                        :label="trans('b2b_suite::app.shop.customers.account.requisitions.edit.description')"
-                                        :placeholder="trans('b2b_suite::app.shop.customers.account.requisitions.edit.description')"
+                                        :label="trans('b2b::app.shop.customers.account.requisitions.edit.description')"
+                                        :placeholder="trans('b2b::app.shop.customers.account.requisitions.edit.description')"
                                     />
 
                                     <x-shop::form.control-group.error control-name="description" />
                                 </x-shop::form.control-group>
-                            
+
                                 <!-- Is Default -->
                                 <div class="mb-5 flex select-none items-center gap-1.5">
                                     <input
@@ -163,7 +181,7 @@
                                         class="cursor-pointer select-none text-base text-zinc-500 max-sm:text-sm ltr:pl-0 rtl:pr-0"
                                         for="is-default"
                                     >
-                                        @lang('b2b_suite::app.shop.customers.account.requisitions.edit.is-default')
+                                        @lang('b2b::app.shop.customers.account.requisitions.edit.is-default')
                                     </label>
                                 </div>
                             </x-slot>
@@ -174,13 +192,13 @@
                                 <x-shop::button
                                     button-type="button"
                                     class="primary-button"
-                                    :title="trans('b2b_suite::app.shop.customers.account.requisitions.edit.btn-save')"
+                                    :title="trans('b2b::app.shop.customers.account.requisitions.edit.btn-save')"
                                 />
                             </x-slot>
                         </x-shop::modal>
                     </form>
                 </x-shop::form>
-                
+
                 <!-- Requisition Items Shimmer Effect -->
                 <template v-if="!isLoading">
                     <x-shop::shimmer.checkout.cart :count="3" />
@@ -188,16 +206,15 @@
 
                 <!-- Requisition Items Information -->
                 <template v-else>
-                    <div
-                        class="mt-8 flex flex-wrap gap-20 pb-8 max-1060:flex-col max-md:mt-0 max-md:gap-[30px] max-md:pb-0"
-                        v-if="requisitionItems?.length"
-                    >
-                        <div class="flex flex-1 flex-col gap-6 max-md:gap-5">
+                    <template v-if="requisitionItems?.length">
+                        {!! view_render_event('bagisto.shop.customers.account.requisition.item.listing.before') !!}
 
+                        <!-- Items Card -->
+                        <div class="overflow-hidden rounded-xl border border-zinc-200 bg-white dark:border-gray-800 dark:bg-gray-900">
                             {!! view_render_event('bagisto.shop.customers.account.requisition.mass_actions.before') !!}
 
-                            <!-- Item Mass Action Container -->
-                            <div class="flex items-center justify-between border-b border-zinc-200 pb-2.5 max-md:py-2.5">
+                            <!-- Item Mass Action Header -->
+                            <div class="flex items-center justify-between gap-2.5 border-b border-zinc-200 px-6 py-4 dark:border-gray-800 max-md:px-4">
                                 <div class="flex select-none items-center">
                                     <input
                                         type="checkbox"
@@ -211,268 +228,265 @@
                                         class="icon-uncheck peer-checked:icon-check-box cursor-pointer text-2xl text-navyBlue peer-checked:text-navyBlue"
                                         for="select-all"
                                         tabindex="0"
-                                        aria-label="@lang('b2b_suite::app.shop.customers.account.requisitions.select-all')"
+                                        aria-label="@lang('b2b::app.shop.customers.account.requisitions.select-all')"
                                         aria-labelledby="select-all-label"
-                                    >
-                                    </label>
+                                    ></label>
 
                                     <span
-                                        class="text-xl max-sm:text-sm ltr:ml-2.5 rtl:mr-2.5"
+                                        class="text-base font-medium text-gray-700 dark:text-gray-200 max-sm:text-sm ltr:ml-2.5 rtl:mr-2.5"
                                         role="heading"
                                         aria-level="2"
                                     >
-                                        @{{ "@lang('b2b_suite::app.shop.customers.account.requisitions.items-selected')".replace(':count', selectedItemsCount) }}
+                                        @{{ "@lang('b2b::app.shop.customers.account.requisitions.items-selected')".replace(':count', selectedItemsCount) }}
                                     </span>
                                 </div>
 
-                                <div v-if="selectedItemsCount">
-                                    <span
-                                        class="cursor-pointer text-base text-blue-700 max-sm:text-xs"
-                                        role="button"
-                                        tabindex="0"
-                                        @click="removeItem(null)"
-                                    >
-                                        @lang('b2b_suite::app.shop.customers.account.requisitions.remove-selected')
+                                <button
+                                    type="button"
+                                    v-if="selectedItemsCount"
+                                    class="group flex items-center gap-1 text-sm font-medium text-red-600 transition-all max-sm:text-xs"
+                                    @click="removeItem(null)"
+                                >
+                                    <span class="icon-bin text-base"></span>
+
+                                    <span class="group-hover:underline">
+                                        @lang('b2b::app.shop.customers.account.requisitions.remove-selected')
                                     </span>
-                                </div>
+                                </button>
                             </div>
 
                             {!! view_render_event('bagisto.shop.customers.account.requisition.mass_actions.after') !!}
 
-                            {!! view_render_event('bagisto.shop.customers.account.requisition.item.listing.before') !!}
-
-                            <!-- Item Item Listing Container -->
+                            <!-- Item Listing -->
                             <div
-                                class="grid gap-y-6"
+                                class="flex gap-x-5 border-b border-zinc-100 px-6 py-5 transition-all last:border-b-0 hover:bg-gray-50/60 dark:border-gray-800 dark:hover:bg-gray-800/40 max-md:gap-x-3 max-md:px-4"
                                 v-for="item in requisitionItems"
                             >
-                                <div class="flex justify-between gap-x-2.5 border-b border-zinc-200 pb-5">
-                                    <div class="flex gap-x-5">
-                                        <div class="mt-11 select-none max-md:mt-9 max-sm:mt-7">
-                                            <input
-                                                type="checkbox"
-                                                :id="'item_' + item.id"
-                                                class="peer hidden"
-                                                v-model="item.selected"
-                                                @change="updateAllSelected"
-                                            >
+                                <!-- Selection Checkbox -->
+                                <div class="select-none pt-1">
+                                    <input
+                                        type="checkbox"
+                                        :id="'item_' + item.id"
+                                        class="peer hidden"
+                                        v-model="item.selected"
+                                        @change="updateAllSelected"
+                                    >
 
-                                            <label
-                                                class="icon-uncheck peer-checked:icon-check-box cursor-pointer text-2xl text-navyBlue peer-checked:text-navyBlue"
-                                                :for="'item_' + item.id"
-                                                tabindex="0"
-                                                aria-label="@lang('b2b_suite::app.shop.customers.account.requisitions.select-cart-item')"
-                                                aria-labelledby="select-item-label"
-                                            ></label>
+                                    <label
+                                        class="icon-uncheck peer-checked:icon-check-box cursor-pointer text-2xl text-navyBlue peer-checked:text-navyBlue"
+                                        :for="'item_' + item.id"
+                                        tabindex="0"
+                                        aria-label="@lang('b2b::app.shop.customers.account.requisitions.select-cart-item')"
+                                        aria-labelledby="select-item-label"
+                                    ></label>
+                                </div>
+
+                                {!! view_render_event('bagisto.shop.customers.account.requisition.item_image.before') !!}
+
+                                <!-- Item Image -->
+                                <a
+                                    class="shrink-0"
+                                    :href="'{{ route('shop.product_or_category.index', '__SLUG__') }}'.replace('__SLUG__', item.product_url_key)"
+                                >
+                                    <x-shop::media.images.lazy
+                                        class="h-24 w-24 rounded-lg border border-zinc-100 dark:border-gray-800 max-md:h-20 max-md:w-20"
+                                        ::src="item.base_image.small_image_url"
+                                        ::alt="item.name"
+                                        width="96"
+                                        height="96"
+                                        ::key="item.id"
+                                        ::index="item.id"
+                                    />
+                                </a>
+
+                                {!! view_render_event('bagisto.shop.customers.account.requisition.item_image.after') !!}
+
+                                <!-- Item Details -->
+                                <div class="flex flex-1 flex-col gap-2">
+                                    {!! view_render_event('bagisto.shop.customers.account.requisition.item_name.before') !!}
+
+                                    <a :href="'{{ route('shop.product_or_category.index', '__SLUG__') }}'.replace('__SLUG__', item.product_url_key)">
+                                        <p class="text-base font-medium text-gray-900 transition-all hover:text-blue-600 dark:text-white max-sm:text-sm">
+                                            @{{ item.name }}
+                                        </p>
+                                    </a>
+
+                                    {!! view_render_event('bagisto.shop.customers.account.requisition.item_name.after') !!}
+
+                                    {!! view_render_event('bagisto.shop.customers.account.requisition.item_details.before') !!}
+
+                                    <!-- Item Options -->
+                                    <div
+                                        class="grid select-none gap-x-2.5 gap-y-1.5"
+                                        v-if="Object.keys(item.options).length"
+                                    >
+                                        <!-- Details Toggler -->
+                                        <div>
+                                            <p
+                                                class="flex w-max cursor-pointer items-center gap-x-2 text-sm text-blue-600 max-sm:text-xs"
+                                                @click="item.option_show = ! item.option_show"
+                                            >
+                                                @lang('b2b::app.shop.customers.account.requisitions.see-details')
+
+                                                <span
+                                                    class="text-lg"
+                                                    :class="{'icon-arrow-up': item.option_show, 'icon-arrow-down': ! item.option_show}"
+                                                ></span>
+                                            </p>
                                         </div>
 
-                                        {!! view_render_event('bagisto.shop.customers.account.requisition.item_image.before') !!}
+                                        <!-- Option Details -->
+                                        <div
+                                            class="grid gap-2 rounded-lg bg-gray-50 p-3 dark:bg-gray-800"
+                                            v-show="item.option_show"
+                                        >
+                                            <template v-for="attribute in item.options">
+                                                <div class="flex flex-wrap gap-x-1.5">
+                                                    <p class="text-sm font-medium text-zinc-500 max-sm:text-xs">
+                                                        @{{ attribute.attribute_name + ':' }}
+                                                    </p>
 
-                                        <!-- Item Image -->
-                                        <a :href="`{{ route('shop.product_or_category.index', '') }}/${item.product_url_key}`">
-                                            <x-shop::media.images.lazy
-                                                class="h-[110px] max-w-[110px] rounded-xl max-md:h-20 max-md:max-w-20"
-                                                ::src="item.base_image.small_image_url"
-                                                ::alt="item.name"
-                                                ::alt="item.name"
-                                                width="110"
-                                                height="110"
-                                                ::key="item.id"
-                                                ::index="item.id"
-                                            />
-                                        </a>
+                                                    <p class="text-sm text-gray-700 dark:text-gray-200 max-sm:text-xs">
+                                                        <template v-if="attribute?.attribute_type === 'file'">
+                                                            <a
+                                                                :href="attribute.file_url"
+                                                                class="text-blue-700"
+                                                                target="_blank"
+                                                                :download="attribute.file_name"
+                                                            >
+                                                                @{{ attribute.file_name }}
+                                                            </a>
+                                                        </template>
 
-                                        {!! view_render_event('bagisto.shop.customers.account.requisition.item_image.after') !!}
-
-                                        <!-- Item Options Container -->
-                                        <div class="grid place-content-start gap-y-2.5 max-md:gap-y-0">
-                                            {!! view_render_event('bagisto.shop.customers.account.requisition.item_name.before') !!}
-
-                                            <a :href="`{{ route('shop.product_or_category.index', '') }}/${item.product_url_key}`">
-                                                <p class="text-base font-medium max-sm:text-sm">
-                                                    @{{ item.name }}
-                                                </p>
-                                            </a>
-
-                                            {!! view_render_event('bagisto.shop.customers.account.requisition.item_name.after') !!}
-
-                                            {!! view_render_event('bagisto.shop.customers.account.requisition.item_details.before') !!}
-
-                                            <!-- Item Options Container -->
-                                            <div 
-                                                class="grid select-none gap-x-2.5 gap-y-1.5"
-                                                v-if="Object.keys(item.options).length"
-                                            >
-                                                <!-- Details Toggler -->
-                                                <div class="">
-                                                    <p
-                                                        class="flex cursor-pointer items-center gap-x-4 text-base max-md:gap-x-1.5 max-sm:text-xs"
-                                                        @click="item.option_show = ! item.option_show"
-                                                    >
-                                                        @lang('b2b_suite::app.shop.customers.account.requisitions.see-details')
-
-                                                        <span
-                                                            class="text-2xl max-md:text-lg"
-                                                            :class="{'icon-arrow-up': item.option_show, 'icon-arrow-down': ! item.option_show}"
-                                                        ></span>
+                                                        <template v-else>
+                                                            @{{ attribute.option_label }}
+                                                        </template>
                                                     </p>
                                                 </div>
-
-                                                <!-- Option Details -->
-                                                <div
-                                                    class="grid gap-2"
-                                                    v-show="item.option_show"
-                                                >
-                                                    <template v-for="attribute in item.options">
-                                                        <div class="max-md:grid max-md:gap-0.5">
-                                                            <p class="text-sm font-medium text-zinc-500 max-md:font-normal max-sm:text-xs">
-                                                                @{{ attribute.attribute_name + ':' }}
-                                                            </p>
-
-                                                            <p class="text-sm max-sm:text-xs">
-                                                                <template v-if="attribute?.attribute_type === 'file'">
-                                                                    <a
-                                                                        :href="attribute.file_url"
-                                                                        class="text-blue-700"
-                                                                        target="_blank"
-                                                                        :download="attribute.file_name"
-                                                                    >
-                                                                        @{{ attribute.file_name }}
-                                                                    </a>
-                                                                </template>
-
-                                                                <template v-else>
-                                                                    @{{ attribute.option_label }}
-                                                                </template>
-                                                            </p>
-                                                        </div>
-                                                    </template>
-                                                </div>
-                                            </div>
-
-                                            {!! view_render_event('bagisto.shop.customers.account.requisition.item_details.after') !!}
-
-                                            {!! view_render_event('bagisto.shop.customers.account.requisition.formatted_total.before') !!}
-
-                                            <div class="md:hidden">
-                                                <p class="text-lg font-semibold max-md:text-sm">
-                                                    @{{ item.formatted_total }}
-                                                </p>
-
-                                                <span
-                                                    class="cursor-pointer text-base text-blue-700 max-md:hidden"
-                                                    role="button"
-                                                    tabindex="0"
-                                                    @click="removeItem(item.id)"
-                                                >
-                                                    @lang('b2b_suite::app.shop.customers.account.requisitions.remove')
-                                                </span>
-                                            </div>
-
-                                            {!! view_render_event('bagisto.shop.customers.account.requisition.formatted_total.after') !!}
-
-                                            {!! view_render_event('bagisto.shop.customers.account.requisition.quantity_changer.before') !!}
-
-                                            <div class="flex items-center gap-2.5 max-md:mt-2.5">
-                                                <x-shop::quantity-changer
-                                                    class="flex max-w-max items-center gap-x-2.5 rounded-[54px] border border-navyBlue px-3.5 py-1.5 max-md:gap-x-1.5 max-md:px-1 max-md:py-0.5"
-                                                    name="quantity"
-                                                    ::value="item?.quantity"
-                                                    @change="setItemQuantity(item.id, $event)"
-                                                />
-
-                                                <!-- For Mobile view Remove Button -->
-                                                <span
-                                                    class="hidden cursor-pointer text-sm text-blue-700 max-md:block"
-                                                    role="button"
-                                                    tabindex="0"
-                                                    @click="removeItem(item.id)"
-                                                >
-                                                    @lang('b2b_suite::app.shop.customers.account.requisitions.remove')
-                                                </span>
-                                            </div>
-
-                                            {!! view_render_event('bagisto.shop.customers.account.requisition.quantity_changer.after') !!}
+                                            </template>
                                         </div>
                                     </div>
 
-                                    <div class="text-right max-md:hidden">
-                                        {!! view_render_event('bagisto.shop.customers.account.requisition.total.before') !!}
-                                        
-                                        <p class="text-lg font-semibold">
-                                            @{{ item.formatted_total }}
-                                        </p>
+                                    {!! view_render_event('bagisto.shop.customers.account.requisition.item_details.after') !!}
 
-                                        {!! view_render_event('bagisto.shop.customers.account.requisition.total.after') !!}
+                                    {!! view_render_event('bagisto.shop.customers.account.requisition.formatted_total.before') !!}
 
-                                        {!! view_render_event('bagisto.shop.customers.account.requisition.remove_button.before') !!}
+                                    <!-- Mobile Total -->
+                                    <p class="text-base font-semibold text-gray-900 dark:text-white md:hidden">
+                                        @{{ item.formatted_total }}
+                                    </p>
 
-                                        <!-- Item Remove Button -->
-                                        <span
-                                            class="cursor-pointer text-base text-blue-700"
-                                            role="button"
-                                            tabindex="0"
+                                    {!! view_render_event('bagisto.shop.customers.account.requisition.formatted_total.after') !!}
+
+                                    {!! view_render_event('bagisto.shop.customers.account.requisition.quantity_changer.before') !!}
+
+                                    <!-- Quantity Changer -->
+                                    <div class="mt-1 flex items-center gap-3">
+                                        <x-shop::quantity-changer
+                                            class="flex max-w-max items-center gap-x-2.5 rounded-lg border border-zinc-300 px-3 py-1.5 dark:border-gray-700 max-md:gap-x-1.5 max-md:px-2 max-md:py-1"
+                                            name="quantity"
+                                            ::value="item?.quantity"
+                                            @change="setItemQuantity(item.id, $event)"
+                                        />
+
+                                        <!-- Mobile Remove Button -->
+                                        <button
+                                            type="button"
+                                            class="group flex items-center gap-1 text-sm font-medium text-red-600 transition-all md:hidden"
                                             @click="removeItem(item.id)"
                                         >
-                                            @lang('b2b_suite::app.shop.customers.account.requisitions.remove')
-                                        </span>
+                                            <span class="icon-bin text-base"></span>
 
-                                        {!! view_render_event('bagisto.shop.customers.account.requisition.remove_button.after') !!}
+                                            <span class="group-hover:underline">
+                                                @lang('b2b::app.shop.customers.account.requisitions.remove')
+                                            </span>
+                                        </button>
                                     </div>
+
+                                    {!! view_render_event('bagisto.shop.customers.account.requisition.quantity_changer.after') !!}
+                                </div>
+
+                                <!-- Desktop Total & Remove -->
+                                <div class="grid content-start justify-items-end gap-2 text-right max-md:hidden">
+                                    {!! view_render_event('bagisto.shop.customers.account.requisition.total.before') !!}
+
+                                    <p class="text-base font-semibold text-gray-900 dark:text-white">
+                                        @{{ item.formatted_total }}
+                                    </p>
+
+                                    {!! view_render_event('bagisto.shop.customers.account.requisition.total.after') !!}
+
+                                    {!! view_render_event('bagisto.shop.customers.account.requisition.remove_button.before') !!}
+
+                                    <!-- Item Remove Button -->
+                                    <button
+                                        type="button"
+                                        class="group flex items-center gap-1 text-sm font-medium text-red-600 transition-all"
+                                        @click="removeItem(item.id)"
+                                    >
+                                        <span class="icon-bin text-base"></span>
+
+                                        <span class="group-hover:underline">
+                                            @lang('b2b::app.shop.customers.account.requisitions.remove')
+                                        </span>
+                                    </button>
+
+                                    {!! view_render_event('bagisto.shop.customers.account.requisition.remove_button.after') !!}
                                 </div>
                             </div>
-
-                            {!! view_render_event('bagisto.shop.customers.account.requisition.controls.before') !!}
-
-                            <!-- Requisition Item Actions -->
-                            <div class="flex flex-wrap justify-end gap-8 max-md:justify-between max-md:gap-5">
-
-                                {!! view_render_event('bagisto.shop.customers.account.requisition.move_to_cart.before') !!}
-
-                                <x-shop::button
-                                    v-if="selectedItemsCount"
-                                    class="secondary-button max-h-14 rounded-2xl max-md:rounded-lg max-md:px-6 max-md:py-3 max-md:text-sm max-sm:py-2"
-                                    :title="trans('b2b_suite::app.shop.customers.account.requisitions.move-to-cart')"
-                                    ::loading="isStoring"
-                                    ::disabled="isStoring"
-                                    @click="moveToCartSelectedItems()"
-                                />
-
-                                {!! view_render_event('bagisto.shop.customers.account.requisition.move_to_cart.after') !!}
-
-                                {!! view_render_event('bagisto.shop.customers.account.requisition.update_item.before') !!}
-
-                                <x-shop::button
-                                    class="secondary-button max-h-14 rounded-2xl max-md:rounded-lg max-md:px-6 max-md:py-3 max-md:text-sm max-sm:py-2"
-                                    :title="trans('b2b_suite::app.shop.customers.account.requisitions.update-items')"
-                                    ::loading="isStoring"
-                                    ::disabled="isStoring"
-                                    @click="updateItems()"
-                                />
-
-                                {!! view_render_event('bagisto.shop.customers.account.requisition.update_item.after') !!}
-                            </div>
-
-                            {!! view_render_event('bagisto.shop.customers.account.requisition.controls.after') !!}
                         </div>
-                    </div>
+
+                        {!! view_render_event('bagisto.shop.customers.account.requisition.item.listing.after') !!}
+
+                        {!! view_render_event('bagisto.shop.customers.account.requisition.controls.before') !!}
+
+                        <!-- Requisition Item Actions -->
+                        <div class="flex flex-wrap justify-end gap-3 max-md:justify-between">
+                            {!! view_render_event('bagisto.shop.customers.account.requisition.move_to_cart.before') !!}
+
+                            <x-shop::button
+                                v-if="selectedItemsCount"
+                                class="secondary-button rounded-lg px-6 py-3 max-md:text-sm"
+                                :title="trans('b2b::app.shop.customers.account.requisitions.move-to-cart')"
+                                ::loading="isStoring"
+                                ::disabled="isStoring"
+                                @click="moveToCartSelectedItems()"
+                            />
+
+                            {!! view_render_event('bagisto.shop.customers.account.requisition.move_to_cart.after') !!}
+
+                            {!! view_render_event('bagisto.shop.customers.account.requisition.update_item.before') !!}
+
+                            <x-shop::button
+                                class="primary-button rounded-lg px-6 py-3 max-md:text-sm"
+                                :title="trans('b2b::app.shop.customers.account.requisitions.update-items')"
+                                ::loading="isStoring"
+                                ::disabled="isStoring"
+                                @click="updateItems()"
+                            />
+
+                            {!! view_render_event('bagisto.shop.customers.account.requisition.update_item.after') !!}
+                        </div>
+
+                        {!! view_render_event('bagisto.shop.customers.account.requisition.controls.after') !!}
+                    </template>
 
                     <!-- Empty Requisition Item Section -->
                     <div
-                        class="m-auto grid w-full place-content-center items-center justify-items-center py-32 text-center"
+                        class="flex flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-zinc-200 bg-white py-20 text-center dark:border-gray-800 dark:bg-gray-900 max-md:py-14"
                         v-else
                     >
                         <img
-                            class="max-md:h-[100px] max-md:w-[100px]"
+                            class="h-24 w-24 opacity-90 max-md:h-20 max-md:w-20"
                             src="{{ bagisto_asset('images/thank-you.png') }}"
-                            alt="@lang('b2b_suite::app.shop.customers.account.requisitions.empty-message')"
+                            alt="@lang('b2b::app.shop.customers.account.requisitions.empty-message')"
                         />
 
                         <p
-                            class="text-xl max-md:text-sm"
+                            class="text-lg font-medium text-gray-700 dark:text-gray-200 max-md:text-base"
                             role="heading"
                         >
-                            @lang('b2b_suite::app.shop.customers.account.requisitions.empty-message')
+                            @lang('b2b::app.shop.customers.account.requisitions.empty-message')
                         </p>
                     </div>
                 </template>
@@ -495,6 +509,8 @@
 
                         isLoading: true,
 
+                        isStoring: false,
+
                         requisition: @json($requisition),
                     }
                 },
@@ -504,7 +520,7 @@
                         return this.requisitionItems.filter(item => item.selected).length;
                     },
                 },
-                
+
                 created() {
                     this.loadItems();
                 },
@@ -523,7 +539,7 @@
                                 console.error("Error loading requisition items:", error);
                             });
                     },
-                    
+
                     selectAll() {
                         for (let item of this.requisitionItems) {
                             item.selected = this.allSelected;
@@ -537,12 +553,12 @@
                     setItemQuantity(itemId, quantity) {
                         this.applied.quantity[itemId] = quantity;
                     },
-                    
+
                     removeItem(itemId) {
                         this.$emitter.emit('open-confirm-modal', {
                             agree: () => {
                                 const selectedItemsIds = this.requisitionItems.flatMap(item => item.selected ? item.id : []);
-                                
+
                                 this.$axios.post('{{ route('shop.customers.account.requisitions.delete_items') }}', {
                                         '_method': 'DELETE',
                                         'requisition_id': this.requisition.id,
@@ -550,6 +566,8 @@
                                     })
                                     .then(response => {
                                         this.requisitionItems = response.data.data;
+
+                                        this.allSelected = false;
 
                                         this.$emitter.emit('add-flash', { type: 'success', message: response.data.message });
 
@@ -562,7 +580,7 @@
                     updateItems() {
                         this.isStoring = true;
 
-                        this.$axios.put('{{ route('shop.customers.account.requisitions.update_items') }}', { 
+                        this.$axios.put('{{ route('shop.customers.account.requisitions.update_items') }}', {
                             requisition_id: this.requisition.id,
                             qty: this.applied.quantity
                         })
@@ -582,7 +600,7 @@
                                 this.isStoring = false;
                             });
                     },
-                    
+
                     updateRequisition(params, { resetForm, setErrors  }) {
                         this.isLoading = true;
 
@@ -595,13 +613,13 @@
                         this.$axios.post("{{ route('shop.customers.account.requisitions.update', $requisition->id) }}", formData)
                         .then((response) => {
                             this.isLoading = false;
-                            
+
                             if (response.data.data) {
                                 this.requisition = response.data.data;
                             }
 
                             this.$refs.updateRequisitionModal.close();
-                            
+
                             if (response.data.redirect_url) {
                                 window.location.href = response.data.redirect_url;
                             }

@@ -38,7 +38,7 @@ class CompanyAttributeController extends Controller
             return datagrid(CompanyAttributeDataGrid::class)->process();
         }
 
-        return view('b2b_suite::admin.company-attributes.index');
+        return view('b2b::admin.company-attributes.index');
     }
 
     /**
@@ -46,7 +46,7 @@ class CompanyAttributeController extends Controller
      */
     public function create(): View
     {
-        return view('b2b_suite::admin.company-attributes.create')
+        return view('b2b::admin.company-attributes.create')
             ->with([
                 'locales' => core()->getAllLocales(),
                 'attributeTypes' => AttributeTypeEnum::getValues(),
@@ -66,14 +66,14 @@ class CompanyAttributeController extends Controller
             'default_value' => 'in:0,1',
         ]);
 
-        Event::dispatch('b2b_suite.company_attribute.create.before');
+        Event::dispatch('b2b.company_attribute.create.before');
 
         $attribute = $this->companyAttributeRepository->create($request->all());
 
-        Event::dispatch('b2b_suite.company_attribute.create.after', $attribute);
+        Event::dispatch('b2b.company_attribute.create.after', $attribute);
 
         return to_route('admin.b2b.attributes.index')
-            ->withSuccess(trans('b2b_suite::app.admin.company-attributes.create-success'));
+            ->withSuccess(trans('b2b::app.admin.company-attributes.create-success'));
     }
 
     /**
@@ -85,7 +85,7 @@ class CompanyAttributeController extends Controller
             $query->orderBy('sort_order', 'asc');
         }])->findOrFail($id);
 
-        return view('b2b_suite::admin.company-attributes.edit')
+        return view('b2b::admin.company-attributes.edit')
             ->with([
                 'attribute' => $attribute,
                 'locales' => core()->getAllLocales(),
@@ -106,14 +106,14 @@ class CompanyAttributeController extends Controller
             'default_value' => 'in:0,1',
         ]);
 
-        Event::dispatch('b2b_suite.company_attribute.update.before', $id);
+        Event::dispatch('b2b.company_attribute.update.before', $id);
 
         $attribute = $this->companyAttributeRepository->update($request->all(), $id);
 
-        Event::dispatch('b2b_suite.company_attribute.update.after', $attribute);
+        Event::dispatch('b2b.company_attribute.update.after', $attribute);
 
         return to_route('admin.b2b.attributes.index')
-            ->withSuccess(trans('b2b_suite::app.admin.company-attributes.update-success'));
+            ->withSuccess(trans('b2b::app.admin.company-attributes.update-success'));
     }
 
     /**
@@ -130,20 +130,20 @@ class CompanyAttributeController extends Controller
         }
 
         try {
-            Event::dispatch('b2b_suite.company_attribute.delete.before', $id);
+            Event::dispatch('b2b.company_attribute.delete.before', $id);
 
             $this->companyAttributeRepository->delete($id);
 
-            Event::dispatch('b2b_suite.company_attribute.delete.after', $id);
+            Event::dispatch('b2b.company_attribute.delete.after', $id);
 
             return new JsonResponse([
-                'message' => trans('b2b_suite::app.admin.company-attributes.delete-success'),
+                'message' => trans('b2b::app.admin.company-attributes.delete-success'),
             ]);
         } catch (Exception $e) {
         }
 
         return new JsonResponse([
-            'message' => trans('b2b_suite::app.admin.company-attributes.delete-failed'),
+            'message' => trans('b2b::app.admin.company-attributes.delete-failed'),
         ], 500);
     }
 
@@ -159,26 +159,26 @@ class CompanyAttributeController extends Controller
 
             if (! $attribute->is_user_defined) {
                 return response()->json([
-                    'message' => trans('b2b_suite::app.admin.company-attributes.delete-failed'),
+                    'message' => trans('b2b::app.admin.company-attributes.delete-failed'),
                 ], 422);
             }
         }
 
         try {
             foreach ($indices as $index) {
-                Event::dispatch('b2b_suite.company_attribute.delete.before', $index);
+                Event::dispatch('b2b.company_attribute.delete.before', $index);
 
                 $this->companyAttributeRepository->delete($index);
 
-                Event::dispatch('b2b_suite.company_attribute.delete.after', $index);
+                Event::dispatch('b2b.company_attribute.delete.after', $index);
             }
 
             return new JsonResponse([
-                'message' => trans('b2b_suite::app.admin.company-attributes.index.datagrid.mass-delete-success'),
+                'message' => trans('b2b::app.admin.company-attributes.index.datagrid.mass-delete-success'),
             ]);
         } catch (Exception $exception) {
             return new JsonResponse([
-                'message' => trans('b2b_suite::app.admin.company-attributes.delete-failed'),
+                'message' => trans('b2b::app.admin.company-attributes.delete-failed'),
             ], 500);
         }
     }
@@ -209,7 +209,7 @@ class CompanyAttributeController extends Controller
             ];
         })->values()->toArray();
 
-        return view('b2b_suite::admin.company-attributes.mapping')
+        return view('b2b::admin.company-attributes.mapping')
             ->with([
                 'customAttributes' => $customAttributes,
                 'attributeGroups' => $attributeGroups,
@@ -236,6 +236,6 @@ class CompanyAttributeController extends Controller
         $this->companyAttributeGroupRepository->updateMapping($request->all());
 
         return to_route('admin.b2b.attributes.index')
-            ->withSuccess(trans('b2b_suite::app.admin.company-attributes.mapping.update-success'));
+            ->withSuccess(trans('b2b::app.admin.company-attributes.mapping.update-success'));
     }
 }

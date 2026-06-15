@@ -2,9 +2,9 @@
     <div class="flex justify-between p-1.5">
         <p class="p-2.5 text-base font-semibold text-gray-800 dark:text-white">
             @if ($quote->state == 'quotation')
-                @lang('b2b_suite::app.admin.quotes.view.quote-information')
+                @lang('b2b::app.admin.quotes.view.quote-information')
             @else
-                @lang('b2b_suite::app.admin.purchase-orders.view.po-information')
+                @lang('b2b::app.admin.purchase-orders.view.po-information')
             @endif
         </p>
     </div>
@@ -13,7 +13,7 @@
         <!-- Quotation Name -->
         <div class="grid grid-cols-2 border-b border-zinc-200 px-8 py-3 dark:border-gray-800 max-md:px-0">
             <span class="text-sm text-gray-600 dark:text-gray-400">
-                @lang('b2b_suite::app.admin.quotes.view.name')
+                @lang('b2b::app.admin.quotes.view.name')
             </span>
 
             <p class="mt-1 text-sm font-medium text-gray-800 dark:text-white">
@@ -24,7 +24,7 @@
         <!-- Quotation Description -->
         <div class="grid grid-cols-2 border-b border-zinc-200 px-8 py-3 dark:border-gray-800 max-md:px-0">
             <span class="text-sm text-gray-600 dark:text-gray-400">
-                @lang('b2b_suite::app.admin.quotes.view.description')
+                @lang('b2b::app.admin.quotes.view.description')
             </span>
 
             <p class="mt-1 text-sm font-medium text-gray-800 dark:text-white">
@@ -35,18 +35,18 @@
         <!-- Quotation Status -->
         <div class="grid grid-cols-2 border-b border-zinc-200 px-8 py-3 dark:border-gray-800 max-md:px-0">
             <span class="text-sm text-gray-600 dark:text-gray-400">
-                @lang('b2b_suite::app.admin.quotes.view.status')
+                @lang('b2b::app.admin.quotes.view.status')
             </span>
 
             <p class="mt-1 text-sm font-medium text-gray-800 dark:text-white">
-                @lang("b2b_suite::app.admin.quotes.view.$quote->status")
+                @lang("b2b::app.admin.quotes.view.$quote->status")
             </p>
         </div>
 
         <!-- Quotation Order Date -->
         <div class="grid grid-cols-2 border-b border-zinc-200 px-8 py-3 dark:border-gray-800 max-md:px-0">
             <span class="text-sm text-gray-600 dark:text-gray-400">
-                @lang('b2b_suite::app.admin.quotes.view.order-date')
+                @lang('b2b::app.admin.quotes.view.order-date')
             </span>
 
             <p class="mt-1 text-sm font-medium text-gray-800 dark:text-white">
@@ -57,7 +57,7 @@
         <!-- Quotation Expected Arrival Date -->
         <div class="grid grid-cols-2 border-b border-zinc-200 px-8 py-3 dark:border-gray-800 max-md:px-0">
             <span class="text-sm text-gray-600 dark:text-gray-400">
-                @lang('b2b_suite::app.admin.quotes.view.expected-arrival')
+                @lang('b2b::app.admin.quotes.view.expected-arrival')
             </span>
 
             <p class="mt-1 text-sm font-medium text-gray-800 dark:text-white">
@@ -68,7 +68,7 @@
         <!-- Quotation Created At -->
         <div class="grid grid-cols-2 border-b border-zinc-200 px-8 py-3 dark:border-gray-800 max-md:px-0">
             <span class="text-sm text-gray-600 dark:text-gray-400">
-                @lang('b2b_suite::app.admin.quotes.view.created-at')
+                @lang('b2b::app.admin.quotes.view.created-at')
             </span>
 
             <p class="mt-1 text-sm font-medium text-gray-800 dark:text-white">
@@ -79,7 +79,7 @@
         <!-- Quotation Expiration Date -->
         <div class="grid grid-cols-2 border-b border-zinc-200 px-8 py-3 dark:border-gray-800 max-md:px-0">
             <span class="text-sm text-gray-600 dark:text-gray-400">
-                @lang('b2b_suite::app.admin.quotes.view.expiration-date')
+                @lang('b2b::app.admin.quotes.view.expiration-date')
             </span>
 
             <p class="mt-1 text-sm font-medium text-gray-800 dark:text-white">

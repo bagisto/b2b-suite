@@ -43,7 +43,7 @@ class UserController extends Controller
             return datagrid(UserDataGrid::class)->process();
         }
 
-        return view('b2b_suite::shop.customers.account.users.index');
+        return view('b2b::shop.customers.account.users.index');
     }
 
     /**
@@ -63,7 +63,7 @@ class UserController extends Controller
             'customer_id' => $companyAdminId,
         ]);
 
-        return view('b2b_suite::shop.customers.account.users.create', compact('roles'));
+        return view('b2b::shop.customers.account.users.create', compact('roles'));
     }
 
     /**
@@ -155,7 +155,7 @@ class UserController extends Controller
         if (core()->getConfigData('emails.general.notifications.emails.general.notifications.verification')) {
             session()->flash('success', trans('shop::app.customers.signup-form.success-verify'));
         } else {
-            session()->flash('success', trans('b2b_suite::app.shop.customers.account.users.create-success'));
+            session()->flash('success', trans('b2b::app.shop.customers.account.users.create-success'));
         }
 
         return redirect()->route('shop.customers.account.users.index');
@@ -179,7 +179,7 @@ class UserController extends Controller
             'customer_id' => $companyAdminId,
         ]);
 
-        return view('b2b_suite::shop.customers.account.users.edit', compact('user', 'roles'));
+        return view('b2b::shop.customers.account.users.edit', compact('user', 'roles'));
     }
 
     /**
@@ -250,12 +250,12 @@ class UserController extends Controller
                 }
             }
 
-            session()->flash('success', trans('b2b_suite::app.shop.customers.account.users.update-success'));
+            session()->flash('success', trans('b2b::app.shop.customers.account.users.update-success'));
 
             return redirect()->route('shop.customers.account.users.index');
         }
 
-        session()->flash('success', trans('b2b_suite::app.shop.customers.account.users.edit-fail'));
+        session()->flash('success', trans('b2b::app.shop.customers.account.users.edit-fail'));
 
         return redirect()->back('shop.customers.account.users.index');
     }
@@ -277,7 +277,7 @@ class UserController extends Controller
             || ! $user->companies->contains($companyId)
         ) {
             return new JsonResponse([
-                'message' => trans('b2b_suite::app.shop.customers.account.users.un-auth-access'),
+                'message' => trans('b2b::app.shop.customers.account.users.un-auth-access'),
             ], 401);
         }
 
@@ -293,11 +293,11 @@ class UserController extends Controller
             $this->customerRepository->delete($id);
 
             return new JsonResponse([
-                'message' => trans('b2b_suite::app.shop.customers.account.users.delete-success'),
+                'message' => trans('b2b::app.shop.customers.account.users.delete-success'),
             ]);
         } catch (\Exception $e) {
             return new JsonResponse([
-                'message' => trans('b2b_suite::app.shop.customers.account.users.delete-failed'),
+                'message' => trans('b2b::app.shop.customers.account.users.delete-failed'),
             ], 500);
         }
     }

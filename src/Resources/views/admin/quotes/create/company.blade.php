@@ -1,14 +1,14 @@
 <div class="box-shadow rounded bg-white dark:bg-gray-900">
     <div class="flex items-center justify-between p-4">
         <p class="text-base font-semibold text-gray-800 dark:text-white">
-            @lang('b2b_suite::app.admin.quotes.create.account-information-title')
+            @lang('b2b::app.admin.quotes.create.account-information-title')
         </p>
 
         <button
             class="secondary-button"
             @click="$refs.selectCompanyComponent.openDrawer()"
         >
-            @lang('b2b_suite::app.admin.quotes.create.edit-company')
+            @lang('b2b::app.admin.quotes.create.edit-company')
         </button>
     </div>
 
@@ -17,7 +17,7 @@
             <!-- Company Details Section -->
             <div class="flex justify-between bg-gray-100 p-4 dark:bg-gray-800">
                 <span class="font-medium text-gray-600 dark:text-gray-300">
-                    @lang('b2b_suite::app.admin.quotes.create.company-name')
+                    @lang('b2b::app.admin.quotes.create.company-name')
                 </span>
                 
                 <div class="cursor-pointer text-blue-600 text-gray-900 transition-all hover:underline dark:text-white">
@@ -27,7 +27,7 @@
 
             <div class="flex justify-between p-4">
                 <span class="font-medium text-gray-600 dark:text-gray-300">
-                    @lang('b2b_suite::app.admin.quotes.create.company-email')
+                    @lang('b2b::app.admin.quotes.create.company-email')
                 </span>
                 
                 <div class="text-gray-900 dark:text-white">{{ $company->email ?? '-' }}</div>
@@ -35,7 +35,7 @@
 
             <div class="flex justify-between bg-gray-100 p-4 dark:bg-gray-800">
                 <span class="font-medium text-gray-600 dark:text-gray-300">
-                    @lang('b2b_suite::app.admin.quotes.create.company-phone')
+                    @lang('b2b::app.admin.quotes.create.company-phone')
                 </span>
                 
                 <div class="text-gray-900 dark:text-white">{{ $company->phone ?? '-' }}</div>
@@ -43,7 +43,7 @@
             
             <div class="flex justify-between p-4">
                 <span class="font-medium text-gray-600 dark:text-gray-300">
-                    @lang('b2b_suite::app.admin.quotes.create.agent-name')
+                    @lang('b2b::app.admin.quotes.create.agent-name')
                 </span>
                 
                 <div class="cursor-pointer text-blue-600 text-gray-900 transition-all hover:underline dark:text-white">
@@ -53,7 +53,7 @@
 
             <div class="flex justify-between bg-gray-100 p-4 dark:bg-gray-800">
                 <span class="font-medium text-gray-600 dark:text-gray-300">
-                    @lang('b2b_suite::app.admin.quotes.create.agent-email')
+                    @lang('b2b::app.admin.quotes.create.agent-email')
                 </span>
                 
                 <div class="text-gray-900 dark:text-white">{{ $user->email ?? '-' }}</div>
@@ -79,14 +79,14 @@
                 <x-slot:header>
                     <div class="grid gap-3">
                         <p class="py-2 text-xl font-medium dark:text-white">
-                            @lang('b2b_suite::app.admin.quotes.create.search-company')
+                            @lang('b2b::app.admin.quotes.create.search-company')
                         </p>
 
                         <div class="relative w-full">
                             <input
                                 type="text"
                                 class="block w-full rounded-lg border bg-white py-1.5 leading-6 text-gray-600 transition-all hover:border-gray-400 ltr:pl-3 ltr:pr-10 rtl:pl-10 rtl:pr-3 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300"
-                                placeholder="@lang('b2b_suite::app.admin.quotes.create.search-by')"
+                                placeholder="@lang('b2b::app.admin.quotes.create.search-by')"
                                 v-model.lazy="searchTerm"
                                 v-debounce="500"
                             />
@@ -140,11 +140,11 @@
                         <!-- Add Variants Information -->
                         <div class="flex flex-col items-center gap-1.5">
                             <p class="text-base font-semibold text-gray-400">
-                                @lang('b2b_suite::app.admin.quotes.create.empty-title')
+                                @lang('b2b::app.admin.quotes.create.empty-title')
                             </p>
 
                             <p class="text-gray-400">
-                                @lang('b2b_suite::app.admin.quotes.create.empty-info')
+                                @lang('b2b::app.admin.quotes.create.empty-info')
                             </p>
                         </div>
                     </div>

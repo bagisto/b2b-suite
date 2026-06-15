@@ -45,7 +45,7 @@ class Acl
             return $aclConfig;
         }
 
-        $aclConfig = config('b2b_suite_acl');
+        $aclConfig = config('b2b_acl');
 
         return $aclConfig;
     }

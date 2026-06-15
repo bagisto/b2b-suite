@@ -116,7 +116,7 @@ class CompanyRequest extends FormRequest
                             request($attribute->code)
                         )
                     ) {
-                        $fail(trans('b2b_suite::app.admin.companies.edit.already-taken', [
+                        $fail(trans('b2b::app.admin.companies.edit.already-taken', [
                             'name' => ':attribute',
                         ]));
                     }

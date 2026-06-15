@@ -38,11 +38,11 @@ class RegistrationController extends BaseRegistrationController
      */
     public function index()
     {
-        if (! (bool) core()->getConfigData('b2b_suite.general.settings.active')) {
+        if (! (bool) core()->getConfigData('b2b.general.settings.active')) {
             return view('shop::customers.sign-up');
         }
 
-        return view('b2b_suite::shop.companies.sign-up')
+        return view('b2b::shop.companies.sign-up')
             ->with('attributes', $this->companyAttributeRepository->getSignUpAttributes());
     }
 
@@ -60,7 +60,7 @@ class RegistrationController extends BaseRegistrationController
          * (status = 0). Bagisto blocks login for inactive customers, so the company
          * cannot log in or transact until an admin approves (activates) the account.
          */
-        $requireApproval = (bool) core()->getConfigData('b2b_suite.general.settings.require_company_approval');
+        $requireApproval = (bool) core()->getConfigData('b2b.general.settings.require_company_approval');
 
         $data = array_merge($request->only([
             'first_name',
@@ -70,6 +70,7 @@ class RegistrationController extends BaseRegistrationController
             'password_confirmation',
             'is_subscribed',
         ]), [
+            'type' => 'company',
             'password' => bcrypt(request()->input('password')),
             'api_token' => Str::random(80),
             'status' => $requireApproval ? 0 : 1,
@@ -133,7 +134,7 @@ class RegistrationController extends BaseRegistrationController
         Event::dispatch('b2b.company.registered', $customer);
 
         if ($requireApproval) {
-            session()->flash('success', trans('b2b_suite::app.shop.companies.signup-form.success-pending-approval'));
+            session()->flash('success', trans('b2b::app.shop.companies.signup-form.success-pending-approval'));
         } elseif (core()->getConfigData('emails.general.notifications.emails.general.notifications.verification')) {
             session()->flash('success', trans('shop::app.customers.signup-form.success-verify'));
         } else {

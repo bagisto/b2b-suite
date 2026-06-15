@@ -64,7 +64,7 @@ class CustomerQuoteRepository extends Repository
             'quote_id' => $quote->id,
             'user_id' => $data['customer_id'],
             'user_type' => isset($data['customer_id']) ? 'customer' : 'admin',
-            'message' => $data['message'] ?? trans('b2b_suite::app.shop.checkout.cart.request-quote.default-message', [
+            'message' => $data['message'] ?? trans('b2b::app.shop.checkout.cart.request-quote.default-message', [
                 'status' => $quote->status,
             ]),
         ]);
@@ -122,8 +122,8 @@ class CustomerQuoteRepository extends Repository
      */
     private function calculateExpirationDate(): Carbon
     {
-        $period = (int) core()->getConfigData('b2b_suite.quotes.settings.default_expiration_period', 30);
-        $unit = core()->getConfigData('b2b_suite.quotes.settings.expiration_period_unit', 'days');
+        $period = (int) core()->getConfigData('b2b.quotes.settings.default_expiration_period', 30);
+        $unit = core()->getConfigData('b2b.quotes.settings.expiration_period_unit', 'days');
 
         return match ($unit) {
             'weeks' => now()->addWeeks($period),
@@ -257,9 +257,9 @@ class CustomerQuoteRepository extends Repository
     {
         $maxId = $quoteId ?? $this->model->max('id') + 1;
 
-        $quotePrefix = core()->getConfigData('b2b_suite.quotes.settings.quote_prefix');
-        $poPrefix = core()->getConfigData('b2b_suite.quotes.settings.po_prefix');
-        $defaultPadding = core()->getConfigData('b2b_suite.quotes.settings.default_padding');
+        $quotePrefix = core()->getConfigData('b2b.quotes.settings.quote_prefix');
+        $poPrefix = core()->getConfigData('b2b.quotes.settings.po_prefix');
+        $defaultPadding = core()->getConfigData('b2b.quotes.settings.default_padding');
 
         $defaultNumber = Str::padLeft($maxId, $defaultPadding ?? 10, '0');
 
@@ -304,7 +304,7 @@ class CustomerQuoteRepository extends Repository
                 'base_negotiated_price' => core()->convertToBasePrice($itemData['negotiated_price'], core()->getBaseCurrencyCode()),
                 'negotiated_total' => $negotiatedTotal,
                 'base_negotiated_total' => core()->convertToBasePrice($negotiatedTotal, core()->getBaseCurrencyCode()),
-                'note' => $data['message'] ?? trans('b2b_suite::app.shop.customers.account.quotes.view.item-updated', [
+                'note' => $data['message'] ?? trans('b2b::app.shop.customers.account.quotes.view.item-updated', [
                     'name' => $quote->customer->name,
                 ]),
                 'status' => $data['status'] ?? $quote->status,

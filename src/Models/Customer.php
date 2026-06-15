@@ -3,6 +3,7 @@
 namespace Webkul\B2BSuite\Models;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Webkul\B2BSuite\Repositories\CompanyAttributeRepository;
@@ -33,6 +34,7 @@ class Customer extends BaseCustomer
         'is_suspended',
         'type',
         'company_role_id',
+        'company_catalog_id',
     ];
 
     /**
@@ -42,6 +44,14 @@ class Customer extends BaseCustomer
     {
         return $this->belongsToMany(self::class, 'customer_companies', 'customer_id', 'company_id')
             ->where('type', 'company');
+    }
+
+    /**
+     * The company catalog assigned to the company.
+     */
+    public function companyCatalog(): BelongsTo
+    {
+        return $this->belongsTo(CompanyCatalogProxy::modelClass(), 'company_catalog_id');
     }
 
     /**

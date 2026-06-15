@@ -5,7 +5,7 @@ return [
     'admin' => [
         'configuration' => [
             'index' => [
-                'b2b-suite' => [
+                'b2b' => [
                     'title' => 'B2B Suite',
                     'info' => 'Configure B2B Suite settings and features',
 
@@ -90,12 +90,85 @@ return [
         ],
 
         'layouts' => [
-            'b2b-suite' => 'B2B Suite',
+            'b2b' => 'B2B Suite',
             'company-attributes' => 'Company Attributes',
             'companies' => 'Companies',
             'quotes' => 'Quotations',
             'purchase-orders' => 'Purchase Orders',
+            'company-catalogs' => 'Company Catalogs',
             'back-btn' => 'Back',
+        ],
+
+        'company-catalogs' => [
+            'create-success' => 'Company catalog created successfully.',
+            'update-success' => 'Company catalog updated successfully.',
+            'delete-success' => 'Company catalog deleted successfully.',
+            'delete-failed' => 'Company catalog could not be deleted.',
+
+            'index' => [
+                'title' => 'Company Catalogs',
+                'create-btn' => 'Create Company Catalog',
+
+                'datagrid' => [
+                    'id' => 'ID',
+                    'name' => 'Name',
+                    'products' => 'Products',
+                    'companies' => 'Companies',
+                    'status' => 'Status',
+                    'active' => 'Active',
+                    'inactive' => 'Inactive',
+                    'created-at' => 'Created At',
+                    'edit' => 'Edit',
+                    'delete' => 'Delete',
+                ],
+            ],
+
+            'create' => [
+                'title' => 'Create Company Catalog',
+                'back-btn' => 'Back',
+                'save-btn' => 'Save Catalog',
+            ],
+
+            'edit' => [
+                'title' => 'Edit Company Catalog',
+                'back-btn' => 'Back',
+                'save-btn' => 'Save Catalog',
+            ],
+
+            'general' => 'General',
+            'name' => 'Name',
+            'description' => 'Description',
+            'status' => 'Status',
+            'products' => 'Products',
+            'products-info' => 'Assigned companies will only be able to see and buy these products.',
+            'companies' => 'Companies',
+            'companies-info' => 'Members of the selected companies inherit this catalog and its prices.',
+            'companies-single-note' => 'A company can belong to only one catalog. Assigning one already in another catalog will move it here.',
+            'in-catalog' => 'In: :name',
+            'search-products' => 'Search products by name or SKU',
+            'search-companies' => 'Search companies by name or email',
+            'sku' => 'SKU',
+            'catalog-price' => 'Catalog Price',
+            'base-price' => 'Base Price',
+            'no-products' => 'No products assigned yet.',
+            'no-companies' => 'No companies assigned yet.',
+            'remove' => 'Remove',
+            'price-placeholder' => 'Default',
+            'product' => 'Product',
+            'price-type' => 'Price Type',
+            'flat' => 'Flat Price',
+            'discount' => 'Discount (%)',
+            'value' => 'Value',
+            'new-price' => 'New Price',
+            'apply' => 'Apply',
+            'bulk-pricing' => 'Bulk pricing',
+            'applies-to-all' => 'Applies to all products',
+            'items-selected' => ':count selected',
+            'assign-products' => 'Assign Products',
+            'assign' => 'Assign',
+            'added' => 'Added',
+            'loading' => 'Loading...',
+            'no-products-found' => 'No products found.',
         ],
 
         'company-attributes' => [
@@ -528,7 +601,7 @@ return [
         ],
 
         'acl' => [
-            'b2b-suite' => 'B2B Suite',
+            'b2b' => 'B2B Suite',
             'attributes' => 'Attributes',
             'create' => 'Create',
             'edit' => 'Edit',
@@ -538,18 +611,20 @@ return [
             'companies' => 'Companies',
             'quotes' => 'Quotations',
             'purchase-orders' => 'Purchase Orders',
+            'company-catalogs' => 'Company Catalogs',
             'assign-product' => 'Assign-Product',
         ],
     ],
 
     'shop' => [
         'layouts' => [
-            'requisitions' => 'My Requisition Lists',
+            'requisitions' => 'Requisition Lists',
             'quotes' => 'Quotations',
             'purchase-orders' => 'Purchase Orders',
             'quick-orders' => 'Quick Orders',
             'users' => 'Users',
             'roles' => 'Roles',
+            'company' => 'Company',
         ],
 
         'acl' => [
@@ -562,6 +637,7 @@ return [
             'list' => 'List',
             'messages' => 'Messages',
             'get-product' => 'Get Product',
+            'company-profile' => 'Company Profile',
             'requisitions' => 'Requisitions',
             'quotes' => 'Quotations',
             'purchase-orders' => 'Purchase Orders',
@@ -606,16 +682,48 @@ return [
                 'verification-sent' => 'Verification email sent',
                 'verified' => 'Your account has been verified, try to login now.',
                 'verify-failed' => 'We cannot verify your mail account.',
+
+                'choose-account-type' => 'Choose your account type',
+                'tab-personal' => 'Personal Account',
+                'tab-company' => 'Company Account',
+                'personal-title' => 'Create a Personal Account',
+                'personal-text' => 'Shop as an individual customer with a personal account.',
+                'company-title' => 'Create a Company Account',
+                'company-text' => 'Register your business to unlock B2B features like quotations, requisition lists and bulk ordering.',
             ],
 
             'account' => [
                 'profile' => [
+                    'index' => [
+                        'title' => 'Company Profile',
+                        'info' => 'Manage your company information.',
+                        'save-btn' => 'Save',
+                        'no-attributes' => 'No company attributes have been configured yet.',
+                    ],
+
                     'edit' => [
                         'btn-back' => 'Back',
                         'settings' => 'Settings',
+                        'profile-image' => 'Profile Image',
                     ],
                 ],
             ],
+        ],
+
+        'sign-in' => [
+            'or-create-account' => 'New here? Create an account',
+            'create-customer-account' => 'Create Customer Account',
+            'create-company-account' => 'Create Company Account',
+
+            'registered-customers' => 'Registered Customers',
+            'registered-customers-text' => 'If you have an account, sign in with your email address.',
+            'required-fields' => '* Required Fields',
+            'new-customers' => 'New Customers',
+            'new-customers-text' => 'Creating an account has many benefits: check out faster, keep more than one address, track orders and more.',
+            'create-an-account' => 'Create an Account',
+            'new-company-account' => 'New Company Account',
+            'new-company-account-text' => 'If you represent a company, you will want to use our company account area. Creating a company account provides all company members with access to B2B features like quoting, company users management, quick order, and more.',
+            'create-a-company-account' => 'Create a Company Account',
         ],
 
         'checkout' => [
@@ -636,9 +744,11 @@ return [
                 'request-failed' => 'Failed to submit quotation request. Please try again.',
                 'cannot-change-negotiated-quantity' => 'You cannot change the negotiated quantity.',
                 'cannot-add-product-with-negotiated-price' => 'This product is already in your cart with negotiated pricing.',
+                'product-not-in-catalog' => 'This product is not available in your company catalog.',
 
                 'request-quote' => [
                     'title' => 'Request For Quote',
+                    'subtitle' => 'Tell us what you need and we will get back to you with a quotation.',
                     'quote-name' => 'Quotation Name',
                     'quote-name-placeholder' => 'Enter a name for your quotation',
                     'comment' => 'Add Your Comment',
@@ -673,7 +783,7 @@ return [
         'customers' => [
             'account' => [
                 'requisitions' => [
-                    'title' => 'My Requisition Lists',
+                    'title' => 'Requisition Lists',
                     'add-title' => 'Create Requisition List',
                     'edit-title' => 'Edit Requisition List',
                     'btn-create' => 'Create',
@@ -748,8 +858,10 @@ return [
                 ],
 
                 'quotes' => [
-                    'title' => 'My Quotations',
+                    'title' => 'Quotations',
                     'not-found' => 'Quotation not found.',
+                    'order-id' => 'Quotation',
+                    'subtotal' => 'Subtotal',
 
                     'index' => [
                         'datagrid' => [
@@ -826,6 +938,15 @@ return [
                         'message-placeholder' => 'Enter your message here...',
                         'btn-send' => 'Send',
                         'no-message' => 'No messages found.',
+                        'loading-messages' => 'Loading messages...',
+                        'no-messages' => 'No messages yet. Start the conversation.',
+                        'no-messages-filtered' => 'No messages match the current filters.',
+                        'clear-filters' => 'Clear filters',
+                        'previous' => 'Previous',
+                        'next' => 'Next',
+                        'you' => 'You',
+                        'seller' => 'Seller',
+                        'product-not-found' => 'Product not found',
                         'success-message' => 'Your message has been sent successfully.',
                         'error-message' => 'Failed to send message. Please try again.',
                         'quote-updated' => 'Quotation updated successfully.',
@@ -856,7 +977,7 @@ return [
 
                 'purchase-orders' => [
                     'index' => [
-                        'title' => 'My Purchase Orders',
+                        'title' => 'Purchase Orders',
                         'empty' => 'You have no purchase orders.',
 
                         'datagrid' => [
@@ -878,7 +999,7 @@ return [
                     'add-from-file' => 'Supported formats: CSV. Columns: sku, quantity, ',
                     'add-to-cart-success' => 'Products added to cart successfully.',
                     'already-added' => 'Some products were already in the cart and were not added again.',
-                    'btn-add' => '+ Add',
+                    'btn-add' => 'Add',
                     'btn-add-to-cart' => 'Add To Cart',
                     'btn-add-to-list' => 'Add to List',
                     'btn-back' => 'Back',

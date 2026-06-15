@@ -53,20 +53,12 @@ class EventServiceProvider extends ServiceProvider
     {
         $templates = [
             [
-                'event' => 'bagisto.shop.layout.head.after',
-                'template' => 'b2b_suite::components.layouts.scripts',
-            ],
-            [
-                'event' => 'bagisto.shop.checkout.cart.summary.proceed_to_checkout.before',
-                'template' => 'b2b_suite::shop.checkout.cart.request-quote-button',
-            ],
-            [
                 'event' => 'bagisto.shop.products.view.additional_actions.before',
-                'template' => 'b2b_suite::shop.customers.account.requisitions.list-modal',
+                'template' => 'b2b::shop.customers.account.requisitions.list-modal',
             ],
             [
                 'event' => 'bagisto.shop.checkout.cart.continue_shopping.before',
-                'template' => 'b2b_suite::shop.customers.account.requisitions.list-modal',
+                'template' => 'b2b::shop.customers.account.requisitions.list-modal',
             ],
         ];
 
@@ -77,7 +69,7 @@ class EventServiceProvider extends ServiceProvider
          */
         if (
             Schema::hasTable('core_config')
-            && core()->getConfigData('b2b_suite.general.settings.active')
+            && core()->getConfigData('b2b.general.settings.active')
         ) {
             foreach ($templates as $template) {
                 Event::listen(current($template), fn ($e) => $e->addTemplate(end($template)));

@@ -57,6 +57,6 @@ class InstallB2BSuite extends Command
                          |___/                                                          
         </>');
 
-        $this->components->info(trans('b2b_suite::app.commands.install.finish'));
+        $this->components->info(trans('b2b::app.commands.install.finish'));
     }
 }

@@ -34,7 +34,7 @@ class PurchaseOrderController extends Controller
             return datagrid(CustomerPurchaseOrderDataGrid::class)->process();
         }
 
-        return view('b2b_suite::shop.customers.account.purchase-orders.index');
+        return view('b2b::shop.customers.account.purchase-orders.index');
     }
 
     /**
@@ -68,13 +68,13 @@ class PurchaseOrderController extends Controller
             ->findOneWhere($quoteConditions);
 
         if (! $quote) {
-            session()->flash('error', trans('b2b_suite::app.shop.customers.account.quotes.view.un-authorized-quote'));
+            session()->flash('error', trans('b2b::app.shop.customers.account.quotes.view.un-authorized-quote'));
 
             return redirect()->route('shop.customers.account.purchase_orders.index');
         }
 
         $isAdminLastQuotation = $this->customerQuoteMessageRepository->getLastQuotationMessage($quote->id, 'admin');
 
-        return view('b2b_suite::shop.customers.account.purchase-orders.view', compact('customer', 'quote', 'isAdminLastQuotation'));
+        return view('b2b::shop.customers.account.purchase-orders.view', compact('customer', 'quote', 'isAdminLastQuotation'));
     }
 }

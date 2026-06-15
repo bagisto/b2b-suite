@@ -26,7 +26,7 @@ class CustomerBouncerMiddleware
             return redirect()->route('customer.session.index');
         }
 
-        $roles = b2b_suite_acl()->getRoles();
+        $roles = b2b_acl()->getRoles();
 
         if (isset($roles[$routeName])) {
             $aclKey = 'account.'.$roles[$routeName];
@@ -81,7 +81,7 @@ class CustomerBouncerMiddleware
      */
     protected function checkIfAuthorized(): void
     {
-        $roles = b2b_suite_acl()->getRoles();
+        $roles = b2b_acl()->getRoles();
         $currentRoute = Route::currentRouteName();
 
         if (isset($roles[$currentRoute])) {

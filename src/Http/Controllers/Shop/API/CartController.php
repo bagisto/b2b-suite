@@ -4,9 +4,12 @@ namespace Webkul\B2BSuite\Http\Controllers\Shop\API;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
+use Webkul\B2BSuite\Helpers\CompanyCatalog;
 use Webkul\B2BSuite\Repositories\CustomerQuoteItemRepository;
 use Webkul\CartRule\Repositories\CartRuleCouponRepository;
 use Webkul\Checkout\Facades\Cart;
+use Webkul\Customer\Repositories\CustomerRepository;
 use Webkul\Product\Repositories\ProductRepository;
 use Webkul\Shop\Http\Controllers\API\CartController as BaseCartController;
 use Webkul\Shop\Http\Resources\CartResource;
@@ -18,17 +21,18 @@ class CartController extends BaseCartController
      *
      * @return void
      */
-    public function __construct(CustomerQuoteItemRepository $customerQuoteItemRepository)
+    public function __construct(protected CustomerQuoteItemRepository $customerQuoteItemRepository)
     {
         parent::__construct(app(ProductRepository::class), app(CartRuleCouponRepository::class));
-
-        $this->customerQuoteItemRepository = $customerQuoteItemRepository;
     }
 
     /**
      * Store items in cart - Override to prevent adding negotiated products when already in cart.
+     *
+     * No return type is declared (matching the core controller) because the success path
+     * returns a JsonResource while the error path returns a JsonResponse (HTTP 400).
      */
-    public function store(): JsonResource
+    public function store()
     {
         $this->validate(request(), [
             'product_id' => 'required|integer|exists:products,id',
@@ -43,6 +47,10 @@ class CartController extends BaseCartController
                 throw new \Exception(trans('shop::app.checkout.cart.inactive-add'));
             }
 
+            if (! $this->isWithinCompanyCatalog($product)) {
+                throw new \Exception(trans('b2b::app.shop.checkout.cart.product-not-in-catalog'));
+            }
+
             $requestedQty = request()->input('quantity', 1);
             $cart = Cart::getCart();
 
@@ -53,8 +61,8 @@ class CartController extends BaseCartController
                     $existingAdditional = $existingCartItem->additional ?? [];
 
                     if (isset($existingAdditional['quote_id'])) {
-                        return new JsonResource([
-                            'message' => trans('b2b_suite::app.shop.checkout.cart.cannot-add-product-with-negotiated-price'),
+                        return response()->json([
+                            'message' => trans('b2b::app.shop.checkout.cart.cannot-add-product-with-negotiated-price'),
                         ], Response::HTTP_BAD_REQUEST);
                     }
                 }
@@ -80,6 +88,32 @@ class CartController extends BaseCartController
                 'message' => $exception->getMessage(),
             ], Response::HTTP_BAD_REQUEST);
         }
+    }
+
+    /**
+     * Ensure the product is within the customer's company catalog (allowlist).
+     * Returns true when no catalog restriction applies.
+     */
+    protected function isWithinCompanyCatalog($product): bool
+    {
+        if (! (bool) core()->getConfigData('b2b.general.settings.active')) {
+            return true;
+        }
+
+        $groupId = app(CustomerRepository::class)->getCurrentGroup()?->id;
+
+        $catalog = app(CompanyCatalog::class)->resolveByGroupId($groupId);
+
+        if (! $catalog) {
+            return true;
+        }
+
+        $productId = $product->parent_id ?? $product->id;
+
+        return DB::table('company_catalog_products')
+            ->where('company_catalog_id', $catalog->id)
+            ->where('product_id', $productId)
+            ->exists();
     }
 
     /**
@@ -109,7 +143,7 @@ class CartController extends BaseCartController
 
                     if ($negotiation && $quantity != $negotiation->negotiated_qty) {
                         return new JsonResource([
-                            'message' => trans('b2b_suite::app.shop.checkout.cart.cannot-change-negotiated-quantity'),
+                            'message' => trans('b2b::app.shop.checkout.cart.cannot-change-negotiated-quantity'),
                         ]);
                     }
                 }

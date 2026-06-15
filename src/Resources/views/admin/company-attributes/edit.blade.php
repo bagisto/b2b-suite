@@ -1,6 +1,6 @@
 <x-admin::layouts>
     <x-slot:title>
-        @lang('b2b_suite::app.admin.company-attributes.edit.title')
+        @lang('b2b::app.admin.company-attributes.edit.title')
     </x-slot>
 
     {!! view_render_event('bagisto.admin.b2b.attributes.edit.before', ['attribute' => $attribute]) !!}
@@ -13,7 +13,7 @@
     >
         <div class="flex items-center justify-between gap-4 max-sm:flex-wrap">
             <p class="text-xl font-bold text-gray-800 dark:text-white">
-                @lang('b2b_suite::app.admin.company-attributes.edit.title')
+                @lang('b2b::app.admin.company-attributes.edit.title')
             </p>
 
             <div class="flex items-center gap-x-2.5">
@@ -22,7 +22,7 @@
                     href="{{ route('admin.b2b.attributes.index') }}"
                     class="transparent-button hover:bg-gray-200 dark:text-white dark:hover:bg-gray-800"
                 >
-                    @lang('b2b_suite::app.admin.company-attributes.edit.back-btn')
+                    @lang('b2b::app.admin.company-attributes.edit.back-btn')
                 </a>
 
                 <!-- Save Button -->
@@ -30,7 +30,7 @@
                     type="submit"
                     class="primary-button"
                 >
-                    @lang('b2b_suite::app.admin.company-attributes.edit.save-btn')
+                    @lang('b2b::app.admin.company-attributes.edit.save-btn')
                 </button>
             </div>
         </div>
@@ -59,13 +59,13 @@
                     <!-- Label -->
                     <div class="box-shadow rounded bg-white p-4 dark:bg-gray-900">
                         <p class="mb-4 text-base font-semibold text-gray-800 dark:text-white">
-                            @lang('b2b_suite::app.admin.company-attributes.edit.label')
+                            @lang('b2b::app.admin.company-attributes.edit.label')
                         </p>
 
                         <!-- Admin Name -->
                         <x-admin::form.control-group>
                             <x-admin::form.control-group.label class="required">
-                                @lang('b2b_suite::app.admin.company-attributes.edit.admin')
+                                @lang('b2b::app.admin.company-attributes.edit.admin')
                             </x-admin::form.control-group.label>
 
                             <x-admin::form.control-group.control
@@ -73,8 +73,8 @@
                                 name="admin_name"
                                 rules="required"
                                 :value="old('admin_name') ?: $attribute->admin_name"
-                                :label="trans('b2b_suite::app.admin.company-attributes.edit.admin')"
-                                :placeholder="trans('b2b_suite::app.admin.company-attributes.edit.admin')"
+                                :label="trans('b2b::app.admin.company-attributes.edit.admin')"
+                                :placeholder="trans('b2b::app.admin.company-attributes.edit.admin')"
                             />
 
                             <x-admin::form.control-group.error control-name="admin_name" />
@@ -351,7 +351,7 @@
                     <x-admin::accordion>
                         <x-slot:header>
                             <p class="p-2.5 text-base font-semibold text-gray-800 dark:text-white">
-                                @lang('b2b_suite::app.admin.company-attributes.edit.general')
+                                @lang('b2b::app.admin.company-attributes.edit.general')
                             </p>
                         </x-slot>
 
@@ -359,7 +359,7 @@
                             <!-- Attribute Code -->
                             <x-admin::form.control-group>
                                 <x-admin::form.control-group.label class="required">
-                                    @lang('b2b_suite::app.admin.company-attributes.edit.code')
+                                    @lang('b2b::app.admin.company-attributes.edit.code')
                                 </x-admin::form.control-group.label>
 
                                 <x-admin::form.control-group.control
@@ -369,8 +369,8 @@
                                     rules="required"
                                     :value="old('code') ?? $attribute->code"
                                     disabled="true"
-                                    :label="trans('b2b_suite::app.admin.company-attributes.edit.code')"
-                                    :placeholder="trans('b2b_suite::app.admin.company-attributes.edit.code')"
+                                    :label="trans('b2b::app.admin.company-attributes.edit.code')"
+                                    :placeholder="trans('b2b::app.admin.company-attributes.edit.code')"
                                 />
 
                                 <x-admin::form.control-group.control
@@ -385,7 +385,7 @@
                             <!-- Attribute Type -->
                             <x-admin::form.control-group>
                                 <x-admin::form.control-group.label class="required">
-                                    @lang('b2b_suite::app.admin.company-attributes.edit.type')
+                                    @lang('b2b::app.admin.company-attributes.edit.type')
                                 </x-admin::form.control-group.label>
 
                                 @php
@@ -400,14 +400,14 @@
                                     rules="required"
                                     :value="$selectedOption"
                                     :disabled="(boolean) $selectedOption"
-                                    :label="trans('b2b_suite::app.admin.company-attributes.edit.type')"
+                                    :label="trans('b2b::app.admin.company-attributes.edit.type')"
                                 >
                                     @foreach($attributeTypes as $attributeType)
                                         <option
                                             value="{{ $attributeType }}"
                                             {{ $selectedOption == $attributeType ? 'selected' : '' }}
                                         >
-                                            @lang('b2b_suite::app.admin.company-attributes.edit.'. $attributeType)
+                                            @lang('b2b::app.admin.company-attributes.edit.'. $attributeType)
                                         </option>
                                     @endforeach
                                 </x-admin::form.control-group.control>
@@ -425,7 +425,7 @@
                             @if($attribute->type == 'textarea')
                                 <x-admin::form.control-group>
                                     <x-admin::form.control-group.label>
-                                        @lang('b2b_suite::app.admin.company-attributes.edit.enable-editor')
+                                        @lang('b2b::app.admin.company-attributes.edit.enable-editor')
                                     </x-admin::form.control-group.label>
 
                                     <input
@@ -440,7 +440,7 @@
                                         type="switch"
                                         name="enable_editor"
                                         value="1"
-                                        :label="trans('b2b_suite::app.admin.company-attributes.edit.enable-editor')"
+                                        :label="trans('b2b::app.admin.company-attributes.edit.enable-editor')"
                                         :checked="(bool) $selectedOption"
                                     />
                                 </x-admin::form.control-group>
@@ -452,14 +452,14 @@
                                 v-if="canHaveDefaultValue"
                             >
                                 <x-admin::form.control-group.label>
-                                    @lang('b2b_suite::app.admin.company-attributes.edit.default-value')
+                                    @lang('b2b::app.admin.company-attributes.edit.default-value')
                                 </x-admin::form.control-group.label>
 
                                 <x-admin::form.control-group.control
                                     type="text"
                                     name="default_value"
                                     value="{{ old('default_value') ?: $attribute->default_value }}"
-                                    :label="trans('b2b_suite::app.admin.company-attributes.edit.default-value')"
+                                    :label="trans('b2b::app.admin.company-attributes.edit.default-value')"
                                 />
 
                                 <x-admin::form.control-group.error control-name="default_value" />
@@ -475,7 +475,7 @@
                     <x-admin::accordion>
                         <x-slot:header>
                             <p class="p-2.5 text-base font-semibold text-gray-800 dark:text-white">
-                                @lang('b2b_suite::app.admin.company-attributes.edit.validations')
+                                @lang('b2b::app.admin.company-attributes.edit.validations')
                             </p>
                         </x-slot>
 
@@ -484,7 +484,7 @@
                             @if($attribute->type == 'text')
                                 <x-admin::form.control-group>
                                     <x-admin::form.control-group.label>
-                                        @lang('b2b_suite::app.admin.company-attributes.edit.input-validation')
+                                        @lang('b2b::app.admin.company-attributes.edit.input-validation')
                                     </x-admin::form.control-group.label>
 
                                         <x-admin::form.control-group.control
@@ -496,7 +496,7 @@
                                         >
                                             @foreach($validations as $validation)
                                                 <option value="{{ $validation }}" {{ $attribute->validation == $validation ? 'selected' : '' }}>
-                                                    @lang('b2b_suite::app.admin.company-attributes.edit.' . $validation)
+                                                    @lang('b2b::app.admin.company-attributes.edit.' . $validation)
                                                 </option>
                                             @endforeach
                                         </x-admin::form.control-group.control>
@@ -507,14 +507,14 @@
                                 @if($attribute->validation == "regex")
                                     <x-admin::form.control-group>
                                         <x-admin::form.control-group.label>
-                                            @lang('b2b_suite::app.admin.company-attributes.create.regex')
+                                            @lang('b2b::app.admin.company-attributes.create.regex')
                                         </x-admin::form.control-group.label>
 
                                         <v-field
                                             type="text"
                                             name="regex"
                                             :value="{{ json_encode($attribute->regex) }}"
-                                            label="{{ trans('b2b_suite::app.admin.company-attributes.create.regex') }}"
+                                            label="{{ trans('b2b::app.admin.company-attributes.create.regex') }}"
                                             v-slot="{ field }"
                                         >
                                             <input
@@ -525,14 +525,14 @@
                                                 :value="{{ json_encode($attribute->regex) }}"
                                                 :class="[errors['{{ $attribute->regex }}'] ? 'border border-red-600 hover:border-red-600' : '']"
                                                 class="flex min-h-[39px] w-full cursor-not-allowed rounded-md border px-3 py-2 text-sm text-gray-600 transition-all hover:border-gray-400 focus:border-gray-400 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-gray-400 dark:focus:border-gray-400"
-                                                placeholder="{{ trans('b2b_suite::app.admin.company-attributes.create.regex') }}"
+                                                placeholder="{{ trans('b2b::app.admin.company-attributes.create.regex') }}"
                                                 disabled
                                             >
                                         </v-field>
 
                                         <!-- Regex Info -->
                                         <p class="mt-2 text-xs font-medium text-gray-500 dark:text-gray-300">
-                                            @lang('b2b_suite::app.admin.company-attributes.create.regex-info')
+                                            @lang('b2b::app.admin.company-attributes.create.regex-info')
                                         </p>
                                     </x-admin::form.control-group>
                                 @endif
@@ -558,7 +558,7 @@
                                     class="cursor-pointer text-xs font-medium text-gray-600 dark:text-gray-300"
                                     for="is_required"
                                 >
-                                    @lang('b2b_suite::app.admin.company-attributes.edit.is-required')
+                                    @lang('b2b::app.admin.company-attributes.edit.is-required')
                                 </label>
                             </x-admin::form.control-group>
 
@@ -584,7 +584,7 @@
                                     class="cursor-pointer text-xs font-medium text-gray-600 dark:text-gray-300"
                                     for="is_unique"
                                 >
-                                    @lang('b2b_suite::app.admin.company-attributes.edit.is-unique')
+                                    @lang('b2b::app.admin.company-attributes.edit.is-unique')
                                 </label>
                             </x-admin::form.control-group>
                         </x-slot>
@@ -598,7 +598,7 @@
                     <x-admin::accordion>
                         <x-slot:header>
                             <p class="p-2.5 text-base font-semibold text-gray-800 dark:text-white">
-                                @lang('b2b_suite::app.admin.company-attributes.edit.configuration')
+                                @lang('b2b::app.admin.company-attributes.edit.configuration')
                             </p>
                         </x-slot>
 
@@ -621,7 +621,7 @@
                                 <label
                                     class="cursor-not-allowed text-xs font-medium text-gray-600 dark:text-gray-300"
                                 >
-                                    @lang('b2b_suite::app.admin.company-attributes.edit.value-per-locale')
+                                    @lang('b2b::app.admin.company-attributes.edit.value-per-locale')
                                 </label>
 
                                 <x-admin::form.control-group.control
@@ -647,7 +647,7 @@
                                 />
 
                                 <label class="cursor-not-allowed text-xs font-medium text-gray-600 dark:text-gray-300">
-                                    @lang('b2b_suite::app.admin.company-attributes.edit.value-per-channel')
+                                    @lang('b2b::app.admin.company-attributes.edit.value-per-channel')
                                 </label>
 
                                 <x-admin::form.control-group.control
@@ -676,7 +676,7 @@
                                     class="cursor-pointer text-xs font-medium text-gray-600 dark:text-gray-300"
                                     for="is_visible_on_sign_up"
                                 >
-                                    @lang('b2b_suite::app.admin.company-attributes.edit.is-visible-on-sign-up')
+                                    @lang('b2b::app.admin.company-attributes.edit.is-visible-on-sign-up')
                                 </label>
 
                                 <x-admin::form.control-group.control
@@ -710,7 +710,7 @@
                         <!-- Modal Header -->
                         <x-slot:header>
                             <p class="text-lg font-bold text-gray-800 dark:text-white">
-                                @lang('b2b_suite::app.admin.company-attributes.edit.add-option')
+                                @lang('b2b::app.admin.company-attributes.edit.add-option')
                             </p>
                         </x-slot>
 
@@ -733,15 +733,15 @@
                                 <!-- Admin Input -->
                                 <x-admin::form.control-group class="mb-2.5 w-full">
                                     <x-admin::form.control-group.label ::class="{ 'required' : ! isNullOptionChecked }">
-                                        @lang('b2b_suite::app.admin.company-attributes.edit.admin')
+                                        @lang('b2b::app.admin.company-attributes.edit.admin')
                                     </x-admin::form.control-group.label>
 
                                     <x-admin::form.control-group.control
                                         type="text"
                                         name="admin_name"
                                         ::rules="{ 'required' : ! isNullOptionChecked }"
-                                        :label="trans('b2b_suite::app.admin.company-attributes.edit.admin')"
-                                        :placeholder="trans('b2b_suite::app.admin.company-attributes.edit.admin')"
+                                        :label="trans('b2b::app.admin.company-attributes.edit.admin')"
+                                        :placeholder="trans('b2b::app.admin.company-attributes.edit.admin')"
                                         ref="inputAdmin"
                                     />
 
@@ -775,7 +775,7 @@
                             <x-admin::button
                                 button-type="button"
                                 class="primary-button"
-                                :title="trans('b2b_suite::app.admin.company-attributes.edit.save-option')"
+                                :title="trans('b2b::app.admin.company-attributes.edit.save-option')"
                             />
                         </x-slot>
                     </x-admin::modal>
@@ -874,7 +874,7 @@
 
                                 this.$emitter.emit('add-flash', {
                                     type: 'success',
-                                    message: "@lang('b2b_suite::app.admin.company-attributes.edit.option-deleted')"
+                                    message: "@lang('b2b::app.admin.company-attributes.edit.option-deleted')"
                                 });
                             }
                         });

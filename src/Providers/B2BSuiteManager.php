@@ -7,7 +7,9 @@ use Webkul\B2BSuite\Http\Controllers\Shop\API\CartController as B2BCartControlle
 use Webkul\B2BSuite\Http\Controllers\Shop\Customer\CustomerController as ShopCustomerController;
 use Webkul\B2BSuite\Http\Controllers\Shop\Customer\RegistrationController;
 use Webkul\B2BSuite\Models\Customer;
+use Webkul\B2BSuite\Repositories\ProductRepository as B2BProductRepository;
 use Webkul\Customer\Contracts\Customer as CustomerContract;
+use Webkul\Product\Repositories\ProductRepository as BaseProductRepository;
 use Webkul\Shop\Http\Controllers\API\CartController as BaseCartController;
 use Webkul\Shop\Http\Controllers\Customer\CustomerController as BaseShopCustomerController;
 use Webkul\Shop\Http\Controllers\Customer\RegistrationController as BaseRegistrationController;
@@ -15,7 +17,7 @@ use Webkul\Shop\Http\Controllers\Customer\RegistrationController as BaseRegistra
 final class B2BSuiteManager
 {
     /**
-     * Constructor to bind classes to the container
+     * Constructor to bind classes to the container.
      *
      * @return void
      */
@@ -25,6 +27,7 @@ final class B2BSuiteManager
 
         $this->registerControllers();
 
+        $this->registerRepositories();
     }
 
     /**
@@ -40,11 +43,22 @@ final class B2BSuiteManager
      */
     private function registerControllers(): void
     {
-
         $this->app->bind(BaseRegistrationController::class, RegistrationController::class);
 
         $this->app->bind(BaseShopCustomerController::class, ShopCustomerController::class);
 
         $this->app->bind(BaseCartController::class, B2BCartController::class);
+    }
+
+    /**
+     * Register the repositories.
+     */
+    private function registerRepositories(): void
+    {
+        /**
+         * Enforces company-catalog allowlist visibility on the storefront. The
+         * override is inert for guests, admins, and unassigned customers.
+         */
+        $this->app->bind(BaseProductRepository::class, B2BProductRepository::class);
     }
 }

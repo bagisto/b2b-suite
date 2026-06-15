@@ -1,13 +1,13 @@
 <x-shop::layouts.account>
     <!-- Page Title -->
     <x-slot:title>
-        @lang('b2b_suite::app.shop.customers.account.quotes.title')
+        @lang('b2b::app.shop.customers.account.quotes.title')
     </x-slot>
 
     <!-- Breadcrumbs -->
     @if ((core()->getConfigData('general.general.breadcrumbs.shop')))
         @section('breadcrumbs')
-            <x-shop::breadcrumbs name="orders" />
+            <x-shop::breadcrumbs name="quotes" />
         @endSection
     @endif
 
@@ -26,7 +26,7 @@
             </a>
 
             <h2 class="text-2xl font-medium max-sm:text-base ltr:ml-2.5 md:ltr:ml-0 rtl:mr-2.5 md:rtl:mr-0">
-                @lang('b2b_suite::app.shop.customers.account.quotes.title')
+                @lang('b2b::app.shop.customers.account.quotes.title')
             </h2>
         </div>
 
@@ -70,7 +70,7 @@
                                 <a :href="record.actions[0].url">
                                     <div class="flex justify-between">
                                         <div class="text-sm font-semibold">
-                                            @lang('b2b_suite::app.shop.customers.account.quotes.order-id'): #@{{ record.id }}
+                                            @lang('b2b::app.shop.customers.account.quotes.order-id'): #@{{ record.id }}
     
                                             <p class="text-xs font-normal text-neutral-500">
                                                 @{{ record.created_at }}
@@ -81,7 +81,7 @@
                                     </div>
         
                                     <div class="mt-2.5 text-xs font-normal text-neutral-500">
-                                        @lang('b2b_suite::app.shop.customers.account.quotes.subtotal')
+                                        @lang('b2b::app.shop.customers.account.quotes.subtotal')
     
                                         <p class="text-xl font-semibold text-black">
                                             @{{ record.grand_total }}

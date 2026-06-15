@@ -7,12 +7,10 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use Webkul\B2BSuite\Console\Commands\InstallB2BSuite;
-use Webkul\B2BSuite\Contracts\Company;
 use Webkul\B2BSuite\Contracts\CompanyFlat;
 use Webkul\B2BSuite\Http\Middleware\CustomerBouncerMiddleware;
 use Webkul\B2BSuite\Menu as B2BMenu;
 use Webkul\B2BSuite\Repositories\CompanyFlatRepository;
-use Webkul\B2BSuite\Repositories\CompanyRepository;
 use Webkul\Core\Menu as CoreMenu;
 
 class B2BSuiteServiceProvider extends ServiceProvider
@@ -33,12 +31,7 @@ class B2BSuiteServiceProvider extends ServiceProvider
 
         $this->mergeConfigFrom(
             dirname(__DIR__).'/Config/shop/acl.php',
-            'b2b_suite_acl'
-        );
-
-        $this->mergeConfigFrom(
-            dirname(__DIR__).'/Config/bagisto-vite.php',
-            'bagisto-vite.viters'
+            'b2b_acl'
         );
 
         $this->registerServices();
@@ -53,19 +46,21 @@ class B2BSuiteServiceProvider extends ServiceProvider
     {
         include __DIR__.'/../Http/helpers.php';
 
-        if (core()->getConfigData('b2b_suite.general.settings.active')) {
+        if (core()->getConfigData('b2b.general.settings.active')) {
             Route::middleware('web')->group(__DIR__.'/../Routes/web.php');
+
+            require __DIR__.'/../Routes/breadcrumbs.php';
         }
 
         Route::aliasMiddleware('customer_bouncer', CustomerBouncerMiddleware::class);
 
         $this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
 
-        $this->loadTranslationsFrom(__DIR__.'/../Resources/lang', 'b2b_suite');
+        $this->loadTranslationsFrom(__DIR__.'/../Resources/lang', 'b2b');
 
-        $this->loadViewsFrom(__DIR__.'/../Resources/views', 'b2b_suite');
+        $this->loadViewsFrom(__DIR__.'/../Resources/views', 'b2b');
 
-        Blade::anonymousComponentPath(__DIR__.'/../Resources/views/components', 'b2b_suite');
+        Blade::anonymousComponentPath(__DIR__.'/../Resources/views/components', 'b2b');
 
         $this->registerCommands();
 
@@ -75,7 +70,7 @@ class B2BSuiteServiceProvider extends ServiceProvider
 
         if (
             Schema::hasTable('core_config')
-            && (bool) core()->getConfigData('b2b_suite.general.settings.active')
+            && (bool) core()->getConfigData('b2b.general.settings.active')
         ) {
             $this->mergeConfigFrom(
                 dirname(__DIR__).'/Config/admin/menu.php',
@@ -122,15 +117,18 @@ class B2BSuiteServiceProvider extends ServiceProvider
     protected function publishAssets(): void
     {
         $this->publishes([
-            __DIR__.'/../../publishable/build' => public_path('themes/b2b-suite/build'),
-        ], 'public');
-
-        $this->publishes([
-            __DIR__.'/../../publishable/storage' => storage_path('app/public'),
+            __DIR__.'/../../publishables/storage' => storage_path('app/public'),
         ]);
 
+        /**
+         * All view/component overrides are published to the package-namespace override
+         * path `resources/views/vendor/<namespace>` (registered by core's
+         * `loadViewsFrom`). One consistent target for both regular `shop::`/`admin::`
+         * views and anonymous `x-shop::` components (which theme view-path overrides
+         * can't reach). Mirror the namespaced path under `publishables/resources/vendor`.
+         */
         $this->publishes([
-            __DIR__.'/../Resources/views/admin/customers/customers' => resource_path('admin-themes/default/views/customers/customers'),
+            __DIR__.'/../../publishables/resources/vendor' => resource_path('views/vendor'),
         ]);
     }
 
@@ -139,11 +137,6 @@ class B2BSuiteServiceProvider extends ServiceProvider
      */
     protected function registerServices(): void
     {
-        $this->app->bind(
-            Company::class,
-            CompanyRepository::class
-        );
-
         $this->app->bind(
             CompanyFlat::class,
             CompanyFlatRepository::class

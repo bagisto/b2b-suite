@@ -35,7 +35,7 @@ class RoleController extends Controller
             return datagrid(RoleDataGrid::class)->process();
         }
 
-        return view('b2b_suite::shop.customers.account.roles.index');
+        return view('b2b::shop.customers.account.roles.index');
     }
 
     /**
@@ -45,7 +45,7 @@ class RoleController extends Controller
      */
     public function create()
     {
-        return view('b2b_suite::shop.customers.account.roles.create');
+        return view('b2b::shop.customers.account.roles.create');
     }
 
     /**
@@ -92,7 +92,7 @@ class RoleController extends Controller
 
         Event::dispatch('customer.role.create.after', $role);
 
-        session()->flash('success', trans('b2b_suite::app.shop.customers.account.roles.create-success'));
+        session()->flash('success', trans('b2b::app.shop.customers.account.roles.create-success'));
 
         return redirect()->route('shop.customers.account.roles.index');
     }
@@ -106,7 +106,7 @@ class RoleController extends Controller
     {
         $role = $this->companyRoleRepository->findOrFail($id);
 
-        return view('b2b_suite::shop.customers.account.roles.edit', compact('role'));
+        return view('b2b::shop.customers.account.roles.edit', compact('role'));
     }
 
     /**
@@ -131,7 +131,7 @@ class RoleController extends Controller
             $isChangedFromAll
             && $this->companyRoleRepository->countCustomersWithAllAccess() === 1
         ) {
-            session()->flash('error', trans('b2b_suite::app.shop.customers.account.roles.being-used'));
+            session()->flash('error', trans('b2b::app.shop.customers.account.roles.being-used'));
 
             return redirect()->route('shop.customers.account.roles.index');
         }
@@ -151,7 +151,7 @@ class RoleController extends Controller
 
         Event::dispatch('customer.role.update.after', $role);
 
-        session()->flash('success', trans('b2b_suite::app.shop.customers.account.roles.update-success'));
+        session()->flash('success', trans('b2b::app.shop.customers.account.roles.update-success'));
 
         return redirect()->route('shop.customers.account.roles.index');
     }
@@ -185,7 +185,7 @@ class RoleController extends Controller
 
             Event::dispatch('customer.role.delete.after', $id);
 
-            return new JsonResponse(['message' => trans('b2b_suite::app.shop.customers.account.roles.delete-success')]);
+            return new JsonResponse(['message' => trans('b2b::app.shop.customers.account.roles.delete-success')]);
         } catch (\Exception $e) {
         }
 

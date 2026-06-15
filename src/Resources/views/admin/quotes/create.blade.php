@@ -1,13 +1,13 @@
 <x-admin::layouts>
     <!-- Title of the page -->
     <x-slot:title>
-        @lang('b2b_suite::app.admin.quotes.create.title', ['name' => $cart->customer->name])
+        @lang('b2b::app.admin.quotes.create.title', ['name' => $cart->customer->name])
     </x-slot>
 
     <div class="flex items-center justify-between gap-4 max-sm:flex-wrap">
         <div class="grid gap-1.5">
             <p class="text-xl font-bold leading-6 text-gray-800 dark:text-white">
-                @lang('b2b_suite::app.admin.quotes.create.title', ['name' => $cart->customer->name])
+                @lang('b2b::app.admin.quotes.create.title', ['name' => $cart->customer->name])
             </p>
         </div>
 
@@ -17,7 +17,7 @@
                 href="{{ route('admin.b2b.quotes.index') }}"
                 class="transparent-button hover:bg-gray-200 dark:text-white dark:hover:bg-gray-800"
             >
-                @lang('b2b_suite::app.admin.quotes.create.back-btn')
+                @lang('b2b::app.admin.quotes.create.back-btn')
             </a>
         </div>
     </div>
@@ -42,10 +42,10 @@
                     id="steps-container"
                 >
                     <!-- Quote & Company Information -->
-                    @include('b2b_suite::admin.quotes.create.quote-info')
+                    @include('b2b::admin.quotes.create.quote-info')
 
                     <!-- Cart Items Component -->
-                    @include('b2b_suite::admin.quotes.create.items')
+                    @include('b2b::admin.quotes.create.items')
 
                     <!-- Product Option Form -->
                     <x-admin::form
@@ -118,7 +118,7 @@
 
                 <div class="flex w-[360px] max-w-full flex-col gap-2 max-sm:w-full">
                     <!-- Company Component -->
-                    @include('b2b_suite::admin.quotes.create.company')
+                    @include('b2b::admin.quotes.create.company')
                 </div>
 
                 {!! view_render_event('bagisto.admin.sales.order.create.right_component.after') !!}

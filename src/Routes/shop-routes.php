@@ -30,6 +30,8 @@ Route::prefix('companies')->group(function () {
          * Profile.
          */
         Route::controller(CustomerController::class)->group(function () {
+            Route::get('profile', 'companyProfile')->name('shop.companies.account.profile.index');
+
             Route::put('{id}', 'modify')->name('shop.companies.account.profile.update');
         });
     });
@@ -75,7 +77,7 @@ Route::group(['middleware' => ['theme', 'locale', 'currency'], 'prefix' => 'cust
         Route::controller(QuoteController::class)->prefix('quotes')->group(function () {
             Route::get('', 'index')->name('shop.customers.account.quotes.index');
 
-            Route::post('', 'store')->name('b2b_suite.shop.quotes.store');
+            Route::post('', 'store')->name('b2b.shop.quotes.store');
 
             Route::get('{id}', 'view')->name('shop.customers.account.quotes.view');
 

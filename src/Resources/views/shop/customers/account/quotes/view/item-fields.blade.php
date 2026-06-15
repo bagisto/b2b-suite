@@ -2,9 +2,9 @@
     <table class="w-full border text-left text-sm">
         <thead class="bg-gray-100">
             <tr>
-                <th class="px-4 py-2">@lang('b2b_suite::app.shop.customers.account.quotes.view.name')</th>
-                <th class="px-4 py-2">@lang('b2b_suite::app.shop.customers.account.quotes.view.negotiated-price')</th>
-                <th class="px-4 py-2">@lang('b2b_suite::app.shop.customers.account.quotes.view.quantity')</th>
+                <th class="px-4 py-2">@lang('b2b::app.shop.customers.account.quotes.view.name')</th>
+                <th class="px-4 py-2">@lang('b2b::app.shop.customers.account.quotes.view.negotiated-price')</th>
+                <th class="px-4 py-2">@lang('b2b::app.shop.customers.account.quotes.view.quantity')</th>
             </tr>
         </thead>
         
@@ -27,7 +27,7 @@
                                 </a>
                             @else
                                 <div class="flex h-[60px] w-[60px] items-center justify-center rounded border border-gray-300 bg-zinc-100 text-xs font-medium text-zinc-500">
-                                    @lang('b2b_suite::app.shop.customers.account.quotes.view.product-not-found')
+                                    @lang('b2b::app.shop.customers.account.quotes.view.product-not-found')
                                 </div>
                             @endif
                             {{ $item->name }}
@@ -42,8 +42,8 @@
                                 name="items[{{ $item->id }}][negotiated_price]"
                                 :value="old('items.'.$item->id.'.negotiated_price') ?? $item->negotiated_price"
                                 rules="required|decimal:4"
-                                :label="trans('b2b_suite::app.shop.customers.account.quotes.view.negotiated-price')"
-                                :placeholder="trans('b2b_suite::app.shop.customers.account.quotes.view.negotiated-price')"
+                                :label="trans('b2b::app.shop.customers.account.quotes.view.negotiated-price')"
+                                :placeholder="trans('b2b::app.shop.customers.account.quotes.view.negotiated-price')"
                             />
 
                             <x-shop::form.control-group.error control-name="items[{{ $item->id }}][negotiated_price]" />
@@ -59,8 +59,8 @@
                                 name="items[{{ $item->id }}][negotiated_qty]"
                                 :value="old('items.'.$item->id.'.negotiated_qty') ?? $item->negotiated_qty"
                                 rules="required|numeric|min:1"
-                                :label="trans('b2b_suite::app.shop.customers.account.quotes.view.quantity')"
-                                :placeholder="trans('b2b_suite::app.shop.customers.account.quotes.view.quantity')"
+                                :label="trans('b2b::app.shop.customers.account.quotes.view.quantity')"
+                                :placeholder="trans('b2b::app.shop.customers.account.quotes.view.quantity')"
                             />
 
                             <x-shop::form.control-group.error control-name="items[{{ $item->id }}][negotiated_qty]" />

@@ -40,7 +40,7 @@ class CompanyController extends Controller
             return app(CompanyDataGrid::class)->process();
         }
 
-        return view('b2b_suite::admin.companies.index');
+        return view('b2b::admin.companies.index');
     }
 
     /**
@@ -91,7 +91,7 @@ class CompanyController extends Controller
             },
         ])->orderBy('column', 'asc')->orderBy('position', 'asc')->get();
 
-        return view('b2b_suite::admin.companies.create', compact('attributeGroups'));
+        return view('b2b::admin.companies.create', compact('attributeGroups'));
     }
 
     /**
@@ -154,7 +154,7 @@ class CompanyController extends Controller
         Event::dispatch('customer.registration.after', $customer);
 
         return to_route('admin.b2b.companies.index')
-            ->withSuccess(trans('b2b_suite::app.admin.companies.create-success'));
+            ->withSuccess(trans('b2b::app.admin.companies.create-success'));
     }
 
     /**
@@ -170,7 +170,7 @@ class CompanyController extends Controller
             },
         ])->orderBy('column', 'asc')->orderBy('position', 'asc')->get();
 
-        return view('b2b_suite::admin.companies.edit', compact('company', 'attributeGroups'));
+        return view('b2b::admin.companies.edit', compact('company', 'attributeGroups'));
     }
 
     /**
@@ -222,7 +222,7 @@ class CompanyController extends Controller
         Event::dispatch('customer.update.after', $customer);
 
         return to_route('admin.b2b.companies.index')
-            ->withSuccess(trans('b2b_suite::app.admin.companies.update-success'));
+            ->withSuccess(trans('b2b::app.admin.companies.update-success'));
     }
 
     /**
@@ -242,7 +242,7 @@ class CompanyController extends Controller
         Event::dispatch('b2b.company.'.($status ? 'approved' : 'disabled'), $company);
 
         return new JsonResponse([
-            'message' => trans('b2b_suite::app.admin.companies.'.($status ? 'approve-success' : 'disable-success')),
+            'message' => trans('b2b::app.admin.companies.'.($status ? 'approve-success' : 'disable-success')),
         ]);
     }
 
@@ -262,7 +262,7 @@ class CompanyController extends Controller
         }
 
         return new JsonResponse([
-            'message' => trans('b2b_suite::app.admin.companies.mass-update-status-success'),
+            'message' => trans('b2b::app.admin.companies.mass-update-status-success'),
         ]);
     }
 
@@ -275,11 +275,11 @@ class CompanyController extends Controller
             $this->customerRepository->delete($id);
 
             return response()->json([
-                'message' => trans('b2b_suite::app.admin.companies.delete-success'),
+                'message' => trans('b2b::app.admin.companies.delete-success'),
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => trans('b2b_suite::app.admin.companies.delete-failed'),
+                'message' => trans('b2b::app.admin.companies.delete-failed'),
             ], 500);
         }
     }
@@ -313,11 +313,11 @@ class CompanyController extends Controller
             }
 
             return new JsonResponse([
-                'message' => trans('b2b_suite::app.admin.companies.mass-delete-success'),
+                'message' => trans('b2b::app.admin.companies.mass-delete-success'),
             ]);
         } catch (\Exception $exception) {
             return new JsonResponse([
-                'message' => trans('b2b_suite::app.admin.companies.delete-failed'),
+                'message' => trans('b2b::app.admin.companies.delete-failed'),
             ], 500);
         }
     }

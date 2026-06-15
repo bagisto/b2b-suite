@@ -7,9 +7,9 @@
         <div class="flex items-center justify-between gap-x-2.5">
             <p class="mb-4 text-base font-semibold text-gray-800">
                 @if ($quote->state == 'quotation')
-                    @lang('b2b_suite::app.shop.customers.account.quotes.view.quote-items')
+                    @lang('b2b::app.shop.customers.account.quotes.view.quote-items')
                 @else
-                    @lang('b2b_suite::app.shop.customers.account.purchase-orders.view.po-items')
+                    @lang('b2b::app.shop.customers.account.purchase-orders.view.po-items')
                 @endif
             </p>
             
@@ -22,14 +22,14 @@
                     type="submit"
                     class="primary-button mb-4 cursor-pointer p-3 text-sm"
                 >
-                    @lang('b2b_suite::app.shop.customers.account.quotes.view.btn-add-to-cart')
+                    @lang('b2b::app.shop.customers.account.quotes.view.btn-add-to-cart')
                 </button>
             @endif
         </div>
 
         @if (! $quote->items->count())
             <div class="text-sm font-medium text-zinc-500">
-                @lang('b2b_suite::app.shop.customers.account.quotes.view.no-items')
+                @lang('b2b::app.shop.customers.account.quotes.view.no-items')
             </div>
         @else
             <!-- For Desktop View -->
@@ -37,16 +37,16 @@
                 <table class="w-full border text-left text-sm">
                     <thead class="bg-gray-100">
                         <tr>
-                            <th class="px-4 py-2">@lang('b2b_suite::app.shop.customers.account.quotes.view.product')</th>
-                            <th class="px-4 py-2">@lang('b2b_suite::app.shop.customers.account.quotes.view.name')</th>
-                            <th class="px-4 py-2">@lang('b2b_suite::app.shop.customers.account.quotes.view.price')</th>
-                            <th class="px-4 py-2">@lang('b2b_suite::app.shop.customers.account.quotes.view.quantity')</th>
-                            <th class="px-4 py-2">@lang('b2b_suite::app.shop.customers.account.quotes.view.sub-total')</th>
+                            <th class="px-4 py-2">@lang('b2b::app.shop.customers.account.quotes.view.product')</th>
+                            <th class="px-4 py-2">@lang('b2b::app.shop.customers.account.quotes.view.name')</th>
+                            <th class="px-4 py-2">@lang('b2b::app.shop.customers.account.quotes.view.price')</th>
+                            <th class="px-4 py-2">@lang('b2b::app.shop.customers.account.quotes.view.quantity')</th>
+                            <th class="px-4 py-2">@lang('b2b::app.shop.customers.account.quotes.view.sub-total')</th>
 
                             @if (in_array($quote->status, ['accepted', 'ordered', 'completed']))
-                                <th class="px-4 py-2 text-right">@lang('b2b_suite::app.shop.customers.account.quotes.view.negotiated-price')</th>
-                                <th class="px-4 py-2 text-right">@lang('b2b_suite::app.shop.customers.account.quotes.view.negotiated-qty')</th>
-                                <th class="px-4 py-2 text-right">@lang('b2b_suite::app.shop.customers.account.quotes.view.negotiated-total')</th>
+                                <th class="px-4 py-2 text-right">@lang('b2b::app.shop.customers.account.quotes.view.negotiated-price')</th>
+                                <th class="px-4 py-2 text-right">@lang('b2b::app.shop.customers.account.quotes.view.negotiated-qty')</th>
+                                <th class="px-4 py-2 text-right">@lang('b2b::app.shop.customers.account.quotes.view.negotiated-total')</th>
                             @endif
                         </tr>
                     </thead>
@@ -69,7 +69,7 @@
                                         </a>
                                     @else
                                         <div class="flex h-[60px] w-[60px] items-center justify-center rounded border border-gray-300 bg-zinc-100 text-xs font-medium text-zinc-500">
-                                            @lang('b2b_suite::app.shop.customers.account.quotes.view.product-not-found')
+                                            @lang('b2b::app.shop.customers.account.quotes.view.product-not-found')
                                         </div>
                                     @endif
                                 </td>
@@ -136,7 +136,7 @@
                     <tfoot>
                         <tr class="border-t">
                             <td colspan="{{ in_array($quote->status, ['accepted', 'ordered', 'completed']) ? '7' : '4' }}" class="px-4 py-2 text-right font-bold">
-                                @lang('b2b_suite::app.shop.customers.account.quotes.view.grand-total')
+                                @lang('b2b::app.shop.customers.account.quotes.view.grand-total')
                             </td>
                             <td colspan="{{ in_array($quote->status, ['accepted', 'ordered', 'completed']) ? '6' : '3' }}" class="px-4 py-2 text-right font-bold text-zinc-500">
                                 {{ core()->formatPrice($quote->total, $quote->currency_code) }}
@@ -144,7 +144,7 @@
                         </tr>
                         <tr class="border-t">
                             <td colspan="{{ in_array($quote->status, ['accepted', 'ordered', 'completed']) ? '7' : '4' }}" class="px-4 py-2 text-right font-bold">
-                                @lang('b2b_suite::app.shop.customers.account.quotes.view.negotiated-total')
+                                @lang('b2b::app.shop.customers.account.quotes.view.negotiated-total')
                             </td>
                             <td colspan="{{ in_array($quote->status, ['accepted', 'ordered', 'completed']) ? '6' : '3' }}" class="px-4 py-2 text-right text-lg font-bold text-navyBlue">
                                 {{ core()->formatPrice($quote->negotiated_total, $quote->currency_code) }}
@@ -170,7 +170,7 @@
                                 </a>
                             @else
                                 <div class="flex h-[60px] w-[60px] flex-shrink-0 items-center justify-center rounded border border-gray-300 bg-zinc-100 text-xs font-medium text-zinc-500">
-                                    @lang('b2b_suite::app.shop.customers.account.quotes.view.product-not-found')
+                                    @lang('b2b::app.shop.customers.account.quotes.view.product-not-found')
                                 </div>
                             @endif
 
@@ -180,39 +180,39 @@
                                 </p>
 
                                 <p class="mt-1 text-xs font-medium text-zinc-500">
-                                    @lang('b2b_suite::app.shop.customers.account.quotes.view.sku'): {{ $item->sku }}
+                                    @lang('b2b::app.shop.customers.account.quotes.view.sku'): {{ $item->sku }}
                                 </p>
 
                                 <p class="mt-1 text-xs font-medium text-zinc-500">
-                                    @lang('b2b_suite::app.shop.customers.account.quotes.view.price'): 
+                                    @lang('b2b::app.shop.customers.account.quotes.view.price'): 
                                     {{ $item->price ? core()->formatPrice($item->price, $quote->currency_code) : '-' }}
                                 </p>
 
                                 <p class="mt-1 text-xs font-medium text-zinc-500">
-                                    @lang('b2b_suite::app.shop.customers.account.quotes.view.quantity'): {{ $item->qty }}
+                                    @lang('b2b::app.shop.customers.account.quotes.view.quantity'): {{ $item->qty }}
                                 </p>
 
                                 <p class="mt-1 text-sm font-semibold text-gray-800">
-                                    @lang('b2b_suite::app.shop.customers.account.quotes.view.sub-total'): 
+                                    @lang('b2b::app.shop.customers.account.quotes.view.sub-total'): 
                                     {{ core()->formatPrice(($item->price*$item->qty), $quote->currency_code) }}
                                 </p>
                                 
                                 @if (in_array($quote->status, ['accepted', 'ordered', 'completed']))
                                     <!-- Negotiated Price -->
                                     <p class="mt-1 text-xs font-medium text-zinc-500">
-                                        @lang('b2b_suite::app.shop.customers.account.quotes.view.negotiated-price'):
+                                        @lang('b2b::app.shop.customers.account.quotes.view.negotiated-price'):
                                         {{ $item->negotiated_price ? core()->formatPrice($item->negotiated_price, $quote->currency_code) : '-' }}
                                     </p>
                                     
                                     <!-- Negotiated Quantity -->
                                     <p class="mt-1 text-xs font-medium text-zinc-500">
-                                        @lang('b2b_suite::app.shop.customers.account.quotes.view.negotiated-qty'):
+                                        @lang('b2b::app.shop.customers.account.quotes.view.negotiated-qty'):
                                         {{ $item->negotiated_qty }}
                                     </p>
                                     
                                     <!-- Negotiated Total -->
                                     <p class="mt-1 text-sm font-semibold text-gray-800">
-                                        @lang('b2b_suite::app.shop.customers.account.quotes.view.negotiated-total'):
+                                        @lang('b2b::app.shop.customers.account.quotes.view.negotiated-total'):
                                         {{ core()->formatPrice(($item->negotiated_price * $item->negotiated_qty), $quote->currency_code) }}
                                     </p>
                                 @endif
@@ -225,7 +225,7 @@
                     <div class="mt-4 w-full max-w-xs">
                         <div class="flex justify-between text-sm font-bold text-gray-800">
                             <span>
-                                @lang('b2b_suite::app.shop.customers.account.quotes.view.grand-total')
+                                @lang('b2b::app.shop.customers.account.quotes.view.grand-total')
                             </span>
 
                             <span class="text-zinc-500">
@@ -235,7 +235,7 @@
 
                         <div class="mt-2 flex justify-between text-sm font-bold text-gray-800">
                             <span>
-                                @lang('b2b_suite::app.shop.customers.account.quotes.view.negotiated-total')
+                                @lang('b2b::app.shop.customers.account.quotes.view.negotiated-total')
                             </span>
 
                             <span class="text-zinc-500">

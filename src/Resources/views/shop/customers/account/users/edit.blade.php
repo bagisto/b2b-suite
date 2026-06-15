@@ -1,13 +1,13 @@
 <x-shop::layouts.account>
     <!-- Page Title -->
     <x-slot:title>
-        @lang('b2b_suite::app.shop.customers.account.users.edit.title')
+        @lang('b2b::app.shop.customers.account.users.edit.title')
     </x-slot>
 
     <!-- Breadcrumbs -->
     @if ((core()->getConfigData('general.general.breadcrumbs.shop')))
         @section('breadcrumbs')
-            <x-shop::breadcrumbs name="profile.edit" />
+            <x-shop::breadcrumbs name="users.edit" />
         @endSection
     @endif
 
@@ -26,7 +26,7 @@
             </a>
 
             <h2 class="text-2xl font-medium ltr:ml-2.5 rtl:mr-2.5 max-md:text-xl max-sm:text-base md:ltr:ml-0 md:rtl:mr-0">
-                @lang('b2b_suite::app.shop.customers.account.users.edit.title')
+                @lang('b2b::app.shop.customers.account.users.edit.title')
             </h2>
         </div>
     
@@ -60,7 +60,7 @@
             <!-- First Name -->
             <x-shop::form.control-group>
                 <x-shop::form.control-group.label class="required">
-                    @lang('b2b_suite::app.shop.customers.account.users.edit.first-name')
+                    @lang('b2b::app.shop.customers.account.users.edit.first-name')
                 </x-shop::form.control-group.label>
 
                 <x-shop::form.control-group.control
@@ -68,8 +68,8 @@
                     name="first_name"
                     rules="required"
                     value="{{ old('first_name') ?? $user->first_name }}"
-                    :label="trans('b2b_suite::app.shop.customers.account.users.edit.first-name')"
-                    :placeholder="trans('b2b_suite::app.shop.customers.account.users.edit.first-name')"
+                    :label="trans('b2b::app.shop.customers.account.users.edit.first-name')"
+                    :placeholder="trans('b2b::app.shop.customers.account.users.edit.first-name')"
                 />
 
                 <x-shop::form.control-group.error control-name="first_name" />
@@ -80,7 +80,7 @@
             <!-- Last Name -->
             <x-shop::form.control-group>
                 <x-shop::form.control-group.label class="required">
-                    @lang('b2b_suite::app.shop.customers.account.users.edit.last-name')
+                    @lang('b2b::app.shop.customers.account.users.edit.last-name')
                 </x-shop::form.control-group.label>
 
                 <x-shop::form.control-group.control
@@ -88,8 +88,8 @@
                     name="last_name"
                     rules="required"
                     value="{{ old('last_name') ?? $user->last_name }}"
-                    :label="trans('b2b_suite::app.shop.customers.account.users.edit.last-name')"
-                    :placeholder="trans('b2b_suite::app.shop.customers.account.users.edit.last-name')"
+                    :label="trans('b2b::app.shop.customers.account.users.edit.last-name')"
+                    :placeholder="trans('b2b::app.shop.customers.account.users.edit.last-name')"
                 />
 
                 <x-shop::form.control-group.error control-name="last_name" />
@@ -100,7 +100,7 @@
             <!-- Email -->
             <x-shop::form.control-group>
                 <x-shop::form.control-group.label class="required">
-                    @lang('b2b_suite::app.shop.customers.account.users.edit.email')
+                    @lang('b2b::app.shop.customers.account.users.edit.email')
                 </x-shop::form.control-group.label>
 
                 <x-shop::form.control-group.control
@@ -108,8 +108,8 @@
                     name="user_email"
                     rules="required|email"
                     value="{{ old('user_email') ?? $user->email }}"
-                    :label="trans('b2b_suite::app.shop.customers.account.users.edit.email')"
-                    :placeholder="trans('b2b_suite::app.shop.customers.account.users.edit.email')"
+                    :label="trans('b2b::app.shop.customers.account.users.edit.email')"
+                    :placeholder="trans('b2b::app.shop.customers.account.users.edit.email')"
                 />
 
                 <x-shop::form.control-group.error control-name="user_email" />
@@ -120,7 +120,7 @@
             <!-- Phone -->
             <x-shop::form.control-group>
                 <x-shop::form.control-group.label class="required">
-                    @lang('b2b_suite::app.shop.customers.account.users.edit.phone')
+                    @lang('b2b::app.shop.customers.account.users.edit.phone')
                 </x-shop::form.control-group.label>
 
                 <x-shop::form.control-group.control
@@ -128,8 +128,8 @@
                     name="phone"
                     rules="required|phone"
                     value="{{ old('phone') ?? $user->phone }}"
-                    :label="trans('b2b_suite::app.shop.customers.account.users.edit.phone')"
-                    :placeholder="trans('b2b_suite::app.shop.customers.account.users.edit.phone')"
+                    :label="trans('b2b::app.shop.customers.account.users.edit.phone')"
+                    :placeholder="trans('b2b::app.shop.customers.account.users.edit.phone')"
                 />
 
                 <x-shop::form.control-group.error control-name="phone" />
@@ -140,7 +140,7 @@
             <!-- Gender -->
             <x-shop::form.control-group>
                 <x-shop::form.control-group.label class="required">
-                    @lang('b2b_suite::app.shop.customers.account.users.edit.gender')
+                    @lang('b2b::app.shop.customers.account.users.edit.gender')
                 </x-shop::form.control-group.label>
 
                 <x-shop::form.control-group.control
@@ -149,19 +149,19 @@
                     name="gender"
                     rules="required"
                     value="{{ old('gender') ?? $user->gender }}"
-                    :aria-label="trans('b2b_suite::app.shop.customers.account.users.edit.select-gender')"
-                    :label="trans('b2b_suite::app.shop.customers.account.users.edit.gender')"
+                    :aria-label="trans('b2b::app.shop.customers.account.users.edit.select-gender')"
+                    :label="trans('b2b::app.shop.customers.account.users.edit.gender')"
                 >
                     <option value="Other">
-                        @lang('b2b_suite::app.shop.customers.account.users.edit.other')
+                        @lang('b2b::app.shop.customers.account.users.edit.other')
                     </option>
 
                     <option value="Male">
-                        @lang('b2b_suite::app.shop.customers.account.users.edit.male')
+                        @lang('b2b::app.shop.customers.account.users.edit.male')
                     </option>
 
                     <option value="Female">
-                        @lang('b2b_suite::app.shop.customers.account.users.edit.female')
+                        @lang('b2b::app.shop.customers.account.users.edit.female')
                     </option>
                 </x-shop::form.control-group.control>
 
@@ -173,15 +173,15 @@
             <!-- DOB -->
             <x-shop::form.control-group>
                 <x-shop::form.control-group.label>
-                    @lang('b2b_suite::app.shop.customers.account.users.edit.dob')
+                    @lang('b2b::app.shop.customers.account.users.edit.dob')
                 </x-shop::form.control-group.label>
 
                 <x-shop::form.control-group.control
                     type="date"
                     name="date_of_birth"
                     value="{{ old('date_of_birth') ?? $user->date_of_birth }}"
-                    :label="trans('b2b_suite::app.shop.customers.account.users.edit.dob')"
-                    :placeholder="trans('b2b_suite::app.shop.customers.account.users.edit.dob')"
+                    :label="trans('b2b::app.shop.customers.account.users.edit.dob')"
+                    :placeholder="trans('b2b::app.shop.customers.account.users.edit.dob')"
                 />
 
                 <x-shop::form.control-group.error control-name="date_of_birth" />
@@ -192,7 +192,7 @@
             <!-- Role -->
             <x-shop::form.control-group>
                 <x-shop::form.control-group.label class="required">
-                    @lang('b2b_suite::app.shop.customers.account.users.edit.role')
+                    @lang('b2b::app.shop.customers.account.users.edit.role')
                 </x-shop::form.control-group.label>
 
                 <x-shop::form.control-group.control
@@ -201,10 +201,10 @@
                     name="company_role_id"
                     rules="required"
                     value="{{ old('company_role_id') ?: $user->company_role_id }}"
-                    :aria-label="trans('b2b_suite::app.shop.customers.account.users.edit.select-role')"
-                    :label="trans('b2b_suite::app.shop.customers.account.users.edit.role')"
+                    :aria-label="trans('b2b::app.shop.customers.account.users.edit.select-role')"
+                    :label="trans('b2b::app.shop.customers.account.users.edit.role')"
                 >
-                    <option value="" disabled>@lang('b2b_suite::app.shop.customers.account.users.edit.select-role')</option>
+                    <option value="" disabled>@lang('b2b::app.shop.customers.account.users.edit.select-role')</option>
 
                     @foreach ($roles as $role)
                         <option value="{{ $role->id }}">
@@ -219,7 +219,7 @@
             <!-- Active Status -->
             <x-shop::form.control-group>
                 <x-shop::form.control-group.label>
-                    @lang('b2b_suite::app.shop.customers.account.users.create.status')
+                    @lang('b2b::app.shop.customers.account.users.create.status')
                 </x-shop::form.control-group.label>
 
                 <x-shop::form.control-group.control
@@ -227,7 +227,7 @@
                     name="status"
                     value="1"
                     :checked="old('status', $user->status) ? true : false"
-                    :label="trans('b2b_suite::app.shop.customers.account.users.create.active')"
+                    :label="trans('b2b::app.shop.customers.account.users.create.active')"
                 />
 
                 <x-shop::form.control-group.error control-name="status" />
@@ -236,7 +236,7 @@
             <!-- Suspended -->
             <x-shop::form.control-group>
                 <x-shop::form.control-group.label>
-                    @lang('b2b_suite::app.shop.customers.account.users.create.is-suspended')
+                    @lang('b2b::app.shop.customers.account.users.create.is-suspended')
                 </x-shop::form.control-group.label>
 
                 <x-shop::form.control-group.control
@@ -244,7 +244,7 @@
                     name="is_suspended"
                     value="1"
                     :checked="old('is_suspended', $user->is_suspended) ? true : false"
-                    :label="trans('b2b_suite::app.shop.customers.account.users.create.suspended')"
+                    :label="trans('b2b::app.shop.customers.account.users.create.suspended')"
                 />
 
                 <x-shop::form.control-group.error control-name="is_suspended" />
@@ -256,7 +256,7 @@
                 type="submit"
                 class="primary-button m-0 block rounded-2xl px-11 py-3 text-center text-base max-md:w-full max-md:max-w-full max-md:rounded-lg max-md:py-1.5"
             >
-                @lang('b2b_suite::app.shop.customers.account.users.edit.btn-save')
+                @lang('b2b::app.shop.customers.account.users.edit.btn-save')
             </button>
 
             {!! view_render_event('bagisto.shop.customers.account.users.edit_form_controls.after', ['user' => $user]) !!}

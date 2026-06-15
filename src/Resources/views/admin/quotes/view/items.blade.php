@@ -3,16 +3,16 @@
     <div class="flex justify-between p-1.5">
         <p class="p-2.5 text-base font-semibold text-gray-800 dark:text-white">
             @if ($quote->state == 'quotation')
-                @lang('b2b_suite::app.admin.quotes.view.quote-items')
+                @lang('b2b::app.admin.quotes.view.quote-items')
             @else
-                @lang('b2b_suite::app.admin.purchase-orders.view.po-items')
+                @lang('b2b::app.admin.purchase-orders.view.po-items')
             @endif
         </p>
     </div>
 
     @if (! $quote->items->count())
         <div class="text-sm font-medium text-zinc-500">
-            @lang('b2b_suite::app.admin.quotes.view.no-items')
+            @lang('b2b::app.admin.quotes.view.no-items')
         </div>
     @else
         <div class="overflow-x-auto p-4 max-md:hidden">
@@ -20,30 +20,30 @@
                 <thead class="bg-gray-100 dark:bg-gray-800">
                     <tr>
                         <th class="border-b px-4 py-2 text-gray-600 dark:border-gray-800 dark:text-gray-300">
-                            @lang('b2b_suite::app.admin.quotes.view.product')
+                            @lang('b2b::app.admin.quotes.view.product')
                         </th>
                         <th class="border-b px-4 py-2 text-gray-600 dark:border-gray-800 dark:text-gray-300">
-                            @lang('b2b_suite::app.admin.quotes.view.name')
+                            @lang('b2b::app.admin.quotes.view.name')
                         </th>
                         <th class="border-b px-4 py-2 text-gray-600 dark:border-gray-800 dark:text-gray-300">
-                            @lang('b2b_suite::app.admin.quotes.view.price')
+                            @lang('b2b::app.admin.quotes.view.price')
                         </th>
                         <th class="border-b px-4 py-2 text-gray-600 dark:border-gray-800 dark:text-gray-300">
-                            @lang('b2b_suite::app.admin.quotes.view.quantity')
+                            @lang('b2b::app.admin.quotes.view.quantity')
                         </th>
                         <th class="border-b px-4 py-2 text-gray-600 dark:border-gray-800 dark:text-gray-300">
-                            @lang('b2b_suite::app.admin.quotes.view.sub-total')
+                            @lang('b2b::app.admin.quotes.view.sub-total')
                         </th>
 
                         @if (in_array($quote->status, ['accepted', 'ordered', 'completed']))
                             <th class="border-b px-4 py-2 text-gray-600 dark:border-gray-800 dark:text-gray-300">
-                                @lang('b2b_suite::app.admin.quotes.view.negotiated-price')
+                                @lang('b2b::app.admin.quotes.view.negotiated-price')
                             </th>
                             <th class="border-b px-4 py-2 text-gray-600 dark:border-gray-800 dark:text-gray-300">
-                                @lang('b2b_suite::app.admin.quotes.view.negotiated-qty')
+                                @lang('b2b::app.admin.quotes.view.negotiated-qty')
                             </th>
                             <th class="border-b px-4 py-2 text-gray-600 dark:border-gray-800 dark:text-gray-300">
-                                @lang('b2b_suite::app.admin.quotes.view.negotiated-total')
+                                @lang('b2b::app.admin.quotes.view.negotiated-total')
                             </th>
                         @endif
                     </tr>
@@ -67,7 +67,7 @@
                                     </a>
                                 @else
                                     <div class="flex h-[60px] w-[60px] items-center justify-center rounded border border-gray-300 bg-zinc-100 text-xs font-medium text-zinc-500">
-                                        @lang('b2b_suite::app.admin.quotes.view.product-not-found')
+                                        @lang('b2b::app.admin.quotes.view.product-not-found')
                                     </div>
                                 @endif
                             </td>
@@ -133,18 +133,18 @@
 
                 <tfoot>
                     <tr class="border-t dark:border-gray-800">
-                        <td colspan="{{ in_array($quote->status, ['accepted', 'ordered', 'completed']) ? '7' : '5' }}" class="px-4 py-2 text-right font-bold text-gray-600 dark:text-gray-300">
-                            @lang('b2b_suite::app.admin.quotes.view.grand-total')
+                        <td colspan="{{ in_array($quote->status, ['accepted', 'ordered', 'completed']) ? '7' : '4' }}" class="px-4 py-2 text-right font-bold text-gray-600 dark:text-gray-300">
+                            @lang('b2b::app.admin.quotes.view.grand-total')
                         </td>
-                        <td colspan="{{ in_array($quote->status, ['accepted', 'ordered', 'completed']) ? '6' : '4' }}" class="px-4 py-2 text-right font-bold text-gray-600 text-zinc-500 dark:text-gray-300">
+                        <td colspan="1" class="px-4 py-2 text-right font-bold text-gray-600 text-zinc-500 dark:text-gray-300">
                             {{ core()->formatBasePrice($quote->base_total) }}
                         </td>
                     </tr>
                     <tr class="border-t dark:border-gray-800">
-                        <td colspan="{{ in_array($quote->status, ['accepted', 'ordered', 'completed']) ? '7' : '5' }}" class="px-4 py-2 text-right font-bold text-gray-600 dark:text-gray-300">
-                            @lang('b2b_suite::app.admin.quotes.view.negotiated-total')
+                        <td colspan="{{ in_array($quote->status, ['accepted', 'ordered', 'completed']) ? '7' : '4' }}" class="px-4 py-2 text-right font-bold text-gray-600 dark:text-gray-300">
+                            @lang('b2b::app.admin.quotes.view.negotiated-total')
                         </td>
-                        <td colspan="{{ in_array($quote->status, ['accepted', 'ordered', 'completed']) ? '6' : '4' }}" class="px-4 py-2 text-right font-bold text-gray-600 text-zinc-500 dark:text-gray-300">
+                        <td colspan="1" class="px-4 py-2 text-right font-bold text-gray-600 text-zinc-500 dark:text-gray-300">
                             {{ core()->formatBasePrice($quote->base_negotiated_total) }}
                         </td>
                     </tr>
