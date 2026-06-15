@@ -62,12 +62,21 @@ class CustomerController extends BaseCustomerController
      */
     public function companyProfile()
     {
-        $customer = $this->customerRepository->find(auth()->guard('customer')->user()->id);
+        if (! (bool) core()->getConfigData('b2b.general.settings.active')) {
+            abort(404);
+        }
 
-        if (
-            ! (bool) core()->getConfigData('b2b.general.settings.active')
-            || $customer->type != 'company'
-        ) {
+        /**
+         * Access is role-gated: the company account, or members whose role grants the
+         * `company_profile` permission. Everyone else (and plain customers) is rejected.
+         */
+        if (! customer_bouncer()->hasPermission('account.company_profile')) {
+            abort(404);
+        }
+
+        $customer = $this->resolveCompany();
+
+        if (! $customer) {
             abort(404);
         }
 
@@ -81,7 +90,39 @@ class CustomerController extends BaseCustomerController
             ->with([
                 'customer' => $customer,
                 'attributeGroups' => $attributeGroups,
+                'canEdit' => customer_bouncer()->hasPermission('account.company_profile.edit'),
             ]);
+    }
+
+    /**
+     * Resolve the company customer whose profile is shown/edited: the account itself for
+     * a company login, or the company a member belongs to.
+     */
+    protected function resolveCompany()
+    {
+        $authId = auth()->guard('customer')->user()?->id;
+
+        if (! $authId) {
+            return null;
+        }
+
+        /**
+         * Resolve through the repository so we get the B2B customer model (with the
+         * `companies()` relation), regardless of the model the auth guard returns.
+         */
+        $customer = $this->customerRepository->find($authId);
+
+        if (! $customer) {
+            return null;
+        }
+
+        if ($customer->type === 'company') {
+            return $customer;
+        }
+
+        $company = $customer->companies()->first();
+
+        return $company ? $this->customerRepository->find($company->id) : null;
     }
 
     /**
@@ -91,11 +132,28 @@ class CustomerController extends BaseCustomerController
      */
     public function modify(CompanyRequest $request, int $id)
     {
-        $id = auth()->guard('customer')->user()->id;
+        if (! (bool) core()->getConfigData('b2b.general.settings.active')) {
+            abort(404);
+        }
 
-        $customer = $this->customerRepository->findOrFail($id);
+        /**
+         * Saving requires the dedicated edit permission (view-only members are blocked).
+         */
+        if (! customer_bouncer()->hasPermission('account.company_profile.edit')) {
+            abort(401, 'Unauthorized action.');
+        }
 
-        Event::dispatch('customer.update.before', $id);
+        $customer = $this->resolveCompany();
+
+        /**
+         * The edited record must be the caller's own company — never another company
+         * passed through the route id.
+         */
+        if (! $customer || $customer->id !== (int) $id) {
+            abort(401, 'Unauthorized action.');
+        }
+
+        Event::dispatch('customer.update.before', $customer->id);
 
         /**
          * Only the column-backed company attributes are written to the customers
@@ -109,10 +167,9 @@ class CustomerController extends BaseCustomerController
             'email',
             'date_of_birth',
             'phone',
-            'company_role_id',
         ]);
 
-        $this->customerRepository->update($data, $id);
+        $this->customerRepository->update($data, $customer->id);
 
         $this->companyAttributeValueRepository->saveValues(
             $request->all(),

@@ -25,11 +25,10 @@
     ];
 
     /**
-     * The Company Profile page edits the mapped company attributes, so it is only
-     * relevant to the company account itself (not individual member users). It stays
-     * in $b2bKeys (kept out of the core section) and is rejected below for non-companies.
+     * The Company Profile link is permission-gated like the other B2B items: the menu is
+     * already filtered by customer_bouncer(), so it only reaches here for the company
+     * account or members whose role grants `company_profile`.
      */
-    $isCompany = $customer?->type === 'company';
 @endphp
 
 <div class="panel-side journal-scroll grid max-h-[1320px] min-w-[342px] max-w-[380px] grid-cols-[1fr] gap-8 overflow-y-auto overflow-x-hidden max-xl:min-w-[270px] max-md:max-w-full max-md:gap-5">
@@ -62,8 +61,7 @@
         @php
             $coreChildren = $menuItem->getChildren()->reject(fn ($child) => in_array($child->getKey(), $b2bKeys));
             $b2bChildren  = $menuItem->getChildren()
-                ->filter(fn ($child) => in_array($child->getKey(), $b2bKeys))
-                ->reject(fn ($child) => $child->getKey() === 'account.company_profile' && ! $isCompany);
+                ->filter(fn ($child) => in_array($child->getKey(), $b2bKeys));
         @endphp
 
         <!-- Core account section -->

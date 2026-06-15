@@ -48,18 +48,34 @@ class ProductRepository extends BaseProductRepository
         }
 
         /**
-         * Catalog visibility is a STOREFRONT concern only. The admin panel shares the
-         * browser session with the shop, so a logged-in customer would otherwise leak
-         * their catalog filter into admin product listings (e.g. the assign-products
-         * modal). Never restrict products when an admin is authenticated.
+         * Catalog visibility is a STOREFRONT concern only. It must never restrict the
+         * admin product listings (e.g. the assign-products modal). Gate on the REQUEST
+         * being an admin-area request rather than on an admin session merely existing —
+         * an admin cookie in the same browser must not disable storefront filtering.
          */
-        if (auth()->guard('admin')->check()) {
+        if ($this->isAdminRequest()) {
             return $this->catalog = null;
         }
 
         $groupId = $this->customerRepository->getCurrentGroup()?->id;
 
         return $this->catalog = app(CompanyCatalogHelper::class)->resolveByGroupId($groupId);
+    }
+
+    /**
+     * Whether the current request targets the admin area. Driven by the request/route
+     * context (not by whether an admin session exists), so a storefront request still
+     * gets catalog filtering even when the admin panel is open in the same browser.
+     */
+    protected function isAdminRequest(): bool
+    {
+        if (request()->routeIs('admin.*')) {
+            return true;
+        }
+
+        $adminPrefix = trim((string) config('app.admin_url', 'admin'), '/') ?: 'admin';
+
+        return request()->is($adminPrefix) || request()->is($adminPrefix.'/*');
     }
 
     /**

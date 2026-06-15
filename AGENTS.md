@@ -12,8 +12,8 @@ company catalogs (per-company product visibility + pricing).
 
 - **Namespace:** `Webkul\B2BSuite` → `src/`
 - **Package path:** `packages/bagisto/b2b-suite` (symlinked into `vendor/bagisto/b2b-suite`)
-- **PHP:** 8.1+ · **Bagisto:** 2.x · Blade views styled via the core Shop/Admin themes
-  (the package ships no build of its own — see *Styling* below)
+- **PHP:** 8.1+ · **Bagisto:** 2.x · Blade views styled via the core Shop/Admin themes,
+  which the package rebuilds into its own bundles (see *Styling* below)
 
 ## How the package is registered
 
@@ -82,39 +82,47 @@ To override another view/component: add it under `publishables/resources/vendor/
 (mirror the namespaced path without the namespace prefix — components live under
 `<namespace>/components/<name>`), then re-publish.
 
-## Styling — the package has no build, but the core themes scan its views
+## Styling — the package builds its own theme bundles
 
-This package ships **no compiled CSS/JS** of its own and has no Vite/Tailwind build. The
-storefront/admin use the core Shop and Admin Vue apps and stylesheets; B2B Blade views are
-styled with Tailwind utility classes.
+B2B Blade views are styled with the core **Shop/Admin Tailwind themes**, but they live
+outside those themes' `src/Resources/**`, so the core builds don't scan them. Rather than
+editing the core theme configs, the package ships **its own build** that regenerates each
+theme's bundle with the B2B views folded in — a single coherent Tailwind pass (correct
+layer order, no second stylesheet) and **no changes to the core Shop/Admin packages**.
 
-**Important cross-package dependency:** B2B views live outside the core themes'
-`src/Resources/**`, so Tailwind would not normally generate the utility classes they use.
-To fix this, the core theme configs were extended to **scan the B2B views**:
+How it works (all in the package root):
 
-- `packages/Webkul/Shop/tailwind.config.js` — `content` includes
-  `../../bagisto/b2b-suite/src/Resources/views/shop/**` and `publishables/resources/vendor/shop/**`;
-  also sets `darkMode: "class"` (the storefront is light-only, so `dark:` utilities never
-  auto-activate via `prefers-color-scheme`).
-- `packages/Webkul/Admin/tailwind.config.js` — `content` includes
-  `../../bagisto/b2b-suite/src/Resources/views/admin/**` and `publishables/resources/vendor/admin/**`.
+- `tailwind.{admin,shop}.config.js` — reuse the core theme's Tailwind config (theme tokens,
+  plugins, safelist, `darkMode`) and add the B2B views to `content` (absolute paths, so the
+  build is cwd-independent).
+- `vite.{admin,shop}.config.js` — `import` the core theme's *own* Vite config and override
+  only PostCSS to use the config above; output goes to the theme's own
+  `public/themes/{admin,shop}/default/build`.
+- Core themes are resolved at `<app-root>/packages/Webkul/<theme>`, so the build works
+  whether this package sits in `packages/bagisto/b2b-suite` (source) or
+  `vendor/bagisto/b2b-suite` (installed).
 
-Consequences for anyone changing B2B views:
+Commands (run from the package). The build reuses the core themes' `node_modules`, so make
+sure `npm install` has been run in `packages/Webkul/{Shop,Admin}` first:
 
-- If you introduce a **new** Tailwind utility class in a B2B view, you must rebuild the
-  affected theme so the class is generated:
-  ```bash
-  cd packages/Webkul/Shop  && npm install && npm run build   # storefront views
-  cd packages/Webkul/Admin && npm install && npm run build   # admin views
-  ```
-- Reusing classes the core theme already emits needs no rebuild.
-- These two `tailwind.config.js` edits are the only changes made to core packages; keep
-  them (or replace them with scoped `@push('styles')` blocks) if you ever vendor this out.
+```bash
+npm install
+npm run build          # admin + shop → straight into public/themes/.../build
+npm run build:admin    # one theme only
+npm run build:shop
+npm run dev:admin      # hot-reload while developing
+npm run dev:shop
+```
+
+**Prebuilt bundles ship with the package**, so a normal install needs **no Node/Tailwind
+build**: `npm run publishables` (maintainer) rebuilds both and copies them into
+`publishables/public/`, and `b2b-suite:install` publishes them into `public/`. Only rebuild
+if you change a B2B view (new utility class) or the core theme changes and you spot breakage.
 
 Do **not** add a second global stylesheet — loading another Tailwind utility sheet after
 the core one lets its plain utilities override core's responsive variants (this previously
-broke the responsive flash toasts). For one-off rules, prefer a scoped `@push('styles')`
-block within the view.
+broke the responsive flash toasts and the admin sidebar layout). For one-off rules, prefer
+a scoped `@push('styles')` block within the view.
 
 ### Vue inside Blade
 
@@ -183,15 +191,22 @@ CompanyCatalogDataGrid`, views under `Resources/views/admin/company-catalogs/`
 
 ## Publishing
 
-The only things published are the view overrides and sample storage (see `publishables/`):
+Everything published lives under `publishables/` (see that section above) and is published
+by the provider:
+
+- `publishables/resources/vendor` → `resources/views/vendor` — view/component overrides
+- `publishables/storage` → `storage/app/public` — sample data
+- `publishables/public/themes/{admin,shop}/default/build` → the matching `public/` build
+  dirs — the **prebuilt theme bundles** (scoped to those two folders; the rest of `public/`
+  is never touched)
 
 ```bash
 php artisan vendor:publish --provider="Webkul\B2BSuite\Providers\B2BSuiteServiceProvider" --force
 php artisan optimize:clear
 ```
 
-Re-run this after editing anything under `publishables/resources/` (the override copies
-live in the app's `resources/views/vendor/...`, not the package).
+Re-run this after editing anything under `publishables/resources/`. After rebuilding the
+theme bundles, refresh `publishables/public/` with `npm run publishables` and re-publish.
 
 ## Commands
 

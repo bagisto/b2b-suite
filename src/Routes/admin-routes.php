@@ -114,6 +114,8 @@ Route::controller(CompanyCatalogController::class)->prefix('company-catalogs')->
 
     Route::get('products', 'products')->name('admin.b2b.company_catalogs.products');
 
+    Route::get('product-children/{id}', 'productChildren')->name('admin.b2b.company_catalogs.product_children');
+
     Route::get('create', 'create')->name('admin.b2b.company_catalogs.create');
 
     Route::post('create', 'store')->name('admin.b2b.company_catalogs.store');

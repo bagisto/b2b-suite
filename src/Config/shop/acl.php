@@ -141,6 +141,31 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Company Profile ACLs
+    |--------------------------------------------------------------------------
+    |
+    | Grants a member access to view and edit the company's profile.
+    |
+    */
+    [
+        'key' => 'company_profile',
+        'name' => 'b2b::app.shop.acl.company-profile',
+        'route' => 'shop.companies.account.profile.index',
+        'sort' => 8,
+    ], [
+        'key' => 'company_profile.view',
+        'name' => 'b2b::app.shop.acl.view',
+        'route' => 'shop.companies.account.profile.index',
+        'sort' => 1,
+    ], [
+        'key' => 'company_profile.edit',
+        'name' => 'b2b::app.shop.acl.edit',
+        'route' => 'shop.companies.account.profile.update',
+        'sort' => 2,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Requisitions ACLs
     |--------------------------------------------------------------------------
     |
@@ -151,7 +176,7 @@ return [
         'key' => 'requisitions',
         'name' => 'b2b::app.shop.acl.requisitions',
         'route' => 'shop.customers.account.requisitions.index',
-        'sort' => 8,
+        'sort' => 9,
     ], [
         'key' => 'requisitions.create',
         'name' => 'b2b::app.shop.acl.create',
@@ -191,7 +216,7 @@ return [
         'key' => 'quotes',
         'name' => 'b2b::app.shop.acl.quotes',
         'route' => 'shop.customers.account.quotes.index',
-        'sort' => 9,
+        'sort' => 10,
     ], [
         'key' => 'quotes.view',
         'name' => 'b2b::app.shop.acl.view',
@@ -226,7 +251,7 @@ return [
         'key' => 'purchase_orders',
         'name' => 'b2b::app.shop.acl.purchase-orders',
         'route' => 'shop.customers.account.purchase_orders.index',
-        'sort' => 10,
+        'sort' => 11,
     ], [
         'key' => 'purchase_orders.view',
         'name' => 'b2b::app.shop.acl.view',
@@ -246,7 +271,7 @@ return [
         'key' => 'quick_orders',
         'name' => 'b2b::app.shop.acl.quick-orders',
         'route' => 'shop.customers.account.quick_orders.index',
-        'sort' => 11,
+        'sort' => 12,
     ], [
         'key' => 'quick_orders.view',
         'name' => 'b2b::app.shop.acl.view',
@@ -266,7 +291,7 @@ return [
         'key' => 'users',
         'name' => 'b2b::app.shop.acl.users',
         'route' => 'shop.customers.account.users.index',
-        'sort' => 12,
+        'sort' => 13,
     ], [
         'key' => 'users.create',
         'name' => 'b2b::app.shop.acl.create',
@@ -296,7 +321,7 @@ return [
         'key' => 'roles',
         'name' => 'b2b::app.shop.acl.roles',
         'route' => 'shop.customers.account.roles.index',
-        'sort' => 13,
+        'sort' => 14,
     ], [
         'key' => 'roles.create',
         'name' => 'b2b::app.shop.acl.create',

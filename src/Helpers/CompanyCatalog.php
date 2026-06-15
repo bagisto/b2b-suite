@@ -2,10 +2,12 @@
 
 namespace Webkul\B2BSuite\Helpers;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Webkul\B2BSuite\Repositories\CompanyCatalogRepository;
 use Webkul\Customer\Models\CustomerProxy;
 use Webkul\Customer\Repositories\CustomerGroupRepository;
+use Webkul\Product\Contracts\Product;
 use Webkul\Product\Jobs\UpdateCreatePriceIndex as UpdateCreatePriceIndexJob;
 use Webkul\Product\Models\ProductCustomerGroupPriceProxy;
 
@@ -176,6 +178,47 @@ class CompanyCatalog
     }
 
     /**
+     * Resolve the price-bearing LEAF products for an assigned product.
+     *
+     * Catalog prices are customer-group prices, which the core price index only reads
+     * at the sellable leaf level. So a composite product fans out to its children:
+     *   - configurable -> variants
+     *   - grouped      -> associated products
+     *   - bundle       -> bundle-option products
+     *   - simple/virtual/downloadable -> the product itself
+     *   - booking      -> none (core never reads group prices for booking)
+     *
+     * @return Collection<int, Product>
+     */
+    public function leafProducts($product)
+    {
+        return match ($product->type) {
+            'configurable' => $product->variants()->get(),
+
+            'grouped' => $product->grouped_products()
+                ->with('associated_product')
+                ->get()
+                ->map(fn ($row) => $row->associated_product)
+                ->filter()
+                ->unique('id')
+                ->values(),
+
+            'bundle' => $product->bundle_options()
+                ->with('bundle_option_products.product')
+                ->get()
+                ->flatMap(fn ($option) => $option->bundle_option_products)
+                ->map(fn ($row) => $row->product)
+                ->filter()
+                ->unique('id')
+                ->values(),
+
+            'booking' => collect(),
+
+            default => collect([$product]),
+        };
+    }
+
+    /**
      * Store per-catalog fixed prices against the backing group and reindex.
      *
      * $prices is keyed by product_id; an empty value clears any override but the
@@ -248,7 +291,15 @@ class CompanyCatalog
             ]);
         }
 
-        $this->reindex($affected);
+        /**
+         * Reindex the priced leaves AND the assigned parents. Grouped/bundle leaves are
+         * independent simple products with no parent_id, so the composite parent's
+         * min/max index can only be refreshed by reindexing the parent itself (which
+         * recurses to its children during indexing).
+         */
+        $parentIds = $catalog->products()->pluck('products.id')->toArray();
+
+        $this->reindex(array_merge($affected, $parentIds));
     }
 
     /**

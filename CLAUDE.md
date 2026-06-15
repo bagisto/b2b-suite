@@ -13,12 +13,14 @@ changes. The essentials:
   storage and all view/component overrides (`publishables/resources/vendor` →
   `resources/views/vendor`, covering both regular `shop::`/`admin::` views and anonymous
   `x-shop::` components like the account navigation). Never publish directly from `src/`.
-- **No own asset build, but the core themes scan B2B views for Tailwind.** The core
-  `packages/Webkul/Shop/tailwind.config.js` and `packages/Webkul/Admin/tailwind.config.js`
-  `content` arrays were extended to include the B2B view paths (and Shop sets
-  `darkMode: "class"`). Using a **new** utility class in a B2B view requires rebuilding the
-  affected theme (`cd packages/Webkul/{Shop,Admin} && npm run build`). Don't add a second
-  global stylesheet; for one-offs use a scoped `@push('styles')` block.
+- **Own theme build (no core edits).** The package has its own Vite/Tailwind build that
+  `import`s each core theme's config and regenerates the theme bundle with B2B views folded
+  in (one coherent Tailwind pass) — `tailwind.{admin,shop}.config.js`, `vite.{admin,shop}.config.js`.
+  Prebuilt bundles ship via `publishables/public` and are published on install (no Node
+  needed normally). Adding a **new** utility class in a B2B view → rebuild: from the package
+  run `npm run build` (after `npm install` in `packages/Webkul/{Shop,Admin}`). Don't add a
+  second global stylesheet; for one-offs use a scoped `@push('styles')` block. Full details
+  in AGENTS.md → *Styling*.
 - **Vue in Blade:** put a component's markup in its own `<script type="text/x-template">`,
   not as slotted content — slot content compiles in the parent scope and breaks the
   component's `data()` bindings.

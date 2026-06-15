@@ -129,6 +129,12 @@ class CompanyController extends Controller
             $data['customer_group_id'] = core()->getGuestCustomerGroup()->id;
         }
 
+        /**
+         * Always a company customer — never rely on the request, otherwise the record
+         * falls back to the default 'user' type and disappears from the company listing.
+         */
+        $data['type'] = 'company';
+
         $customer = $this->customerRepository->create($data);
 
         $this->companyAttributeValueRepository->saveValues(
@@ -202,6 +208,12 @@ class CompanyController extends Controller
         if (empty($data['customer_group_id'])) {
             $data['customer_group_id'] = core()->getGuestCustomerGroup()->id;
         }
+
+        /**
+         * Keep the record a company on every save (re-asserts type for any record that
+         * was previously stored with the wrong type).
+         */
+        $data['type'] = 'company';
 
         $wasPending = ! $customer->status;
 

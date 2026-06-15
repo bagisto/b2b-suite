@@ -15,6 +15,11 @@
         <x-shop::layouts.account.navigation />
     </div>
 
+    @php
+        /* When the member's role lacks the edit permission the form is shown read-only. */
+        $canEdit ??= true;
+    @endphp
+
     <div class="flex-auto max-md:px-4">
 
         {!! view_render_event('bagisto.shop.companies.account.profile.before', ['customer' => $customer]) !!}
@@ -49,13 +54,15 @@
                         @lang('b2b::app.shop.companies.account.profile.edit.btn-back')
                     </a>
 
-                    <!-- Save Button -->
-                    <button
-                        type="submit"
-                        class="primary-button rounded-lg px-8 py-2.5 text-center text-base max-md:px-6 max-md:py-2 max-md:text-sm"
-                    >
-                        @lang('b2b::app.shop.companies.account.profile.index.save-btn')
-                    </button>
+                    <!-- Save Button (hidden for view-only members) -->
+                    @if ($canEdit)
+                        <button
+                            type="submit"
+                            class="primary-button rounded-lg px-8 py-2.5 text-center text-base max-md:px-6 max-md:py-2 max-md:text-sm"
+                        >
+                            @lang('b2b::app.shop.companies.account.profile.index.save-btn')
+                        </button>
+                    @endif
                 </div>
             </div>
 
@@ -77,6 +84,7 @@
                     </p>
                 </div>
             @else
+                <fieldset @disabled(! $canEdit)>
                 <div class="mt-6 flex gap-6 max-xl:flex-wrap max-md:mt-4 max-md:gap-4">
                     <!-- Left Column -->
                     <div class="flex flex-1 flex-col gap-6 max-xl:flex-auto max-md:gap-4">
@@ -104,6 +112,7 @@
                         </div>
                     @endif
                 </div>
+                </fieldset>
             @endif
 
             {!! view_render_event('bagisto.shop.companies.account.profile.controls.after', ['customer' => $customer]) !!}

@@ -27,6 +27,7 @@ class CustomerBouncer
         }
 
         $b2bKeys = [
+            'account.company_profile',
             'account.requisitions',
             'account.quotes',
             'account.purchase_orders',

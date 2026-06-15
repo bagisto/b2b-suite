@@ -133,12 +133,22 @@ class CompanyCatalogController extends Controller
     {
         $query = trim((string) request('query'));
 
+        /**
+         * Only storefront-listable products are assignable. Restricting to
+         * visible_individually keeps variants (and other non-listable children) out of
+         * the picker, so a variant can never be assigned on its own — its catalog price
+         * is owned solely by its configurable parent's expansion. Children of grouped /
+         * bundle products are reached the same way (through their parent), not here.
+         */
         $products = app(ProductRepository::class)
             ->setSearchEngine('database')
             ->getAll(array_filter([
                 'query' => $query !== '' ? $query : null,
-                'sort' => 'created_at',
-                'order' => 'desc',
+                'type' => request('type') ?: null,
+                'status' => 1,
+                'visible_individually' => 1,
+                'channel_id' => core()->getCurrentChannel()->id,
+                'sort' => 'created_at-desc',
                 'limit' => 10,
             ]));
 
@@ -147,6 +157,7 @@ class CompanyCatalogController extends Controller
                 'id' => $product->id,
                 'sku' => $product->sku,
                 'name' => $product->name,
+                'type' => $product->type,
                 'price' => (float) $product->price,
                 'formatted_price' => core()->formatPrice($product->price),
                 'image' => $product->images->first()?->url,
@@ -239,7 +250,8 @@ class CompanyCatalogController extends Controller
     }
 
     /**
-     * Build the product rows (with catalog prices) for the edit screen.
+     * Build the product tree (each assigned product + its priceable leaves and their
+     * catalog prices) for the edit screen.
      */
     protected function prepareProducts($catalog): Collection
     {
@@ -252,19 +264,67 @@ class CompanyCatalogController extends Controller
                 ->keyBy('product_id');
         }
 
-        return $catalog->products()->with('images')->get()->map(function ($product) use ($priceRows) {
-            $row = $priceRows->get($product->id);
+        $assigned = $catalog->products()->with('images')->get();
+
+        $assignedIds = $assigned->pluck('id')->all();
+
+        /**
+         * A variant whose configurable parent is also assigned must not appear as its own
+         * top-level row — it is already shown (and priced) under the parent's expansion.
+         * Dropping it here de-duplicates the listing and removes it from the allowlist on
+         * the next save, while its price is still submitted via the parent.
+         */
+        return $assigned
+            ->reject(fn ($product) => $product->parent_id && in_array($product->parent_id, $assignedIds))
+            ->map(fn ($product) => $this->buildProductNode($product, $priceRows))
+            ->values();
+    }
+
+    /**
+     * Shape a single assigned product into a node: type metadata + the price-bearing
+     * leaves (variants / associated / bundle products, or the product itself), each
+     * carrying any existing catalog price for this group.
+     */
+    protected function buildProductNode($product, $priceRows): array
+    {
+        $leaves = $this->companyCatalogHelper->leafProducts($product)->map(function ($leaf) use ($priceRows) {
+            $row = $priceRows->get($leaf->id);
 
             return [
-                'id' => $product->id,
-                'sku' => $product->sku,
-                'name' => $product->name,
-                'price' => (float) $product->price,
-                'formatted_price' => core()->formatPrice($product->price),
-                'image' => $product->images->first()?->url,
+                'id' => $leaf->id,
+                'sku' => $leaf->sku,
+                'name' => $leaf->name,
+                'price' => (float) $leaf->price,
+                'formatted_price' => core()->formatPrice($leaf->price),
                 'price_type' => $row->value_type ?? 'fixed',
                 'price_value' => $row ? (float) $row->value : '',
             ];
-        });
+        })->values();
+
+        return [
+            'id' => $product->id,
+            'sku' => $product->sku,
+            'name' => $product->name,
+            'type' => $product->type,
+            'image' => $product->images->first()?->url,
+            'priceable' => $product->type !== 'booking',
+            'is_composite' => in_array($product->type, ['configurable', 'grouped', 'bundle']),
+            'leaves' => $leaves,
+        ];
+    }
+
+    /**
+     * Return a single product shaped as a catalog node (type + priceable leaves with
+     * base prices, no overrides) so the assign-products picker can render its rows.
+     */
+    public function productChildren($id)
+    {
+        $product = app(ProductRepository::class)->find($id);
+
+        if (! $product) {
+            return response()->json(['data' => null], 404);
+        }
+
+        return response()->json(['data' => $this->buildProductNode($product, collect())]);
     }
 }
