@@ -96,10 +96,15 @@ class CompanyCatalogController extends Controller
     {
         $query = trim((string) request('query'));
 
+        $sort = request('sort') === 'email' ? 'company_flat.email' : 'company_flat.business_name';
+
+        $order = request('order') === 'desc' ? 'desc' : 'asc';
+
         $companies = DB::table('company_flat')
             ->leftJoin('customers', 'company_flat.customer_id', '=', 'customers.id')
             ->leftJoin('company_catalogs', 'customers.company_catalog_id', '=', 'company_catalogs.id')
             ->where('customers.type', 'company')
+            ->where('company_flat.locale', app()->getLocale())
             ->when($query !== '', function ($builder) use ($query) {
                 $builder->where(function ($sub) use ($query) {
                     $sub->where('company_flat.business_name', 'like', '%'.$query.'%')
@@ -112,18 +117,22 @@ class CompanyCatalogController extends Controller
                 'company_flat.email',
                 'company_catalogs.name as current_catalog'
             )
-            ->groupBy('company_flat.customer_id', 'company_flat.business_name', 'company_flat.email', 'company_catalogs.name')
-            ->orderBy('company_flat.business_name')
-            ->limit(10)
-            ->get()
-            ->map(fn ($company) => [
+            ->orderBy($sort, $order)
+            ->paginate(10);
+
+        return response()->json([
+            'data' => collect($companies->items())->map(fn ($company) => [
                 'id' => $company->id,
                 'name' => $company->business_name ?: $company->email,
                 'email' => $company->email,
                 'current_catalog' => $company->current_catalog,
-            ]);
-
-        return response()->json(['data' => $companies]);
+            ])->values(),
+            'meta' => [
+                'current_page' => $companies->currentPage(),
+                'last_page' => $companies->lastPage(),
+                'total' => $companies->total(),
+            ],
+        ]);
     }
 
     /**

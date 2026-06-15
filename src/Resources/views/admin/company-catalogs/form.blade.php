@@ -12,6 +12,7 @@
         'formatted_price' => $l['formatted_price'],
         'price_type'      => $l['price_type'] ?? 'fixed',
         'price_value'     => ($l['price_value'] ?? '') === '' ? '' : (float) $l['price_value'],
+        'selected'        => false,
     ];
 
     $initialProducts = collect($products)->map(fn ($p) => [
@@ -28,9 +29,10 @@
     ])->values();
 
     $initialCompanies = collect($companies)->map(fn ($c) => [
-        'id'    => $c['id'],
-        'name'  => $c['name'],
-        'email' => $c['email'],
+        'id'       => $c['id'],
+        'name'     => $c['name'],
+        'email'    => $c['email'],
+        'selected' => false,
     ])->values();
 
     $currencySymbol = core()->currencySymbol(core()->getBaseCurrencyCode());
@@ -229,7 +231,7 @@
                                             class="border-t border-gray-100 transition-all hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-950"
                                         >
                                             <td class="px-3 py-3">
-                                                <input type="checkbox" class="cursor-pointer" v-model="product.selected">
+                                                <input type="checkbox" class="cursor-pointer" v-model="product.leaves[0].selected">
                                             </td>
 
                                             <td class="px-4 py-3">
@@ -313,7 +315,12 @@
                                         <template v-else>
                                             <tr class="border-t border-gray-100 bg-gray-50 transition-all dark:border-gray-800 dark:bg-gray-950">
                                                 <td class="px-3 py-3">
-                                                    <input type="checkbox" class="cursor-pointer" v-model="product.selected">
+                                                    <input
+                                                        type="checkbox"
+                                                        class="cursor-pointer"
+                                                        :checked="isProductSelected(product)"
+                                                        @change="toggleProduct(product, $event.target.checked)"
+                                                    >
                                                 </td>
 
                                                 <td class="px-4 py-3">
@@ -348,7 +355,9 @@
                                                 :key="leaf.id"
                                                 class="border-t border-gray-100 dark:border-gray-800"
                                             >
-                                                <td class="px-3 py-2.5"></td>
+                                                <td class="px-3 py-2.5">
+                                                    <input type="checkbox" class="cursor-pointer" v-model="leaf.selected">
+                                                </td>
 
                                                 <td class="px-4 py-2.5">
                                                     <div class="grid ps-8">
@@ -468,6 +477,185 @@
 
                     </x-slot>
                 </x-admin::accordion>
+
+                <!-- Companies -->
+                <x-admin::accordion>
+                    <x-slot:header>
+                        <p class="p-2.5 text-base font-semibold text-gray-800 dark:text-white">
+                            @lang('b2b::app.admin.company-catalogs.companies')
+                        </p>
+                    </x-slot>
+
+                    <x-slot:content>
+                        <!-- Info + Assign Companies (right) -->
+                        <div class="mb-3 flex items-center justify-between gap-3">
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-300">
+                                    @lang('b2b::app.admin.company-catalogs.companies-info')
+                                </p>
+
+                                <p class="mt-1 text-xs text-amber-600 dark:text-amber-400">
+                                    @lang('b2b::app.admin.company-catalogs.companies-single-note')
+                                </p>
+                            </div>
+
+                            <button
+                                type="button"
+                                class="secondary-button flex shrink-0 items-center gap-1.5 !rounded-lg"
+                                @click="openCompanyModal"
+                            >
+                                <span class="icon-plus text-lg"></span>
+
+                                @lang('b2b::app.admin.company-catalogs.assign-companies')
+                            </button>
+                        </div>
+
+                        <!-- Mass Action Bar -->
+                        <div
+                            v-if="companySelectedCount"
+                            class="mt-4 flex flex-wrap items-center gap-2.5 rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-gray-800 dark:bg-gray-950"
+                        >
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-200">
+                                @{{ "@lang('b2b::app.admin.company-catalogs.items-selected')".replace(':count', companySelectedCount) }}
+                            </span>
+
+                            <select
+                                v-model="companyMassAction"
+                                class="rounded-lg border border-gray-200 px-3 py-1.5 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+                            >
+                                <option value="delete">@lang('b2b::app.admin.company-catalogs.delete-action')</option>
+                            </select>
+
+                            <button
+                                v-if="companyMassAction"
+                                type="button"
+                                class="secondary-button !rounded-lg !px-4 !py-1.5 text-sm"
+                                @click="runCompanyMassAction"
+                            >
+                                @lang('b2b::app.admin.company-catalogs.apply')
+                            </button>
+                        </div>
+
+                        <!-- Assigned companies -->
+                        <div class="mt-3 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800">
+                            <table class="w-full" style="table-layout: fixed;">
+                                <colgroup>
+                                    <col style="width: 3rem;">
+                                    <col>
+                                    <col style="width: 18rem;">
+                                    <col style="width: 3.5rem;">
+                                </colgroup>
+
+                                <thead class="bg-gray-50 dark:bg-gray-800">
+                                    <tr class="text-left text-xs font-medium uppercase text-gray-500">
+                                        <th class="px-3 py-4">
+                                            <input
+                                                type="checkbox"
+                                                class="cursor-pointer"
+                                                :checked="companyAllSelected"
+                                                @change="toggleAllCompanies($event)"
+                                            >
+                                        </th>
+                                        <th class="px-4 py-4">
+                                            <button type="button" class="flex items-center gap-1 uppercase text-gray-600 transition-all hover:text-gray-800 dark:text-gray-300 dark:hover:text-white" @click="sortCompaniesBy('name')">
+                                                @lang('b2b::app.admin.company-catalogs.company')
+                                                <span :class="companySortIcon('name')" class="text-base"></span>
+                                            </button>
+                                        </th>
+                                        <th class="px-4 py-4">
+                                            <button type="button" class="flex items-center gap-1 uppercase text-gray-600 transition-all hover:text-gray-800 dark:text-gray-300 dark:hover:text-white" @click="sortCompaniesBy('email')">
+                                                @lang('b2b::app.admin.company-catalogs.email')
+                                                <span :class="companySortIcon('email')" class="text-base"></span>
+                                            </button>
+                                        </th>
+                                        <th class="px-4 py-4"></th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <tr v-if="! companies.length">
+                                        <td colspan="4" class="px-4 py-6 text-center text-sm text-gray-500">
+                                            @lang('b2b::app.admin.company-catalogs.no-companies')
+                                        </td>
+                                    </tr>
+
+                                    <tr
+                                        v-for="company in paginatedCompanies"
+                                        :key="company.id"
+                                        class="border-t border-gray-100 transition-all hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-950"
+                                    >
+                                        <td class="px-3 py-3">
+                                            <input type="checkbox" class="cursor-pointer" v-model="company.selected">
+                                        </td>
+
+                                        <td class="px-4 py-3">
+                                            <span class="text-sm font-medium text-gray-800 dark:text-white">@{{ company.name }}</span>
+                                        </td>
+
+                                        <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">@{{ company.email }}</td>
+
+                                        <td class="px-4 py-3 text-right">
+                                            <span class="icon-delete cursor-pointer text-xl text-gray-500 transition-all hover:text-red-600" @click="removeCompany(company.id)"></span>
+                                        </td>
+                                    </tr>
+
+                                    <!-- Shimmer rows while newly assigned companies are being fetched -->
+                                    <template v-if="companiesLoading">
+                                        <tr
+                                            v-for="n in companyAddingCount"
+                                            :key="'company-skeleton-' + n"
+                                            class="border-t border-gray-100 dark:border-gray-800"
+                                        >
+                                            <td class="px-3 py-3"><div class="b2b-shimmer h-4 w-4"></div></td>
+                                            <td class="px-4 py-3"><div class="b2b-shimmer h-3 w-40"></div></td>
+                                            <td class="px-4 py-3"><div class="b2b-shimmer h-3 w-48"></div></td>
+                                            <td class="px-4 py-3"></td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        <div
+                            v-if="companyTotalPages > 1"
+                            class="mt-3 flex items-center justify-between gap-2 text-sm"
+                        >
+                            <span class="text-gray-500 dark:text-gray-400">
+                                @{{ companies.length }} @lang('b2b::app.admin.company-catalogs.companies')
+                            </span>
+
+                            <div class="flex items-center gap-1.5">
+                                <button
+                                    type="button"
+                                    class="grid h-8 w-8 place-items-center rounded-md border border-gray-200 text-gray-600 transition-all hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+                                    :class="{ 'cursor-not-allowed opacity-50': companyPage === 1 }"
+                                    :disabled="companyPage === 1"
+                                    @click="companyPage--"
+                                >
+                                    <span class="icon-sort-left rtl:icon-sort-right text-xl"></span>
+                                </button>
+
+                                <span class="px-2 text-gray-600 dark:text-gray-300">@{{ companyPage }} / @{{ companyTotalPages }}</span>
+
+                                <button
+                                    type="button"
+                                    class="grid h-8 w-8 place-items-center rounded-md border border-gray-200 text-gray-600 transition-all hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+                                    :class="{ 'cursor-not-allowed opacity-50': companyPage === companyTotalPages }"
+                                    :disabled="companyPage === companyTotalPages"
+                                    @click="companyPage++"
+                                >
+                                    <span class="icon-sort-right rtl:icon-sort-left text-xl"></span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- All assigned companies submitted (not just the visible page) -->
+                        <template v-for="company in companies" :key="'company-field-' + company.id">
+                            <input type="hidden" name="companies[]" :value="company.id">
+                        </template>
+                    </x-slot>
+                </x-admin::accordion>
             </div>
 
             <!-- Right Column -->
@@ -528,83 +716,6 @@
                                 :label="trans('b2b::app.admin.company-catalogs.status')"
                             />
                         </x-admin::form.control-group>
-                    </x-slot>
-                </x-admin::accordion>
-
-                <!-- Companies -->
-                <x-admin::accordion>
-                    <x-slot:header>
-                        <p class="p-2.5 text-base font-semibold text-gray-800 dark:text-white">
-                            @lang('b2b::app.admin.company-catalogs.companies')
-                        </p>
-                    </x-slot>
-
-                    <x-slot:content>
-                        <p class="mb-1 text-sm text-gray-500 dark:text-gray-300">
-                            @lang('b2b::app.admin.company-catalogs.companies-info')
-                        </p>
-
-                        <p class="mb-3 text-xs text-amber-600 dark:text-amber-400">
-                            @lang('b2b::app.admin.company-catalogs.companies-single-note')
-                        </p>
-
-                        <!-- Search -->
-                        <div class="relative">
-                            <input
-                                type="text"
-                                class="w-full rounded-md border border-gray-200 px-4 py-2.5 text-sm text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-white"
-                                placeholder="@lang('b2b::app.admin.company-catalogs.search-companies')"
-                                v-model="companyQuery"
-                                @input="searchCompanies"
-                            />
-
-                            <div
-                                v-if="companyResults.length"
-                                class="absolute z-10 mt-1 max-h-72 w-full overflow-auto rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-800 dark:bg-gray-900"
-                            >
-                                <div
-                                    v-for="result in companyResults"
-                                    :key="result.id"
-                                    class="flex cursor-pointer flex-col border-b border-gray-100 p-2.5 last:border-b-0 hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-800"
-                                    @click="addCompany(result)"
-                                >
-                                    <span class="text-sm font-medium text-gray-800 dark:text-white">@{{ result.name }}</span>
-                                    <span class="text-xs text-gray-500">@{{ result.email }}</span>
-
-                                    <span
-                                        v-if="result.current_catalog"
-                                        class="mt-1 w-max rounded bg-amber-100 px-1.5 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-900/40 dark:text-amber-400"
-                                    >
-                                        @{{ "@lang('b2b::app.admin.company-catalogs.in-catalog')".replace(':name', result.current_catalog) }}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Selected companies -->
-                        <div class="mt-4 grid gap-2">
-                            <p v-if="! companies.length" class="py-4 text-center text-sm text-gray-500">
-                                @lang('b2b::app.admin.company-catalogs.no-companies')
-                            </p>
-
-                            <div
-                                v-for="company in companies"
-                                :key="company.id"
-                                class="flex items-center justify-between gap-2 rounded-md border border-gray-200 p-2.5 dark:border-gray-800"
-                            >
-                                <div class="grid">
-                                    <span class="text-sm font-medium text-gray-800 dark:text-white">@{{ company.name }}</span>
-                                    <span class="text-xs text-gray-500">@{{ company.email }}</span>
-                                </div>
-
-                                <span
-                                    class="icon-delete cursor-pointer text-xl text-gray-500 transition-all hover:text-red-600"
-                                    @click="removeCompany(company.id)"
-                                ></span>
-
-                                <input type="hidden" name="companies[]" :value="company.id">
-                            </div>
-                        </div>
                     </x-slot>
                 </x-admin::accordion>
             </div>
@@ -827,6 +938,179 @@
                                 </button>
                             </x-slot>
                         </x-admin::modal>
+
+                        <!-- Assign Companies Modal -->
+                        <x-admin::modal ref="assignCompaniesModal">
+                            <x-slot:header>
+                                <p class="text-lg font-bold text-gray-800 dark:text-white">
+                                    @lang('b2b::app.admin.company-catalogs.assign-companies')
+                                </p>
+                            </x-slot>
+
+                            <x-slot:content>
+                                <div class="b2b-assign-modal">
+                                <!-- Search -->
+                                <div class="relative mb-4">
+                                    <span class="icon-search pointer-events-none absolute top-2.5 text-xl text-gray-400 ltr:left-3 rtl:right-3"></span>
+
+                                    <input
+                                        type="text"
+                                        class="w-full rounded-lg border border-gray-200 py-2.5 text-sm text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-white ltr:pl-10 rtl:pr-10"
+                                        placeholder="@lang('b2b::app.admin.company-catalogs.search-companies')"
+                                        v-model="companyModalQuery"
+                                        @input="searchModalCompanies"
+                                    >
+                                </div>
+
+                                <!-- Company list -->
+                                <div class="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800">
+                                    <div class="h-96 overflow-y-auto">
+                                        <table class="w-full" style="table-layout: fixed;">
+                                            <colgroup>
+                                                <col style="width: 3rem;">
+                                                <col>
+                                                <col style="width: 18rem;">
+                                                <col style="width: 8rem;">
+                                            </colgroup>
+
+                                            <thead class="sticky top-0 z-10 bg-gray-50 dark:bg-gray-800">
+                                                <tr class="text-left text-xs font-medium uppercase text-gray-500">
+                                                    <th class="px-3 py-4">
+                                                        <input
+                                                            type="checkbox"
+                                                            class="cursor-pointer"
+                                                            :checked="companyModalAllChecked"
+                                                            @change="toggleModalAllCompanies($event)"
+                                                        >
+                                                    </th>
+                                                    <th class="px-4 py-4">
+                                                        <button type="button" class="flex items-center gap-1 uppercase text-gray-600 transition-all hover:text-gray-800 dark:text-gray-300 dark:hover:text-white" @click="sortCompanyModalBy('name')">
+                                                            @lang('b2b::app.admin.company-catalogs.company')
+                                                            <span :class="companyModalSortIcon('name')" class="text-base"></span>
+                                                        </button>
+                                                    </th>
+                                                    <th class="px-4 py-4">
+                                                        <button type="button" class="flex items-center gap-1 uppercase text-gray-600 transition-all hover:text-gray-800 dark:text-gray-300 dark:hover:text-white" @click="sortCompanyModalBy('email')">
+                                                            @lang('b2b::app.admin.company-catalogs.email')
+                                                            <span :class="companyModalSortIcon('email')" class="text-base"></span>
+                                                        </button>
+                                                    </th>
+                                                    <th class="px-4 py-4"></th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                <template v-if="companyModalLoading">
+                                                    <tr
+                                                        v-for="n in 6"
+                                                        :key="'company-modal-skeleton-' + n"
+                                                        class="border-t border-gray-100 dark:border-gray-800"
+                                                    >
+                                                        <td class="px-3 py-3"><div class="b2b-shimmer h-4 w-4"></div></td>
+                                                        <td class="px-4 py-3"><div class="b2b-shimmer h-3 w-40"></div></td>
+                                                        <td class="px-4 py-3"><div class="b2b-shimmer h-3 w-48"></div></td>
+                                                        <td class="px-4 py-3"></td>
+                                                    </tr>
+                                                </template>
+
+                                                <tr v-else-if="! companyModalRows.length">
+                                                    <td colspan="4" class="p-6 text-center text-sm text-gray-500">
+                                                        @lang('b2b::app.admin.company-catalogs.no-companies-found')
+                                                    </td>
+                                                </tr>
+
+                                                <template v-else>
+                                                    <tr
+                                                        v-for="company in companyModalRows"
+                                                        :key="company.id"
+                                                        class="cursor-pointer border-t border-gray-100 transition-all hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-800"
+                                                        :class="{ 'opacity-60': isCompanyAssigned(company.id) }"
+                                                        @click="toggleModalCompany(company)"
+                                                    >
+                                                        <td class="px-3 py-3">
+                                                            <input
+                                                                type="checkbox"
+                                                                class="pointer-events-none"
+                                                                :checked="isCompanyChecked(company.id)"
+                                                                :disabled="isCompanyAssigned(company.id)"
+                                                            >
+                                                        </td>
+
+                                                        <td class="px-4 py-3">
+                                                            <span class="text-sm font-medium text-gray-800 dark:text-white">@{{ company.name }}</span>
+
+                                                            <span
+                                                                v-if="company.current_catalog"
+                                                                class="mt-0.5 block w-max rounded bg-amber-100 px-1.5 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-900/40 dark:text-amber-400"
+                                                            >
+                                                                @{{ "@lang('b2b::app.admin.company-catalogs.in-catalog')".replace(':name', company.current_catalog) }}
+                                                            </span>
+                                                        </td>
+
+                                                        <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">@{{ company.email }}</td>
+
+                                                        <td class="px-4 py-3 text-right">
+                                                            <span
+                                                                v-if="isCompanyAssigned(company.id)"
+                                                                class="whitespace-nowrap text-xs font-medium text-green-600"
+                                                            >
+                                                                @lang('b2b::app.admin.company-catalogs.added')
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                </template>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!-- Modal pagination -->
+                                <div
+                                    v-if="companyModalLastPage > 1"
+                                    class="mt-3 flex items-center justify-between text-sm"
+                                >
+                                    <span class="text-gray-500 dark:text-gray-400">
+                                        @{{ companyModalTotal }} @lang('b2b::app.admin.company-catalogs.companies')
+                                    </span>
+
+                                    <div class="flex items-center gap-1.5">
+                                        <button
+                                            type="button"
+                                            class="grid h-8 w-8 place-items-center rounded-md border border-gray-200 text-gray-600 transition-all hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+                                            :class="{ 'cursor-not-allowed opacity-50': companyModalPage === 1 }"
+                                            :disabled="companyModalPage === 1"
+                                            @click="fetchModalCompanies(companyModalPage - 1)"
+                                        >
+                                            <span class="icon-sort-left rtl:icon-sort-right text-xl"></span>
+                                        </button>
+
+                                        <span class="px-2 text-gray-600 dark:text-gray-300">@{{ companyModalPage }} / @{{ companyModalLastPage }}</span>
+
+                                        <button
+                                            type="button"
+                                            class="grid h-8 w-8 place-items-center rounded-md border border-gray-200 text-gray-600 transition-all hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+                                            :class="{ 'cursor-not-allowed opacity-50': companyModalPage === companyModalLastPage }"
+                                            :disabled="companyModalPage === companyModalLastPage"
+                                            @click="fetchModalCompanies(companyModalPage + 1)"
+                                        >
+                                            <span class="icon-sort-right rtl:icon-sort-left text-xl"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                                </div>
+                            </x-slot>
+
+                            <x-slot:footer>
+                                <button
+                                    type="button"
+                                    class="primary-button"
+                                    @click="assignCompaniesSelected"
+                                >
+                                    @lang('b2b::app.admin.company-catalogs.assign')
+                                    <span v-if="companyModalSelectedCount">(@{{ companyModalSelectedCount }})</span>
+                                </button>
+                            </x-slot>
+                        </x-admin::modal>
         </div>
     </script>
 
@@ -838,9 +1122,25 @@
                 return {
                     products: @json($initialProducts),
                     companies: @json($initialCompanies),
-                    companyQuery: '',
-                    companyResults: [],
-                    companyTimer: null,
+                    companyMassAction: 'delete',
+                    companyPage: 1,
+                    companyPerPage: 10,
+                    companySortKey: '',
+                    companySortOrder: 'asc',
+                    companiesLoading: false,
+                    companyAddingCount: 0,
+
+                    /* Assign-companies modal */
+                    companyModalQuery: '',
+                    companyModalSort: '',
+                    companyModalOrder: 'asc',
+                    companyModalRows: [],
+                    companyModalSelected: {},
+                    companyModalPage: 1,
+                    companyModalLastPage: 1,
+                    companyModalTotal: 0,
+                    companyModalLoading: false,
+                    companyModalTimer: null,
                     massAction: 'update-price',
                     massType: 'fixed',
                     massValue: '',
@@ -894,13 +1194,25 @@
                     return index;
                 },
 
+                /* Every price-bearing leaf across all assigned products. */
+                allLeaves() {
+                    return this.products.flatMap(p => p.leaves);
+                },
+
                 selectedCount() {
-                    return this.products.filter(p => p.selected).length;
+                    const leaves = this.allLeaves.filter(l => l.selected).length;
+                    const bookings = this.products.filter(p => ! p.priceable && p.selected).length;
+
+                    return leaves + bookings;
                 },
 
                 allSelected() {
-                    return this.paginatedProducts.length > 0
-                        && this.paginatedProducts.every(p => p.selected);
+                    const page = this.paginatedProducts;
+
+                    return page.length > 0 && page.every(p => p.priceable
+                        ? (p.leaves.length > 0 && p.leaves.every(l => l.selected))
+                        : p.selected
+                    );
                 },
 
                 totalPages() {
@@ -954,6 +1266,52 @@
 
                     return assignable.length > 0
                         && assignable.every(p => !! this.modalSelectedProducts[p.id]);
+                },
+
+                /* ----- Companies ----- */
+                companySelectedCount() {
+                    return this.companies.filter(c => c.selected).length;
+                },
+
+                companyAllSelected() {
+                    return this.paginatedCompanies.length > 0
+                        && this.paginatedCompanies.every(c => c.selected);
+                },
+
+                companyTotalPages() {
+                    return Math.ceil(this.companies.length / this.companyPerPage);
+                },
+
+                sortedCompanies() {
+                    if (! this.companySortKey) {
+                        return this.companies;
+                    }
+
+                    const factor = this.companySortOrder === 'asc' ? 1 : -1;
+
+                    return [...this.companies].sort((a, b) => {
+                        const av = (a[this.companySortKey] ?? '').toString().toLowerCase();
+                        const bv = (b[this.companySortKey] ?? '').toString().toLowerCase();
+
+                        return av.localeCompare(bv, undefined, { numeric: true }) * factor;
+                    });
+                },
+
+                paginatedCompanies() {
+                    const start = (this.companyPage - 1) * this.companyPerPage;
+
+                    return this.sortedCompanies.slice(start, start + this.companyPerPage);
+                },
+
+                companyModalSelectedCount() {
+                    return Object.keys(this.companyModalSelected).length;
+                },
+
+                companyModalAllChecked() {
+                    const assignable = this.companyModalRows.filter(c => ! this.isCompanyAssigned(c.id));
+
+                    return assignable.length > 0
+                        && assignable.every(c => !! this.companyModalSelected[c.id]);
                 },
             },
 
@@ -1020,19 +1378,17 @@
                 },
 
                 applyMass() {
-                    /* Apply to the selected products' leaves (or every product when none selected). */
-                    const targets = this.selectedCount
-                        ? this.products.filter(p => p.selected)
-                        : this.products;
+                    /* Apply to the selected leaves (or every leaf when nothing is selected). */
+                    const selected = this.allLeaves.filter(l => l.selected);
+                    const targets = selected.length ? selected : this.allLeaves;
 
-                    targets.forEach(product => {
-                        product.leaves.forEach(leaf => {
-                            leaf.price_type = this.massType;
-                            leaf.price_value = this.massValue;
-                        });
+                    targets.forEach(leaf => {
+                        leaf.price_type = this.massType;
+                        leaf.price_value = this.massValue;
                     });
 
                     /* Reset selection so the mass-action bar hides (v-if="selectedCount"). */
+                    this.allLeaves.forEach(l => l.selected = false);
                     this.products.forEach(p => p.selected = false);
 
                     this.massValue = '';
@@ -1042,12 +1398,32 @@
                 toggleAll(event) {
                     const checked = event.target.checked;
 
-                    this.paginatedProducts.forEach(p => p.selected = checked);
+                    this.paginatedProducts.forEach(p => {
+                        if (p.priceable) {
+                            p.leaves.forEach(l => l.selected = checked);
+                        } else {
+                            p.selected = checked;
+                        }
+                    });
                 },
 
-                /* Remove every checked product from the catalog. */
+                /* Composite header checkbox reflects/sets all of its leaves. */
+                isProductSelected(product) {
+                    return product.leaves.length > 0 && product.leaves.every(l => l.selected);
+                },
+
+                toggleProduct(product, checked) {
+                    product.leaves.forEach(l => l.selected = checked);
+                },
+
+                /* Delete removes a product if any of its leaves is checked (or a checked booking). */
                 removeSelected() {
-                    this.products = this.products.filter(p => ! p.selected);
+                    this.products = this.products.filter(p => {
+                        const leafSelected = p.leaves.some(l => l.selected);
+                        const bookingSelected = ! p.priceable && p.selected;
+
+                        return ! (leafSelected || bookingSelected);
+                    });
 
                     this.massAction = 'update-price';
                 },
@@ -1252,6 +1628,7 @@
                                     formatted_price: leaf.formatted_price,
                                     price_type: leaf.price_type ?? 'fixed',
                                     price_value: (leaf.price_value ?? '') === '' ? '' : parseFloat(leaf.price_value),
+                                    selected: false,
                                 })),
                             });
                         });
@@ -1274,51 +1651,188 @@
                     this.products = this.products.filter(p => p.id !== id);
                 },
 
-                searchCompanies() {
-                    clearTimeout(this.companyTimer);
+                /* ----- Assigned companies table ----- */
+                companySortIcon(key) {
+                    if (this.companySortKey !== key) {
+                        return 'icon-sort text-gray-400';
+                    }
 
-                    if (this.companyQuery.length < 2) {
-                        this.companyResults = [];
+                    return this.companySortOrder === 'asc' ? 'icon-sort-up text-blue-500' : 'icon-sort-down text-blue-500';
+                },
 
+                sortCompaniesBy(key) {
+                    if (this.companySortKey === key) {
+                        this.companySortOrder = this.companySortOrder === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        this.companySortKey = key;
+                        this.companySortOrder = 'asc';
+                    }
+
+                    this.companyPage = 1;
+                },
+
+                toggleAllCompanies(event) {
+                    const checked = event.target.checked;
+
+                    this.paginatedCompanies.forEach(c => c.selected = checked);
+                },
+
+                /* Run the chosen company mass action behind a confirmation modal. */
+                runCompanyMassAction() {
+                    if (! this.companyMassAction || ! this.companySelectedCount) {
                         return;
                     }
 
-                    this.companyTimer = setTimeout(() => {
-                        this.$axios.get("{{ route('admin.b2b.company_catalogs.companies') }}", {
-                            params: { query: this.companyQuery },
-                        }).then((response) => {
-                            const rows = response.data?.data ?? response.data ?? [];
-
-                            const selected = this.companies.map(c => c.id);
-
-                            this.companyResults = rows
-                                .filter(c => ! selected.includes(c.id))
-                                .map(c => ({
-                                    id: c.id,
-                                    name: c.name,
-                                    email: c.email,
-                                    current_catalog: c.current_catalog,
-                                }));
-                        }).catch((error) => {
-                            this.$emitter.emit('add-flash', {
-                                type: 'error',
-                                message: error.response?.data?.message ?? 'Company search failed.',
-                            });
+                    if (this.companyMassAction === 'delete') {
+                        this.$emitter.emit('open-confirm-modal', {
+                            message: "@lang('b2b::app.admin.company-catalogs.confirm-remove-companies')".replace(':count', this.companySelectedCount),
+                            agree: () => this.removeSelectedCompanies(),
                         });
-                    }, 400);
+                    }
                 },
 
-                addCompany(company) {
-                    if (! this.companies.find(c => c.id === company.id)) {
-                        this.companies.push(company);
-                    }
-
-                    this.companyResults = [];
-                    this.companyQuery = '';
+                removeSelectedCompanies() {
+                    this.companies = this.companies.filter(c => ! c.selected);
                 },
 
                 removeCompany(id) {
                     this.companies = this.companies.filter(c => c.id !== id);
+                },
+
+                /* ----- Assign-companies modal ----- */
+                openCompanyModal() {
+                    this.companyModalQuery = '';
+                    this.companyModalSort = '';
+                    this.companyModalOrder = 'asc';
+                    this.companyModalSelected = {};
+                    this.companyModalRows = [];
+
+                    this.$refs.assignCompaniesModal?.open();
+
+                    this.$nextTick(() => this.fetchModalCompanies(1));
+                },
+
+                searchModalCompanies() {
+                    clearTimeout(this.companyModalTimer);
+
+                    this.companyModalTimer = setTimeout(() => this.fetchModalCompanies(1), 400);
+                },
+
+                fetchModalCompanies(page) {
+                    if (page < 1) {
+                        return;
+                    }
+
+                    this.companyModalLoading = true;
+
+                    this.$axios.get("{{ route('admin.b2b.company_catalogs.companies') }}", {
+                        params: { query: this.companyModalQuery, sort: this.companyModalSort, order: this.companyModalOrder, page },
+                    }).then((response) => {
+                        this.companyModalRows = response.data.data ?? [];
+                        this.companyModalPage = response.data.meta?.current_page ?? 1;
+                        this.companyModalLastPage = response.data.meta?.last_page ?? 1;
+                        this.companyModalTotal = response.data.meta?.total ?? 0;
+                        this.companyModalLoading = false;
+                    }).catch((error) => {
+                        this.companyModalLoading = false;
+
+                        this.$emitter.emit('add-flash', {
+                            type: 'error',
+                            message: error.response?.data?.message ?? 'Company search failed.',
+                        });
+                    });
+                },
+
+                sortCompanyModalBy(key) {
+                    if (this.companyModalSort === key) {
+                        this.companyModalOrder = this.companyModalOrder === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        this.companyModalSort = key;
+                        this.companyModalOrder = 'asc';
+                    }
+
+                    this.fetchModalCompanies(1);
+                },
+
+                companyModalSortIcon(key) {
+                    if (this.companyModalSort !== key) {
+                        return 'icon-sort text-gray-400';
+                    }
+
+                    return this.companyModalOrder === 'asc' ? 'icon-sort-up text-blue-500' : 'icon-sort-down text-blue-500';
+                },
+
+                isCompanyAssigned(id) {
+                    return this.companies.some(c => c.id === id);
+                },
+
+                isCompanyChecked(id) {
+                    return this.isCompanyAssigned(id) || !! this.companyModalSelected[id];
+                },
+
+                toggleModalCompany(company) {
+                    if (this.isCompanyAssigned(company.id)) {
+                        return;
+                    }
+
+                    if (this.companyModalSelected[company.id]) {
+                        delete this.companyModalSelected[company.id];
+                    } else {
+                        this.companyModalSelected[company.id] = company;
+                    }
+                },
+
+                toggleModalAllCompanies(event) {
+                    const checked = event.target.checked;
+
+                    this.companyModalRows.forEach((company) => {
+                        if (this.isCompanyAssigned(company.id)) {
+                            return;
+                        }
+
+                        if (checked) {
+                            this.companyModalSelected[company.id] = company;
+                        } else {
+                            delete this.companyModalSelected[company.id];
+                        }
+                    });
+                },
+
+                assignCompaniesSelected() {
+                    const toAdd = Object.values(this.companyModalSelected)
+                        .filter(company => ! this.isCompanyAssigned(company.id));
+
+                    if (! toAdd.length) {
+                        this.$refs.assignCompaniesModal.close();
+
+                        return;
+                    }
+
+                    /* Skeleton rows show briefly while the additions settle. */
+                    this.companiesLoading = true;
+                    this.companyAddingCount = toAdd.length;
+
+                    new Promise(resolve => setTimeout(resolve, 500)).then(() => {
+                        toAdd.forEach((company) => {
+                            if (! this.isCompanyAssigned(company.id)) {
+                                this.companies.push({
+                                    id: company.id,
+                                    name: company.name,
+                                    email: company.email,
+                                    selected: false,
+                                });
+                            }
+                        });
+
+                        this.companyPage = 1;
+                    }).finally(() => {
+                        this.companiesLoading = false;
+                        this.companyAddingCount = 0;
+                    });
+
+                    this.companyModalSelected = {};
+
+                    this.$refs.assignCompaniesModal.close();
                 },
             },
         });
