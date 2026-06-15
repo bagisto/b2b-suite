@@ -117,18 +117,12 @@ class B2BSuiteServiceProvider extends ServiceProvider
     protected function publishAssets(): void
     {
         $this->publishes([
-            __DIR__.'/../../publishables/storage' => storage_path('app/public'),
-        ]);
+            __DIR__.'/../../publishables/public/themes/admin/default/build' => public_path('themes/admin/default/build'),
+            __DIR__.'/../../publishables/public/themes/shop/default/build' => public_path('themes/shop/default/build'),
 
-        /**
-         * All view/component overrides are published to the package-namespace override
-         * path `resources/views/vendor/<namespace>` (registered by core's
-         * `loadViewsFrom`). One consistent target for both regular `shop::`/`admin::`
-         * views and anonymous `x-shop::` components (which theme view-path overrides
-         * can't reach). Mirror the namespaced path under `publishables/resources/vendor`.
-         */
-        $this->publishes([
             __DIR__.'/../../publishables/resources/vendor' => resource_path('views/vendor'),
+
+            __DIR__.'/../../publishables/storage' => storage_path('app/public'),
         ]);
     }
 

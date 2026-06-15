@@ -91,6 +91,37 @@ php artisan b2b-suite:install
 
 > That’s it! The package is now installed and ready to use in your Bagisto project.
 
+#### Frontend assets
+
+The package **ships prebuilt admin & shop theme bundles** (each core theme with the B2B
+views folded in). They are published automatically by `b2b-suite:install`, so a normal
+install **does not need Node, npm, or a Tailwind build**.
+
+If you upgrade or customize the core **Shop/Admin** theme and notice any B2B styling
+breakage, just rebuild the bundles. `npm run build` writes the regenerated bundles
+straight into `public/themes/.../build`, so there's nothing else to publish. The build
+resolves the core themes relative to the app, so it works from `vendor/`.
+
+> **Prerequisite:** the B2B build reuses the **Shop** and **Admin** theme dependencies
+> (Vue plugin, theme JS), so make sure `npm install` has been run in **both** core theme
+> packages first:
+>
+> ```bash
+> ( cd packages/Webkul/Shop  && npm install )
+> ( cd packages/Webkul/Admin && npm install )
+> ```
+
+```bash
+cd vendor/bagisto/b2b-suite
+npm install
+npm run build   # rebuilds admin + shop directly into public/themes/.../build
+
+php artisan optimize:clear
+```
+
+> Individual themes can be rebuilt with `npm run build:admin` or `npm run build:shop`
+> (and `npm run dev:admin` / `npm run dev:shop` for hot-reload while developing).
+
 ---
 
 ### 4. License

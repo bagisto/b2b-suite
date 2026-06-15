@@ -1,0 +1,17 @@
+{
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "npm run build:admin && npm run build:shop",
+        "build:admin": "cd ../../../packages/Webkul/Admin && vite build --config \"$OLDPWD/vite.admin.config.js\"",
+        "build:shop": "cd ../../../packages/Webkul/Shop && vite build --config \"$OLDPWD/vite.shop.config.js\"",
+        "dev:admin": "cd ../../../packages/Webkul/Admin && vite --config \"$OLDPWD/vite.admin.config.js\"",
+        "dev:shop": "cd ../../../packages/Webkul/Shop && vite --config \"$OLDPWD/vite.shop.config.js\"",
+        "publishables": "npm run build && node scripts/copy-builds.mjs"
+    },
+    "devDependencies": {
+        "autoprefixer": "^10.4.16",
+        "tailwindcss": "^3.3.2",
+        "vite": "^6.4.2"
+    }
+}
