@@ -8,7 +8,8 @@ follow when changing it.
 
 B2B Suite extends Bagisto's storefront and admin with company accounts, company users
 and roles, requisition lists, quick order, quotations (RFQ), purchase orders and
-company catalogs (per-company product visibility + pricing).
+company catalogs (per-company product **and category** visibility, custom pricing and
+quantity-tier/volume pricing).
 
 - **Namespace:** `Webkul\B2BSuite` → `src/`
 - **Package path:** `packages/bagisto/b2b-suite` (symlinked into `vendor/bagisto/b2b-suite`)
@@ -134,6 +135,39 @@ in scope and bindings like `v-if="items.length"` throw on `undefined`. (This bit
 catalog form once.) Blade/`@lang`/`{{ route() }}` inside `<script>` produce false-positive
 IDE diagnostics — ignore them.
 
+**Gotchas that have bitten this package — follow these:**
+
+- **Vue `@event` bindings collide with Blade directives.** In a `.blade.php` file an
+  `@error="…"`, `@empty="…"`, `@checked`, `@selected`, `@class`, `@style` Vue binding is
+  parsed by Blade as the *directive* of that name, producing broken compiled PHP. `@error`,
+  for example, opens an `@error … @enderror` conditional that never closes →
+  `syntax error, unexpected end of file, expecting "endif"` **at render time** (the page
+  500s, not the build). **Always use the long form** — `v-on:error`, `v-on:empty`, … — for
+  any Vue event whose name matches a Blade directive. `@click`, `@change`, `@input`,
+  `@submit` are safe (no Blade twin).
+- **`php artisan view:cache` is NOT a syntax check.** It writes the compiled file and reports
+  *"Blade templates cached successfully"* even when that PHP has a parse error — the error
+  only fires when the view renders. To actually verify a view, lint the compiled output:
+
+  ```bash
+  php artisan view:clear && php artisan view:cache
+  for f in storage/framework/views/*.php; do php -l "$f" | grep -v 'No syntax errors'; done
+  ```
+
+  (Pre-existing breakage in core's `components/example.blade.php` is unrelated — ignore it.)
+- **Verify Tailwind classes against the built bundle, not from memory.** The B2B theme
+  purges, so a utility — or a responsive variant such as `max-md:flex-col`, or `h-80`,
+  `pl-10`, `text-blue-900` — used in a B2B view but absent from the compiled CSS *silently
+  does nothing*. Check it against `public/themes/<theme>/default/build/assets/app-*.css`
+  (resolve the actual file via `manifest.json`) before relying on it, or express the rule in
+  a scoped `@push('styles')` block / inline `style="…"`.
+- **Comment style in these views.** Use multi-line JSDoc blocks (`/** … */`, one ` * ` per
+  line, sentences capitalised and punctuated) for *both* the Vue component JS and the
+  `@push('styles')` CSS — keep one consistent comment style across the whole view.
+- **Indentation inside `<script type="text/x-template">` is not auto-fixed.** `blade-formatter`
+  (and most HTML formatters) treat a script-template's body as opaque and won't re-indent its
+  block structure or wrap inline-element attributes; reflow such templates carefully by hand.
+
 ## Company Catalog
 
 Company catalogs: assign a catalog to companies to control **which products
@@ -146,6 +180,9 @@ Bagisto's existing customer-group price index instead of touching the core index
   `customer_group_id` pointing at a dedicated group (`code = company_catalog_<id>`,
   `is_user_defined = 0`) created on first save by `Helpers/CompanyCatalog::provisionGroup()`.
 - `company_catalog_products` is the visibility **allowlist** (catalog ↔ product).
+- `company_catalog_categories` is a **derived** category allowlist (catalog ↔ category),
+  recomputed on every save (`deriveCategories()`) from the assigned products' categories plus
+  their NestedSet ancestors — it drives storefront category visibility.
 - `customers.company_catalog_id` assigns a **company** (a `customers` row with
   `type = company`) to a catalog.
 
@@ -160,13 +197,30 @@ Bagisto's existing customer-group price index instead of touching the core index
 
 **Pricing — no core indexer changes** (`Helpers/CompanyCatalog::setPrices()`):
 
-- Per-product fixed prices are written to `product_customer_group_prices` for the catalog
-  group, then `UpdateCreatePriceIndex` is dispatched for the affected products. The existing
-  price index serves catalog prices automatically. Reindexing every catalog product (even
-  unpriced ones) ensures each has a price-index row for the group — the admin form posts a
-  `prices[ID]` entry for every assigned product so this happens.
+- Per-leaf **fixed or percentage-discount** prices are written to
+  `product_customer_group_prices` for the catalog group, then `UpdateCreatePriceIndex` is
+  dispatched for the affected products. The existing price index serves catalog prices
+  automatically. "Leaf" = the price-bearing product: a simple/virtual product itself, or each
+  variant / associated / bundle child of a composite (configurable / grouped / bundle);
+  booking is visibility-only. Reindexing every catalog product (even unpriced ones) ensures
+  each has a price-index row for the group — the admin form posts a `prices[ID]` entry for
+  every assigned leaf so this happens.
 - Reindex timing depends on `QUEUE_CONNECTION`: `sync` runs inline; otherwise a queue worker
   must run for prices to appear.
+- **`setPrices()` is destructive — it wipes the whole group first.** It runs
+  `delete where customer_group_id = <group>` and then rewrites only the rows in the posted
+  payload, so calling it with a *partial* payload (or testing it in tinker against a real
+  catalog) **erases every other override for that catalog**. The admin form guards this by
+  posting a `prices[ID]` entry for every assigned leaf; never call it with a subset. If you
+  ever need to test it, use a throwaway catalog — and note that `product_price_indices`
+  retains the last effective price per `(customer_group_id, product_id)`, which is the only
+  way deleted overrides can be recovered.
+- **Tier (volume) pricing rides the same table.** Each price break is another
+  `product_customer_group_prices` row keyed by `qty` (qty 1 = base catalog price, qty > 1 =
+  volume breaks); core's `AbstractType::getCustomerGroupPrice($product, $qty)` resolves the
+  right tier in cart and `getCustomerGroupPricingOffers()` renders the PDP break table — no
+  custom storefront code. Core only applies a tier when it is *cheaper* than the base/earlier
+  tiers, so break prices must descend as qty rises.
 
 **Storefront visibility (allowlist)** — `Repositories/ProductRepository` (extends core,
 bound in `B2BSuiteManager`):
@@ -178,11 +232,23 @@ bound in `B2BSuiteManager`):
 - The cart-add guard lives in the shop API `CartController::isWithinCompanyCatalog()`.
 - The DB path is covered; an **Elasticsearch** storefront would need an equivalent ES filter.
 
+**Storefront category visibility** — `Repositories/CategoryRepository` (extends core, bound in
+`B2BSuiteManager`):
+
+- For a catalog customer it restricts the category tree/menu (`getVisibleCategoryTree`) to the
+  catalog's allowed category ids and returns `null` from `findBySlug` for disallowed categories
+  (→ 404), so the storefront nav and category pages match the product allowlist.
+- Gated to **storefront requests only** via `isAdminRequest()` (admin requests are inert), and
+  inert for guests / unassigned customers.
+
 **Admin UI:** `Http/Controllers/Admin/CompanyCatalogController`, `DataGrids/Admin/
 CompanyCatalogDataGrid`, views under `Resources/views/admin/company-catalogs/`
-(`index`, `create`, `edit`, shared `form`). The form's product picker reuses
-`admin.catalog.products.search`; the company picker uses the dedicated
-`admin.b2b.company_catalogs.companies` endpoint, which searches/returns the **company name**
+(`index`, `create`, `edit`, shared `form`). The form's product picker uses the dedicated
+`admin.b2b.company_catalogs.products` endpoint (restricted to `visible_individually`
+products, with a type filter); a composite's priceable children/tiers come from
+`admin.b2b.company_catalogs.product_children`, and the save dialog previews the derived
+category tree via `admin.b2b.company_catalogs.category_preview`. The company picker uses
+`admin.b2b.company_catalogs.companies`, which searches/returns the **company name**
 (`company_flat.business_name`), not the contact person's name. ACL keys live under
 `b2b.company-catalogs.*`; the menu entry is in `Config/admin/menu.php`.
 

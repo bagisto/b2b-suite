@@ -28,6 +28,10 @@ class CustomerQuoteDataGrid extends DataGrid
             ->leftJoin('customers as company', 'customer_quotes.company_id', '=', 'company.id')
             ->leftJoin('customers as customer', 'customer_quotes.customer_id', '=', 'customer.id')
             ->leftJoin('admins as agent', 'customer_quotes.agent_id', '=', 'agent.id')
+            ->leftJoin('company_flat', function ($join) {
+                $join->on('customer_quotes.company_id', '=', 'company_flat.customer_id')
+                    ->where('company_flat.locale', '=', app()->getLocale());
+            })
             ->addSelect(
                 'customer_quotes.id as quote_id',
                 'customer_quotes.quotation_number',
@@ -42,7 +46,7 @@ class CustomerQuoteDataGrid extends DataGrid
                 'customer_quotes.expiration_date'
             )
             ->addSelect(DB::raw('CONCAT('.$tablePrefix.'customer.first_name, " ", '.$tablePrefix.'customer.last_name) as customer_name'))
-            ->addSelect(DB::raw('CONCAT('.$tablePrefix.'company.first_name, " ", '.$tablePrefix.'company.last_name) as company_name'))
+            ->addSelect(DB::raw('COALESCE(NULLIF('.$tablePrefix.'company_flat.business_name, ""), CONCAT('.$tablePrefix.'company.first_name, " ", '.$tablePrefix.'company.last_name)) as company_name'))
             ->whereIn('customer_quotes.state', [
                 CustomerQuote::STATE_QUOTATION,
                 CustomerQuote::STATE_PURCHASE_ORDER,
@@ -63,11 +67,10 @@ class CustomerQuoteDataGrid extends DataGrid
         $this->addFilter('quotation_number', 'customer_quotes.quotation_number');
         $this->addFilter('name', 'customer_quotes.name');
         $this->addFilter('status', 'customer_quotes.status');
-        $this->addFilter('soft_deleted', 'customer_quotes.soft_deleted');
         $this->addFilter('base_total', 'customer_quotes.base_total');
         $this->addFilter('negotiated_total', 'customer_quotes.negotiated_total');
         $this->addFilter('customer_name', DB::raw('CONCAT('.$tablePrefix.'customer.first_name, " ", '.$tablePrefix.'customer.last_name)'));
-        $this->addFilter('company_name', DB::raw('CONCAT('.$tablePrefix.'company.first_name, " ", '.$tablePrefix.'company.last_name)'));
+        $this->addFilter('company_name', DB::raw('COALESCE(NULLIF('.$tablePrefix.'company_flat.business_name, ""), CONCAT('.$tablePrefix.'company.first_name, " ", '.$tablePrefix.'company.last_name))'));
         $this->addFilter('agent_name', 'agent.name');
         $this->addFilter('created_at', 'customer_quotes.created_at');
         $this->addFilter('expiration_date', 'customer_quotes.expiration_date');
@@ -84,7 +87,7 @@ class CustomerQuoteDataGrid extends DataGrid
             'index' => 'quotation_number',
             'label' => trans('b2b::app.admin.quotes.index.datagrid.quote-id'),
             'type' => 'string',
-            'searchable' => false,
+            'searchable' => true,
             'filterable' => true,
             'sortable' => true,
         ]);
@@ -162,10 +165,6 @@ class CustomerQuoteDataGrid extends DataGrid
             'filterable_type' => 'dropdown',
             'filterable_options' => [
                 [
-                    'label' => trans('b2b::app.admin.quotes.index.datagrid.draft'),
-                    'value' => CustomerQuote::STATUS_DRAFT,
-                ],
-                [
                     'label' => trans('b2b::app.admin.quotes.index.datagrid.open'),
                     'value' => CustomerQuote::STATUS_OPEN,
                 ],
@@ -176,10 +175,6 @@ class CustomerQuoteDataGrid extends DataGrid
                 [
                     'label' => trans('b2b::app.admin.quotes.index.datagrid.negotiation'),
                     'value' => CustomerQuote::STATUS_NEGOTIATION,
-                ],
-                [
-                    'label' => trans('b2b::app.admin.quotes.index.datagrid.expired'),
-                    'value' => CustomerQuote::STATUS_EXPIRED,
                 ],
                 [
                     'label' => trans('b2b::app.admin.quotes.index.datagrid.rejected'),

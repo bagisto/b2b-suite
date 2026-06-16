@@ -7,58 +7,58 @@
     </x-slot>
 
     <x-slot:content>
-        <div class="grid grid-cols-12 gap-4">
+        <div class="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
             <!-- Company Name -->
-            <div class="grid grid-cols-2 border-b border-zinc-200 px-8 py-3 dark:border-gray-800 max-md:px-0">
-                <span class="text-sm font-medium text-gray-600 dark:text-gray-400">
+            <div class="border-b border-zinc-200 py-3 dark:border-gray-800">
+                <span class="text-xs text-gray-500 dark:text-gray-400">
                     @lang('b2b::app.admin.quotes.view.company-name')
                 </span>
 
-                <p class="mt-1 text-sm font-medium text-gray-800 dark:text-white">
+                <p class="mt-1 break-words text-sm font-medium text-gray-800 dark:text-white">
                     {{ $quote->company->name }}
                 </p>
             </div>
 
             <!-- Company Email -->
-            <div class="grid grid-cols-2 border-b border-zinc-200 px-8 py-3 dark:border-gray-800 max-md:px-0">
-                <span class="text-sm text-gray-600 dark:text-gray-400">
+            <div class="border-b border-zinc-200 py-3 dark:border-gray-800">
+                <span class="text-xs text-gray-500 dark:text-gray-400">
                     @lang('b2b::app.admin.quotes.view.company-email')
                 </span>
 
-                <p class="mt-1 text-sm font-medium text-gray-800 dark:text-white">
+                <p class="mt-1 break-words text-sm font-medium text-gray-800 dark:text-white">
                     {{ $quote->company->email }}
                 </p>
             </div>
 
             <!-- Company Phone -->
-            <div class="grid grid-cols-2 border-b border-zinc-200 px-8 py-3 dark:border-gray-800 max-md:px-0">
-                <span class="text-sm text-gray-600 dark:text-gray-400">
+            <div class="border-b border-zinc-200 py-3 dark:border-gray-800">
+                <span class="text-xs text-gray-500 dark:text-gray-400">
                     @lang('b2b::app.admin.quotes.view.company-phone')
                 </span>
 
-                <p class="mt-1 text-sm font-medium text-gray-800 dark:text-white">
+                <p class="mt-1 break-words text-sm font-medium text-gray-800 dark:text-white">
                     {{ $quote->company->phone }}
                 </p>
             </div>
 
             <!-- Sales Representative Name -->
-            <div class="grid grid-cols-2 border-b border-zinc-200 px-8 py-3 dark:border-gray-800 max-md:px-0">
-                <span class="text-sm text-gray-600 dark:text-gray-400">
+            <div class="border-b border-zinc-200 py-3 dark:border-gray-800">
+                <span class="text-xs text-gray-500 dark:text-gray-400">
                     @lang('b2b::app.admin.quotes.view.sr-name')
                 </span>
 
-                <p class="mt-1 text-sm font-medium text-gray-800 dark:text-white">
+                <p class="mt-1 break-words text-sm font-medium text-gray-800 dark:text-white">
                     {{ $quote->agent->name }}
                 </p>
             </div>
 
             <!-- Sales Representative Email -->
-            <div class="grid grid-cols-2 border-b border-zinc-200 px-8 py-3 dark:border-gray-800 max-md:px-0">
-                <span class="text-sm text-gray-600 dark:text-gray-400">
+            <div class="border-b border-zinc-200 py-3 dark:border-gray-800">
+                <span class="text-xs text-gray-500 dark:text-gray-400">
                     @lang('b2b::app.admin.quotes.view.sr-email')
                 </span>
 
-                <p class="mt-1 text-sm font-medium text-gray-800 dark:text-white">
+                <p class="mt-1 break-words text-sm font-medium text-gray-800 dark:text-white">
                     {{ $quote->agent->email }}
                 </p>
             </div>

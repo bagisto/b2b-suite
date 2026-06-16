@@ -28,6 +28,10 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
             ->leftJoin('customers as company', 'customer_quotes.company_id', '=', 'company.id')
             ->leftJoin('customers as customer', 'customer_quotes.customer_id', '=', 'customer.id')
             ->leftJoin('admins as agent', 'customer_quotes.agent_id', '=', 'agent.id')
+            ->leftJoin('company_flat', function ($join) {
+                $join->on('customer_quotes.company_id', '=', 'company_flat.customer_id')
+                    ->where('company_flat.locale', '=', app()->getLocale());
+            })
             ->addSelect(
                 'customer_quotes.id as quote_id',
                 'customer_quotes.po_number',
@@ -43,7 +47,7 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
                 'customer_quotes.expiration_date'
             )
             ->addSelect(DB::raw('CONCAT('.$tablePrefix.'customer.first_name, " ", '.$tablePrefix.'customer.last_name) as customer_name'))
-            ->addSelect(DB::raw('CONCAT('.$tablePrefix.'company.first_name, " ", '.$tablePrefix.'company.last_name) as company_name'))
+            ->addSelect(DB::raw('COALESCE(NULLIF('.$tablePrefix.'company_flat.business_name, ""), CONCAT('.$tablePrefix.'company.first_name, " ", '.$tablePrefix.'company.last_name)) as company_name'))
             ->where('customer_quotes.state', CustomerQuote::STATE_PURCHASE_ORDER)
             ->whereIn('customer_quotes.status', [
                 CustomerQuote::STATUS_ORDERED,
@@ -53,11 +57,12 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
         $this->addFilter('po_number', 'customer_quotes.po_number');
         $this->addFilter('name', 'customer_quotes.name');
         $this->addFilter('status', 'customer_quotes.status');
-        $this->addFilter('soft_deleted', 'customer_quotes.soft_deleted');
         $this->addFilter('base_total', 'customer_quotes.base_total');
         $this->addFilter('negotiated_total', 'customer_quotes.negotiated_total');
         $this->addFilter('customer_name', DB::raw('CONCAT('.$tablePrefix.'customer.first_name, " ", '.$tablePrefix.'customer.last_name)'));
-        $this->addFilter('company_name', DB::raw('CONCAT('.$tablePrefix.'company.first_name, " ", '.$tablePrefix.'company.last_name)'));
+        $this->addFilter('customer_email', 'customer.email');
+        $this->addFilter('company_name', DB::raw('COALESCE(NULLIF('.$tablePrefix.'company_flat.business_name, ""), CONCAT('.$tablePrefix.'company.first_name, " ", '.$tablePrefix.'company.last_name))'));
+        $this->addFilter('company_email', 'company.email');
         $this->addFilter('agent_name', 'agent.name');
         $this->addFilter('created_at', 'customer_quotes.created_at');
         $this->addFilter('expiration_date', 'customer_quotes.expiration_date');
@@ -74,7 +79,7 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
             'index' => 'po_number',
             'label' => trans('b2b::app.admin.purchase-orders.index.datagrid.id'),
             'type' => 'integer',
-            'searchable' => false,
+            'searchable' => true,
             'filterable' => true,
             'sortable' => true,
         ]);
