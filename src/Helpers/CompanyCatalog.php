@@ -5,6 +5,7 @@ namespace Webkul\B2BSuite\Helpers;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Webkul\B2BSuite\Repositories\CompanyCatalogRepository;
+use Webkul\Category\Models\CategoryProxy;
 use Webkul\Customer\Models\CustomerProxy;
 use Webkul\Customer\Repositories\CustomerGroupRepository;
 use Webkul\Product\Contracts\Product;
@@ -178,6 +179,122 @@ class CompanyCatalog
     }
 
     /**
+     * Derive and persist the catalog's visible categories from its assigned products.
+     * The set is the products' categories plus every ancestor (so the storefront tree
+     * stays navigable). Called on save.
+     */
+    public function deriveCategories($catalog): void
+    {
+        $productIds = $catalog->products()->pluck('products.id')->toArray();
+
+        $catalog->categories()->sync($this->buildCategoryData($productIds)['categoryIds']);
+    }
+
+    /**
+     * Build the category tree (with rolled-up product counts) for a set of products —
+     * used by the save-confirmation preview.
+     */
+    public function categoryTreeForProducts(array $productIds): array
+    {
+        return $this->buildCategoryData($productIds)['tree'];
+    }
+
+    /**
+     * The category ids visible to a catalog (the derived set).
+     */
+    public function allowedCategoryIds($catalog): array
+    {
+        return $catalog->categories()->pluck('categories.id')->toArray();
+    }
+
+    /**
+     * Resolve, from a set of products, the visible category set (products' categories +
+     * ancestors) and a display tree where each node carries a rolled-up product count
+     * (products in that category OR any of its descendants). Root categories are kept in
+     * the id set (the tree needs them) but excluded from the displayed nodes.
+     *
+     * @return array{categoryIds: array<int>, tree: array<int, array>}
+     */
+    protected function buildCategoryData(array $productIds): array
+    {
+        $productIds = array_values(array_unique(array_filter(array_map('intval', $productIds))));
+
+        if (empty($productIds)) {
+            return ['categoryIds' => [], 'tree' => []];
+        }
+
+        /**
+         * Direct category -> the assigned products that sit in it. Category links live on
+         * the (parent) product, which is exactly what the allowlist holds.
+         */
+        $directProducts = [];
+
+        foreach (DB::table('product_categories')->whereIn('product_id', $productIds)->get() as $row) {
+            $directProducts[$row->category_id][$row->product_id] = true;
+        }
+
+        if (empty($directProducts)) {
+            return ['categoryIds' => [], 'tree' => []];
+        }
+
+        $rolled = [];
+
+        $allIds = [];
+
+        $directCategories = CategoryProxy::modelClass()::query()
+            ->whereIn('id', array_keys($directProducts))
+            ->get();
+
+        foreach ($directCategories as $category) {
+            $chain = $category->ancestors->pluck('id')->push($category->id)->all();
+
+            foreach ($chain as $categoryId) {
+                $allIds[$categoryId] = true;
+
+                foreach ($directProducts[$category->id] as $productId => $unused) {
+                    $rolled[$categoryId][$productId] = true;
+                }
+            }
+        }
+
+        $allIds = array_map('intval', array_keys($allIds));
+
+        $tree = CategoryProxy::modelClass()::query()
+            ->whereIn('id', $allIds)
+            ->whereNotNull('parent_id')
+            ->orderBy('_lft')
+            ->get()
+            ->map(fn ($category) => [
+                'id' => $category->id,
+                'name' => $category->name ?: '#'.$category->id,
+                'parent_id' => (int) $category->parent_id,
+                'count' => count($rolled[$category->id] ?? []),
+            ])
+            ->values()
+            ->all();
+
+        /**
+         * Nesting depth relative to the displayed tree (roots are excluded), so the
+         * dialog can indent rows without a recursive component.
+         */
+        $byId = collect($tree)->keyBy('id');
+
+        foreach ($tree as &$node) {
+            $depth = 0;
+            $parentId = $node['parent_id'];
+
+            while ($parentId && $byId->has($parentId)) {
+                $depth++;
+                $parentId = $byId[$parentId]['parent_id'];
+            }
+
+            $node['depth'] = $depth;
+        }
+
+        return ['categoryIds' => $allIds, 'tree' => $tree];
+    }
+
+    /**
      * Resolve the price-bearing LEAF products for an assigned product.
      *
      * Catalog prices are customer-group prices, which the core price index only reads
@@ -253,42 +370,46 @@ class CompanyCatalog
             $affected[] = $productId;
 
             /**
-             * Each row is ['type' => 'fixed'|'discount', 'value' => number]. A plain
-             * scalar (legacy) is treated as a flat price.
+             * A plain scalar (legacy payload) is treated as a flat base price.
              */
-            $value = is_array($row) ? ($row['value'] ?? null) : $row;
-
-            $type = (is_array($row) && ($row['type'] ?? null) === 'discount')
-                ? 'discount'
-                : 'fixed';
-
-            if (
-                $value === ''
-                || $value === null
-                || ! is_numeric($value)
-                || (float) $value < 0
-            ) {
-                continue;
+            if (! is_array($row)) {
+                $row = ['value' => $row];
             }
 
             /**
-             * A discount is a percentage off the base price (core clamps to 0-100).
+             * Build the qty-keyed tier ladder for this leaf: the qty=1 base catalog price
+             * plus any volume breaks (qty >= 2). Each tier becomes one
+             * product_customer_group_prices row — core's getCustomerGroupPrice() resolves
+             * the right one by cart quantity, and the PDP renders the qty>1 rows as offers.
              */
-            if (
-                $type === 'discount'
-                && (float) $value > 100
-            ) {
-                continue;
+            $tiers = [];
+
+            if ($tier = $this->normalizeTier(1, $row['type'] ?? null, $row['value'] ?? null)) {
+                $tiers[1] = $tier;
             }
 
-            $model::create([
-                'qty' => 1,
-                'value_type' => $type,
-                'value' => (float) $value,
-                'product_id' => $productId,
-                'customer_group_id' => $groupId,
-                'unique_id' => implode('|', [1, $productId, $groupId]),
-            ]);
+            foreach ($row['breaks'] ?? [] as $break) {
+                $qty = (int) ($break['qty'] ?? 0);
+
+                if ($qty < 2) {
+                    continue;
+                }
+
+                if ($tier = $this->normalizeTier($qty, $break['type'] ?? null, $break['value'] ?? null)) {
+                    $tiers[$qty] = $tier;
+                }
+            }
+
+            foreach ($tiers as $tier) {
+                $model::create([
+                    'qty' => $tier['qty'],
+                    'value_type' => $tier['type'],
+                    'value' => $tier['value'],
+                    'product_id' => $productId,
+                    'customer_group_id' => $groupId,
+                    'unique_id' => implode('|', [$tier['qty'], $productId, $groupId]),
+                ]);
+            }
         }
 
         /**
@@ -300,6 +421,37 @@ class CompanyCatalog
         $parentIds = $catalog->products()->pluck('products.id')->toArray();
 
         $this->reindex(array_merge($affected, $parentIds));
+    }
+
+    /**
+     * Validate and shape a single price tier. Returns ['qty', 'type', 'value'] or null
+     * when the value is empty/invalid (a discount must be 0-100, a flat price >= 0).
+     */
+    protected function normalizeTier(int $qty, $type, $value): ?array
+    {
+        $type = $type === 'discount' ? 'discount' : 'fixed';
+
+        if (
+            $value === ''
+            || $value === null
+            || ! is_numeric($value)
+            || (float) $value < 0
+        ) {
+            return null;
+        }
+
+        if (
+            $type === 'discount'
+            && (float) $value > 100
+        ) {
+            return null;
+        }
+
+        return [
+            'qty' => $qty,
+            'type' => $type,
+            'value' => (float) $value,
+        ];
     }
 
     /**

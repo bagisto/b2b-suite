@@ -12,6 +12,11 @@
         'formatted_price' => $l['formatted_price'],
         'price_type'      => $l['price_type'] ?? 'fixed',
         'price_value'     => ($l['price_value'] ?? '') === '' ? '' : (float) $l['price_value'],
+        'breaks'          => collect($l['breaks'] ?? [])->map(fn ($b) => [
+            'qty'   => (int) $b['qty'],
+            'type'  => $b['type'] ?? 'fixed',
+            'value' => (float) $b['value'],
+        ])->values(),
         'selected'        => false,
     ];
 
@@ -47,6 +52,20 @@
         /* Widen only the Assign Products modal (scoped via its marker), without touching the core modal component. */
         .box-shadow:has(.b2b-assign-modal) {
             max-width: 64rem !important;
+        }
+
+        /* The tier-pricing modal is a touch wider than the default (but narrower than the
+           assign modal). Core's max-md:w-[90%] still caps it to the viewport on mobile. */
+        .box-shadow:has(.b2b-tier-modal) {
+            max-width: 44rem !important;
+        }
+
+        /* Stack the save-confirmation modal's two panels on small screens. Scoped rule
+           because the `max-md:flex-col` utility is purged out of the B2B theme bundle. */
+        @media (max-width: 767px) {
+            .b2b-preview-cols {
+                flex-direction: column;
+            }
         }
 
         /* Skeleton shimmer for the loading state. */
@@ -87,8 +106,9 @@
             </a>
 
             <button
-                type="submit"
+                type="button"
                 class="primary-button"
+                @click="$emitter.emit('b2b-open-category-preview')"
             >
                 @lang('b2b::app.admin.company-catalogs.'.$mode.'.save-btn')
             </button>
@@ -114,21 +134,31 @@
                     </x-slot>
 
                     <x-slot:content>
-                        <!-- Info + Assign Products (right) -->
-                        <div class="mb-3 flex items-center justify-between gap-3">
-                            <p class="text-sm text-gray-500 dark:text-gray-300">
-                                @lang('b2b::app.admin.company-catalogs.products-info')
-                            </p>
+                        <!-- Info + count (left) · pagination + Assign (right) -->
+                        <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-300">
+                                    @lang('b2b::app.admin.company-catalogs.products-info')
+                                </p>
 
-                            <button
-                                type="button"
-                                class="secondary-button flex shrink-0 items-center gap-1.5 !rounded-lg"
-                                @click="openAssignModal"
-                            >
-                                <span class="icon-plus text-lg"></span>
+                                <p v-if="products.length" class="mt-1 text-xs text-gray-400">
+                                    @{{ "@lang('b2b::app.admin.company-catalogs.products-count')".replace(':count', products.length) }}<span v-if="childCount"> · @{{ "@lang('b2b::app.admin.company-catalogs.variants-count')".replace(':count', childCount) }}</span>
+                                </p>
+                            </div>
 
-                                @lang('b2b::app.admin.company-catalogs.assign-products')
-                            </button>
+                            <div class="flex shrink-0 items-center gap-3">
+                                <x-b2b::table.pagination page="currentPage" total="totalPages" prev="currentPage--" next="currentPage++" />
+
+                                <button
+                                    type="button"
+                                    class="secondary-button flex items-center gap-1.5 !rounded-lg"
+                                    @click="openAssignModal"
+                                >
+                                    <span class="icon-plus text-lg"></span>
+
+                                    @lang('b2b::app.admin.company-catalogs.assign-products')
+                                </button>
+                            </div>
                         </div>
 
                         <!-- Mass Action Bar (shown only when products are selected) -->
@@ -178,8 +208,8 @@
                         </div>
 
                         <!-- Selected products -->
-                        <div class="mt-3 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800">
-                            <table class="w-full" style="table-layout: fixed;">
+                        <div class="mt-3 overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-800">
+                            <table class="w-full" style="table-layout: fixed; min-width: 52rem;">
                                 <colgroup>
                                     <col style="width: 3rem;">
                                     <col>
@@ -215,7 +245,7 @@
                                 </thead>
 
                                 <tbody>
-                                    <tr v-if="! products.length">
+                                    <tr v-if="! products.length && ! productsLoading">
                                         <td colspan="7" class="px-4 py-6 text-center text-sm text-gray-500">
                                             @lang('b2b::app.admin.company-catalogs.no-products')
                                         </td>
@@ -231,7 +261,12 @@
                                             class="border-t border-gray-100 transition-all hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-950"
                                         >
                                             <td class="px-3 py-3">
-                                                <input type="checkbox" class="cursor-pointer" v-model="product.leaves[0].selected">
+                                                <input
+                                                    type="checkbox"
+                                                    class="cursor-pointer"
+                                                    :checked="isLeafSelected(product, product.leaves[0])"
+                                                    @change="setLeafSelected(product, product.leaves[0], $event.target.checked)"
+                                                >
                                             </td>
 
                                             <td class="px-4 py-3">
@@ -241,6 +276,13 @@
                                                     <div class="grid">
                                                         <span class="text-sm font-medium text-gray-800 dark:text-white">@{{ product.name }}</span>
                                                         <span class="text-xs text-gray-500">@{{ product.sku }}</span>
+
+                                                        <span
+                                                            class="mt-1 cursor-pointer text-xs font-medium text-blue-500 hover:underline"
+                                                            @click="openTierModal(product.leaves[0], product.image)"
+                                                        >
+                                                            @lang('b2b::app.admin.company-catalogs.volume-pricing')<span v-if="breakCount(product.leaves[0])"> (@{{ breakCount(product.leaves[0]) }})</span>
+                                                        </span>
 
                                                         <span
                                                             v-if="isSharedLeaf(product.leaves[0].id)"
@@ -288,7 +330,12 @@
                                             class="border-t border-gray-100 transition-all hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-950"
                                         >
                                             <td class="px-3 py-3">
-                                                <input type="checkbox" class="cursor-pointer" v-model="product.selected">
+                                                <input
+                                                    type="checkbox"
+                                                    class="cursor-pointer"
+                                                    :checked="isBookingSelected(product)"
+                                                    @change="setBookingSelected(product, $event.target.checked)"
+                                                >
                                             </td>
 
                                             <td class="px-4 py-3">
@@ -356,13 +403,25 @@
                                                 class="border-t border-gray-100 dark:border-gray-800"
                                             >
                                                 <td class="px-3 py-2.5">
-                                                    <input type="checkbox" class="cursor-pointer" v-model="leaf.selected">
+                                                    <input
+                                                        type="checkbox"
+                                                        class="cursor-pointer"
+                                                        :checked="isLeafSelected(product, leaf)"
+                                                        @change="setLeafSelected(product, leaf, $event.target.checked)"
+                                                    >
                                                 </td>
 
                                                 <td class="px-4 py-2.5">
                                                     <div class="grid ps-8">
                                                         <span class="text-sm text-gray-700 dark:text-gray-200">@{{ leaf.name }}</span>
                                                         <span class="text-xs text-gray-500">@{{ leaf.sku }}</span>
+
+                                                        <span
+                                                            class="mt-1 cursor-pointer text-xs font-medium text-blue-500 hover:underline"
+                                                            @click="openTierModal(leaf, product.image)"
+                                                        >
+                                                            @lang('b2b::app.admin.company-catalogs.volume-pricing')<span v-if="breakCount(leaf)"> (@{{ breakCount(leaf) }})</span>
+                                                        </span>
 
                                                         <span
                                                             v-if="isSharedLeaf(leaf.id)"
@@ -428,39 +487,6 @@
                             </table>
                         </div>
 
-                        <!-- Pagination -->
-                        <div
-                            v-if="totalPages > 1"
-                            class="mt-3 flex items-center justify-between gap-2 text-sm"
-                        >
-                            <span class="text-gray-500 dark:text-gray-400">
-                                @{{ products.length }} @lang('b2b::app.admin.company-catalogs.products')
-                            </span>
-
-                            <div class="flex items-center gap-1.5">
-                                <button
-                                    type="button"
-                                    class="grid h-8 w-8 place-items-center rounded-md border border-gray-200 text-gray-600 transition-all hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
-                                    :class="{ 'cursor-not-allowed opacity-50': currentPage === 1 }"
-                                    :disabled="currentPage === 1"
-                                    @click="currentPage--"
-                                >
-                                    <span class="icon-sort-left rtl:icon-sort-right text-xl"></span>
-                                </button>
-
-                                <span class="px-2 text-gray-600 dark:text-gray-300">@{{ currentPage }} / @{{ totalPages }}</span>
-
-                                <button
-                                    type="button"
-                                    class="grid h-8 w-8 place-items-center rounded-md border border-gray-200 text-gray-600 transition-all hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
-                                    :class="{ 'cursor-not-allowed opacity-50': currentPage === totalPages }"
-                                    :disabled="currentPage === totalPages"
-                                    @click="currentPage++"
-                                >
-                                    <span class="icon-sort-right rtl:icon-sort-left text-xl"></span>
-                                </button>
-                            </div>
-                        </div>
 
                         <!--
                             All assigned products' fields are submitted here (not just the
@@ -472,6 +498,12 @@
                             <template v-for="leaf in product.leaves" :key="'leaf-field-' + leaf.id">
                                 <input type="hidden" :name="`prices[${leaf.id}][type]`" :value="leaf.price_type">
                                 <input type="hidden" :name="`prices[${leaf.id}][value]`" :value="leaf.price_value">
+
+                                <template v-for="(brk, i) in (leaf.breaks || [])" :key="'brk-field-' + leaf.id + '-' + i">
+                                    <input type="hidden" :name="`prices[${leaf.id}][breaks][${i}][qty]`" :value="brk.qty">
+                                    <input type="hidden" :name="`prices[${leaf.id}][breaks][${i}][type]`" :value="brk.type">
+                                    <input type="hidden" :name="`prices[${leaf.id}][breaks][${i}][value]`" :value="brk.value">
+                                </template>
                             </template>
                         </template>
 
@@ -487,8 +519,8 @@
                     </x-slot>
 
                     <x-slot:content>
-                        <!-- Info + Assign Companies (right) -->
-                        <div class="mb-3 flex items-center justify-between gap-3">
+                        <!-- Info + count (left) · pagination + Assign (right) -->
+                        <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
                             <div>
                                 <p class="text-sm text-gray-500 dark:text-gray-300">
                                     @lang('b2b::app.admin.company-catalogs.companies-info')
@@ -497,17 +529,25 @@
                                 <p class="mt-1 text-xs text-amber-600 dark:text-amber-400">
                                     @lang('b2b::app.admin.company-catalogs.companies-single-note')
                                 </p>
+
+                                <p v-if="companies.length" class="mt-1 text-xs text-gray-400">
+                                    @{{ "@lang('b2b::app.admin.company-catalogs.companies-count')".replace(':count', companies.length) }}
+                                </p>
                             </div>
 
-                            <button
-                                type="button"
-                                class="secondary-button flex shrink-0 items-center gap-1.5 !rounded-lg"
-                                @click="openCompanyModal"
-                            >
-                                <span class="icon-plus text-lg"></span>
+                            <div class="flex shrink-0 items-center gap-3">
+                                <x-b2b::table.pagination page="companyPage" total="companyTotalPages" prev="companyPage--" next="companyPage++" />
 
-                                @lang('b2b::app.admin.company-catalogs.assign-companies')
-                            </button>
+                                <button
+                                    type="button"
+                                    class="secondary-button flex items-center gap-1.5 !rounded-lg"
+                                    @click="openCompanyModal"
+                                >
+                                    <span class="icon-plus text-lg"></span>
+
+                                    @lang('b2b::app.admin.company-catalogs.assign-companies')
+                                </button>
+                            </div>
                         </div>
 
                         <!-- Mass Action Bar -->
@@ -537,8 +577,8 @@
                         </div>
 
                         <!-- Assigned companies -->
-                        <div class="mt-3 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800">
-                            <table class="w-full" style="table-layout: fixed;">
+                        <div class="mt-3 overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-800">
+                            <table class="w-full" style="table-layout: fixed; min-width: 38rem;">
                                 <colgroup>
                                     <col style="width: 3rem;">
                                     <col>
@@ -573,7 +613,7 @@
                                 </thead>
 
                                 <tbody>
-                                    <tr v-if="! companies.length">
+                                    <tr v-if="! companies.length && ! companiesLoading">
                                         <td colspan="4" class="px-4 py-6 text-center text-sm text-gray-500">
                                             @lang('b2b::app.admin.company-catalogs.no-companies')
                                         </td>
@@ -614,40 +654,6 @@
                                     </template>
                                 </tbody>
                             </table>
-                        </div>
-
-                        <!-- Pagination -->
-                        <div
-                            v-if="companyTotalPages > 1"
-                            class="mt-3 flex items-center justify-between gap-2 text-sm"
-                        >
-                            <span class="text-gray-500 dark:text-gray-400">
-                                @{{ companies.length }} @lang('b2b::app.admin.company-catalogs.companies')
-                            </span>
-
-                            <div class="flex items-center gap-1.5">
-                                <button
-                                    type="button"
-                                    class="grid h-8 w-8 place-items-center rounded-md border border-gray-200 text-gray-600 transition-all hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
-                                    :class="{ 'cursor-not-allowed opacity-50': companyPage === 1 }"
-                                    :disabled="companyPage === 1"
-                                    @click="companyPage--"
-                                >
-                                    <span class="icon-sort-left rtl:icon-sort-right text-xl"></span>
-                                </button>
-
-                                <span class="px-2 text-gray-600 dark:text-gray-300">@{{ companyPage }} / @{{ companyTotalPages }}</span>
-
-                                <button
-                                    type="button"
-                                    class="grid h-8 w-8 place-items-center rounded-md border border-gray-200 text-gray-600 transition-all hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
-                                    :class="{ 'cursor-not-allowed opacity-50': companyPage === companyTotalPages }"
-                                    :disabled="companyPage === companyTotalPages"
-                                    @click="companyPage++"
-                                >
-                                    <span class="icon-sort-right rtl:icon-sort-left text-xl"></span>
-                                </button>
-                            </div>
                         </div>
 
                         <!-- All assigned companies submitted (not just the visible page) -->
@@ -759,8 +765,8 @@
 
                                 <!-- Product list (fixed height so the modal doesn't resize between pages) -->
                                 <div class="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800">
-                                    <div class="h-96 overflow-y-auto">
-                                        <table class="w-full" style="table-layout: fixed;">
+                                    <div class="h-96 overflow-auto">
+                                        <table class="w-full" style="table-layout: fixed; min-width: 46rem;">
                                             <colgroup>
                                                 <col style="width: 3rem;">
                                                 <col>
@@ -900,29 +906,7 @@
                                         @{{ modalTotal }} @lang('b2b::app.admin.company-catalogs.products')
                                     </span>
 
-                                    <div class="flex items-center gap-1.5">
-                                        <button
-                                            type="button"
-                                            class="grid h-8 w-8 place-items-center rounded-md border border-gray-200 text-gray-600 transition-all hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
-                                            :class="{ 'cursor-not-allowed opacity-50': modalPage === 1 }"
-                                            :disabled="modalPage === 1"
-                                            @click="fetchModalProducts(modalPage - 1)"
-                                        >
-                                            <span class="icon-sort-left rtl:icon-sort-right text-xl"></span>
-                                        </button>
-
-                                        <span class="px-2 text-gray-600 dark:text-gray-300">@{{ modalPage }} / @{{ modalLastPage }}</span>
-
-                                        <button
-                                            type="button"
-                                            class="grid h-8 w-8 place-items-center rounded-md border border-gray-200 text-gray-600 transition-all hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
-                                            :class="{ 'cursor-not-allowed opacity-50': modalPage === modalLastPage }"
-                                            :disabled="modalPage === modalLastPage"
-                                            @click="fetchModalProducts(modalPage + 1)"
-                                        >
-                                            <span class="icon-sort-right rtl:icon-sort-left text-xl"></span>
-                                        </button>
-                                    </div>
+                                    <x-b2b::table.pagination page="modalPage" total="modalLastPage" prev="fetchModalProducts(modalPage - 1)" next="fetchModalProducts(modalPage + 1)" />
                                 </div>
                                 </div>
                             </x-slot>
@@ -964,8 +948,8 @@
 
                                 <!-- Company list -->
                                 <div class="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800">
-                                    <div class="h-96 overflow-y-auto">
-                                        <table class="w-full" style="table-layout: fixed;">
+                                    <div class="h-96 overflow-auto">
+                                        <table class="w-full" style="table-layout: fixed; min-width: 40rem;">
                                             <colgroup>
                                                 <col style="width: 3rem;">
                                                 <col>
@@ -1073,29 +1057,7 @@
                                         @{{ companyModalTotal }} @lang('b2b::app.admin.company-catalogs.companies')
                                     </span>
 
-                                    <div class="flex items-center gap-1.5">
-                                        <button
-                                            type="button"
-                                            class="grid h-8 w-8 place-items-center rounded-md border border-gray-200 text-gray-600 transition-all hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
-                                            :class="{ 'cursor-not-allowed opacity-50': companyModalPage === 1 }"
-                                            :disabled="companyModalPage === 1"
-                                            @click="fetchModalCompanies(companyModalPage - 1)"
-                                        >
-                                            <span class="icon-sort-left rtl:icon-sort-right text-xl"></span>
-                                        </button>
-
-                                        <span class="px-2 text-gray-600 dark:text-gray-300">@{{ companyModalPage }} / @{{ companyModalLastPage }}</span>
-
-                                        <button
-                                            type="button"
-                                            class="grid h-8 w-8 place-items-center rounded-md border border-gray-200 text-gray-600 transition-all hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
-                                            :class="{ 'cursor-not-allowed opacity-50': companyModalPage === companyModalLastPage }"
-                                            :disabled="companyModalPage === companyModalLastPage"
-                                            @click="fetchModalCompanies(companyModalPage + 1)"
-                                        >
-                                            <span class="icon-sort-right rtl:icon-sort-left text-xl"></span>
-                                        </button>
-                                    </div>
+                                    <x-b2b::table.pagination page="companyModalPage" total="companyModalLastPage" prev="fetchModalCompanies(companyModalPage - 1)" next="fetchModalCompanies(companyModalPage + 1)" />
                                 </div>
                                 </div>
                             </x-slot>
@@ -1108,6 +1070,285 @@
                                 >
                                     @lang('b2b::app.admin.company-catalogs.assign')
                                     <span v-if="companyModalSelectedCount">(@{{ companyModalSelectedCount }})</span>
+                                </button>
+                            </x-slot>
+                        </x-admin::modal>
+
+                        <!-- Save confirmation: category tree shown to the assigned companies -->
+                        <x-admin::modal ref="categoryPreviewModal">
+                            <x-slot:header>
+                                <div class="flex items-center gap-2.5">
+                                    <p class="text-lg font-bold text-gray-800 dark:text-white">
+                                        @lang('b2b::app.admin.company-catalogs.category-preview-title')
+                                    </p>
+
+                                    <span
+                                        class="rounded-full px-2.5 py-0.5 text-xs font-bold uppercase tracking-wide text-blue-500"
+                                        style="background-color: rgba(59, 130, 246, 0.12);"
+                                    >
+                                        @lang('b2b::app.admin.company-catalogs.preview-badge')
+                                    </span>
+                                </div>
+                            </x-slot>
+
+                            <x-slot:content>
+                                <div class="b2b-assign-modal">
+                                    <!-- Preview callout -->
+                                    <div
+                                        class="mb-5 flex items-start gap-3 rounded-lg p-4"
+                                        style="background-color: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.25);"
+                                    >
+                                        <span class="icon-view shrink-0 text-3xl text-blue-500"></span>
+
+                                        <div>
+                                            <p class="text-sm font-semibold text-gray-800 dark:text-white">
+                                                @lang('b2b::app.admin.company-catalogs.preview-banner-title')
+                                            </p>
+
+                                            <p class="mt-0.5 text-sm text-gray-600 dark:text-gray-300">
+                                                @lang('b2b::app.admin.company-catalogs.category-preview-info')
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="b2b-preview-cols flex gap-4">
+                                        <!-- Derived category tree -->
+                                        <div class="flex-1">
+                                            <p class="mb-2 text-xs font-semibold uppercase text-gray-500">
+                                                @lang('b2b::app.admin.company-catalogs.visible-categories')
+                                                <span v-if="! categoryLoading" class="text-gray-400">(@{{ categoryTree.length }})</span>
+                                            </p>
+
+                                            <div class="relative mb-2">
+                                                <span class="icon-search pointer-events-none absolute top-2.5 text-lg text-gray-400 ltr:left-3 rtl:right-3"></span>
+
+                                                <input
+                                                    type="text"
+                                                    class="w-full rounded-lg border border-gray-200 py-2 text-sm text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-white ltr:pl-10 rtl:pr-10"
+                                                    placeholder="@lang('b2b::app.admin.company-catalogs.search-categories')"
+                                                    v-model="previewCategorySearch"
+                                                >
+                                            </div>
+
+                                            <div class="rounded-lg border border-gray-200 dark:border-gray-800">
+                                                <div class="overflow-y-auto p-2" style="height: 24rem;">
+                                                    <template v-if="categoryLoading">
+                                                        <div v-for="n in 6" :key="'cat-sk-' + n" class="px-2 py-2">
+                                                            <div class="b2b-shimmer h-3" :style="{ width: (160 - n * 14) + 'px' }"></div>
+                                                        </div>
+                                                    </template>
+
+                                                    <p v-else-if="! categoryTree.length" class="py-8 text-center text-sm text-gray-500">
+                                                        @lang('b2b::app.admin.company-catalogs.no-categories-derived')
+                                                    </p>
+
+                                                    <p v-else-if="! filteredCategoryTree.length" class="py-8 text-center text-sm text-gray-500">
+                                                        @lang('b2b::app.admin.company-catalogs.no-matches')
+                                                    </p>
+
+                                                    <template v-else>
+                                                        <div
+                                                            v-for="node in filteredCategoryTree"
+                                                            :key="node.id"
+                                                            class="flex items-center justify-between gap-2 rounded py-1.5 ltr:pr-2 rtl:pl-2 hover:bg-gray-50 dark:hover:bg-gray-800"
+                                                            :style="{ paddingInlineStart: (node.depth * 1.25 + 0.5) + 'rem' }"
+                                                        >
+                                                            <span
+                                                                class="text-sm text-gray-700 dark:text-gray-200"
+                                                                :class="node.depth === 0 ? 'font-medium text-gray-800 dark:text-white' : ''"
+                                                            >@{{ node.name }}</span>
+
+                                                            <span class="shrink-0 rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                                                                @{{ node.count }}
+                                                            </span>
+                                                        </div>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Companies that will see this -->
+                                        <div class="w-72 max-w-full max-md:w-full">
+                                            <p class="mb-2 text-xs font-semibold uppercase text-gray-500">
+                                                @lang('b2b::app.admin.company-catalogs.shown-to-companies')
+                                                <span class="text-gray-400">(@{{ companies.length }})</span>
+                                            </p>
+
+                                            <div class="relative mb-2">
+                                                <span class="icon-search pointer-events-none absolute top-2.5 text-lg text-gray-400 ltr:left-3 rtl:right-3"></span>
+
+                                                <input
+                                                    type="text"
+                                                    class="w-full rounded-lg border border-gray-200 py-2 text-sm text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-white ltr:pl-10 rtl:pr-10"
+                                                    placeholder="@lang('b2b::app.admin.company-catalogs.search-companies')"
+                                                    v-model="previewCompanySearch"
+                                                    @input="previewCompanyLimit = 9"
+                                                >
+                                            </div>
+
+                                            <div class="rounded-lg border border-gray-200 dark:border-gray-800">
+                                                <div class="overflow-y-auto p-2" style="height: 24rem;">
+                                                    <p v-if="! companies.length" class="py-8 text-center text-sm text-gray-500">
+                                                        @lang('b2b::app.admin.company-catalogs.no-companies')
+                                                    </p>
+
+                                                    <p v-else-if="! filteredPreviewCompanies.length" class="py-8 text-center text-sm text-gray-500">
+                                                        @lang('b2b::app.admin.company-catalogs.no-matches')
+                                                    </p>
+
+                                                    <template v-else>
+                                                        <div v-for="company in visiblePreviewCompanies" :key="'cp-' + company.id" class="rounded px-2 py-1.5">
+                                                            <span class="block text-sm font-medium text-gray-800 dark:text-white">@{{ company.name }}</span>
+                                                            <span class="block text-xs text-gray-500">@{{ company.email }}</span>
+                                                        </div>
+
+                                                        <button
+                                                            v-if="filteredPreviewCompanies.length > previewCompanyLimit"
+                                                            type="button"
+                                                            class="mt-2 w-full rounded-lg border border-gray-200 py-2 text-sm font-medium text-gray-600 transition-all hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+                                                            @click="loadMoreCompanies"
+                                                        >
+                                                            @{{ "@lang('b2b::app.admin.company-catalogs.load-more')".replace(':count', filteredPreviewCompanies.length - previewCompanyLimit) }}
+                                                        </button>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </x-slot>
+
+                            <x-slot:footer>
+                                <button type="submit" class="primary-button">
+                                    @lang('b2b::app.admin.company-catalogs.confirm-save')
+                                </button>
+                            </x-slot>
+                        </x-admin::modal>
+
+                        <!-- Volume Pricing (tier) Modal -->
+                        <x-admin::modal ref="tierModal">
+                            <x-slot:header>
+                                <p class="text-lg font-bold text-gray-800 dark:text-white">
+                                    @lang('b2b::app.admin.company-catalogs.volume-pricing')
+                                </p>
+                            </x-slot>
+
+                            <x-slot:content>
+                                <div v-if="tierModalLeaf" class="b2b-tier-modal">
+                                    <!-- Product details -->
+                                    <div class="mb-4 flex items-center gap-3">
+                                        <img
+                                            v-if="tierModalImage"
+                                            class="h-12 w-12 shrink-0 rounded border border-gray-100 object-cover dark:border-gray-800"
+                                            :src="tierModalImage"
+                                        >
+
+                                        <div class="grid">
+                                            <span class="text-sm font-medium text-gray-800 dark:text-white">@{{ tierModalLeaf.name }}</span>
+                                            <span class="text-xs text-gray-500">@{{ tierModalLeaf.sku }}</span>
+                                        </div>
+                                    </div>
+
+                                    <p class="mb-4 text-sm text-gray-500 dark:text-gray-300">
+                                        @lang('b2b::app.admin.company-catalogs.volume-pricing-info')
+                                    </p>
+
+                                    <!-- Base (qty 1) price for reference; edited inline on the row -->
+                                    <div class="mb-4 flex items-center justify-between rounded-lg border border-gray-200 px-4 py-3 dark:border-gray-800">
+                                        <span class="text-sm text-gray-600 dark:text-gray-300">@lang('b2b::app.admin.company-catalogs.base-price') (1+)</span>
+                                        <span class="text-sm font-semibold text-gray-800 dark:text-white">@{{ newPrice(tierModalLeaf) }}</span>
+                                    </div>
+
+                                    <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-800">
+                                        <table class="w-full" style="table-layout: fixed; min-width: 34rem;">
+                                            <colgroup>
+                                                <col style="width: 7rem;">
+                                                <col style="width: 9rem;">
+                                                <col style="width: 8rem;">
+                                                <col>
+                                                <col style="width: 3.5rem;">
+                                            </colgroup>
+
+                                            <thead class="bg-gray-50 dark:bg-gray-800">
+                                                <tr class="text-left text-xs font-medium uppercase text-gray-500">
+                                                    <th class="px-4 py-3">@lang('b2b::app.admin.company-catalogs.tier-qty')</th>
+                                                    <th class="px-4 py-3">@lang('b2b::app.admin.company-catalogs.price-type')</th>
+                                                    <th class="px-4 py-3">@lang('b2b::app.admin.company-catalogs.value')</th>
+                                                    <th class="px-4 py-3">@lang('b2b::app.admin.company-catalogs.unit-price')</th>
+                                                    <th class="px-4 py-3"></th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                <tr v-if="! tierModalLeaf.breaks.length">
+                                                    <td colspan="5" class="px-4 py-6 text-center text-sm text-gray-500">
+                                                        @lang('b2b::app.admin.company-catalogs.no-breaks')
+                                                    </td>
+                                                </tr>
+
+                                                <tr
+                                                    v-for="(brk, i) in tierModalLeaf.breaks"
+                                                    :key="'brk-' + i"
+                                                    class="border-t border-gray-100 dark:border-gray-800"
+                                                >
+                                                    <td class="px-4 py-2.5">
+                                                        <input
+                                                            type="number" min="2" step="1"
+                                                            class="w-20 rounded-lg border border-gray-200 px-3 py-1.5 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+                                                            v-model="brk.qty"
+                                                        >
+                                                    </td>
+
+                                                    <td class="px-4 py-2.5">
+                                                        <select class="rounded-lg border border-gray-200 px-2.5 py-1.5 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white" v-model="brk.type">
+                                                            <option value="fixed">@lang('b2b::app.admin.company-catalogs.flat')</option>
+                                                            <option value="discount">@lang('b2b::app.admin.company-catalogs.discount')</option>
+                                                        </select>
+                                                    </td>
+
+                                                    <td class="px-4 py-2.5">
+                                                        <div class="relative w-28">
+                                                            <input
+                                                                type="number" step="0.01" min="0"
+                                                                class="w-28 rounded-lg border border-gray-200 px-3 py-1.5 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+                                                                :class="brk.type === 'discount' ? 'ltr:pr-7 rtl:pl-7' : ''"
+                                                                v-model="brk.value"
+                                                                :placeholder="brk.type === 'discount' ? '0' : '@lang('b2b::app.admin.company-catalogs.price-placeholder')'"
+                                                            >
+                                                            <span v-if="brk.type === 'discount'" class="pointer-events-none absolute top-1.5 text-sm text-gray-400 ltr:right-3 rtl:left-3">%</span>
+                                                        </div>
+                                                    </td>
+
+                                                    <td class="whitespace-nowrap px-4 py-2.5 text-sm font-semibold text-gray-800 dark:text-white">@{{ unitPrice(tierModalLeaf, brk) }}</td>
+
+                                                    <td class="px-4 py-2.5 text-right">
+                                                        <span class="icon-delete cursor-pointer text-xl text-gray-500 transition-all hover:text-red-600" @click="removeBreak(i)"></span>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <div class="mt-3 flex justify-end">
+                                        <button
+                                            type="button"
+                                            class="flex items-center gap-1 text-sm font-medium text-blue-500 transition-all hover:text-blue-600"
+                                            @click="addBreak"
+                                        >
+                                            <span class="text-base font-semibold">+</span>
+                                            @lang('b2b::app.admin.company-catalogs.add-price-break')
+                                        </button>
+                                    </div>
+                                </div>
+                            </x-slot>
+
+                            <x-slot:footer>
+                                <button
+                                    type="button"
+                                    class="primary-button"
+                                    @click="$refs.tierModal.close()"
+                                >
+                                    @lang('b2b::app.admin.company-catalogs.done')
                                 </button>
                             </x-slot>
                         </x-admin::modal>
@@ -1152,6 +1393,22 @@
                     productsLoading: false,
                     addingCount: 0,
 
+                    /**
+                     * Selection is tracked per (product, leaf) — keyed "productId:leafId" —
+                     * not on the leaf object, because shared leaves (a product assigned both
+                     * standalone and inside a bundle) reference ONE object; keying by product
+                     * keeps each occurrence's selection independent (so select-all only ever
+                     * affects the current page).
+                     */
+                    selectedKeys: {},
+
+                    /* Save-confirmation category preview */
+                    categoryTree: [],
+                    categoryLoading: false,
+                    previewCategorySearch: '',
+                    previewCompanySearch: '',
+                    previewCompanyLimit: 9,
+
                     /* Assign-products modal */
                     modalQuery: '',
                     modalType: '',
@@ -1165,11 +1422,18 @@
                     modalTotal: 0,
                     modalLoading: false,
                     modalTimer: null,
+
+                    /* Tier-pricing modal — references a leaf in products[].leaves */
+                    tierModalLeaf: null,
+                    tierModalImage: null,
                 };
             },
 
             created() {
                 this.linkSharedLeaves();
+
+                /* The top "Save" button opens the category preview instead of submitting. */
+                this.$emitter.on('b2b-open-category-preview', () => this.openCategoryPreview());
             },
 
             watch: {
@@ -1199,20 +1463,19 @@
                     return this.products.flatMap(p => p.leaves);
                 },
 
-                selectedCount() {
-                    const leaves = this.allLeaves.filter(l => l.selected).length;
-                    const bookings = this.products.filter(p => ! p.priceable && p.selected).length;
+                /* Total child rows (variants / associated / bundle products) across composites. */
+                childCount() {
+                    return this.products.reduce((sum, p) => sum + (p.is_composite ? p.leaves.length : 0), 0);
+                },
 
-                    return leaves + bookings;
+                selectedCount() {
+                    return Object.keys(this.selectedKeys).length;
                 },
 
                 allSelected() {
                     const page = this.paginatedProducts;
 
-                    return page.length > 0 && page.every(p => p.priceable
-                        ? (p.leaves.length > 0 && p.leaves.every(l => l.selected))
-                        : p.selected
-                    );
+                    return page.length > 0 && page.every(p => this.isProductSelected(p));
                 },
 
                 totalPages() {
@@ -1313,6 +1576,34 @@
                     return assignable.length > 0
                         && assignable.every(c => !! this.companyModalSelected[c.id]);
                 },
+
+                /* ----- Save-confirmation preview ----- */
+                filteredCategoryTree() {
+                    const query = this.previewCategorySearch.trim().toLowerCase();
+
+                    if (! query) {
+                        return this.categoryTree;
+                    }
+
+                    return this.categoryTree.filter(node => node.name.toLowerCase().includes(query));
+                },
+
+                filteredPreviewCompanies() {
+                    const query = this.previewCompanySearch.trim().toLowerCase();
+
+                    if (! query) {
+                        return this.companies;
+                    }
+
+                    return this.companies.filter(company =>
+                        (company.name || '').toLowerCase().includes(query)
+                        || (company.email || '').toLowerCase().includes(query)
+                    );
+                },
+
+                visiblePreviewCompanies() {
+                    return this.filteredPreviewCompanies.slice(0, this.previewCompanyLimit);
+                },
             },
 
             methods: {
@@ -1343,6 +1634,86 @@
                     }
 
                     return this.currencySymbol + price.toFixed(2);
+                },
+
+                /**
+                 * Resulting unit price for a volume break (fixed value, or base product
+                 * price minus the discount %). Same math as newPrice(), but the break
+                 * carries its own type/value while the unit price is always off leaf.price.
+                 */
+                unitPrice(leaf, tier) {
+                    const value = parseFloat(tier.value);
+
+                    if (tier.value === '' || tier.value === null || isNaN(value) || value < 0) {
+                        return '—';
+                    }
+
+                    let price = value;
+
+                    if (tier.type === 'discount') {
+                        if (value > 100) {
+                            return '—';
+                        }
+
+                        price = leaf.price - (leaf.price * value / 100);
+                    }
+
+                    if (price < 0) {
+                        price = 0;
+                    }
+
+                    return this.currencySymbol + price.toFixed(2);
+                },
+
+                /* Count of volume breaks that carry a usable value (drives the row badge). */
+                breakCount(leaf) {
+                    if (! leaf || ! Array.isArray(leaf.breaks)) {
+                        return 0;
+                    }
+
+                    return leaf.breaks.filter(b => b.value !== '' && b.value !== null && ! isNaN(parseFloat(b.value))).length;
+                },
+
+                /* Open the tier-pricing modal for a leaf (mutated in place, reactively). */
+                openTierModal(leaf, image) {
+                    if (! Array.isArray(leaf.breaks)) {
+                        leaf.breaks = [];
+                    }
+
+                    this.tierModalLeaf = leaf;
+                    this.tierModalImage = image ?? null;
+
+                    this.$refs.tierModal?.open();
+                },
+
+                /* Append a new break, seeded one increment above the current highest qty. */
+                addBreak() {
+                    const leaf = this.tierModalLeaf;
+
+                    if (! leaf) {
+                        return;
+                    }
+
+                    if (leaf.breaks.length >= 10) {
+                        this.$emitter.emit('add-flash', {
+                            type: 'warning',
+                            message: "@lang('b2b::app.admin.company-catalogs.max-breaks')".replace(':count', 10),
+                        });
+
+                        return;
+                    }
+
+                    const maxQty = leaf.breaks.reduce((max, b) => Math.max(max, parseInt(b.qty) || 0), 1);
+
+                    leaf.breaks.push({
+                        qty: maxQty <= 1 ? 10 : maxQty + 10,
+                        type: leaf.price_type || 'fixed',
+                        value: '',
+                    });
+                },
+
+                removeBreak(index) {
+                    this.tierModalLeaf?.breaks.splice(index, 1);
                 },
 
                 /* Run the chosen mass action behind a confirmation modal. */
@@ -1377,9 +1748,49 @@
                     }
                 },
 
+                /* ----- Per-(product, leaf) selection keys ----- */
+                leafKey(product, leaf) {
+                    return product.id + ':' + leaf.id;
+                },
+
+                isLeafSelected(product, leaf) {
+                    return !! this.selectedKeys[this.leafKey(product, leaf)];
+                },
+
+                setLeafSelected(product, leaf, on) {
+                    const key = this.leafKey(product, leaf);
+
+                    if (on) {
+                        this.selectedKeys[key] = true;
+                    } else {
+                        delete this.selectedKeys[key];
+                    }
+                },
+
+                isBookingSelected(product) {
+                    return !! this.selectedKeys[product.id + ':booking'];
+                },
+
+                setBookingSelected(product, on) {
+                    const key = product.id + ':booking';
+
+                    if (on) {
+                        this.selectedKeys[key] = true;
+                    } else {
+                        delete this.selectedKeys[key];
+                    }
+                },
+
                 applyMass() {
                     /* Apply to the selected leaves (or every leaf when nothing is selected). */
-                    const selected = this.allLeaves.filter(l => l.selected);
+                    const selected = [];
+
+                    this.products.forEach(p => p.leaves.forEach(l => {
+                        if (this.isLeafSelected(p, l)) {
+                            selected.push(l);
+                        }
+                    }));
+
                     const targets = selected.length ? selected : this.allLeaves;
 
                     targets.forEach(leaf => {
@@ -1388,43 +1799,49 @@
                     });
 
                     /* Reset selection so the mass-action bar hides (v-if="selectedCount"). */
-                    this.allLeaves.forEach(l => l.selected = false);
-                    this.products.forEach(p => p.selected = false);
+                    this.selectedKeys = {};
 
                     this.massValue = '';
                     this.massAction = 'update-price';
                 },
 
+                /* Select-all toggles ONLY the current page (never other pages). */
                 toggleAll(event) {
                     const checked = event.target.checked;
 
-                    this.paginatedProducts.forEach(p => {
-                        if (p.priceable) {
-                            p.leaves.forEach(l => l.selected = checked);
-                        } else {
-                            p.selected = checked;
-                        }
-                    });
+                    this.paginatedProducts.forEach(p => this.toggleProduct(p, checked));
                 },
 
-                /* Composite header checkbox reflects/sets all of its leaves. */
+                /* A product is selected when all its leaves are (or, for booking, the row itself). */
                 isProductSelected(product) {
-                    return product.leaves.length > 0 && product.leaves.every(l => l.selected);
+                    if (! product.priceable) {
+                        return this.isBookingSelected(product);
+                    }
+
+                    return product.leaves.length > 0
+                        && product.leaves.every(l => this.isLeafSelected(product, l));
                 },
 
                 toggleProduct(product, checked) {
-                    product.leaves.forEach(l => l.selected = checked);
+                    if (! product.priceable) {
+                        this.setBookingSelected(product, checked);
+
+                        return;
+                    }
+
+                    product.leaves.forEach(l => this.setLeafSelected(product, l, checked));
                 },
 
                 /* Delete removes a product if any of its leaves is checked (or a checked booking). */
                 removeSelected() {
                     this.products = this.products.filter(p => {
-                        const leafSelected = p.leaves.some(l => l.selected);
-                        const bookingSelected = ! p.priceable && p.selected;
+                        const leafSelected = p.leaves.some(l => this.isLeafSelected(p, l));
+                        const bookingSelected = ! p.priceable && this.isBookingSelected(p);
 
                         return ! (leafSelected || bookingSelected);
                     });
 
+                    this.selectedKeys = {};
                     this.massAction = 'update-price';
                 },
 
@@ -1628,6 +2045,11 @@
                                     formatted_price: leaf.formatted_price,
                                     price_type: leaf.price_type ?? 'fixed',
                                     price_value: (leaf.price_value ?? '') === '' ? '' : parseFloat(leaf.price_value),
+                                    breaks: (leaf.breaks ?? []).map(b => ({
+                                        qty: parseInt(b.qty) || 2,
+                                        type: b.type ?? 'fixed',
+                                        value: (b.value ?? '') === '' ? '' : parseFloat(b.value),
+                                    })),
                                     selected: false,
                                 })),
                             });
@@ -1649,6 +2071,42 @@
 
                 removeProduct(id) {
                     this.products = this.products.filter(p => p.id !== id);
+
+                    Object.keys(this.selectedKeys).forEach(key => {
+                        if (key.startsWith(id + ':')) {
+                            delete this.selectedKeys[key];
+                        }
+                    });
+                },
+
+                /* Open the save-confirmation dialog with the categories derived from the
+                   currently assigned products. The dialog's button submits the form. */
+                openCategoryPreview() {
+                    this.categoryTree = [];
+                    this.categoryLoading = true;
+                    this.previewCategorySearch = '';
+                    this.previewCompanySearch = '';
+                    this.previewCompanyLimit = 9;
+
+                    this.$refs.categoryPreviewModal?.open();
+
+                    this.$axios.post("{{ route('admin.b2b.company_catalogs.category_preview') }}", {
+                        products: this.products.map(p => p.id),
+                    }).then((response) => {
+                        this.categoryTree = response.data.tree ?? [];
+                        this.categoryLoading = false;
+                    }).catch((error) => {
+                        this.categoryLoading = false;
+
+                        this.$emitter.emit('add-flash', {
+                            type: 'error',
+                            message: error.response?.data?.message ?? 'Failed to load categories.',
+                        });
+                    });
+                },
+
+                loadMoreCompanies() {
+                    this.previewCompanyLimit += 9;
                 },
 
                 /* ----- Assigned companies table ----- */

@@ -237,6 +237,10 @@ class CompanyCatalogController extends Controller
             'prices' => 'array',
             'prices.*.type' => 'nullable|in:fixed,discount',
             'prices.*.value' => 'nullable|numeric|min:0',
+            'prices.*.breaks' => 'array',
+            'prices.*.breaks.*.qty' => 'nullable|integer|min:2',
+            'prices.*.breaks.*.type' => 'nullable|in:fixed,discount',
+            'prices.*.breaks.*.value' => 'nullable|numeric|min:0',
             'companies' => 'array',
             'companies.*' => 'integer',
         ]);
@@ -256,6 +260,29 @@ class CompanyCatalogController extends Controller
         $this->companyCatalogHelper->setPrices($catalog, request('prices', []));
 
         $this->companyCatalogHelper->assignCompanies($catalog, request('companies', []));
+
+        /**
+         * The visible categories are always derived from the assigned products (their
+         * categories + ancestors), so the storefront tree stays in sync with what was
+         * just confirmed in the save dialog.
+         */
+        $this->companyCatalogHelper->deriveCategories($catalog);
+    }
+
+    /**
+     * Category tree (with rolled-up product counts) for the save-confirmation dialog,
+     * computed from the products currently assigned in the form.
+     */
+    public function categoryPreview()
+    {
+        $this->validate(request(), [
+            'products' => 'array',
+            'products.*' => 'integer',
+        ]);
+
+        return response()->json([
+            'tree' => $this->companyCatalogHelper->categoryTreeForProducts(request('products', [])),
+        ]);
     }
 
     /**
@@ -269,8 +296,9 @@ class CompanyCatalogController extends Controller
         if ($catalog->customer_group_id) {
             $priceRows = DB::table('product_customer_group_prices')
                 ->where('customer_group_id', $catalog->customer_group_id)
+                ->orderBy('qty')
                 ->get()
-                ->keyBy('product_id');
+                ->groupBy('product_id');
         }
 
         $assigned = $catalog->products()->with('images')->get();
@@ -297,7 +325,23 @@ class CompanyCatalogController extends Controller
     protected function buildProductNode($product, $priceRows): array
     {
         $leaves = $this->companyCatalogHelper->leafProducts($product)->map(function ($leaf) use ($priceRows) {
-            $row = $priceRows->get($leaf->id);
+            $rows = collect($priceRows->get($leaf->id) ?? []);
+
+            $base = $rows->firstWhere('qty', 1);
+
+            /**
+             * qty > 1 rows are volume breaks, edited in the per-product tier modal. The
+             * qty = 1 row stays the inline base catalog price.
+             */
+            $breaks = $rows
+                ->filter(fn ($row) => (int) $row->qty > 1)
+                ->sortBy('qty')
+                ->map(fn ($row) => [
+                    'qty' => (int) $row->qty,
+                    'type' => $row->value_type,
+                    'value' => (float) $row->value,
+                ])
+                ->values();
 
             return [
                 'id' => $leaf->id,
@@ -305,8 +349,9 @@ class CompanyCatalogController extends Controller
                 'name' => $leaf->name,
                 'price' => (float) $leaf->price,
                 'formatted_price' => core()->formatPrice($leaf->price),
-                'price_type' => $row->value_type ?? 'fixed',
-                'price_value' => $row ? (float) $row->value : '',
+                'price_type' => $base->value_type ?? 'fixed',
+                'price_value' => $base ? (float) $base->value : '',
+                'breaks' => $breaks,
             ];
         })->values();
 

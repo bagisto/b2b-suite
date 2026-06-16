@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Webkul\B2BSuite\Contracts\CompanyCatalog as CompanyCatalogContract;
+use Webkul\Category\Models\CategoryProxy;
 use Webkul\Customer\Models\CustomerGroupProxy;
 use Webkul\Customer\Models\CustomerProxy;
 use Webkul\Product\Models\ProductProxy;
@@ -82,5 +83,19 @@ class CompanyCatalog extends Model implements CompanyCatalogContract
     {
         return $this->hasMany(CustomerProxy::modelClass(), 'company_catalog_id')
             ->where('type', 'company');
+    }
+
+    /**
+     * Categories visible to the catalog — derived from the assigned products
+     * (their categories plus all ancestors), used to filter the storefront tree.
+     */
+    public function categories(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            CategoryProxy::modelClass(),
+            'company_catalog_categories',
+            'company_catalog_id',
+            'category_id'
+        );
     }
 }

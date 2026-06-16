@@ -7,7 +7,9 @@ use Webkul\B2BSuite\Http\Controllers\Shop\API\CartController as B2BCartControlle
 use Webkul\B2BSuite\Http\Controllers\Shop\Customer\CustomerController as ShopCustomerController;
 use Webkul\B2BSuite\Http\Controllers\Shop\Customer\RegistrationController;
 use Webkul\B2BSuite\Models\Customer;
+use Webkul\B2BSuite\Repositories\CategoryRepository as B2BCategoryRepository;
 use Webkul\B2BSuite\Repositories\ProductRepository as B2BProductRepository;
+use Webkul\Category\Repositories\CategoryRepository as BaseCategoryRepository;
 use Webkul\Customer\Contracts\Customer as CustomerContract;
 use Webkul\Product\Repositories\ProductRepository as BaseProductRepository;
 use Webkul\Shop\Http\Controllers\API\CartController as BaseCartController;
@@ -60,5 +62,7 @@ final class B2BSuiteManager
          * override is inert for guests, admins, and unassigned customers.
          */
         $this->app->bind(BaseProductRepository::class, B2BProductRepository::class);
+
+        $this->app->bind(BaseCategoryRepository::class, B2BCategoryRepository::class);
     }
 }
