@@ -46,6 +46,7 @@
                 <div class="b2b-dg-head border-b px-4 py-2.5 dark:border-gray-800">
                     <div
                         class="flex select-none items-center gap-2.5"
+                        :class="{ 'b2b-dg-divider': index > 0 }"
                         v-for="(columnGroup, index) in [['quotation_number', 'name', 'status'], ['company_name', 'customer_name', 'created_at'], ['base_total', 'negotiated_total', 'expiration_date'], ['items']]"
                     >
                         <p class="text-gray-600 dark:text-gray-300">

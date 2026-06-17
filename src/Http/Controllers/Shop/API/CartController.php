@@ -51,11 +51,18 @@ class CartController extends BaseCartController
                 throw new \Exception(trans('b2b::app.shop.checkout.cart.product-not-in-catalog'));
             }
 
-            $requestedQty = request()->input('quantity', 1);
             $cart = Cart::getCart();
 
-            if ($cart && $cart->items->count() > 0) {
-                $existingCartItem = $cart->items->where('product_id', $product->id)->first();
+            if ($cart) {
+                /**
+                 * Look up an existing line for this product with a direct query (items())
+                 * rather than the cached `items` relation. Touching $cart->items here would
+                 * cache the collection on the very cart instance that Cart::addProduct()
+                 * later re-reads in collectTotals()/validateItems(); when the cart is empty
+                 * that stale cache makes addProduct wrongly drop the whole cart and return
+                 * null — which is what made the first add-to-cart fail.
+                 */
+                $existingCartItem = $cart->items()->where('product_id', $product->id)->first();
 
                 if ($existingCartItem) {
                     $existingAdditional = $existingCartItem->additional ?? [];

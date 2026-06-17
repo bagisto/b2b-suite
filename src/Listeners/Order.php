@@ -44,6 +44,58 @@ class Order extends Base
             $isQuote->order_id = $order->id;
             $isQuote->save();
         }
+
+        $this->chargeCompanyCredit($order);
+    }
+
+    /**
+     * Charge a "Pay By Credit" order to the buyer's company credit (one purchase ledger
+     * entry per order). No-op for any other payment method.
+     */
+    public function chargeCompanyCredit(OrderContract $order): void
+    {
+        if ($order->payment?->method !== 'paybycredit') {
+            return;
+        }
+
+        $creditManager = app('Webkul\B2BSuite\Helpers\CreditManager');
+
+        if (! $creditManager->isActive()) {
+            return;
+        }
+
+        if (! $credit = $creditManager->companyCreditFor($order->customer)) {
+            return;
+        }
+
+        $creditManager->purchase($credit, (float) $order->base_grand_total, $order->id, [
+            'type' => 'customer',
+            'id' => $order->customer_id,
+        ]);
+    }
+
+    /**
+     * Free the company credit when a "Pay By Credit" order is cancelled.
+     */
+    public function afterCancelled(OrderContract $order): void
+    {
+        if ($order->payment?->method !== 'paybycredit') {
+            return;
+        }
+
+        $creditManager = app('Webkul\B2BSuite\Helpers\CreditManager');
+
+        if (! $creditManager->isActive()) {
+            return;
+        }
+
+        if (! $credit = $creditManager->companyCreditFor($order->customer)) {
+            return;
+        }
+
+        $creditManager->revert($credit, (float) $order->base_grand_total, $order->id, [
+            'type' => 'system',
+        ]);
     }
 
     /**

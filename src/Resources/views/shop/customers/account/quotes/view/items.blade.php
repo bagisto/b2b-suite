@@ -114,11 +114,20 @@
                                 </td>
                                 
                                 @if (in_array($quote->status, ['accepted', 'ordered', 'completed']))
-                                    <!-- Negotiated Price -->
+                                    <!-- Negotiated Price (with the per-item discount applied, if any) -->
                                     <td class="px-4 py-2 text-right font-semibold">
                                         {{ $item->negotiated_price ? core()->formatPrice($item->negotiated_price, $quote->currency_code) : '-' }}
+
+                                        @if ($item->discount_type && (float) $item->discount_value > 0)
+                                            <span class="mt-0.5 block text-xs font-medium text-green-700">
+                                                @lang('b2b::app.shop.customers.account.quotes.view.discount'):
+                                                {{ $item->discount_type === 'percent'
+                                                    ? (float) $item->discount_value . '%'
+                                                    : core()->formatPrice($item->discount_value, $quote->currency_code) }}
+                                            </span>
+                                        @endif
                                     </td>
-                                    
+
                                     <!-- Negotiated Quantity -->
                                     <td class="px-4 py-2 text-right font-semibold">
                                         {{ $item->negotiated_qty }}
@@ -142,6 +151,28 @@
                                 {{ core()->formatPrice($quote->total, $quote->currency_code) }}
                             </td>
                         </tr>
+
+                        @if (in_array($quote->status, ['accepted', 'ordered', 'completed']) && (float) $quote->total > (float) $quote->negotiated_total)
+                            <!-- Total discount the buyer is getting on this quotation -->
+                            <tr class="border-t">
+                                <td colspan="7" class="px-4 py-2 text-right font-bold">
+                                    @lang('b2b::app.shop.customers.account.quotes.view.you-save')
+
+                                    @if ($quote->discount_type && (float) $quote->discount_value > 0)
+                                        <span class="font-normal text-zinc-500">
+                                            (@lang('b2b::app.shop.customers.account.quotes.view.discount-on-total'):
+                                            {{ $quote->discount_type === 'percent'
+                                                ? (float) $quote->discount_value . '%'
+                                                : core()->formatPrice($quote->discount_value, $quote->currency_code) }})
+                                        </span>
+                                    @endif
+                                </td>
+                                <td colspan="6" class="px-4 py-2 text-right font-bold text-green-700">
+                                    − {{ core()->formatPrice($quote->total - $quote->negotiated_total, $quote->currency_code) }}
+                                </td>
+                            </tr>
+                        @endif
+
                         <tr class="border-t">
                             <td colspan="{{ in_array($quote->status, ['accepted', 'ordered', 'completed']) ? '7' : '4' }}" class="px-4 py-2 text-right font-bold">
                                 @lang('b2b::app.shop.customers.account.quotes.view.negotiated-total')
@@ -203,7 +234,17 @@
                                         @lang('b2b::app.shop.customers.account.quotes.view.negotiated-price'):
                                         {{ $item->negotiated_price ? core()->formatPrice($item->negotiated_price, $quote->currency_code) : '-' }}
                                     </p>
-                                    
+
+                                    @if ($item->discount_type && (float) $item->discount_value > 0)
+                                        <!-- Per-item Discount -->
+                                        <p class="mt-1 text-xs font-medium text-green-700">
+                                            @lang('b2b::app.shop.customers.account.quotes.view.discount'):
+                                            {{ $item->discount_type === 'percent'
+                                                ? (float) $item->discount_value . '%'
+                                                : core()->formatPrice($item->discount_value, $quote->currency_code) }}
+                                        </p>
+                                    @endif
+
                                     <!-- Negotiated Quantity -->
                                     <p class="mt-1 text-xs font-medium text-zinc-500">
                                         @lang('b2b::app.shop.customers.account.quotes.view.negotiated-qty'):
@@ -232,6 +273,19 @@
                                 {{ core()->formatPrice($quote->total, $quote->currency_code) }}
                             </span>
                         </div>
+
+                        @if (in_array($quote->status, ['accepted', 'ordered', 'completed']) && (float) $quote->total > (float) $quote->negotiated_total)
+                            <!-- Total discount the buyer is getting on this quotation -->
+                            <div class="mt-2 flex justify-between text-sm font-bold text-green-700">
+                                <span>
+                                    @lang('b2b::app.shop.customers.account.quotes.view.you-save')
+                                </span>
+
+                                <span>
+                                    − {{ core()->formatPrice($quote->total - $quote->negotiated_total, $quote->currency_code) }}
+                                </span>
+                            </div>
+                        @endif
 
                         <div class="mt-2 flex justify-between text-sm font-bold text-gray-800">
                             <span>

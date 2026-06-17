@@ -166,6 +166,26 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Company Credit ACLs
+    |--------------------------------------------------------------------------
+    |
+    | All ACLs related to the company credit dashboard will be placed here.
+    |
+    */
+    [
+        'key' => 'company_credit',
+        'name' => 'b2b::app.shop.acl.company-credit',
+        'route' => 'shop.customers.account.credit.index',
+        'sort' => 9,
+    ], [
+        'key' => 'company_credit.view',
+        'name' => 'b2b::app.shop.acl.view',
+        'route' => 'shop.customers.account.credit.index',
+        'sort' => 1,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Requisitions ACLs
     |--------------------------------------------------------------------------
     |

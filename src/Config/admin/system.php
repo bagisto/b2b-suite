@@ -48,6 +48,28 @@ return [
             ],
         ],
     ], [
+        'key' => 'b2b.credit',
+        'name' => 'b2b::app.admin.configuration.index.b2b.credit.title',
+        'info' => 'b2b::app.admin.configuration.index.b2b.credit.info',
+        'icon' => 'settings/store.svg',
+        'sort' => 3,
+    ], [
+        'key' => 'b2b.credit.settings',
+        'name' => 'b2b::app.admin.configuration.index.b2b.credit.settings.title',
+        'info' => 'b2b::app.admin.configuration.index.b2b.credit.settings.info',
+        'sort' => 1,
+        'fields' => [
+            [
+                'name' => 'active',
+                'title' => 'b2b::app.admin.configuration.index.b2b.credit.settings.active',
+                'info' => 'b2b::app.admin.configuration.index.b2b.credit.settings.active-info',
+                'type' => 'boolean',
+                'default' => false,
+                'channel_based' => true,
+                'locale_based' => false,
+            ],
+        ],
+    ], [
         'key' => 'b2b.quotes',
         'name' => 'b2b::app.admin.configuration.index.b2b.quotes.title',
         'info' => 'b2b::app.admin.configuration.index.b2b.quotes.info',
@@ -237,6 +259,50 @@ return [
                 'name' => 'mail_from_title',
                 'title' => 'b2b::app.admin.configuration.index.b2b.quotes.email-options.from-name',
                 'type' => 'text',
+            ],
+        ],
+    ],
+
+    /**
+     * Pay By Credit payment method (visible only to companies with credit).
+     */
+    [
+        'key' => 'sales.payment_methods.paybycredit',
+        'name' => 'b2b::app.admin.configuration.index.sales.payment-methods.pay-by-credit',
+        'info' => 'b2b::app.admin.configuration.index.sales.payment-methods.pay-by-credit-info',
+        'sort' => 9,
+        'fields' => [
+            [
+                'name' => 'active',
+                'title' => 'admin::app.configuration.index.sales.payment-methods.status',
+                'type' => 'boolean',
+                'default' => true,
+                'channel_based' => true,
+                'locale_based' => false,
+            ], [
+                'name' => 'title',
+                'title' => 'admin::app.configuration.index.sales.payment-methods.title',
+                'type' => 'text',
+                'default' => 'Pay By Credit',
+                'depends' => 'active:1',
+                'channel_based' => true,
+                'locale_based' => true,
+            ], [
+                'name' => 'description',
+                'title' => 'admin::app.configuration.index.sales.payment-methods.description',
+                'type' => 'textarea',
+                'default' => 'Pay later using your company credit.',
+                'depends' => 'active:1',
+                'channel_based' => true,
+                'locale_based' => true,
+            ], [
+                'name' => 'sort',
+                'title' => 'admin::app.configuration.index.sales.payment-methods.sort-order',
+                'type' => 'number',
+                'default' => 9,
+                'depends' => 'active:1',
+                'channel_based' => true,
+                'locale_based' => false,
             ],
         ],
     ],

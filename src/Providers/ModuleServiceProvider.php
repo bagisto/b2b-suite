@@ -11,6 +11,8 @@ use Webkul\B2BSuite\Models\CompanyAttributeTranslation;
 use Webkul\B2BSuite\Models\CompanyAttributeValue;
 use Webkul\B2BSuite\Models\CompanyCatalog;
 use Webkul\B2BSuite\Models\CompanyCatalogProduct;
+use Webkul\B2BSuite\Models\CompanyCredit;
+use Webkul\B2BSuite\Models\CompanyCreditTransaction;
 use Webkul\B2BSuite\Models\CompanyFlat;
 use Webkul\B2BSuite\Models\CompanyRole;
 use Webkul\B2BSuite\Models\CustomerQuote;
@@ -48,5 +50,7 @@ class ModuleServiceProvider extends CoreModuleServiceProvider
         CustomerRequisitionListProduct::class,
         CompanyCatalog::class,
         CompanyCatalogProduct::class,
+        CompanyCredit::class,
+        CompanyCreditTransaction::class,
     ];
 }

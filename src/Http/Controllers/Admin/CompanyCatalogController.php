@@ -37,7 +37,8 @@ class CompanyCatalogController extends Controller
      */
     public function create()
     {
-        return view('b2b::admin.company-catalogs.create');
+        // Catalogs are created through a modal on the listing; the page route just returns there.
+        return to_route('admin.b2b.company_catalogs.index');
     }
 
     /**
@@ -45,7 +46,7 @@ class CompanyCatalogController extends Controller
      */
     public function store()
     {
-        $this->validateRequest();
+        $this->validateSettings();
 
         $catalog = $this->companyCatalogRepository->create([
             'name' => request('name'),
@@ -53,11 +54,13 @@ class CompanyCatalogController extends Controller
             'status' => request('status') !== null ? (int) (bool) request('status') : 1,
         ]);
 
-        $this->persistRelations($catalog);
+        // Provision the backing customer group so the catalog is ready to price products.
+        $this->companyCatalogHelper->provisionGroup($catalog);
 
         session()->flash('success', trans('b2b::app.admin.company-catalogs.create-success'));
 
-        return to_route('admin.b2b.company_catalogs.index');
+        // Continue to the edit screen to assign products and companies (product-style flow).
+        return to_route('admin.b2b.company_catalogs.edit', $catalog->id);
     }
 
     /**
@@ -184,17 +187,32 @@ class CompanyCatalogController extends Controller
      */
     public function update($id)
     {
-        $this->validateRequest();
+        $this->validateRelations();
 
         $catalog = $this->companyCatalogRepository->findOrFail($id);
+
+        // The edit screen owns products, prices and companies; the general settings
+        // (name/description/status) are managed separately via the settings modal.
+        $this->persistRelations($catalog);
+
+        session()->flash('success', trans('b2b::app.admin.company-catalogs.update-success'));
+
+        return to_route('admin.b2b.company_catalogs.index');
+    }
+
+    /**
+     * Update only the catalog's general settings (name, description, status) — posted from
+     * the settings modal on the listing.
+     */
+    public function updateSettings($id)
+    {
+        $this->validateSettings();
 
         $this->companyCatalogRepository->update([
             'name' => request('name'),
             'description' => request('description'),
             'status' => request('status') !== null ? (int) (bool) request('status') : 1,
         ], $id);
-
-        $this->persistRelations($catalog->refresh());
 
         session()->flash('success', trans('b2b::app.admin.company-catalogs.update-success'));
 
@@ -226,12 +244,21 @@ class CompanyCatalogController extends Controller
     /**
      * Validate the catalog request.
      */
-    protected function validateRequest(): void
+    protected function validateSettings(): void
     {
         $this->validate(request(), [
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'status' => 'sometimes|nullable|boolean',
+        ]);
+    }
+
+    /**
+     * Validate the product / price / company payload posted from the edit screen.
+     */
+    protected function validateRelations(): void
+    {
+        $this->validate(request(), [
             'products' => 'array',
             'products.*' => 'integer',
             'prices' => 'array',

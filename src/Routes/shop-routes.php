@@ -32,6 +32,8 @@ Route::prefix('companies')->group(function () {
         Route::controller(CustomerController::class)->group(function () {
             Route::get('profile', 'companyProfile')->name('shop.companies.account.profile.index');
 
+            Route::get('company-credit', 'companyCredit')->name('shop.customers.account.credit.index');
+
             Route::put('{id}', 'modify')->name('shop.companies.account.profile.update');
         });
     });

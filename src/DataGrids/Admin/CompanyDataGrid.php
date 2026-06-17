@@ -181,6 +181,18 @@ class CompanyDataGrid extends DataGrid
             ]);
         }
 
+        if (bouncer()->hasPermission('b2b.company-credit')) {
+            $this->addAction([
+                'index' => 'credit',
+                'icon' => 'icon-sales',
+                'title' => trans('b2b::app.admin.companies.credit.manage'),
+                'method' => 'GET',
+                'url' => function ($row) {
+                    return route('admin.b2b.companies.credit', $row->customer_id);
+                },
+            ]);
+        }
+
         if (bouncer()->hasPermission('b2b.companies.delete')) {
             $this->addAction([
                 'index' => 'delete',

@@ -49,7 +49,7 @@
                     <!-- Back Button (desktop) -->
                     <a
                         href="{{ route('shop.customers.account.profile.index') }}"
-                        class="transparent-button px-5 py-2.5 hover:bg-gray-100 max-md:hidden dark:hover:bg-gray-800"
+                        class="transparent-button px-5 py-2.5 hover:bg-gray-100 max-md:hidden"
                     >
                         @lang('b2b::app.shop.companies.account.profile.edit.btn-back')
                     </a>
@@ -66,7 +66,7 @@
                 </div>
             </div>
 
-            <p class="mt-1.5 text-sm text-gray-500 dark:text-gray-300">
+            <p class="mt-1.5 text-sm text-gray-500">
                 @lang('b2b::app.shop.companies.account.profile.index.info')
             </p>
 
@@ -78,8 +78,8 @@
             @endphp
 
             @if ($attributeGroups->isEmpty())
-                <div class="mt-6 flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-zinc-200 bg-white py-16 text-center dark:border-gray-800 dark:bg-gray-900">
-                    <p class="text-base font-medium text-gray-600 dark:text-gray-300">
+                <div class="mt-6 flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-zinc-200 bg-white py-16 text-center">
+                    <p class="text-base font-medium text-gray-600">
                         @lang('b2b::app.shop.companies.account.profile.index.no-attributes')
                     </p>
                 </div>

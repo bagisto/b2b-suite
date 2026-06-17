@@ -28,6 +28,8 @@ class CustomerQuoteItem extends Model implements CustomerQuoteItemContract
         'base_negotiated_price',
         'negotiated_total',
         'base_negotiated_total',
+        'discount_type',
+        'discount_value',
         'note',
         'status',
         'additional',

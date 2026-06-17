@@ -46,7 +46,7 @@
                         @{{ cart.formatted_sub_total }}
                     </p>
 
-                    <p class="text-xs italic text-gray-500 dark:text-gray-400">
+                    <p class="text-xs italic text-gray-500">
                         @lang('shop::app.checkout.cart.summary.incl-tax') @{{ cart.formatted_sub_total_incl_tax }}
                     </p>
                 </div>
@@ -113,21 +113,21 @@
                     v-show="cart.show_discount_breakdown"
                 >
                     <div class="flex justify-between gap-1 text-right">
-                        <p class="text-sm text-gray-500 dark:text-gray-400">
+                        <p class="text-sm text-gray-500">
                             @lang('shop::app.checkout.cart.summary.items-discount')
                         </p>
 
-                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">
+                        <p class="text-sm font-medium text-gray-500">
                             - @{{ cart.formatted_items_discount_amount }}
                         </p>
                     </div>
 
                     <div class="flex justify-between gap-1 text-right">
-                        <p class="text-sm text-gray-500 dark:text-gray-400">
+                        <p class="text-sm text-gray-500">
                             @lang('shop::app.checkout.cart.summary.shipping-discount')
                         </p>
 
-                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">
+                        <p class="text-sm font-medium text-gray-500">
                             - @{{ cart.formatted_shipping_discount_amount }}
                         </p>
                     </div>
@@ -170,7 +170,7 @@
                         + @{{ cart.formatted_shipping_amount }}
                     </p>
 
-                    <p class="text-xs italic text-gray-500 dark:text-gray-400">
+                    <p class="text-xs italic text-gray-500">
                         @lang('shop::app.checkout.cart.summary.incl-tax') @{{ cart.formatted_shipping_amount_incl_tax }}
                     </p>
                 </div>
@@ -223,7 +223,7 @@
                     <template v-if="displayTax.subtotal === 'including_tax'">
                         @{{ cart.formatted_tax_total }}
 
-                        <span class="text-xs italic font-normal text-gray-500 dark:text-gray-400">
+                        <span class="text-xs italic font-normal text-gray-500">
                             (@lang('shop::app.checkout.cart.summary.included'))
                         </span>
                     </template>
@@ -245,11 +245,11 @@
                     class="flex justify-between gap-1 text-right"
                     v-for="(amount, index) in cart.applied_taxes"
                 >
-                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                    <p class="text-sm text-gray-500">
                         @{{ index }}
                     </p>
 
-                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    <p class="text-sm font-medium text-gray-500">
                         <template v-if="displayTax.subtotal === 'including_tax'">@{{ amount }}</template>
                         
                         <template v-else>+ @{{ amount }}</template>

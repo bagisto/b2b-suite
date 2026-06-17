@@ -85,6 +85,25 @@ return [
                             ],
                         ],
                     ],
+
+                    'credit' => [
+                        'title' => 'Company Credit',
+                        'info' => 'Configure the Company Credit (Pay By Credit) feature.',
+
+                        'settings' => [
+                            'title' => 'Company Credit Settings',
+                            'info' => 'Enable buy-now-pay-later credit accounts for companies.',
+                            'active' => 'Enable Company Credit',
+                            'active-info' => 'When enabled, companies with a credit limit can pay using "Pay By Credit" at checkout.',
+                        ],
+                    ],
+                ],
+
+                'sales' => [
+                    'payment-methods' => [
+                        'pay-by-credit' => 'Pay By Credit',
+                        'pay-by-credit-info' => 'Buy now and pay later using the company credit balance. Shown only to companies that have an active credit account.',
+                    ],
                 ],
             ],
         ],
@@ -96,6 +115,7 @@ return [
             'quotes' => 'Quotations',
             'purchase-orders' => 'Purchase Orders',
             'company-catalogs' => 'Company Catalogs',
+            'company-credit' => 'Company Credit',
             'back-btn' => 'Back',
         ],
 
@@ -133,6 +153,17 @@ return [
                 'title' => 'Edit Company Catalog',
                 'back-btn' => 'Back',
                 'save-btn' => 'Save Catalog',
+            ],
+
+            'settings' => [
+                'create-title' => 'Create Company Catalog',
+                'edit-title' => 'General Settings',
+                'edit-settings' => 'General Settings',
+                'name-placeholder' => 'e.g. Acme Wholesale Pricing',
+                'description-info' => 'An internal note to help you identify this catalog. Companies do not see it.',
+                'name-required' => 'Please enter a catalog name.',
+                'save-btn' => 'Save',
+                'next-btn' => 'Save & Continue',
             ],
 
             'general' => 'General',
@@ -382,6 +413,57 @@ return [
         ],
 
         'companies' => [
+            'credit' => [
+                'title' => 'Company Credit',
+                'manage' => 'Manage Credit',
+                'back' => 'Back',
+
+                'company-details' => 'Company Details',
+                'company-name' => 'Company',
+                'email' => 'Email',
+                'phone' => 'Phone',
+                'tax-id' => 'VAT / Tax ID',
+
+                'datagrid' => [
+                    'company' => 'Company',
+                    'email' => 'Email',
+                ],
+
+                'credit-limit' => 'Credit Limit',
+                'outstanding-balance' => 'Outstanding Balance',
+                'available-credit' => 'Available Credit',
+                'status' => 'Status',
+                'enabled' => 'Enabled',
+                'disabled' => 'Disabled',
+                'allow-exceed-limit' => 'Allow orders to exceed the credit limit',
+                'set-limit' => 'Credit Settings',
+                'comment' => 'Comment',
+                'save' => 'Save',
+                'reimburse' => 'Reimburse Balance',
+                'amount' => 'Amount',
+                'reference' => 'Reference',
+                'reimburse-btn' => 'Record Payment',
+                'settings-title' => 'Credit Settings',
+                'history' => 'Credit History',
+                'date' => 'Date',
+                'operation' => 'Operation',
+                'balance-after' => 'Balance',
+                'details' => 'Details',
+                'order' => 'Order',
+                'no-transactions' => 'No credit transactions yet.',
+                'limit-updated' => 'Credit settings updated successfully.',
+                'reimbursed' => 'Payment recorded against the company balance.',
+
+                'operations' => [
+                    'allocated' => 'Credit Allocated',
+                    'updated' => 'Limit Updated',
+                    'purchased' => 'Order Purchase',
+                    'reimbursed' => 'Payment Received',
+                    'refunded' => 'Order Refunded',
+                    'reverted' => 'Order Reverted',
+                ],
+            ],
+
             'index' => [
                 'title' => 'Company',
                 'companies-placeholder' => 'Company name',
@@ -584,6 +666,18 @@ return [
                 'negotiated-price' => 'Negotiated Price',
                 'quantity' => 'Quantity',
                 'negotiated-qty' => 'Negotiated Quantity',
+                'discount' => 'Discount',
+                'discount-on-total' => 'Discount on Total',
+                'you-save' => 'You save',
+                'send-quotation' => 'Send Quotation',
+                'send-quotation-info' => 'Set a discount per item and/or on the whole quotation, then review and send it to the customer.',
+                'review-info' => 'Please review the quotation summary before sending it to the customer.',
+                'confirm-send' => 'Confirm & Send Quotation',
+                'back' => 'Back',
+                'remove-item' => 'Remove item',
+                'min-one-item' => 'A quotation must have at least one item.',
+                'message-required' => 'Please add a message for the customer before sending.',
+                'qty-invalid' => 'Each item quantity must be at least 1.',
                 'sub-total' => 'Sub Total',
                 'grand-total' => 'Grand Total',
                 'negotiated-total' => 'Negotiated Total',
@@ -651,6 +745,8 @@ return [
             'purchase-orders' => 'Purchase Orders',
             'company-catalogs' => 'Company Catalogs',
             'assign-product' => 'Assign-Product',
+            'manage-credit' => 'Manage Credit',
+            'company-credit' => 'Company Credit',
         ],
     ],
 
@@ -676,6 +772,7 @@ return [
             'messages' => 'Messages',
             'get-product' => 'Get Product',
             'company-profile' => 'Company Profile',
+            'company-credit' => 'Company Credit',
             'requisitions' => 'Requisitions',
             'quotes' => 'Quotations',
             'purchase-orders' => 'Purchase Orders',
@@ -745,6 +842,30 @@ return [
                         'profile-image' => 'Profile Image',
                     ],
                 ],
+
+                'credit' => [
+                    'title' => 'Company Credit',
+                    'info' => 'Buy now and pay later against your company credit limit.',
+                    'credit-limit' => 'Credit Limit',
+                    'outstanding-balance' => 'Outstanding Balance',
+                    'available-credit' => 'Available Credit',
+                    'history' => 'Credit History',
+                    'date' => 'Date',
+                    'operation' => 'Operation',
+                    'amount' => 'Amount',
+                    'balance' => 'Balance',
+                    'order' => 'Order',
+                    'no-transactions' => 'No credit transactions yet.',
+
+                    'operations' => [
+                        'allocated' => 'Credit Allocated',
+                        'updated' => 'Limit Updated',
+                        'purchased' => 'Order Purchase',
+                        'reimbursed' => 'Payment Received',
+                        'refunded' => 'Order Refunded',
+                        'reverted' => 'Order Reverted',
+                    ],
+                ],
             ],
         ],
 
@@ -765,6 +886,12 @@ return [
         ],
 
         'checkout' => [
+            'pay-by-credit' => [
+                'description' => 'Pay later using your company credit.',
+                'insufficient' => 'Exceeds available credit (:available).',
+                'order-blocked' => 'This order exceeds your available company credit, so it cannot be placed with Pay By Credit. Please reduce your cart or choose another payment method.',
+            ],
+
             'cart' => [
                 'request-quote-button' => 'Request For Quote',
                 'minimum-amount-required' => 'The cart total must meet the minimum amount before a quotation can be requested.',

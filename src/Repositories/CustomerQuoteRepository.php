@@ -287,28 +287,100 @@ class CustomerQuoteRepository extends Repository
     {
         $quote = $this->find($id);
 
-        $itemNegotiatedTotal = 0;
+        $baseCurrencyCode = core()->getBaseCurrencyCode();
+
+        /**
+         * Line items the admin removed during negotiation are deleted (their quotation
+         * snapshots cascade). Guarded by a non-empty remaining set so a quote can never be
+         * emptied.
+         */
+        if (! empty($data['items'])) {
+            foreach (array_filter(array_map('intval', $data['removed_items'] ?? [])) as $removedId) {
+                $removed = $this->customerQuoteItemRepository->find($removedId);
+
+                if ($removed && (int) $removed->customer_quote_id === (int) $quote->id) {
+                    $this->customerQuoteItemRepository->delete($removedId);
+                }
+            }
+
+            $quote->refresh();
+        }
+
+        /**
+         * First pass: apply each line's own discount to get its per-unit price and the
+         * running subtotal (before any whole-quote discount).
+         */
+        $lines = [];
+        $subtotal = 0;
 
         foreach ($data['items'] ?? [] as $itemId => $itemData) {
             if (! $item = $this->customerQuoteItemRepository->find($itemId)) {
                 continue;
             }
 
-            $negotiatedTotal = $itemData['negotiated_price'] * $itemData['negotiated_qty'];
+            $type = in_array($itemData['discount_type'] ?? null, ['percent', 'fixed'])
+                ? $itemData['discount_type']
+                : null;
+
+            $value = isset($itemData['discount_value']) && is_numeric($itemData['discount_value'])
+                ? (float) $itemData['discount_value']
+                : 0;
+
+            $qty = max(1, (int) ($itemData['negotiated_qty'] ?? $item->qty));
+
+            $price = $this->applyDiscount((float) $item->price, $type, $value);
+
+            $lines[] = [
+                'item' => $item,
+                'qty' => $qty,
+                'price' => $price,
+                'discount_type' => $value > 0 ? $type : null,
+                'discount_value' => $value > 0 ? $value : null,
+            ];
+
+            $subtotal += $price * $qty;
+        }
+
+        /**
+         * Second pass: a whole-quote discount is distributed proportionally across the
+         * lines, so the negotiated total stays internally consistent AND carries into the
+         * order (which is rebuilt from each line's negotiated price — see moveToCart()).
+         */
+        $totalType = in_array($data['total_discount_type'] ?? null, ['percent', 'fixed'])
+            ? $data['total_discount_type']
+            : null;
+
+        $totalValue = isset($data['total_discount_value']) && is_numeric($data['total_discount_value'])
+            ? (float) $data['total_discount_value']
+            : 0;
+
+        $factor = $subtotal > 0
+            ? $this->applyDiscount($subtotal, $totalType, $totalValue) / $subtotal
+            : 1;
+
+        $itemNegotiatedTotal = 0;
+
+        foreach ($lines as $line) {
+            $item = $line['item'];
+
+            $negotiatedPrice = round($line['price'] * $factor, 4);
+            $negotiatedTotal = $negotiatedPrice * $line['qty'];
 
             $itemNegotiatedTotal += $negotiatedTotal;
 
             $this->customerQuoteItemRepository->update([
-                'negotiated_qty' => $itemData['negotiated_qty'],
-                'negotiated_price' => $itemData['negotiated_price'],
-                'base_negotiated_price' => core()->convertToBasePrice($itemData['negotiated_price'], core()->getBaseCurrencyCode()),
+                'negotiated_qty' => $line['qty'],
+                'negotiated_price' => $negotiatedPrice,
+                'base_negotiated_price' => core()->convertToBasePrice($negotiatedPrice, $baseCurrencyCode),
                 'negotiated_total' => $negotiatedTotal,
-                'base_negotiated_total' => core()->convertToBasePrice($negotiatedTotal, core()->getBaseCurrencyCode()),
+                'base_negotiated_total' => core()->convertToBasePrice($negotiatedTotal, $baseCurrencyCode),
+                'discount_type' => $line['discount_type'],
+                'discount_value' => $line['discount_value'],
                 'note' => $data['message'] ?? trans('b2b::app.shop.customers.account.quotes.view.item-updated', [
                     'name' => $quote->customer->name,
                 ]),
                 'status' => $data['status'] ?? $quote->status,
-            ], $itemId);
+            ], $item->id);
 
             $this->customerQuoteQuotationRepository->updateOrCreate([
                 'message_id' => $data['message_id'] ?? null,
@@ -317,20 +389,38 @@ class CustomerQuoteRepository extends Repository
             ], [
                 'sku' => $item->sku,
                 'name' => $item->name,
-                'qty' => $itemData['negotiated_qty'],
-                'price' => $itemData['negotiated_price'],
-                'base_price' => core()->convertToBasePrice($itemData['negotiated_price'], core()->getBaseCurrencyCode()),
+                'qty' => $line['qty'],
+                'price' => $negotiatedPrice,
+                'base_price' => core()->convertToBasePrice($negotiatedPrice, $baseCurrencyCode),
                 'total' => $negotiatedTotal,
-                'base_total' => core()->convertToBasePrice($negotiatedTotal, core()->getBaseCurrencyCode()),
+                'base_total' => core()->convertToBasePrice($negotiatedTotal, $baseCurrencyCode),
             ]);
         }
 
         $quote->update([
             'status' => $data['status'] ?? $quote->status,
             'negotiated_total' => $itemNegotiatedTotal,
-            'base_negotiated_total' => core()->convertToBasePrice($itemNegotiatedTotal, core()->getBaseCurrencyCode()),
+            'base_negotiated_total' => core()->convertToBasePrice($itemNegotiatedTotal, $baseCurrencyCode),
+            'discount_type' => $totalValue > 0 ? $totalType : null,
+            'discount_value' => $totalValue > 0 ? $totalValue : null,
         ]);
 
         return $quote;
+    }
+
+    /**
+     * Subtract a percentage or fixed-amount discount from an amount (never below zero).
+     */
+    protected function applyDiscount(float $amount, ?string $type, float $value): float
+    {
+        if ($value <= 0 || $amount <= 0) {
+            return $amount;
+        }
+
+        if ($type === 'percent') {
+            return round(max(0, $amount - ($amount * min($value, 100) / 100)), 4);
+        }
+
+        return round(max(0, $amount - $value), 4);
     }
 }

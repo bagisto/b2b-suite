@@ -1,7 +1,7 @@
 {!! view_render_event("bagisto.shop.customers.account.profile.edit_form_controls.{$group->code}.before", ['customer' => $customer]) !!}
 
-<div class="rounded-xl border border-zinc-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900 max-md:p-4">
-    <p class="mb-4 text-base font-semibold text-gray-900 dark:text-white">
+<div class="rounded-xl border border-zinc-200 bg-white p-6 max-md:p-4">
+    <p class="mb-4 text-base font-semibold text-gray-900">
         {{ $group->name }}
     </p>
 

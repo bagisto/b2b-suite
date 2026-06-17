@@ -62,11 +62,11 @@
         <script type="text/x-template" id="v-quick-order-template">
             <div class="grid gap-6 max-md:gap-4">
                 <!-- Add Products By Search -->
-                <div class="rounded-xl border border-zinc-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900 max-md:p-4">
+                <div class="rounded-xl border border-zinc-200 bg-white p-6 max-md:p-4">
                     <div class="mb-5 flex items-center gap-3">
-                        <span class="icon-search grid h-10 w-10 shrink-0 place-items-center rounded-full bg-blue-50 text-xl text-blue-600 dark:bg-gray-800 dark:text-blue-400"></span>
+                        <span class="icon-search grid h-10 w-10 shrink-0 place-items-center rounded-full bg-blue-50 text-xl text-blue-600"></span>
 
-                        <h3 class="text-base font-semibold text-gray-900 dark:text-white">
+                        <h3 class="text-base font-semibold text-gray-900">
                             @lang('b2b::app.shop.customers.account.quick-orders.search-by-sku-name')
                         </h3>
                     </div>
@@ -75,7 +75,7 @@
                     <div class="relative w-full">
                         <input
                             type="text"
-                            class="w-full rounded-lg border border-zinc-300 px-5 py-3 text-base text-gray-700 outline-none transition-all focus:border-navyBlue dark:border-gray-700 dark:bg-gray-900 dark:text-white ltr:pr-12 rtl:pl-12"
+                            class="w-full rounded-lg border border-zinc-300 px-5 py-3 text-base text-gray-700 outline-none transition-all focus:border-navyBlue ltr:pr-12 rtl:pl-12"
                             placeholder="@lang('b2b::app.shop.customers.account.quick-orders.search-by-sku-name')"
                             v-model.lazy="searchTerm"
                             v-debounce="500"
@@ -98,12 +98,12 @@
                         <div
                             v-for="product in searchedProducts"
                             :key="product.id"
-                            class="flex items-center justify-between gap-3 rounded-lg border border-zinc-200 p-3 transition-all hover:border-zinc-300 hover:shadow-sm dark:border-gray-800"
+                            class="flex items-center justify-between gap-3 rounded-lg border border-zinc-200 p-3 transition-all hover:border-zinc-300 hover:shadow-sm"
                         >
                             <!-- Information -->
                             <div class="flex items-center gap-3">
                                 <!-- Image -->
-                                <div class="h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-zinc-100 dark:border-gray-800">
+                                <div class="h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-zinc-100">
                                     <template v-if="! product.images.length">
                                         <img
                                             class="h-16 w-16 object-cover"
@@ -121,7 +121,7 @@
 
                                 <!-- Details -->
                                 <div class="grid gap-0.5">
-                                    <p class="break-all text-sm font-medium text-gray-900 dark:text-white">
+                                    <p class="break-all text-sm font-medium text-gray-900">
                                         @{{ product.name }}
                                     </p>
 
@@ -129,7 +129,7 @@
                                         @lang('b2b::app.shop.customers.account.quick-orders.sku') @{{ product.sku }}
                                     </p>
 
-                                    <p class="text-sm font-semibold text-gray-900 dark:text-white">
+                                    <p class="text-sm font-semibold text-gray-900">
                                         @{{ product.formatted_price }}
                                     </p>
                                 </div>
@@ -154,11 +154,11 @@
                 <!-- Bulk Add: Multiple SKUs & Upload File -->
                 <div class="grid grid-cols-2 gap-6 max-md:grid-cols-1 max-md:gap-4">
                     <!-- Multiple SKUs -->
-                    <div class="flex flex-col rounded-xl border border-zinc-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900 max-md:p-4">
+                    <div class="flex flex-col rounded-xl border border-zinc-200 bg-white p-6 max-md:p-4">
                         <div class="mb-4 flex items-center gap-3">
-                            <span class="icon-listing grid h-10 w-10 shrink-0 place-items-center rounded-full bg-blue-50 text-xl text-blue-600 dark:bg-gray-800 dark:text-blue-400"></span>
+                            <span class="icon-listing grid h-10 w-10 shrink-0 place-items-center rounded-full bg-blue-50 text-xl text-blue-600"></span>
 
-                            <h3 class="text-base font-semibold text-gray-900 dark:text-white">
+                            <h3 class="text-base font-semibold text-gray-900">
                                 @lang('b2b::app.shop.customers.account.quick-orders.enter-multiple-skus')
                             </h3>
                         </div>
@@ -183,11 +183,11 @@
                     </div>
 
                     <!-- Upload A File -->
-                    <div class="flex flex-col rounded-xl border border-zinc-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900 max-md:p-4">
+                    <div class="flex flex-col rounded-xl border border-zinc-200 bg-white p-6 max-md:p-4">
                         <div class="mb-4 flex items-center gap-3">
-                            <span class="icon-download grid h-10 w-10 shrink-0 place-items-center rounded-full bg-blue-50 text-xl text-blue-600 dark:bg-gray-800 dark:text-blue-400"></span>
+                            <span class="icon-download grid h-10 w-10 shrink-0 place-items-center rounded-full bg-blue-50 text-xl text-blue-600"></span>
 
-                            <h3 class="text-base font-semibold text-gray-900 dark:text-white">
+                            <h3 class="text-base font-semibold text-gray-900">
                                 @lang('b2b::app.shop.customers.account.quick-orders.upload-file')
                             </h3>
                         </div>
@@ -220,13 +220,13 @@
                 <!-- Selected Products -->
                 <div
                     v-if="selectedProducts.length"
-                    class="overflow-hidden rounded-xl border border-zinc-200 bg-white dark:border-gray-800 dark:bg-gray-900"
+                    class="overflow-hidden rounded-xl border border-zinc-200 bg-white"
                 >
                     <!-- Header -->
-                    <div class="flex items-center gap-2 border-b border-zinc-200 px-6 py-4 dark:border-gray-800 max-md:px-4">
-                        <span class="icon-cart text-xl text-gray-700 dark:text-gray-200"></span>
+                    <div class="flex items-center gap-2 border-b border-zinc-200 px-6 py-4 max-md:px-4">
+                        <span class="icon-cart text-xl text-gray-700"></span>
 
-                        <h3 class="text-base font-semibold text-gray-900 dark:text-white">
+                        <h3 class="text-base font-semibold text-gray-900">
                             @lang('b2b::app.shop.customers.account.quick-orders.selected-products') (@{{ selectedProducts.length }})
                         </h3>
                     </div>
@@ -235,11 +235,11 @@
                     <div
                         v-for="(product, index) in selectedProducts"
                         :key="product.id"
-                        class="flex items-center justify-between gap-3 border-b border-zinc-100 px-6 py-4 transition-all last:border-b-0 hover:bg-gray-50/60 dark:border-gray-800 max-md:flex-wrap max-md:px-4"
+                        class="flex items-center justify-between gap-3 border-b border-zinc-100 px-6 py-4 transition-all last:border-b-0 hover:bg-gray-50/60 max-md:flex-wrap max-md:px-4"
                     >
                         <!-- Information -->
                         <div class="flex items-center gap-3">
-                            <div class="h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-zinc-100 dark:border-gray-800">
+                            <div class="h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-zinc-100">
                                 <template v-if="! product.images.length">
                                     <img
                                         class="h-16 w-16 object-cover"
@@ -257,7 +257,7 @@
 
                             <!-- Details -->
                             <div class="grid gap-0.5">
-                                <p class="break-all text-sm font-medium text-gray-900 dark:text-white">
+                                <p class="break-all text-sm font-medium text-gray-900">
                                     @{{ product.name }}
                                 </p>
 
@@ -265,7 +265,7 @@
                                     @lang('b2b::app.shop.customers.account.quick-orders.sku') @{{ product.sku }}
                                 </p>
 
-                                <p class="text-sm font-semibold text-gray-900 dark:text-white">
+                                <p class="text-sm font-semibold text-gray-900">
                                     @{{ product.formatted_price }}
                                 </p>
                             </div>
@@ -274,7 +274,7 @@
                         <!-- Qty + Remove -->
                         <div class="flex items-center gap-3">
                             <x-shop::quantity-changer
-                                class="flex max-w-max items-center gap-x-2.5 rounded-lg border border-zinc-300 px-3 py-1.5 dark:border-gray-700"
+                                class="flex max-w-max items-center gap-x-2.5 rounded-lg border border-zinc-300 px-3 py-1.5"
                                 name="quantity"
                                 ::value="product.qty"
                                 @change="product.qty = $event"

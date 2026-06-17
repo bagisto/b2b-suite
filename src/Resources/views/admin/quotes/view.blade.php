@@ -44,35 +44,24 @@
     </div>
 
     @php
-        $isOpenOrNegotiation = in_array($quote->status, ['open', 'negotiation']);
         $isOpenOrNegotiationOrRejected = in_array($quote->status, ['open', 'negotiation', 'rejected']);
         $isOrderedOrCompletedOrRejected = in_array($quote->status, ['ordered', 'completed', 'rejected']);
     @endphp
 
     <!-- Quote Actions -->
     <div class="mt-4 flex flex-wrap items-center justify-end gap-2.5">
-        @if ($isOpenOrNegotiation)
-            <!-- Accept Quote (available as soon as the customer sends the quote) -->
+        @if (! $isOrderedOrCompletedOrRejected)
+            <!-- Reject Quotation (kept less prominent than the primary action) -->
             @include('b2b::admin.quotes.view.partials.modal', [
-                'action'     => 'accept',
-                'buttonText' => 'btn-accept-quote',
+                'action'      => 'reject',
+                'buttonText'  => 'btn-reject-quote',
+                'buttonClass' => 'secondary-button',
             ])
         @endif
 
         @if ($isOpenOrNegotiationOrRejected)
-            <!-- Send Offer (price negotiation) -->
-            @include('b2b::admin.quotes.view.partials.modal', [
-                'action'     => 'submit',
-                'buttonText' => 'btn-submit-quote',
-            ])
-        @endif
-
-        @if (! $isOrderedOrCompletedOrRejected)
-            <!-- Reject Quote -->
-            @include('b2b::admin.quotes.view.partials.modal', [
-                'action'     => 'reject',
-                'buttonText' => 'btn-reject-quote',
-            ])
+            <!-- Send Quotation (per-item & whole-quote discounts) — primary, on the right -->
+            @include('b2b::admin.quotes.view.negotiation')
         @endif
     </div>
 

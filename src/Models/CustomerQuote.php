@@ -76,6 +76,8 @@ class CustomerQuote extends Model implements CustomerQuoteContract
         'base_total',
         'negotiated_total',
         'base_negotiated_total',
+        'discount_type',
+        'discount_value',
         'order_date',
         'expected_arrival_date',
         'expiration_date',

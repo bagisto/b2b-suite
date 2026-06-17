@@ -25,7 +25,9 @@ class CompanyCatalogDataGrid extends DataGrid
             ->select(
                 'company_catalogs.id',
                 'company_catalogs.name',
+                'company_catalogs.description',
                 'company_catalogs.status',
+                'company_catalogs.status as status_value',
                 'company_catalogs.created_at',
                 DB::raw('(SELECT COUNT(*) FROM '.$tablePrefix.'company_catalog_products WHERE '.$tablePrefix.'company_catalog_products.company_catalog_id = '.$tablePrefix.'company_catalogs.id) as products_count'),
                 DB::raw('(SELECT COUNT(*) FROM '.$tablePrefix.'customers WHERE '.$tablePrefix.'customers.company_catalog_id = '.$tablePrefix.'company_catalogs.id) as companies_count')

@@ -3,9 +3,10 @@
     (shop::components.layouts.account.navigation).
 
     Keeps the core account links in their own section and groups all B2B/company
-    features (requisitions, quotes, purchase orders, quick orders, users, roles) under a
-    separate "Company" heading. Menu keys are left as `account.*` so the existing ACL /
-    CustomerBouncer permission logic is unaffected — only the rendering is split.
+    features (company profile, company credit, users, roles, requisitions, quick orders,
+    quotes, purchase orders) under a separate "Company" heading. Menu keys are left as
+    `account.*` so the existing ACL / CustomerBouncer permission logic is unaffected —
+    only the rendering is split.
 --}}
 @php
     $customer = auth()->guard('customer')->user();
@@ -16,12 +17,13 @@
      */
     $b2bKeys = [
         'account.company_profile',
-        'account.requisitions',
-        'account.quotes',
-        'account.purchase_orders',
-        'account.quick_orders',
+        'account.company_credit',
         'account.users',
         'account.roles',
+        'account.requisitions',
+        'account.quick_orders',
+        'account.quotes',
+        'account.purchase_orders',
     ];
 
     /**

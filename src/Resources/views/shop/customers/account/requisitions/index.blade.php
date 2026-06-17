@@ -161,7 +161,7 @@
                         <x-shop::modal ref="requisitionCreateModal">
                             <!-- Modal Header -->
                             <x-slot:header>
-                                <p class="text-lg font-bold text-gray-800 dark:text-white">
+                                <p class="text-lg font-bold text-gray-800">
                                     <span v-if="selectedRequisitions">
                                         @lang('b2b::app.shop.customers.account.requisitions.edit-title')
                                     </span>

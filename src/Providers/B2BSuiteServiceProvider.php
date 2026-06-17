@@ -9,6 +9,7 @@ use Illuminate\Support\ServiceProvider;
 use Webkul\B2BSuite\Console\Commands\InstallB2BSuite;
 use Webkul\B2BSuite\Contracts\CompanyFlat;
 use Webkul\B2BSuite\Http\Middleware\CustomerBouncerMiddleware;
+use Webkul\B2BSuite\Http\Middleware\EnsurePayByCreditWithinLimit;
 use Webkul\B2BSuite\Menu as B2BMenu;
 use Webkul\B2BSuite\Repositories\CompanyFlatRepository;
 use Webkul\Core\Menu as CoreMenu;
@@ -34,6 +35,11 @@ class B2BSuiteServiceProvider extends ServiceProvider
             'b2b_acl'
         );
 
+        $this->mergeConfigFrom(
+            dirname(__DIR__).'/Config/payment-methods.php',
+            'payment_methods'
+        );
+
         $this->registerServices();
 
         $this->app->bind(CoreMenu::class, B2BMenu::class);
@@ -53,6 +59,12 @@ class B2BSuiteServiceProvider extends ServiceProvider
         }
 
         Route::aliasMiddleware('customer_bouncer', CustomerBouncerMiddleware::class);
+
+        /**
+         * Guard checkout so a "Pay By Credit" order can never exceed the company's available
+         * credit (the method is shown but the order is rejected when over the limit).
+         */
+        Route::pushMiddlewareToGroup('shop', EnsurePayByCreditWithinLimit::class);
 
         $this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
 

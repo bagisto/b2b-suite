@@ -229,6 +229,13 @@ class QuoteController extends Controller
         try {
             $request->validate([
                 'items' => ['required', 'array', 'min:1'],
+                'items.*.discount_type' => ['nullable', 'in:percent,fixed'],
+                'items.*.discount_value' => ['nullable', 'numeric', 'min:0'],
+                'items.*.negotiated_qty' => ['required', 'integer', 'min:1'],
+                'total_discount_type' => ['nullable', 'in:percent,fixed'],
+                'total_discount_value' => ['nullable', 'numeric', 'min:0'],
+                'removed_items' => ['nullable', 'array'],
+                'removed_items.*' => ['integer'],
                 'message' => 'required|string|max:1000',
             ]);
 
@@ -241,15 +248,38 @@ class QuoteController extends Controller
                 'created_at' => now(),
             ]);
 
+            /**
+             * Sending a quotation is the admin's final, approved offer: the quote moves
+             * straight to "accepted" so the buyer can add the negotiated items to the cart
+             * without a separate approval step. (The buyer can still reject it.)
+             */
             $data = array_merge([
-                'status' => CustomerQuote::STATUS_NEGOTIATION,
+                'status' => CustomerQuote::STATUS_ACCEPTED,
                 'message_id' => $message->id,
             ], $request->only([
                 'items',
                 'message',
+                'total_discount_type',
+                'total_discount_value',
+                'removed_items',
             ]));
 
             $this->customerQuoteRepository->createOrUpdateMessageQuotation($data, $id);
+
+            /**
+             * Mark this quotation snapshot as accepted on the admin's behalf so the buyer's
+             * thread reflects the offer as finalised, mirroring the customer-accept path.
+             */
+            $this->customerQuoteQuotationRepository->updateOrCreate(
+                [
+                    'message_id' => $message->id,
+                    'quote_id' => $id,
+                ],
+                [
+                    'is_accepted' => 1,
+                    'accepted_by' => 'admin',
+                ]
+            );
 
             return redirect()->route('admin.b2b.quotes.view', $id)
                 ->with('success', trans('b2b::app.admin.quotes.view.quote-submitted'));
@@ -258,54 +288,6 @@ class QuoteController extends Controller
             session()->flash('error', $e->getMessage());
 
             return redirect()->back();
-        }
-    }
-
-    /**
-     * Accept this quote.
-     */
-    public function acceptQuote(Request $request, $id)
-    {
-        $adminId = auth()->guard('admin')->user()->id;
-
-        try {
-            $request->validate([
-                'message' => 'required|string|max:1000',
-            ]);
-
-            $quote = $this->customerQuoteRepository->findOrFail($id);
-
-            $quote->update(['status' => 'accepted']);
-
-            $message = $quote->messages()->create([
-                'message' => $request->message,
-                'status' => trans('b2b::app.shop.customers.account.quotes.view.'.$quote->status),
-                'user_type' => 'admin',
-                'user_id' => $adminId,
-                'created_at' => now(),
-            ]);
-
-            $isAdminLastQuotation = $this->customerQuoteMessageRepository->getLastQuotationMessage($quote->id, 'admin');
-
-            $targetMessageId = $isAdminLastQuotation?->id ?? $message->id;
-
-            if ($targetMessageId) {
-                $this->customerQuoteQuotationRepository->updateOrCreate([
-                    'message_id' => $targetMessageId,
-                    'quote_id' => $quote->id,
-                ], [
-                    'is_accepted' => 1,
-                    'accepted_by' => 'admin',
-                ]);
-            }
-
-            return redirect()->route('admin.b2b.quotes.view', $id)
-                ->with('success', trans('b2b::app.admin.quotes.view.quote-accepted'));
-
-        } catch (\Exception $e) {
-            return redirect()->back()->withErrors([
-                'error' => trans('b2b::app.admin.quotes.view.error-message'),
-            ]);
         }
     }
 

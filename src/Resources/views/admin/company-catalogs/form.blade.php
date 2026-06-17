@@ -154,9 +154,9 @@
     <script type="text/x-template" id="v-company-catalog-template">
         <div>
             <!-- Main Content -->
-            <div class="mt-3.5 flex gap-2.5 max-xl:flex-wrap">
-                <!-- Left Column -->
-                <div class="flex flex-1 flex-col gap-2 overflow-auto max-xl:flex-auto">
+            <div class="mt-3.5 flex flex-col gap-2">
+                <!-- Products & Companies (full width) -->
+                <div class="flex flex-col gap-2">
                     <!-- Products -->
                     <x-admin::accordion>
                         <x-slot:header>
@@ -805,72 +805,6 @@
                                     :value="company.id"
                                 >
                             </template>
-                        </x-slot>
-                    </x-admin::accordion>
-                </div>
-
-                <!-- Right Column -->
-                <div class="flex w-[360px] max-w-full flex-col gap-2">
-                    <!-- General -->
-                    <x-admin::accordion>
-                        <x-slot:header>
-                            <p class="p-2.5 text-base font-semibold text-gray-800 dark:text-white">
-                                @lang('b2b::app.admin.company-catalogs.general')
-                            </p>
-                        </x-slot>
-
-                        <x-slot:content>
-                            <x-admin::form.control-group>
-                                <x-admin::form.control-group.label class="required">
-                                    @lang('b2b::app.admin.company-catalogs.name')
-                                </x-admin::form.control-group.label>
-
-                                <x-admin::form.control-group.control
-                                    type="text"
-                                    name="name"
-                                    rules="required"
-                                    :value="old('name', $catalog?->name)"
-                                    :label="trans('b2b::app.admin.company-catalogs.name')"
-                                    :placeholder="trans('b2b::app.admin.company-catalogs.name')"
-                                />
-
-                                <x-admin::form.control-group.error control-name="name" />
-                            </x-admin::form.control-group>
-
-                            <x-admin::form.control-group>
-                                <x-admin::form.control-group.label>
-                                    @lang('b2b::app.admin.company-catalogs.description')
-                                </x-admin::form.control-group.label>
-
-                                <x-admin::form.control-group.control
-                                    type="textarea"
-                                    name="description"
-                                    rows="4"
-                                    :value="old('description', $catalog?->description)"
-                                    :label="trans('b2b::app.admin.company-catalogs.description')"
-                                    :placeholder="trans('b2b::app.admin.company-catalogs.description')"
-                                />
-                            </x-admin::form.control-group>
-
-                            <x-admin::form.control-group class="!mb-0">
-                                <x-admin::form.control-group.label>
-                                    @lang('b2b::app.admin.company-catalogs.status')
-                                </x-admin::form.control-group.label>
-
-                                <input
-                                    type="hidden"
-                                    name="status"
-                                    value="0"
-                                >
-
-                                <x-admin::form.control-group.control
-                                    type="switch"
-                                    name="status"
-                                    value="1"
-                                    :checked="(bool) old('status', $catalog?->status ?? true)"
-                                    :label="trans('b2b::app.admin.company-catalogs.status')"
-                                />
-                            </x-admin::form.control-group>
                         </x-slot>
                     </x-admin::accordion>
                 </div>

@@ -80,7 +80,7 @@
 
             <!-- Access Control Input Fields -->
             <div class="box-shadow rounded bg-white py-4">
-                <p class="mb-4 text-base font-semibold text-gray-800 dark:text-white">
+                <p class="mb-4 text-base font-semibold text-gray-800">
                     @lang('b2b::app.shop.customers.account.roles.create.access-control')
                 </p>
 

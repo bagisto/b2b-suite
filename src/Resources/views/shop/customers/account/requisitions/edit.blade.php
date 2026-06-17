@@ -38,7 +38,7 @@
             <!-- Back Button (desktop) -->
             <a
                 href="{{ route('shop.customers.account.requisitions.index') }}"
-                class="transparent-button px-5 py-2.5 hover:bg-gray-100 max-md:hidden dark:hover:bg-gray-800"
+                class="transparent-button px-5 py-2.5 hover:bg-gray-100 max-md:hidden"
             >
                 @lang('b2b::app.shop.customers.account.requisitions.edit.btn-back')
             </a>
@@ -61,29 +61,29 @@
         >
             <div class="b2b-requisition-detail grid gap-6 max-md:gap-4">
                 <!-- List Information Card -->
-                <div class="rounded-xl border border-zinc-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900 max-md:p-4">
+                <div class="rounded-xl border border-zinc-200 bg-white p-6 max-md:p-4">
                     <div class="flex flex-wrap items-start justify-between gap-4">
                         <div class="flex items-start gap-4 max-sm:gap-3">
-                            <span class="icon-cart grid h-12 w-12 shrink-0 place-items-center rounded-full bg-blue-50 text-2xl text-blue-600 dark:bg-gray-800 dark:text-blue-400 max-sm:h-10 max-sm:w-10 max-sm:text-xl"></span>
+                            <span class="icon-cart grid h-12 w-12 shrink-0 place-items-center rounded-full bg-blue-50 text-2xl text-blue-600 max-sm:h-10 max-sm:w-10 max-sm:text-xl"></span>
 
                             <div class="grid gap-1">
                                 <div class="flex flex-wrap items-center gap-2">
                                     <h2
-                                        class="text-xl font-semibold text-gray-900 dark:text-white max-sm:text-base"
+                                        class="text-xl font-semibold text-gray-900 max-sm:text-base"
                                         v-text="requisition.name"
                                     ></h2>
 
                                     <!-- Default Label -->
                                     <span
                                         v-if="requisition.is_default"
-                                        class="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/40 dark:text-green-400"
+                                        class="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700"
                                     >
                                         @lang('b2b::app.shop.customers.account.requisitions.edit.default-label')
                                     </span>
                                 </div>
 
                                 <p
-                                    class="text-sm text-gray-500 dark:text-gray-300"
+                                    class="text-sm text-gray-500"
                                     v-text="requisition.description"
                                 ></p>
                             </div>
@@ -92,7 +92,7 @@
                         <!-- Rename Requisition -->
                         <button
                             type="button"
-                            class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3.5 py-2 text-sm font-medium text-gray-700 transition-all hover:border-zinc-300 hover:bg-gray-50 hover:text-gray-900 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white"
+                            class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3.5 py-2 text-sm font-medium text-gray-700 transition-all hover:border-zinc-300 hover:bg-gray-50 hover:text-gray-900"
                             @click="$refs.updateRequisitionModal.open()"
                         >
                             <span class="icon-edit text-lg"></span>
@@ -114,7 +114,7 @@
                         <x-shop::modal ref="updateRequisitionModal">
                             <!-- Option Form Modal Header -->
                             <x-slot:header>
-                                <p class="text-lg font-bold text-gray-800 dark:text-white">
+                                <p class="text-lg font-bold text-gray-800">
                                     @lang('b2b::app.shop.customers.account.requisitions.edit.edit-title')
                                 </p>
                             </x-slot>
@@ -210,11 +210,11 @@
                         {!! view_render_event('bagisto.shop.customers.account.requisition.item.listing.before') !!}
 
                         <!-- Items Card -->
-                        <div class="overflow-hidden rounded-xl border border-zinc-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+                        <div class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
                             {!! view_render_event('bagisto.shop.customers.account.requisition.mass_actions.before') !!}
 
                             <!-- Item Mass Action Header -->
-                            <div class="flex items-center justify-between gap-2.5 border-b border-zinc-200 px-6 py-4 dark:border-gray-800 max-md:px-4">
+                            <div class="flex items-center justify-between gap-2.5 border-b border-zinc-200 px-6 py-4 max-md:px-4">
                                 <div class="flex select-none items-center">
                                     <input
                                         type="checkbox"
@@ -233,7 +233,7 @@
                                     ></label>
 
                                     <span
-                                        class="text-base font-medium text-gray-700 dark:text-gray-200 max-sm:text-sm ltr:ml-2.5 rtl:mr-2.5"
+                                        class="text-base font-medium text-gray-700 max-sm:text-sm ltr:ml-2.5 rtl:mr-2.5"
                                         role="heading"
                                         aria-level="2"
                                     >
@@ -259,7 +259,7 @@
 
                             <!-- Item Listing -->
                             <div
-                                class="flex gap-x-5 border-b border-zinc-100 px-6 py-5 transition-all last:border-b-0 hover:bg-gray-50/60 dark:border-gray-800 dark:hover:bg-gray-800/40 max-md:gap-x-3 max-md:px-4"
+                                class="flex gap-x-5 border-b border-zinc-100 px-6 py-5 transition-all last:border-b-0 hover:bg-gray-50/60 max-md:gap-x-3 max-md:px-4"
                                 v-for="item in requisitionItems"
                             >
                                 <!-- Selection Checkbox -->
@@ -289,7 +289,7 @@
                                     :href="'{{ route('shop.product_or_category.index', '__SLUG__') }}'.replace('__SLUG__', item.product_url_key)"
                                 >
                                     <x-shop::media.images.lazy
-                                        class="h-24 w-24 rounded-lg border border-zinc-100 dark:border-gray-800 max-md:h-20 max-md:w-20"
+                                        class="h-24 w-24 rounded-lg border border-zinc-100 max-md:h-20 max-md:w-20"
                                         ::src="item.base_image.small_image_url"
                                         ::alt="item.name"
                                         width="96"
@@ -306,7 +306,7 @@
                                     {!! view_render_event('bagisto.shop.customers.account.requisition.item_name.before') !!}
 
                                     <a :href="'{{ route('shop.product_or_category.index', '__SLUG__') }}'.replace('__SLUG__', item.product_url_key)">
-                                        <p class="text-base font-medium text-gray-900 transition-all hover:text-blue-600 dark:text-white max-sm:text-sm">
+                                        <p class="text-base font-medium text-gray-900 transition-all hover:text-blue-600 max-sm:text-sm">
                                             @{{ item.name }}
                                         </p>
                                     </a>
@@ -337,7 +337,7 @@
 
                                         <!-- Option Details -->
                                         <div
-                                            class="grid gap-2 rounded-lg bg-gray-50 p-3 dark:bg-gray-800"
+                                            class="grid gap-2 rounded-lg bg-gray-50 p-3"
                                             v-show="item.option_show"
                                         >
                                             <template v-for="attribute in item.options">
@@ -346,7 +346,7 @@
                                                         @{{ attribute.attribute_name + ':' }}
                                                     </p>
 
-                                                    <p class="text-sm text-gray-700 dark:text-gray-200 max-sm:text-xs">
+                                                    <p class="text-sm text-gray-700 max-sm:text-xs">
                                                         <template v-if="attribute?.attribute_type === 'file'">
                                                             <a
                                                                 :href="attribute.file_url"
@@ -372,7 +372,7 @@
                                     {!! view_render_event('bagisto.shop.customers.account.requisition.formatted_total.before') !!}
 
                                     <!-- Mobile Total -->
-                                    <p class="text-base font-semibold text-gray-900 dark:text-white md:hidden">
+                                    <p class="text-base font-semibold text-gray-900 md:hidden">
                                         @{{ item.formatted_total }}
                                     </p>
 
@@ -383,7 +383,7 @@
                                     <!-- Quantity Changer -->
                                     <div class="mt-1 flex items-center gap-3">
                                         <x-shop::quantity-changer
-                                            class="flex max-w-max items-center gap-x-2.5 rounded-lg border border-zinc-300 px-3 py-1.5 dark:border-gray-700 max-md:gap-x-1.5 max-md:px-2 max-md:py-1"
+                                            class="flex max-w-max items-center gap-x-2.5 rounded-lg border border-zinc-300 px-3 py-1.5 max-md:gap-x-1.5 max-md:px-2 max-md:py-1"
                                             name="quantity"
                                             ::value="item?.quantity"
                                             @change="setItemQuantity(item.id, $event)"
@@ -410,7 +410,7 @@
                                 <div class="grid content-start justify-items-end gap-2 text-right max-md:hidden">
                                     {!! view_render_event('bagisto.shop.customers.account.requisition.total.before') !!}
 
-                                    <p class="text-base font-semibold text-gray-900 dark:text-white">
+                                    <p class="text-base font-semibold text-gray-900">
                                         @{{ item.formatted_total }}
                                     </p>
 
@@ -473,7 +473,7 @@
 
                     <!-- Empty Requisition Item Section -->
                     <div
-                        class="flex flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-zinc-200 bg-white py-20 text-center dark:border-gray-800 dark:bg-gray-900 max-md:py-14"
+                        class="flex flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-zinc-200 bg-white py-20 text-center max-md:py-14"
                         v-else
                     >
                         <img
@@ -483,7 +483,7 @@
                         />
 
                         <p
-                            class="text-lg font-medium text-gray-700 dark:text-gray-200 max-md:text-base"
+                            class="text-lg font-medium text-gray-700 max-md:text-base"
                             role="heading"
                         >
                             @lang('b2b::app.shop.customers.account.requisitions.empty-message')

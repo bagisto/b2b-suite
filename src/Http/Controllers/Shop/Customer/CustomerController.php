@@ -5,6 +5,7 @@ namespace Webkul\B2BSuite\Http\Controllers\Shop\Customer;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Event;
 use Illuminate\View\View;
+use Webkul\B2BSuite\Helpers\CreditManager;
 use Webkul\B2BSuite\Http\Requests\CompanyRequest;
 use Webkul\B2BSuite\Repositories\CompanyAttributeGroupRepository;
 use Webkul\B2BSuite\Repositories\CompanyAttributeRepository;
@@ -92,6 +93,42 @@ class CustomerController extends BaseCustomerController
                 'attributeGroups' => $attributeGroups,
                 'canEdit' => customer_bouncer()->hasPermission('account.company_profile.edit'),
             ]);
+    }
+
+    /**
+     * Company credit dashboard for the buyer: balance, available credit and ledger.
+     *
+     * @return View
+     */
+    public function companyCredit()
+    {
+        $creditManager = app(CreditManager::class);
+
+        if (
+            ! (bool) core()->getConfigData('b2b.general.settings.active')
+            || ! $creditManager->isActive()
+            || ! customer_bouncer()->hasPermission('account.company_credit')
+        ) {
+            abort(404);
+        }
+
+        if (! $company = $this->resolveCompany()) {
+            abort(404);
+        }
+
+        $credit = $creditManager->find($company->id);
+
+        if (! $credit) {
+            abort(404);
+        }
+
+        $transactions = $credit->transactions()
+            ->with('order')
+            ->orderByDesc('id')
+            ->paginate(10);
+
+        return view('b2b::shop.companies.account.credit.index')
+            ->with(compact('company', 'credit', 'transactions'));
     }
 
     /**

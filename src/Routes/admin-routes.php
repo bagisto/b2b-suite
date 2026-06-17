@@ -5,6 +5,7 @@ use Webkul\B2BSuite\Http\Controllers\Admin\CartController;
 use Webkul\B2BSuite\Http\Controllers\Admin\CompanyAttributeController;
 use Webkul\B2BSuite\Http\Controllers\Admin\CompanyCatalogController;
 use Webkul\B2BSuite\Http\Controllers\Admin\CompanyController;
+use Webkul\B2BSuite\Http\Controllers\Admin\CompanyCreditController;
 use Webkul\B2BSuite\Http\Controllers\Admin\PurchaseOrderController;
 use Webkul\B2BSuite\Http\Controllers\Admin\QuoteController;
 
@@ -63,6 +64,19 @@ Route::controller(CompanyController::class)->prefix('companies')->group(function
 });
 
 /**
+ * Company credit (Pay By Credit) management.
+ */
+Route::controller(CompanyCreditController::class)->prefix('companies')->group(function () {
+    Route::get('credits', 'index')->name('admin.b2b.companies.credits.index');
+
+    Route::get('{id}/credit', 'show')->name('admin.b2b.companies.credit');
+
+    Route::post('{id}/credit/limit', 'updateLimit')->name('admin.b2b.companies.credit.limit');
+
+    Route::post('{id}/credit/reimburse', 'reimburse')->name('admin.b2b.companies.credit.reimburse');
+});
+
+/**
  * ----------------------------------------------------
  * All the company quotes routes will be defined here
  * ----------------------------------------------------
@@ -83,8 +97,6 @@ Route::controller(QuoteController::class)->prefix('quotes')->group(function () {
     Route::post('{id}/reject-quote', 'rejectQuote')->name('admin.b2b.quotes.reject_quote');
 
     Route::post('{id}/submit', 'submitQuote')->name('admin.b2b.quotes.submit_quote');
-
-    Route::post('{id}/accept-quote', 'acceptQuote')->name('admin.b2b.quotes.accept_quote');
 
     Route::post('mass-delete', 'massDestroy')->name('admin.b2b.quotes.mass_delete');
 
@@ -125,6 +137,8 @@ Route::controller(CompanyCatalogController::class)->prefix('company-catalogs')->
     Route::get('edit/{id}', 'edit')->name('admin.b2b.company_catalogs.edit');
 
     Route::put('edit/{id}', 'update')->name('admin.b2b.company_catalogs.update');
+
+    Route::put('settings/{id}', 'updateSettings')->name('admin.b2b.company_catalogs.settings');
 
     Route::delete('delete/{id}', 'destroy')->name('admin.b2b.company_catalogs.delete');
 });
