@@ -44,7 +44,9 @@
     </div>
 
     @php
-        $isOpenOrNegotiationOrRejected = in_array($quote->status, ['open', 'negotiation', 'rejected']);
+        // "accepted" is included so the admin can still send a revised offer after a
+        // quotation has been sent/accepted (until it is ordered, completed or rejected).
+        $canSendQuotation = in_array($quote->status, ['open', 'negotiation', 'rejected', 'accepted']);
         $isOrderedOrCompletedOrRejected = in_array($quote->status, ['ordered', 'completed', 'rejected']);
     @endphp
 
@@ -59,14 +61,14 @@
             ])
         @endif
 
-        @if ($isOpenOrNegotiationOrRejected)
+        @if ($canSendQuotation)
             <!-- Send Quotation (per-item & whole-quote discounts) — primary, on the right -->
             @include('b2b::admin.quotes.view.negotiation')
         @endif
     </div>
 
     <div class="mt-5 flex-wrap items-center justify-between gap-x-1 gap-y-2">
-        <!-- Quote details -->
+        <!-- Quote details: Information + Company side by side -->
         <div class="mt-3.5 flex gap-2.5 max-xl:flex-wrap">
             <!-- Left Component -->
             <div class="flex flex-1 flex-col gap-2 max-xl:flex-auto">
@@ -74,9 +76,6 @@
 
                 <!-- Quote Information -->
                 @include('b2b::admin.quotes.view.quote-information')
-
-                <!-- Quote Items -->
-                @include('b2b::admin.quotes.view.items')
             </div>
 
             <!-- Right Component -->
@@ -85,10 +84,17 @@
 
                 <!-- Company Information -->
                 @include('b2b::admin.quotes.view.company-information')
-
-                <!-- Quote Attachments -->
-                @include('b2b::admin.quotes.view.attachments')
             </div>
+        </div>
+
+        <!-- Quote Items (full-width row) -->
+        <div class="mt-2 flex flex-col gap-2">
+            @include('b2b::admin.quotes.view.items')
+        </div>
+
+        <!-- Quote Attachments (full-width row) -->
+        <div class="mt-2 flex flex-col gap-2">
+            @include('b2b::admin.quotes.view.attachments')
         </div>
                 
         <!-- Quote Messages -->

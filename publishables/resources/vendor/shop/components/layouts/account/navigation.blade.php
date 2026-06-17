@@ -33,7 +33,7 @@
      */
 @endphp
 
-<div class="panel-side journal-scroll grid max-h-[1320px] min-w-[342px] max-w-[380px] grid-cols-[1fr] gap-8 overflow-y-auto overflow-x-hidden max-xl:min-w-[270px] max-md:max-w-full max-md:gap-5">
+<div class="panel-side grid min-w-[342px] max-w-[380px] grid-cols-[1fr] gap-8 overflow-x-hidden max-xl:min-w-[270px] max-md:max-w-full max-md:gap-5">
     <!-- Account Profile Hero Section -->
     <div class="grid grid-cols-[auto_1fr] items-center gap-4 rounded-xl border border-zinc-200 px-5 py-[25px] max-md:py-2.5">
         <div class="">

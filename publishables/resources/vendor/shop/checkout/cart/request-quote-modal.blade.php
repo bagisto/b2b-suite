@@ -44,8 +44,8 @@
                         </div>
                     </x-slot>
 
-                    <!-- Content -->
-                    <x-slot:content class="!px-6 !py-6 max-sm:!p-4">
+                    <!-- Content (capped height so the modal never outgrows the viewport; the body scrolls) -->
+                    <x-slot:content class="!px-6 !py-6 max-sm:!p-4" style="max-height: 60vh; overflow-y: auto;">
                         <div class="grid gap-6">
                             <!-- Quote Name -->
                             <x-shop::form.control-group class="!mb-0">
@@ -145,10 +145,10 @@
 
                     <!-- Footer -->
                     <x-slot:footer>
-                        <div class="flex w-full gap-3 max-sm:flex-col">
+                        <div class="flex w-full justify-end gap-3 max-sm:flex-col">
                             <x-shop::button
                                 type="button"
-                                class="secondary-button flex-1 rounded-2xl px-6 py-3 max-md:rounded-lg"
+                                class="secondary-button rounded-2xl px-6 py-3 max-md:rounded-lg max-sm:w-full"
                                 :title="trans('b2b::app.shop.checkout.cart.request-quote.save-as-draft')"
                                 ::loading="isDraftSaving"
                                 ::disabled="isDraftSaving || isSubmitting"
@@ -156,7 +156,7 @@
                             />
 
                             <x-shop::button
-                                class="primary-button flex-1 rounded-2xl px-6 py-3 max-md:rounded-lg"
+                                class="primary-button rounded-2xl px-6 py-3 max-md:rounded-lg max-sm:w-full"
                                 :title="trans('b2b::app.shop.checkout.cart.request-quote.request-quote-submit')"
                                 ::loading="isSubmitting"
                                 ::disabled="isSubmitting || isDraftSaving"

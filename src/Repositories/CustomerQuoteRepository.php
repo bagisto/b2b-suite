@@ -7,7 +7,6 @@ use Illuminate\Container\Container;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Intervention\Image\ImageManager;
 use Webkul\B2BSuite\Contracts\CustomerQuote;
 use Webkul\Checkout\Facades\Cart;
 use Webkul\Checkout\Repositories\CartRepository;
@@ -149,13 +148,11 @@ class CustomerQuoteRepository extends Repository
             foreach ($data[$uploadFileType] as $indexOrModelId => $file) {
                 if ($file instanceof UploadedFile) {
                     if (Str::contains($file->getMimeType(), 'image')) {
-                        $manager = new ImageManager;
-
-                        $image = $manager->make($file)->encode('webp');
+                        $encoded = image_manager()->read($file)->encodeByExtension('webp');
 
                         $path = 'b2b-quote/'.$quote->id.'/'.Str::random(40).'.webp';
 
-                        Storage::put($path, $image);
+                        Storage::put($path, (string) $encoded);
                     } else {
                         $path = $file->store('b2b-quote/'.$quote->id);
                     }

@@ -15,7 +15,7 @@
         <x-shop::layouts.account.navigation />
     </div>
 
-    <div class="flex-auto">
+    <div class="min-w-0 flex-auto">
 
         {!! view_render_event('bagisto.shop.customers.account.quote.view.before', ['quote' => $quote]) !!}
 

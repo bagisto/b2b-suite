@@ -334,7 +334,7 @@
                     <button
                         v-show="step === 'preview'"
                         type="button"
-                        class="primary-button"
+                        class="primary-button ltr:ml-2.5 rtl:mr-2.5"
                         @click="$refs.form.submit()"
                     >
                         @lang('b2b::app.admin.quotes.view.confirm-send')

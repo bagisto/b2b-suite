@@ -120,6 +120,17 @@ class CustomerQuoteDataGrid extends DataGrid
         ]);
 
         $this->addColumn([
+            'index' => 'negotiated_total',
+            'label' => trans('b2b::app.shop.customers.account.quotes.index.datagrid.negotiated_total'),
+            'type' => 'decimal',
+            'filterable' => true,
+            'sortable' => true,
+            'closure' => function ($row) {
+                return core()->formatPrice($row->negotiated_total, core()->getCurrentCurrencyCode());
+            },
+        ]);
+
+        $this->addColumn([
             'index' => 'status',
             'label' => trans('b2b::app.shop.customers.account.quotes.index.datagrid.status'),
             'type' => 'string',

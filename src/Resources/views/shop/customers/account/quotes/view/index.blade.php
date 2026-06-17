@@ -1,4 +1,4 @@
-<div class="mt-8 grid gap-8 max-sm:p-2">
+<div class="mt-8 grid items-start gap-8 sm:grid-cols-2 max-sm:p-2">
     {!! view_render_event("bagisto.shop.customers.account.quote.view_form_controls.quote_information.before", ['quote' => $quote]) !!}
 
     <!-- Quote Information -->

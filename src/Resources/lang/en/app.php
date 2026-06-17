@@ -833,6 +833,9 @@ return [
                         'title' => 'Company Profile',
                         'info' => 'Manage your company information.',
                         'save-btn' => 'Save',
+                        'edit-btn' => 'Edit Profile',
+                        'yes' => 'Yes',
+                        'no' => 'No',
                         'no-attributes' => 'No company attributes have been configured yet.',
                     ],
 
@@ -854,7 +857,11 @@ return [
                     'operation' => 'Operation',
                     'amount' => 'Amount',
                     'balance' => 'Balance',
+                    'details' => 'Details',
                     'order' => 'Order',
+                    'status' => 'Status',
+                    'enabled' => 'Active',
+                    'disabled' => 'Inactive',
                     'no-transactions' => 'No credit transactions yet.',
 
                     'operations' => [
@@ -1087,6 +1094,9 @@ return [
                         'sub-total' => 'Sub Total',
                         'grand-total' => 'Grand Total',
                         'negotiated-total' => 'Negotiated Total',
+                        'discount' => 'Discount',
+                        'discount-on-total' => 'Discount on Total',
+                        'you-save' => 'You Save',
                         'no-items' => 'No items found in this quotation.',
                         'quote-attachments' => 'Quotation Attachments',
                         'no-attachments' => 'No attachments found.',

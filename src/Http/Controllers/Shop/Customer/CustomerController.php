@@ -5,6 +5,7 @@ namespace Webkul\B2BSuite\Http\Controllers\Shop\Customer;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Event;
 use Illuminate\View\View;
+use Webkul\B2BSuite\DataGrids\Shop\CompanyCreditTransactionDataGrid;
 use Webkul\B2BSuite\Helpers\CreditManager;
 use Webkul\B2BSuite\Http\Requests\CompanyRequest;
 use Webkul\B2BSuite\Repositories\CompanyAttributeGroupRepository;
@@ -96,6 +97,42 @@ class CustomerController extends BaseCustomerController
     }
 
     /**
+     * Edit form for the company profile — separate from the read-only summary view. Only
+     * reachable by members whose role grants the edit permission.
+     *
+     * @return View
+     */
+    public function companyProfileEdit()
+    {
+        if (! (bool) core()->getConfigData('b2b.general.settings.active')) {
+            abort(404);
+        }
+
+        if (! customer_bouncer()->hasPermission('account.company_profile.edit')) {
+            abort(404);
+        }
+
+        $customer = $this->resolveCompany();
+
+        if (! $customer) {
+            abort(404);
+        }
+
+        $attributeGroups = $this->companyAttributeGroupRepository->with([
+            'custom_attributes' => function ($query) {
+                $query->orderBy('pivot_position', 'asc');
+            },
+        ])->orderBy('column', 'asc')->orderBy('position', 'asc')->get();
+
+        return view('b2b::shop.companies.account.profile.edit')
+            ->with([
+                'customer' => $customer,
+                'attributeGroups' => $attributeGroups,
+                'canEdit' => true,
+            ]);
+    }
+
+    /**
      * Company credit dashboard for the buyer: balance, available credit and ledger.
      *
      * @return View
@@ -122,13 +159,12 @@ class CustomerController extends BaseCustomerController
             abort(404);
         }
 
-        $transactions = $credit->transactions()
-            ->with('order')
-            ->orderByDesc('id')
-            ->paginate(10);
+        if (request()->ajax()) {
+            return app(CompanyCreditTransactionDataGrid::class)->process();
+        }
 
         return view('b2b::shop.companies.account.credit.index')
-            ->with(compact('company', 'credit', 'transactions'));
+            ->with(compact('company', 'credit'));
     }
 
     /**
