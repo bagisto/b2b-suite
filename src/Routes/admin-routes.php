@@ -96,6 +96,8 @@ Route::controller(QuoteController::class)->prefix('quotes')->group(function () {
 
     Route::post('{id}/reject-quote', 'rejectQuote')->name('admin.b2b.quotes.reject_quote');
 
+    Route::post('{id}/accept-quote', 'acceptQuote')->name('admin.b2b.quotes.accept_quote');
+
     Route::post('{id}/submit', 'submitQuote')->name('admin.b2b.quotes.submit_quote');
 
     Route::post('mass-delete', 'massDestroy')->name('admin.b2b.quotes.mass_delete');

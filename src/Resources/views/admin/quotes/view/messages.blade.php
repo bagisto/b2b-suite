@@ -129,7 +129,10 @@
                                         <tr>
                                             <th>@lang('b2b::app.admin.quotes.view.name')</th>
                                             <th>@lang('b2b::app.admin.quotes.view.price')</th>
+                                            <th>@lang('b2b::app.admin.quotes.view.discount')</th>
+                                            <th>@lang('b2b::app.admin.quotes.view.negotiated-price')</th>
                                             <th>@lang('b2b::app.admin.quotes.view.quantity')</th>
+                                            <th style="text-align: right;">@lang('b2b::app.admin.quotes.view.sub-total')</th>
                                         </tr>
                                     </thead>
 
@@ -150,10 +153,33 @@
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td>@{{ formatCurrency(quotation.price) }}</td>
+                                            <td>@{{ quotation.item ? formatCurrency(quotation.item.price) : '—' }}</td>
+                                            <td>
+                                                <span v-if="discountLabel(quotation)" class="font-medium text-green-600">@{{ discountLabel(quotation) }}</span>
+                                                <span v-else class="text-zinc-400">—</span>
+                                            </td>
+                                            <td class="font-semibold">@{{ formatCurrency(lineNegotiatedPrice(quotation)) }}</td>
                                             <td>@{{ quotation.qty }}</td>
+                                            <td style="text-align: right;" class="font-semibold">@{{ formatCurrency(lineSubTotal(quotation)) }}</td>
                                         </tr>
                                     </tbody>
+
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="5" style="text-align: right;" class="font-semibold">@lang('b2b::app.admin.quotes.view.sub-total')</td>
+                                            <td style="text-align: right;" class="font-semibold">@{{ formatCurrency(offerSubTotal(msg)) }}</td>
+                                        </tr>
+
+                                        <tr v-if="offerDiscountOnTotal(msg) > 0.0001">
+                                            <td colspan="5" style="text-align: right;" class="font-semibold">@lang('b2b::app.admin.quotes.view.discount-on-total')</td>
+                                            <td style="text-align: right;" class="font-semibold text-green-600">− @{{ formatCurrency(offerDiscountOnTotal(msg)) }}</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td colspan="5" style="text-align: right;" class="font-bold">@lang('b2b::app.admin.quotes.view.negotiated-total')</td>
+                                            <td style="text-align: right;" class="font-bold">@{{ formatCurrency(offerNegotiatedTotal(msg)) }}</td>
+                                        </tr>
+                                    </tfoot>
                                 </table>
                             </div>
 
@@ -290,6 +316,58 @@
                     return (this.$admin && this.$admin.formatPrice)
                         ? this.$admin.formatPrice(amount)
                         : amount;
+                },
+
+                /**
+                 * The item-level discount stored on the offer snapshot ("10%" or a fixed
+                 * amount). Null when the line has no item discount.
+                 */
+                discountLabel(quotation) {
+                    const value = parseFloat(quotation.discount_value);
+
+                    if (! quotation.discount_type || ! (value > 0)) {
+                        return null;
+                    }
+
+                    return quotation.discount_type === 'percent'
+                        ? parseFloat(value.toFixed(2)) + '%'
+                        : this.formatCurrency(value);
+                },
+
+                /**
+                 * Per-unit price after the ITEM discount only (before any whole-quote discount),
+                 * mirroring the quote items table's "Negotiated Price" column.
+                 */
+                lineNegotiatedPrice(quotation) {
+                    const original = quotation.item ? parseFloat(quotation.item.price) : parseFloat(quotation.price);
+                    const value = parseFloat(quotation.discount_value);
+
+                    if (! quotation.discount_type || ! (value > 0)) {
+                        return original;
+                    }
+
+                    if (quotation.discount_type === 'percent') {
+                        return Math.max(0, original - (original * Math.min(value, 100) / 100));
+                    }
+
+                    return Math.max(0, original - value);
+                },
+
+                lineSubTotal(quotation) {
+                    return this.lineNegotiatedPrice(quotation) * (parseInt(quotation.qty) || 0);
+                },
+
+                offerSubTotal(msg) {
+                    return (msg.quotations || []).reduce((sum, q) => sum + this.lineSubTotal(q), 0);
+                },
+
+                // Whole-quote ("Discount on Total"): the snapshot price already folds it in.
+                offerNegotiatedTotal(msg) {
+                    return (msg.quotations || []).reduce((sum, q) => sum + (parseFloat(q.price) * (parseInt(q.qty) || 0)), 0);
+                },
+
+                offerDiscountOnTotal(msg) {
+                    return this.offerSubTotal(msg) - this.offerNegotiatedTotal(msg);
                 },
 
                 getUserTypeLabel(userType) {

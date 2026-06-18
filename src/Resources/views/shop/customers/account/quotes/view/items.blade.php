@@ -48,7 +48,7 @@
             </div>
         @else
             @php
-                $isNegotiated = in_array($quote->status, ['accepted', 'ordered', 'completed']);
+                $isNegotiated = in_array($quote->status, ['open', 'negotiation', 'accepted', 'ordered', 'completed']);
 
                 /**
                  * The stored negotiated_price folds the whole-quote discount into each unit.

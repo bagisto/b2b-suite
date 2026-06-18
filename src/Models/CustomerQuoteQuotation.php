@@ -17,6 +17,8 @@ class CustomerQuoteQuotation extends Model implements CustomerQuoteQuotationCont
         'sku',
         'name',
         'qty',
+        'discount_type',
+        'discount_value',
         'price',
         'base_price',
         'total',

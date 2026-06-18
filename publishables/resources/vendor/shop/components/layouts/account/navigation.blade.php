@@ -39,7 +39,8 @@
         <div class="">
             <img
                 src="{{ $customer->image_url ??  bagisto_asset('images/user-placeholder.png') }}"
-                class="h-[60px] w-[60px] rounded-full"
+                class="h-[60px] w-[60px] shrink-0 rounded-full object-cover"
+                style="min-width: 60px;"
                 alt="Profile Image"
             >
         </div>
@@ -52,7 +53,7 @@
                 Hello! {{ $customer->first_name }}
             </p>
 
-            <p class="no-underline max-md:text-md: text-zinc-500">
+            <p class="no-underline break-all max-md:text-md: text-zinc-500">
                 {{ $customer->email }}
             </p>
         </div>

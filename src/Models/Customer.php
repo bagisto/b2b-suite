@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Webkul\B2BSuite\Repositories\CompanyAttributeRepository;
 use Webkul\Customer\Models\Customer as BaseCustomer;
+use Webkul\User\Models\AdminProxy;
 
 class Customer extends BaseCustomer
 {
@@ -60,7 +61,7 @@ class Customer extends BaseCustomer
      */
     public function salesRep(): BelongsTo
     {
-        return $this->belongsTo(\Webkul\User\Models\AdminProxy::modelClass(), 'sales_rep_id');
+        return $this->belongsTo(AdminProxy::modelClass(), 'sales_rep_id');
     }
 
     /**

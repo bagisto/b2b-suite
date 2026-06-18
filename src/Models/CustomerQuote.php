@@ -5,6 +5,7 @@ namespace Webkul\B2BSuite\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 use Webkul\B2BSuite\Contracts\CustomerQuote as CustomerQuoteContract;
 use Webkul\Checkout\Models\Cart;
 use Webkul\User\Models\Admin;
@@ -109,14 +110,14 @@ class CustomerQuote extends Model implements CustomerQuoteContract
      * listing badge and the view-page badge always share a colour for a given status.
      */
     public const STATUS_LABEL_CLASSES = [
-        self::STATUS_DRAFT       => 'label-info',
-        self::STATUS_OPEN        => 'label-pending',
+        self::STATUS_DRAFT => 'label-info',
+        self::STATUS_OPEN => 'label-pending',
         self::STATUS_NEGOTIATION => 'label-closed',
-        self::STATUS_ACCEPTED    => 'label-processing',
-        self::STATUS_ORDERED     => 'label-completed',
-        self::STATUS_COMPLETED   => 'label-active',
-        self::STATUS_EXPIRED     => 'label-canceled',
-        self::STATUS_REJECTED    => 'label-canceled',
+        self::STATUS_ACCEPTED => 'label-processing',
+        self::STATUS_ORDERED => 'label-completed',
+        self::STATUS_COMPLETED => 'label-active',
+        self::STATUS_EXPIRED => 'label-canceled',
+        self::STATUS_REJECTED => 'label-canceled',
     ];
 
     /**
@@ -125,14 +126,14 @@ class CustomerQuote extends Model implements CustomerQuoteContract
      * x-b2b::quote-status-badge component used on the shop view pages.
      */
     public const STATUS_COLORS = [
-        self::STATUS_DRAFT       => ['#3f3f46', '#f4f4f5'],
-        self::STATUS_OPEN        => ['#0044F2', '#e6edff'],
+        self::STATUS_DRAFT => ['#3f3f46', '#f4f4f5'],
+        self::STATUS_OPEN => ['#0044F2', '#e6edff'],
         self::STATUS_NEGOTIATION => ['#9a6700', '#fff3da'],
-        self::STATUS_ACCEPTED    => ['#1f7a33', '#e7f6ea'],
-        self::STATUS_ORDERED     => ['#060c3b', '#e8eaf2'],
-        self::STATUS_COMPLETED   => ['#1f7a33', '#e7f6ea'],
-        self::STATUS_EXPIRED     => ['#52525b', '#f4f4f5'],
-        self::STATUS_REJECTED    => ['#b42318', '#fde8e6'],
+        self::STATUS_ACCEPTED => ['#1f7a33', '#e7f6ea'],
+        self::STATUS_ORDERED => ['#060c3b', '#e8eaf2'],
+        self::STATUS_COMPLETED => ['#1f7a33', '#e7f6ea'],
+        self::STATUS_EXPIRED => ['#52525b', '#f4f4f5'],
+        self::STATUS_REJECTED => ['#b42318', '#fde8e6'],
     ];
 
     /**
@@ -167,7 +168,7 @@ class CustomerQuote extends Model implements CustomerQuoteContract
     {
         [$text, $bg] = self::statusColor($status);
 
-        $label = $label ?? \Illuminate\Support\Str::title((string) $status);
+        $label = $label ?? Str::title((string) $status);
 
         return '<span class="inline-flex items-center whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold"'
             .' style="color: '.$text.'; background-color: '.$bg.';">'.e($label).'</span>';

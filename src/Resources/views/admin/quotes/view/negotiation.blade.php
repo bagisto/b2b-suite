@@ -14,10 +14,11 @@
         'removed'        => false,
     ])->values();
 
-    // Once an offer has been sent (negotiation) — or the customer has decided
-    // (accepted/rejected) — sending again is a revision. Only the first send
-    // (status "open") reads "Send Quotation".
-    $isRevision = in_array($quote->status, ['negotiation', 'accepted', 'rejected']);
+    // This is a revision whenever the buyer has already engaged — the quote moved past
+    // "open" (negotiation/accepted/rejected) or the buyer requested/submitted it (any
+    // customer message). Only an admin-created quote with no buyer activity reads "Send Quotation".
+    $isRevision = in_array($quote->status, ['negotiation', 'accepted', 'rejected'])
+        || $quote->messages()->where('user_type', 'customer')->exists();
 @endphp
 
 @pushOnce('styles')

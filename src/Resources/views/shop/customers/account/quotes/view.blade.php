@@ -60,11 +60,12 @@
                 @endif
 
                 @if ($isDraft)
-                        <!-- Submit Quote (send the draft for review — no buyer price setting) -->
-                        @include('b2b::shop.customers.account.quotes.view.partials.modal', [
-                            'action'         => 'submit',
-                            'buttonText'     => 'btn-submit-quote',
-                            'showItemFields' => false,
+                        <!-- Submit Quote (name + description + per-item discount editor) -->
+                        @include('b2b::shop.customers.account.quotes.view.submission-modal', [
+                            'quote'       => $quote,
+                            'mode'        => 'draft',
+                            'buttonLabel' => trans('b2b::app.shop.customers.account.quotes.view.btn-submit-quote'),
+                            'buttonClass' => 'primary-button',
                         ])
 
                         <!-- Delete Quote -->
@@ -77,10 +78,11 @@
                     @endif
 
                     @if (! $isAdminLastQuotation && $quote->state == 'quotation' && $isOpenOrNegotiation)
-                        <!-- Re-submit Quote -->
-                        @include('b2b::shop.customers.account.quotes.view.partials.modal', [
-                            'action'      => 'submit',
-                            'buttonText'  => 'btn-again-quote',
+                        <!-- Re-submit / counter-offer (per-item discount editor + message) -->
+                        @include('b2b::shop.customers.account.quotes.view.submission-modal', [
+                            'quote'       => $quote,
+                            'mode'        => 'counter',
+                            'buttonLabel' => trans('b2b::app.shop.customers.account.quotes.view.btn-again-quote'),
                             'buttonClass' => 'secondary-button',
                         ])
                     @endif

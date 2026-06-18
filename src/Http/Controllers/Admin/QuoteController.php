@@ -157,7 +157,12 @@ class QuoteController extends Controller
 
         $this->authorizeQuoteAccess($quote);
 
-        return view('b2b::admin.quotes.view', compact('quote'));
+        // The admin may accept the buyer's offer only when the buyer made the latest quotation.
+        $lastQuotation = $quote->messages()->whereHas('quotations')->orderByDesc('id')->first();
+
+        $adminIsLastQuotation = $lastQuotation && $lastQuotation->user_type === 'admin';
+
+        return view('b2b::admin.quotes.view', compact('quote', 'adminIsLastQuotation'));
     }
 
     /**
@@ -329,6 +334,52 @@ class QuoteController extends Controller
 
             return redirect()->route('admin.b2b.quotes.view', $id)
                 ->with('success', trans('b2b::app.admin.quotes.view.quote-rejected'));
+
+        } catch (\Exception $e) {
+            session()->flash('error', $e->getMessage());
+
+            return redirect()->back();
+        }
+    }
+
+    /**
+     * Accept the buyer's quotation (the buyer's last offer becomes the agreed quote).
+     */
+    public function acceptQuote(Request $request, $id)
+    {
+        try {
+            $request->validate([
+                'message' => 'required|string|max:1000',
+            ]);
+
+            $quote = $this->customerQuoteRepository->findOrFail($id);
+
+            $this->authorizeQuoteAccess($quote);
+
+            if (in_array($quote->status, [
+                CustomerQuote::STATUS_COMPLETED,
+                CustomerQuote::STATUS_ORDERED,
+                CustomerQuote::STATUS_REJECTED,
+            ])) {
+                session()->flash('error', trans('b2b::app.admin.quotes.view.un-authorized-quote'));
+
+                return redirect()->back();
+            }
+
+            $quote->status = CustomerQuote::STATUS_ACCEPTED;
+
+            $quote->save();
+
+            $quote->messages()->create([
+                'message' => $request->message,
+                'status' => trans('b2b::app.admin.quotes.view.'.$quote->status),
+                'user_type' => 'admin',
+                'user_id' => auth()->guard('admin')->user()->id,
+                'created_at' => now(),
+            ]);
+
+            return redirect()->route('admin.b2b.quotes.view', $id)
+                ->with('success', trans('b2b::app.admin.quotes.view.quote-accepted'));
 
         } catch (\Exception $e) {
             session()->flash('error', $e->getMessage());

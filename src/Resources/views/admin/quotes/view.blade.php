@@ -49,6 +49,11 @@
         $canSendQuotation = in_array($quote->status, ['open', 'negotiation', 'rejected', 'accepted']);
         $isOrderedOrCompletedOrRejected = in_array($quote->status, ['ordered', 'completed', 'rejected']);
 
+        // The admin can accept the buyer's offer while it is the buyer's turn (the buyer
+        // submitted or countered last), i.e. the admin has not made the latest quotation.
+        $canAdminAccept = in_array($quote->status, ['open', 'negotiation'])
+            && ! ($adminIsLastQuotation ?? false);
+
         // A quote can be rejected by either side; the rejection is the last message, so its
         // author tells us who declined (drives which note the admin sees).
         $rejectedByAdmin = $quote->status === 'rejected'
@@ -86,6 +91,16 @@
                 'action'      => 'reject',
                 'buttonText'  => 'btn-reject-quote',
                 'buttonClass' => 'secondary-button',
+            ])
+        @endif
+
+        @if ($canAdminAccept)
+            <!-- Accept the buyer's quotation -->
+            @include('b2b::admin.quotes.view.partials.modal', [
+                'action'           => 'accept',
+                'buttonText'       => 'btn-accept-quote',
+                'buttonClass'      => 'secondary-button',
+                'actionButtonText' => 'btn-accept',
             ])
         @endif
 

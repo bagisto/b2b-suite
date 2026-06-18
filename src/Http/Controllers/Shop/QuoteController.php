@@ -272,13 +272,6 @@ class QuoteController extends Controller
      */
     public function submitQuote(Request $request, $id)
     {
-        $request->validate([
-            'items' => ['sometimes', 'array', 'min:1'],
-            'message' => 'required|string|max:1000',
-            'order_date' => ['nullable', 'date'],
-            'expected_arrival_date' => ['nullable', 'date'],
-        ]);
-
         $currentAdmin = $this->customerRepository->find(auth()->guard('customer')->user()->id);
 
         try {
@@ -304,9 +297,59 @@ class QuoteController extends Controller
                 return redirect()->back();
             }
 
-            $quoteStatus = $quote->status === CustomerQuote::STATUS_DRAFT
-                ? CustomerQuote::STATUS_OPEN
-                : CustomerQuote::STATUS_NEGOTIATION;
+            /**
+             * Initial draft submission: the buyer edits the name + description they filled at
+             * creation and proposes a per-item discount (the seller decides the dates). Sending
+             * moves the draft to "open" for the seller to review.
+             */
+            if ($quote->status === CustomerQuote::STATUS_DRAFT) {
+                $request->validate([
+                    'name' => ['required', 'string', 'max:255'],
+                    'description' => ['nullable', 'string', 'max:1000'],
+                    'items' => ['sometimes', 'array', 'min:1'],
+                    'items.*.discount_type' => ['nullable', 'in:percent,fixed'],
+                    'items.*.discount_value' => ['nullable', 'numeric', 'min:0'],
+                    'items.*.negotiated_qty' => ['nullable', 'integer', 'min:1'],
+                ]);
+
+                $note = $request->description ?: trans('b2b::app.shop.customers.account.quotes.view.draft-submitted-note');
+
+                $quote->update([
+                    'name' => $request->name,
+                    'description' => $request->description,
+                ]);
+
+                $message = $quote->messages()->create([
+                    'message' => $note,
+                    'user_type' => 'customer',
+                    'user_id' => $currentAdmin->id,
+                    'created_at' => now(),
+                ]);
+
+                if ($request->filled('items')) {
+                    $data = array_merge([
+                        'status' => CustomerQuote::STATUS_OPEN,
+                        'message_id' => $message->id,
+                        'message' => $note,
+                    ], $request->only(['items']));
+
+                    $this->customerQuoteRepository->createOrUpdateMessageQuotation($data, $id);
+                } else {
+                    $quote->update(['status' => CustomerQuote::STATUS_OPEN]);
+                }
+
+                return redirect()
+                    ->route('shop.customers.account.quotes.view', $id)
+                    ->with('success', trans('b2b::app.shop.customers.account.quotes.view.quote-submitted'));
+            }
+
+            /**
+             * Re-submit / counter-offer during negotiation.
+             */
+            $request->validate([
+                'items' => ['sometimes', 'array', 'min:1'],
+                'message' => 'required|string|max:1000',
+            ]);
 
             $message = $quote->messages()->create([
                 'message' => $request->message,
@@ -315,36 +358,15 @@ class QuoteController extends Controller
                 'created_at' => now(),
             ]);
 
-            /**
-             * Persist the buyer's order / expected-arrival dates automatically on send,
-             * so no separate "Save" step is needed.
-             */
-            $dates = array_filter([
-                'order_date' => $request->order_date,
-                'expected_arrival_date' => $request->expected_arrival_date,
-            ]);
-
-            if ($dates) {
-                $quote->update($dates);
-            }
-
             if ($request->filled('items')) {
-                /**
-                 * Counter-offer during negotiation: persist the buyer's proposed
-                 * quantities/prices for each item.
-                 */
                 $data = array_merge([
-                    'status' => $quoteStatus,
+                    'status' => CustomerQuote::STATUS_NEGOTIATION,
                     'message_id' => $message->id,
                 ], $request->only(['items', 'message']));
 
                 $this->customerQuoteRepository->createOrUpdateMessageQuotation($data, $id);
             } else {
-                /**
-                 * Initial draft submission: simply send the quote for review. Prices
-                 * are quoted by the seller, so the buyer is not asked to set them here.
-                 */
-                $quote->update(['status' => $quoteStatus]);
+                $quote->update(['status' => CustomerQuote::STATUS_NEGOTIATION]);
             }
 
             return redirect()

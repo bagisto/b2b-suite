@@ -1,5 +1,5 @@
 @php
-    $hasNegotiated = in_array($quote->status, ['accepted', 'ordered', 'completed']);
+    $hasNegotiated = in_array($quote->status, ['open', 'negotiation', 'accepted', 'ordered', 'completed']);
 
     /**
      * The stored negotiated price folds the whole-quote discount into each unit. For display

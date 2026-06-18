@@ -387,6 +387,8 @@ class CustomerQuoteRepository extends Repository
                 'sku' => $item->sku,
                 'name' => $item->name,
                 'qty' => $line['qty'],
+                'discount_type' => $line['discount_type'],
+                'discount_value' => $line['discount_value'],
                 'price' => $negotiatedPrice,
                 'base_price' => core()->convertToBasePrice($negotiatedPrice, $baseCurrencyCode),
                 'total' => $negotiatedTotal,
