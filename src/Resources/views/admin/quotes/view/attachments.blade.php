@@ -1,12 +1,12 @@
-<x-admin::accordion>
-    <x-slot:header>
+<!-- Quote Attachments -->
+<div class="box-shadow rounded bg-white dark:bg-gray-900">
+    <div class="flex justify-between p-1.5">
         <p class="p-2.5 text-base font-semibold text-gray-800 dark:text-white">
             @lang('b2b::app.admin.quotes.view.quote-attachments')
         </p>
-    </x-slot>
+    </div>
 
-    <x-slot:content>
-        <div class="mt-4 flex flex-wrap gap-4">
+    <div class="flex flex-wrap gap-4 px-4 pb-4">
             @forelse ($quote->attachments as $attachment)
                 @if (Str::startsWith($attachment->mime_type, 'image/'))
                     <a href="{{ asset('storage/' . $attachment->path) }}" target="_blank" rel="noopener noreferrer" title="@lang('b2b::app.shop.customers.account.quotes.view.download')">
@@ -34,5 +34,5 @@
                 </div>
             @endforelse
         </div>
-    </x-slot:content>
-</x-admin::accordion>
+    </div>
+</div>

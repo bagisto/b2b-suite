@@ -41,33 +41,60 @@
         </div>
     </div>
 
-    <div class="mt-5 flex-wrap items-center justify-between gap-x-1 gap-y-2">
-        <!-- Quote details -->
-        <div class="mt-3.5 flex gap-2.5 max-xl:flex-wrap">
+    <div class="mt-5">
+        <!-- PO details: Information + Company side by side; stacks to one column below 1280px -->
+        <div class="b2b-view-columns mt-3.5">
             <!-- Left Component -->
-            <div class="flex flex-1 flex-col gap-2 max-xl:flex-auto">
+            <div class="flex flex-col gap-2">
                 {!! view_render_event('bagisto.admin.b2b.quote.left_component.before', ['quote' => $quote]) !!}
 
                 <!-- Quote Information -->
                 @include('b2b::admin.quotes.view.quote-information')
-
-                <!-- Quote Items -->
-                @include('b2b::admin.quotes.view.items')
             </div>
 
             <!-- Right Component -->
-            <div class="flex w-[525px] flex-col gap-2 max-sm:w-full">
+            <div class="flex flex-col gap-2">
                 {!! view_render_event('bagisto.admin.sales.order.right_component.before', ['quote' => $quote]) !!}
 
                 <!-- Company Information -->
                 @include('b2b::admin.quotes.view.company-information')
-
-                <!-- Quote Attachments -->
-                @include('b2b::admin.quotes.view.attachments')
             </div>
         </div>
-                
+
+        <!-- Order Items (full-width row) -->
+        <div class="mt-2 flex flex-col gap-2">
+            @include('b2b::admin.quotes.view.items')
+        </div>
+
+        <!-- Order Attachments (full-width row) -->
+        <div class="mt-2 flex flex-col gap-2">
+            @include('b2b::admin.quotes.view.attachments')
+        </div>
+
         <!-- Quote Messages -->
         @include('b2b::admin.quotes.view.messages', ['quote' => $quote])
     </div>
+
+    @pushOnce('styles')
+        <style>
+            /**
+             * Standardised two-column layout shared by the quote and purchase-order view
+             * pages: a single stacked column on smaller screens and a main + fixed side
+             * column from 1280px up. Defined here because the responsive width variants are
+             * purged out of the B2B admin bundle.
+             */
+            .b2b-view-columns {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr);
+                gap: 0.625rem;
+            }
+
+            @media (min-width: 1280px) {
+                .b2b-view-columns {
+                    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+                    align-items: start;
+                }
+            }
+        </style>
+    @endPushOnce
 </x-admin::layouts>

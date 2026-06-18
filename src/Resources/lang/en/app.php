@@ -628,6 +628,7 @@ return [
                 'created-at' => 'Created At',
                 'expiration-date' => 'Expiration Date',
                 'company-information' => 'Company Information',
+                'edit-company' => 'Edit Company',
                 'business-name' => 'Business Name',
                 'company-name' => 'Contact Name',
                 'company-email' => 'Email',

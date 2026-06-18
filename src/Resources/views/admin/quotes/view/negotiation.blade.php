@@ -43,16 +43,31 @@
             min-height: 0;
             overflow-y: auto;
         }
+
+        /* The trigger button lives inside the Vue template, so <v-quote-negotiation> is empty
+           until Vue mounts. The shimmer placeholder holds the button's space meanwhile; the
+           moment the component mounts (Vue fills or replaces the tag, so the :empty match is
+           gone) the placeholder is removed — no layout shift. */
+        .b2b-negotiation-slot:not(:has(v-quote-negotiation:empty)) .b2b-negotiation-shimmer {
+            display: none !important;
+        }
     </style>
 @endPushOnce
 
-<v-quote-negotiation
-    action="{{ route('admin.b2b.quotes.submit_quote', $quote->id) }}"
-    currency="{{ core()->currencySymbol(core()->getBaseCurrencyCode()) }}"
-    :items='@json($negotiationItems)'
-    total-discount-type="{{ $quote->discount_type ?: 'percent' }}"
-    total-discount-value="{{ $quote->discount_value !== null ? (float) $quote->discount_value : '' }}"
-></v-quote-negotiation>
+<div class="b2b-negotiation-slot" style="display: inline-flex;">
+    <span
+        class="b2b-negotiation-shimmer shimmer rounded-md"
+        style="display: inline-block; height: 40px; width: 170px;"
+    ></span>
+
+    <v-quote-negotiation
+        action="{{ route('admin.b2b.quotes.submit_quote', $quote->id) }}"
+        currency="{{ core()->currencySymbol(core()->getBaseCurrencyCode()) }}"
+        :items='@json($negotiationItems)'
+        total-discount-type="{{ $quote->discount_type ?: 'percent' }}"
+        total-discount-value="{{ $quote->discount_value !== null ? (float) $quote->discount_value : '' }}"
+    ></v-quote-negotiation>
+</div>
 
 @pushOnce('scripts')
     <script

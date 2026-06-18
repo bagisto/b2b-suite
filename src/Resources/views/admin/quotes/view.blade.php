@@ -58,6 +58,10 @@
         // author tells us who declined (drives which note the admin sees).
         $rejectedByAdmin = $quote->status === 'rejected'
             && optional($quote->messages()->orderByDesc('id')->first())->user_type === 'admin';
+
+        // Whether any action button renders, so the row reserves its height and the cards
+        // below do not shift down while the Vue-driven buttons mount.
+        $hasQuoteActions = ! $isOrderedOrCompletedOrRejected || $canAdminAccept || $canSendQuotation;
     @endphp
 
     <!-- Status note: the customer has accepted / rejected; the admin can still revise. -->
@@ -84,7 +88,10 @@
     @endif
 
     <!-- Quote Actions -->
-    <div class="mt-4 flex flex-wrap items-center justify-end gap-2.5">
+    <div
+        class="mt-4 flex flex-wrap items-center justify-end gap-2.5"
+        @if ($hasQuoteActions) style="min-height: 40px;" @endif
+    >
         @if (! $isOrderedOrCompletedOrRejected)
             <!-- Reject Quotation (kept less prominent than the primary action) -->
             @include('b2b::admin.quotes.view.partials.modal', [
@@ -110,11 +117,11 @@
         @endif
     </div>
 
-    <div class="mt-5 flex-wrap items-center justify-between gap-x-1 gap-y-2">
-        <!-- Quote details: Information + Company side by side -->
-        <div class="mt-3.5 flex gap-2.5 max-xl:flex-wrap">
+    <div class="mt-5">
+        <!-- Quote details: Information + Company side by side; stacks to one column below 1280px -->
+        <div class="b2b-view-columns mt-3.5">
             <!-- Left Component -->
-            <div class="flex flex-1 flex-col gap-2 max-xl:flex-auto">
+            <div class="flex flex-col gap-2">
                 {!! view_render_event('bagisto.admin.b2b.quote.left_component.before', ['quote' => $quote]) !!}
 
                 <!-- Quote Information -->
@@ -122,7 +129,7 @@
             </div>
 
             <!-- Right Component -->
-            <div class="flex w-[525px] flex-col gap-2 max-sm:w-full">
+            <div class="flex flex-col gap-2">
                 {!! view_render_event('bagisto.admin.sales.order.right_component.before', ['quote' => $quote]) !!}
 
                 <!-- Company Information -->
@@ -139,8 +146,31 @@
         <div class="mt-2 flex flex-col gap-2">
             @include('b2b::admin.quotes.view.attachments')
         </div>
-                
+
         <!-- Quote Messages -->
         @include('b2b::admin.quotes.view.messages', ['quote' => $quote])
     </div>
+
+    @pushOnce('styles')
+        <style>
+            /**
+             * Standardised two-column layout shared by the quote and purchase-order view
+             * pages: a single stacked column on smaller screens and a main + fixed side
+             * column from 1280px up. Defined here because the responsive width variants are
+             * purged out of the B2B admin bundle.
+             */
+            .b2b-view-columns {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr);
+                gap: 0.625rem;
+            }
+
+            @media (min-width: 1280px) {
+                .b2b-view-columns {
+                    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+                    align-items: start;
+                }
+            }
+        </style>
+    @endPushOnce
 </x-admin::layouts>
