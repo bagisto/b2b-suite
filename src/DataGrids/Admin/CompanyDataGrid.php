@@ -247,6 +247,20 @@ class CompanyDataGrid extends DataGrid
                     ],
                 ],
             ]);
+
+            $this->addMassAction([
+                'title' => trans('b2b::app.admin.companies.index.datagrid.assign-sales-rep'),
+                'method' => 'POST',
+                'url' => route('admin.b2b.companies.mass_assign_sales_rep'),
+                'options' => \Webkul\User\Models\AdminProxy::modelClass()::orderBy('name')
+                    ->get(['id', 'name'])
+                    ->map(fn ($admin) => [
+                        'label' => $admin->name,
+                        'value' => $admin->id,
+                    ])
+                    ->values()
+                    ->toArray(),
+            ]);
         }
 
         if (bouncer()->hasPermission('b2b.companies.delete')) {

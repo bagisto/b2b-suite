@@ -36,7 +36,7 @@
             <!-- Header -->
             <template #header="{ isLoading, available, applied, sort }">
                 <template v-if="isLoading">
-                    <x-shop::shimmer.datagrid.table.head />
+                    <x-b2b::shimmer.datagrid.dg.head />
                 </template>
 
                 <template v-else>
@@ -77,7 +77,7 @@
             <!-- Body -->
             <template #body="{ isLoading, available }">
                 <template v-if="isLoading">
-                    <x-shop::shimmer.datagrid.table.body />
+                    <x-b2b::shimmer.datagrid.dg.body />
                 </template>
 
                 <template v-else>

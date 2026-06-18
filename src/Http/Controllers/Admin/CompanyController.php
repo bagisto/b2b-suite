@@ -307,6 +307,26 @@ class CompanyController extends Controller
     }
 
     /**
+     * Mass-assign a sales representative to the selected companies.
+     */
+    public function massAssignSalesRep(MassUpdateRequest $massUpdateRequest): JsonResponse
+    {
+        $repId = (int) $massUpdateRequest->input('value');
+
+        $companies = $this->customerRepository->findWhereIn('id', $massUpdateRequest->input('indices'));
+
+        foreach ($companies as $company) {
+            abort_unless(Customer::repCanAccessCompany($company->id), 403);
+
+            $company->update(['sales_rep_id' => $repId ?: null]);
+        }
+
+        return new JsonResponse([
+            'message' => trans('b2b::app.admin.companies.mass-assign-sales-rep-success'),
+        ]);
+    }
+
+    /**
      * Remove the specified company from storage.
      */
     public function destroy($id)

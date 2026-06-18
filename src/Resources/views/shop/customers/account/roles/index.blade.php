@@ -70,7 +70,7 @@
                     performAction
                 }">
                     <template v-if="isLoading">
-                        <x-shop::shimmer.datagrid.table.body />
+                        <x-b2b::shimmer.datagrid.card.body />
                     </template>
     
                     <template v-else>

@@ -28,7 +28,7 @@
         <!-- Header -->
         <template #header="{ isLoading, available, applied, selectAll, sort }">
             <template v-if="isLoading">
-                <x-admin::shimmer.datagrid.table.head :isMultiRow="true" />
+                <x-b2b::shimmer.datagrid.company.head />
             </template>
 
             <template v-else>
@@ -85,7 +85,7 @@
         <!-- Body -->
         <template #body="{ isLoading, available, applied, performAction }">
             <template v-if="isLoading">
-                <x-admin::shimmer.datagrid.table.body :isMultiRow="true" />
+                <x-b2b::shimmer.datagrid.company.body />
             </template>
 
             <template v-else>

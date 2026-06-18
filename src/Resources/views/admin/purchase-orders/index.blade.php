@@ -24,7 +24,7 @@
             performAction
         }">
             <template v-if="isLoading">
-                <x-admin::shimmer.datagrid.table.head :isMultiRow="true" />
+                <x-b2b::shimmer.datagrid.dg.head />
             </template>
 
             <template v-else>
@@ -73,7 +73,7 @@
             performAction
         }">
             <template v-if="isLoading">
-                <x-admin::shimmer.datagrid.table.body :isMultiRow="true" />
+                <x-b2b::shimmer.datagrid.dg.body />
             </template>
 
             <template v-else>

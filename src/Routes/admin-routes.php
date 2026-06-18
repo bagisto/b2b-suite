@@ -61,6 +61,8 @@ Route::controller(CompanyController::class)->prefix('companies')->group(function
     Route::post('mass-delete', 'massDestroy')->name('admin.b2b.companies.mass_delete');
 
     Route::post('mass-update-status', 'massUpdateStatus')->name('admin.b2b.companies.mass_update_status');
+
+    Route::post('mass-assign-sales-rep', 'massAssignSalesRep')->name('admin.b2b.companies.mass_assign_sales_rep');
 });
 
 /**

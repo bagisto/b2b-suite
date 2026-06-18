@@ -42,8 +42,6 @@
         <div class="mt-3.5 flex gap-2.5 max-xl:flex-wrap">
             <!-- Left Column -->
             <div class="flex flex-1 flex-col gap-2 overflow-auto max-xl:flex-auto">
-                @include('b2b::admin.companies.sales-rep', ['admins' => $admins, 'company' => $company])
-
                 @foreach($attributeGroups->where('column', 1) as $group)
                     <x-admin::accordion>
                         <x-slot:header>
@@ -63,15 +61,17 @@
 
             <!-- Right Column -->
             <div class="flex w-[360px] max-w-full flex-col gap-2">
-                <!-- Approval / Status -->
+                <!-- Sales Rep & Approval -->
                 <x-admin::accordion>
                     <x-slot:header>
                         <p class="p-2.5 text-base font-semibold text-gray-800 dark:text-white">
-                            @lang('b2b::app.admin.companies.edit.approval-status')
+                            @lang('b2b::app.admin.companies.edit.sales-rep-approval')
                         </p>
                     </x-slot>
 
                     <x-slot:content>
+                        @include('b2b::admin.companies.sales-rep', ['admins' => $admins, 'company' => $company])
+
                         <x-admin::form.control-group>
                             <x-admin::form.control-group.label>
                                 @lang('b2b::app.admin.companies.edit.status')
