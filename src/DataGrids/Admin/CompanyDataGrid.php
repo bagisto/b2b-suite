@@ -4,6 +4,7 @@ namespace Webkul\B2BSuite\DataGrids\Admin;
 
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
+use Webkul\B2BSuite\Models\Customer;
 use Webkul\DataGrid\DataGrid;
 
 class CompanyDataGrid extends DataGrid
@@ -30,6 +31,7 @@ class CompanyDataGrid extends DataGrid
         $queryBuilder = DB::table('company_flat')
             ->distinct()
             ->leftJoin('customers', 'company_flat.customer_id', '=', 'customers.id')
+            ->leftJoin('admins as sales_rep', 'customers.sales_rep_id', '=', 'sales_rep.id')
             ->select(
                 'company_flat.customer_id',
                 'company_flat.email',
@@ -37,6 +39,7 @@ class CompanyDataGrid extends DataGrid
                 'company_flat.business_name',
                 'company_flat.website_url',
                 'company_flat.vat_tax_id',
+                'sales_rep.name as sales_rep_name',
                 'customers.status',
                 'company_flat.created_at',
                 'company_flat.updated_at'
@@ -52,7 +55,13 @@ class CompanyDataGrid extends DataGrid
         $this->addFilter('business_name', 'company_flat.business_name');
         $this->addFilter('website_url', 'company_flat.website_url');
         $this->addFilter('vat_tax_id', 'company_flat.vat_tax_id');
+        $this->addFilter('sales_rep_name', 'sales_rep.name');
         $this->addFilter('status', 'customers.status');
+
+        // A sales rep only sees the companies they manage; super-admins see all.
+        if ($repId = Customer::salesRepScopeId()) {
+            $queryBuilder->where('customers.sales_rep_id', $repId);
+        }
 
         return $queryBuilder;
     }
@@ -121,6 +130,15 @@ class CompanyDataGrid extends DataGrid
         $this->addColumn([
             'index' => 'vat_tax_id',
             'label' => trans('b2b::app.admin.companies.index.datagrid.vat-tax-id'),
+            'type' => 'string',
+            'searchable' => true,
+            'filterable' => true,
+            'sortable' => true,
+        ]);
+
+        $this->addColumn([
+            'index' => 'sales_rep_name',
+            'label' => trans('b2b::app.admin.companies.index.datagrid.sales-representative'),
             'type' => 'string',
             'searchable' => true,
             'filterable' => true,

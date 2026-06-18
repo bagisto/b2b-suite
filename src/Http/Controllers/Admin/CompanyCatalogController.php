@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Webkul\Admin\Http\Controllers\Controller;
 use Webkul\B2BSuite\DataGrids\Admin\CompanyCatalogDataGrid;
 use Webkul\B2BSuite\Helpers\CompanyCatalog as CompanyCatalogHelper;
+use Webkul\B2BSuite\Models\Customer;
 use Webkul\B2BSuite\Repositories\CompanyCatalogRepository;
 use Webkul\Product\Repositories\ProductRepository;
 
@@ -52,6 +53,7 @@ class CompanyCatalogController extends Controller
             'name' => request('name'),
             'description' => request('description'),
             'status' => request('status') !== null ? (int) (bool) request('status') : 1,
+            'created_by' => auth()->guard('admin')->user()->id,
         ]);
 
         // Provision the backing customer group so the catalog is ready to price products.
@@ -69,6 +71,8 @@ class CompanyCatalogController extends Controller
     public function edit($id)
     {
         $catalog = $this->companyCatalogRepository->findOrFail($id);
+
+        abort_unless(Customer::repCanAccessCatalog((int) $id), 403);
 
         $products = $this->prepareProducts($catalog);
 
@@ -89,7 +93,10 @@ class CompanyCatalogController extends Controller
             ];
         })->values();
 
-        return view('b2b::admin.company-catalogs.edit', compact('catalog', 'products', 'companies'));
+        // Viewers who are not the creator (and not super-admin) get a read-only form.
+        $canEdit = Customer::repCanEditCatalog((int) $id);
+
+        return view('b2b::admin.company-catalogs.edit', compact('catalog', 'products', 'companies', 'canEdit'));
     }
 
     /**
@@ -103,11 +110,14 @@ class CompanyCatalogController extends Controller
 
         $order = request('order') === 'desc' ? 'desc' : 'asc';
 
+        $repId = Customer::salesRepScopeId();
+
         $companies = DB::table('company_flat')
             ->leftJoin('customers', 'company_flat.customer_id', '=', 'customers.id')
             ->leftJoin('company_catalogs', 'customers.company_catalog_id', '=', 'company_catalogs.id')
             ->where('customers.type', 'company')
             ->where('company_flat.locale', app()->getLocale())
+            ->when($repId, fn ($builder) => $builder->where('customers.sales_rep_id', $repId))
             ->when($query !== '', function ($builder) use ($query) {
                 $builder->where(function ($sub) use ($query) {
                     $sub->where('company_flat.business_name', 'like', '%'.$query.'%')
@@ -187,6 +197,8 @@ class CompanyCatalogController extends Controller
      */
     public function update($id)
     {
+        abort_unless(Customer::repCanEditCatalog((int) $id), 403, trans('b2b::app.admin.company-catalogs.not-owner'));
+
         $this->validateRelations();
 
         $catalog = $this->companyCatalogRepository->findOrFail($id);
@@ -206,6 +218,8 @@ class CompanyCatalogController extends Controller
      */
     public function updateSettings($id)
     {
+        abort_unless(Customer::repCanEditCatalog((int) $id), 403, trans('b2b::app.admin.company-catalogs.not-owner'));
+
         $this->validateSettings();
 
         $this->companyCatalogRepository->update([
@@ -224,6 +238,8 @@ class CompanyCatalogController extends Controller
      */
     public function destroy($id)
     {
+        abort_unless(Customer::repCanEditCatalog((int) $id), 403, trans('b2b::app.admin.company-catalogs.not-owner'));
+
         $catalog = $this->companyCatalogRepository->findOrFail($id);
 
         try {

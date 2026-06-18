@@ -13,9 +13,9 @@ use Webkul\Admin\Http\Requests\MassUpdateRequest;
 use Webkul\Admin\Http\Resources\CartResource;
 use Webkul\B2BSuite\DataGrids\Admin\CustomerQuoteDataGrid;
 use Webkul\B2BSuite\Http\Requests\QuoteRequest;
+use Webkul\B2BSuite\Models\Customer;
 use Webkul\B2BSuite\Models\CustomerQuote;
 use Webkul\B2BSuite\Repositories\CustomerQuoteMessageRepository;
-use Webkul\B2BSuite\Repositories\CustomerQuoteQuotationRepository;
 use Webkul\B2BSuite\Repositories\CustomerQuoteRepository;
 use Webkul\Checkout\Repositories\CartRepository;
 use Webkul\Customer\Repositories\CustomerGroupRepository;
@@ -31,9 +31,17 @@ class QuoteController extends Controller
         protected CustomerRepository $customerRepository,
         protected CustomerQuoteRepository $customerQuoteRepository,
         protected CustomerQuoteMessageRepository $customerQuoteMessageRepository,
-        protected CustomerQuoteQuotationRepository $customerQuoteQuotationRepository,
         protected CustomerGroupRepository $customerGroupRepository
     ) {}
+
+    /**
+     * Abort with 403 when the current admin (a sales rep) may not access this quote's
+     * company. Guards direct-URL access that datagrid scoping does not cover.
+     */
+    protected function authorizeQuoteAccess($quote): void
+    {
+        abort_unless(Customer::repCanAccessCompany($quote?->company_id), 403);
+    }
 
     /**
      * Display a listing of the resource.
@@ -104,7 +112,7 @@ class QuoteController extends Controller
 
         $customer = $cart->customer;
 
-        $company = $company ? $company->id : $customer->companies->first()->id;
+        $company = $company ?: $customer->companies->first();
 
         $quoteNumber = $this->customerQuoteRepository->generateQuotationNumber(null);
 
@@ -112,8 +120,8 @@ class QuoteController extends Controller
             'quotation_number' => $quoteNumber['quotation_number'],
             'po_number' => $quoteNumber['po_number'],
             'customer_id' => $customer->id,
-            'company_id' => $company,
-            'agent_id' => auth()->guard('admin')->user()->id,
+            'company_id' => $company?->id,
+            'agent_id' => $company?->sales_rep_id ?? auth()->guard('admin')->user()->id,
             'customer_name' => $customer->name,
             'cart' => $cart,
         ], $quoteRequest->only([
@@ -143,7 +151,11 @@ class QuoteController extends Controller
      */
     public function view(int $id)
     {
-        $quote = $this->customerQuoteRepository->findOrFail($id);
+        $quote = $this->customerQuoteRepository
+            ->with(['company', 'company.salesRep', 'company.company_flats'])
+            ->findOrFail($id);
+
+        $this->authorizeQuoteAccess($quote);
 
         return view('b2b::admin.quotes.view', compact('quote'));
     }
@@ -157,6 +169,8 @@ class QuoteController extends Controller
     public function getMessages($id, Request $request)
     {
         $quote = $this->customerQuoteRepository->findOrFail($id);
+
+        $this->authorizeQuoteAccess($quote);
 
         $query = $quote->messages()
             ->with('quotations', 'quotations.item');
@@ -186,6 +200,8 @@ class QuoteController extends Controller
             ]);
 
             $quote = $this->customerQuoteRepository->findOrFail($id);
+
+            $this->authorizeQuoteAccess($quote);
 
             if ($quote->status === CustomerQuote::STATUS_OPEN) {
                 $quote->status = CustomerQuote::STATUS_NEGOTIATION;
@@ -241,6 +257,8 @@ class QuoteController extends Controller
 
             $quote = $this->customerQuoteRepository->findOrFail($id);
 
+            $this->authorizeQuoteAccess($quote);
+
             $message = $quote->messages()->create([
                 'message' => $request->message,
                 'user_type' => 'admin',
@@ -249,12 +267,13 @@ class QuoteController extends Controller
             ]);
 
             /**
-             * Sending a quotation is the admin's final, approved offer: the quote moves
-             * straight to "accepted" so the buyer can add the negotiated items to the cart
-             * without a separate approval step. (The buyer can still reject it.)
+             * Sending a quotation is a counter-offer, not a final sale: the quote moves to
+             * "negotiation" and the thread stays open. The buyer reviews the offer and either
+             * keeps negotiating, rejects it, or accepts it — accepting adds the negotiated
+             * items straight to their cart.
              */
             $data = array_merge([
-                'status' => CustomerQuote::STATUS_ACCEPTED,
+                'status' => CustomerQuote::STATUS_NEGOTIATION,
                 'message_id' => $message->id,
             ], $request->only([
                 'items',
@@ -265,21 +284,6 @@ class QuoteController extends Controller
             ]));
 
             $this->customerQuoteRepository->createOrUpdateMessageQuotation($data, $id);
-
-            /**
-             * Mark this quotation snapshot as accepted on the admin's behalf so the buyer's
-             * thread reflects the offer as finalised, mirroring the customer-accept path.
-             */
-            $this->customerQuoteQuotationRepository->updateOrCreate(
-                [
-                    'message_id' => $message->id,
-                    'quote_id' => $id,
-                ],
-                [
-                    'is_accepted' => 1,
-                    'accepted_by' => 'admin',
-                ]
-            );
 
             return redirect()->route('admin.b2b.quotes.view', $id)
                 ->with('success', trans('b2b::app.admin.quotes.view.quote-submitted'));
@@ -302,6 +306,8 @@ class QuoteController extends Controller
             ]);
 
             $quote = $this->customerQuoteRepository->findOrFail($id);
+
+            $this->authorizeQuoteAccess($quote);
 
             if (in_array($quote->status, [CustomerQuote::STATUS_COMPLETED, CustomerQuote::STATUS_REJECTED])) {
                 session()->flash('error', trans('b2b::app.admin.quotes.view.un-authorized-quote'));
@@ -338,6 +344,8 @@ class QuoteController extends Controller
      */
     public function update(QuoteRequest $request, int $id)
     {
+        $this->authorizeQuoteAccess($this->customerQuoteRepository->findOrFail($id));
+
         Event::dispatch('b2b.quote.update.before', $id);
 
         $data = $request->only([
@@ -370,6 +378,8 @@ class QuoteController extends Controller
     {
         $quote = $this->customerQuoteRepository->findOrFail($id);
 
+        $this->authorizeQuoteAccess($quote);
+
         try {
             Event::dispatch('b2b.quote.delete.before', $id);
 
@@ -397,6 +407,8 @@ class QuoteController extends Controller
 
         try {
             foreach ($indices as $index) {
+                $this->authorizeQuoteAccess($this->customerQuoteRepository->findOrFail($index));
+
                 Event::dispatch('b2b.quote.delete.before', $index);
 
                 $this->customerQuoteRepository->delete($index);
@@ -428,6 +440,8 @@ class QuoteController extends Controller
                 Event::dispatch('b2b.quotes.mass-update.before', $quoteId);
 
                 $quote = $this->customerQuoteRepository->find($quoteId);
+
+                $this->authorizeQuoteAccess($quote);
 
                 $quote->status = $massUpdateRequest->input('value');
 

@@ -14,7 +14,7 @@
                 </p>
 
                 <!-- Order Status -->
-                <span class="label-pending mx-1.5 text-sm">
+                <span class="{{ \Webkul\B2BSuite\Models\CustomerQuote::statusLabelClass($quote->status) }} mx-1.5 text-sm">
                     @lang("b2b::app.admin.quotes.view.$quote->status")
                 </span>
             </div>
@@ -48,7 +48,35 @@
         // quotation has been sent/accepted (until it is ordered, completed or rejected).
         $canSendQuotation = in_array($quote->status, ['open', 'negotiation', 'rejected', 'accepted']);
         $isOrderedOrCompletedOrRejected = in_array($quote->status, ['ordered', 'completed', 'rejected']);
+
+        // A quote can be rejected by either side; the rejection is the last message, so its
+        // author tells us who declined (drives which note the admin sees).
+        $rejectedByAdmin = $quote->status === 'rejected'
+            && optional($quote->messages()->orderByDesc('id')->first())->user_type === 'admin';
     @endphp
+
+    <!-- Status note: the customer has accepted / rejected; the admin can still revise. -->
+    @if ($quote->status === 'accepted')
+        <div
+            class="mt-4 flex items-start gap-2 rounded-lg p-3"
+            style="background-color: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.25);"
+        >
+            <span class="icon-information shrink-0 text-xl" style="color: #16a34a;"></span>
+            <p class="text-sm text-gray-700 dark:text-gray-200">
+                @lang('b2b::app.admin.quotes.view.customer-accepted-note')
+            </p>
+        </div>
+    @elseif ($quote->status === 'rejected')
+        <div
+            class="mt-4 flex items-start gap-2 rounded-lg p-3"
+            style="background-color: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25);"
+        >
+            <span class="icon-information shrink-0 text-xl" style="color: #f59e0b;"></span>
+            <p class="text-sm text-gray-700 dark:text-gray-200">
+                @lang('b2b::app.admin.quotes.view.'.($rejectedByAdmin ? 'admin-rejected-note' : 'customer-rejected-note'))
+            </p>
+        </div>
+    @endif
 
     <!-- Quote Actions -->
     <div class="mt-4 flex flex-wrap items-center justify-end gap-2.5">

@@ -44,7 +44,7 @@
                         <div
                             class="flex select-none items-center gap-2.5"
                             :class="{ 'b2b-dg-divider': index > 0 }"
-                            v-for="(columnGroup, index) in [['po_number', 'name', 'status'], ['company_name', 'created_at'], ['base_total', 'negotiated_total'], []]"
+                            v-for="(columnGroup, index) in [['po_number', 'name', 'status'], ['customer_name', 'created_at'], ['base_total', 'negotiated_total'], []]"
                         >
                             <p class="text-zinc-600">
                                 <span class="[&>*]:after:content-['_/_']">
@@ -99,11 +99,11 @@
                             <div v-html="record.status"></div>
                         </div>
 
-                        <!-- Company, Created At -->
+                        <!-- Customer, Created At -->
                         <div class="b2b-dg-divider flex flex-col gap-3">
                             <div class="flex flex-col gap-0.5">
-                                <span class="text-xs uppercase tracking-wide text-zinc-400">@lang('b2b::app.shop.customers.account.quotes.index.datagrid.company')</span>
-                                <p class="break-words text-sm font-medium text-zinc-800">@{{ record.company_name || '—' }}</p>
+                                <span class="text-xs uppercase tracking-wide text-zinc-400">@lang('b2b::app.shop.customers.account.quotes.index.datagrid.customer')</span>
+                                <p class="break-words text-sm font-medium text-zinc-800">@{{ record.customer_name || '—' }}</p>
                             </div>
 
                             <div class="flex flex-col gap-0.5">

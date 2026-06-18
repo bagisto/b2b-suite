@@ -3,6 +3,7 @@
 namespace Webkul\B2BSuite\DataGrids\Admin;
 
 use Illuminate\Support\Facades\DB;
+use Webkul\B2BSuite\Models\Customer;
 use Webkul\B2BSuite\Models\CustomerQuote;
 use Webkul\B2BSuite\Repositories\CustomerQuoteRepository;
 use Webkul\DataGrid\DataGrid;
@@ -27,7 +28,7 @@ class CustomerQuoteDataGrid extends DataGrid
             ->distinct()
             ->leftJoin('customers as company', 'customer_quotes.company_id', '=', 'company.id')
             ->leftJoin('customers as customer', 'customer_quotes.customer_id', '=', 'customer.id')
-            ->leftJoin('admins as agent', 'customer_quotes.agent_id', '=', 'agent.id')
+            ->leftJoin('admins as agent', 'company.sales_rep_id', '=', 'agent.id')
             ->leftJoin('company_flat', function ($join) {
                 $join->on('customer_quotes.company_id', '=', 'company_flat.customer_id')
                     ->where('company_flat.locale', '=', app()->getLocale());
@@ -75,6 +76,11 @@ class CustomerQuoteDataGrid extends DataGrid
         $this->addFilter('created_at', 'customer_quotes.created_at');
         $this->addFilter('expiration_date', 'customer_quotes.expiration_date');
 
+        // A sales rep only sees quotes for the companies they manage; super-admins see all.
+        if ($repId = Customer::salesRepScopeId()) {
+            $queryBuilder->where('company.sales_rep_id', $repId);
+        }
+
         return $queryBuilder;
     }
 
@@ -121,7 +127,7 @@ class CustomerQuoteDataGrid extends DataGrid
 
         $this->addColumn([
             'index' => 'agent_name',
-            'label' => trans('b2b::app.admin.quotes.index.datagrid.agent'),
+            'label' => trans('b2b::app.admin.quotes.index.datagrid.sales-representative'),
             'type' => 'string',
             'searchable' => true,
             'filterable' => true,
@@ -191,37 +197,13 @@ class CustomerQuoteDataGrid extends DataGrid
             ],
             'sortable' => true,
             'closure' => function ($row) {
-                $html = '';
+                $deleted = $row->soft_deleted
+                    ? '<p class="label-canceled">'.trans('b2b::app.admin.quotes.index.datagrid.deleted').'</p>'
+                    : '';
 
-                if ($row->soft_deleted) {
-                    $html = '<p class="label-canceled">'.trans('b2b::app.admin.quotes.index.datagrid.deleted').'</p>';
-                }
+                $label = trans('b2b::app.admin.quotes.index.datagrid.'.$row->status);
 
-                switch ($row->status) {
-                    case CustomerQuote::STATUS_DRAFT:
-                        return '<div class="flex flex-row gap-1"><p class="label-info">'.trans('b2b::app.admin.quotes.index.datagrid.draft').'</p>'.$html.'</div>';
-
-                    case CustomerQuote::STATUS_OPEN:
-                        return '<div class="flex flex-row gap-1"><p class="label-pending">'.trans('b2b::app.admin.quotes.index.datagrid.open').'</p>'.$html.'</div>';
-
-                    case CustomerQuote::STATUS_ACCEPTED:
-                        return '<div class="flex flex-row gap-1"><p class="label-processing">'.trans('b2b::app.admin.quotes.index.datagrid.accepted').'</p>'.$html.'</div>';
-
-                    case CustomerQuote::STATUS_NEGOTIATION:
-                        return '<div class="flex flex-row gap-1"><p class="label-closed">'.trans('b2b::app.admin.quotes.index.datagrid.negotiation').'</p>'.$html.'</div>';
-
-                    case CustomerQuote::STATUS_EXPIRED:
-                        return '<div class="flex flex-row gap-1"><p class="label-canceled">'.trans('b2b::app.admin.quotes.index.datagrid.expired').'</p>'.$html.'</div>';
-
-                    case CustomerQuote::STATUS_REJECTED:
-                        return '<div class="flex flex-row gap-1"><p class="label-canceled">'.trans('b2b::app.admin.quotes.index.datagrid.rejected').'</p>'.$html.'</div>';
-
-                    case CustomerQuote::STATUS_ORDERED:
-                        return '<div class="flex flex-row gap-1"><p class="label-completed">'.trans('b2b::app.admin.quotes.index.datagrid.ordered').'</p>'.$html.'</div>';
-
-                    case CustomerQuote::STATUS_COMPLETED:
-                        return '<div class="flex flex-row gap-1"><p class="label-active">'.trans('b2b::app.admin.quotes.index.datagrid.completed').'</p>'.$html.'</div>';
-                }
+                return '<div class="flex flex-row gap-1"><p class="'.CustomerQuote::statusLabelClass($row->status).'">'.$label.'</p>'.$deleted.'</div>';
             },
         ]);
 

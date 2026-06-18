@@ -36,6 +36,7 @@ class CompanyCatalog extends Model implements CompanyCatalogContract
         'description',
         'status',
         'customer_group_id',
+        'created_by',
     ];
 
     /**

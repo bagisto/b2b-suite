@@ -42,6 +42,8 @@
         <div class="mt-3.5 flex gap-2.5 max-xl:flex-wrap">
             <!-- Left Column -->
             <div class="flex flex-1 flex-col gap-2 overflow-auto max-xl:flex-auto">
+                @include('b2b::admin.companies.sales-rep', ['admins' => $admins, 'company' => $company])
+
                 @foreach($attributeGroups->where('column', 1) as $group)
                     <x-admin::accordion>
                         <x-slot:header>

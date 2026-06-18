@@ -21,6 +21,7 @@ class EventServiceProvider extends ServiceProvider
          */
         'customer.registration.after' => [
             [Company::class, 'afterUpdate'],
+            [Company::class, 'provisionCompanyCredit'],
         ],
         'customer.update.after' => [
             [Company::class, 'afterUpdate'],

@@ -3,6 +3,7 @@
 namespace Webkul\B2BSuite\Listeners;
 
 use Webkul\B2BSuite\Helpers\CompanyCatalog;
+use Webkul\B2BSuite\Helpers\CreditManager;
 use Webkul\B2BSuite\Helpers\FlatIndexer;
 use Webkul\Customer\Contracts\Customer;
 use Webkul\Customer\Models\CustomerProxy;
@@ -17,7 +18,29 @@ class Company
     public function __construct(
         protected FlatIndexer $flatIndexer,
         protected CompanyCatalog $companyCatalog,
+        protected CreditManager $creditManager,
     ) {}
+
+    /**
+     * Provision a (disabled, zero-limit) company credit account when a company is created
+     * from the admin or registered from the storefront. The admin enables it and sets a
+     * limit later from the Company Credit settings.
+     *
+     * @param  Customer  $customer
+     * @return void
+     */
+    public function provisionCompanyCredit($customer)
+    {
+        if (! (bool) core()->getConfigData('b2b.general.settings.active')) {
+            return;
+        }
+
+        if (($customer->type ?? null) !== 'company') {
+            return;
+        }
+
+        $this->creditManager->getOrCreate($customer->id);
+    }
 
     /**
      * Update or create customer indices

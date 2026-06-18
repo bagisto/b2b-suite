@@ -47,7 +47,7 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
                 'customer_quotes.created_at',
                 'customer_quotes.updated_at'
             )
-            ->addSelect(DB::raw('CONCAT('.$tablePrefix.'company.first_name, " ", '.$tablePrefix.'company.last_name) as company_name'))
+            ->addSelect(DB::raw('CONCAT('.$tablePrefix.'customer.first_name, " ", '.$tablePrefix.'customer.last_name) as customer_name'))
             ->where('customer_quotes.soft_deleted', 0)
             ->where('customer_quotes.state', CustomerQuote::STATE_PURCHASE_ORDER)
             ->whereIn('customer_quotes.status', [
@@ -62,7 +62,7 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
         $this->addFilter('status', 'customer_quotes.status');
         $this->addFilter('base_total', 'customer_quotes.base_total');
         $this->addFilter('negotiated_total', 'customer_quotes.negotiated_total');
-        $this->addFilter('company_name', DB::raw('CONCAT('.$tablePrefix.'company.first_name, " ", '.$tablePrefix.'company.last_name)'));
+        $this->addFilter('customer_name', DB::raw('CONCAT('.$tablePrefix.'customer.first_name, " ", '.$tablePrefix.'customer.last_name)'));
         $this->addFilter('created_at', 'customer_quotes.created_at');
 
         return $queryBuilder;
@@ -92,8 +92,8 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
         ]);
 
         $this->addColumn([
-            'index' => 'company_name',
-            'label' => trans('b2b::app.shop.customers.account.quotes.index.datagrid.company'),
+            'index' => 'customer_name',
+            'label' => trans('b2b::app.shop.customers.account.quotes.index.datagrid.customer'),
             'type' => 'string',
             'searchable' => true,
             'filterable' => true,
@@ -141,13 +141,10 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
             ],
             'sortable' => true,
             'closure' => function ($row) {
-                switch ($row->status) {
-                    case CustomerQuote::STATUS_ORDERED:
-                        return '<p class="label-active">'.trans('b2b::app.shop.customers.account.quotes.index.datagrid.ordered').'</p>';
-
-                    case CustomerQuote::STATUS_COMPLETED:
-                        return '<p class="label-completed">'.trans('b2b::app.shop.customers.account.quotes.index.datagrid.completed').'</p>';
-                }
+                return CustomerQuote::statusBadge(
+                    $row->status,
+                    trans('b2b::app.shop.customers.account.quotes.index.datagrid.'.$row->status)
+                );
             },
         ]);
 

@@ -60,6 +60,7 @@ class CompanyRequest extends FormRequest
                 new PhoneNumber,
                 Rule::unique('customers', 'phone')->ignore($customerId),
             ],
+            'sales_rep_id' => ['nullable', 'exists:admins,id'],
         ];
 
         if (

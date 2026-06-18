@@ -3,6 +3,13 @@
         @lang('b2b::app.admin.company-catalogs.index.title')
     </x-slot>
 
+    @php
+        // A catalog is editable only by its creator or a super-admin; everyone else gets a
+        // view-only (eye) action that opens the read-only form.
+        $currentAdminId = auth()->guard('admin')->user()->id;
+        $isSuperAdmin   = optional(auth()->guard('admin')->user()->role)->permission_type === 'all';
+    @endphp
+
     <div class="flex items-center justify-between gap-4 max-sm:flex-wrap">
         <!-- Title -->
         <p class="text-xl font-bold text-gray-800 dark:text-white">
@@ -113,21 +120,32 @@
 
                     <!-- Actions -->
                     <div class="b2b-dg-divider flex items-start justify-end gap-1.5">
-                        <!-- Update general settings (modal) -->
-                        <span
-                            class="icon-settings grid h-9 w-9 cursor-pointer place-items-center rounded-md border border-gray-200 text-gray-600 transition-all hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
-                            title="@lang('b2b::app.admin.company-catalogs.settings.edit-settings')"
-                            @click="$emitter.emit('open-catalog-settings', record)"
-                        ></span>
-
-                        <template v-for="action in record.actions">
+                        <!-- Creator / super-admin: full controls (settings + edit + delete) -->
+                        <template v-if="{{ $isSuperAdmin ? 'true' : 'false' }} || record.created_by == {{ $currentAdminId }}">
+                            <!-- Update general settings (modal) -->
                             <span
-                                class="grid h-9 w-9 cursor-pointer place-items-center rounded-md border border-gray-200 text-gray-600 transition-all hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
-                                :class="action.icon"
-                                :title="action.title"
-                                @click="performAction(action)"
+                                class="icon-settings grid h-9 w-9 cursor-pointer place-items-center rounded-md border border-gray-200 text-gray-600 transition-all hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+                                title="@lang('b2b::app.admin.company-catalogs.settings.edit-settings')"
+                                @click="$emitter.emit('open-catalog-settings', record)"
                             ></span>
+
+                            <template v-for="action in record.actions">
+                                <span
+                                    class="grid h-9 w-9 cursor-pointer place-items-center rounded-md border border-gray-200 text-gray-600 transition-all hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+                                    :class="action.icon"
+                                    :title="action.title"
+                                    @click="performAction(action)"
+                                ></span>
+                            </template>
                         </template>
+
+                        <!-- Other admins: read-only view of the shared catalog -->
+                        <a
+                            v-else
+                            :href="'{{ route('admin.b2b.company_catalogs.edit', 'ID_PLACEHOLDER') }}'.replace('ID_PLACEHOLDER', record.id)"
+                            class="icon-view grid h-9 w-9 cursor-pointer place-items-center rounded-md border border-gray-200 text-gray-600 transition-all hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+                            title="@lang('b2b::app.admin.company-catalogs.index.datagrid.view')"
+                        ></a>
                     </div>
                 </div>
             </template>

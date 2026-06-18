@@ -52,7 +52,7 @@
                     <div
                         class="flex select-none items-center gap-2.5"
                         :class="{ 'b2b-company-divider': index > 0 }"
-                        v-for="(columnGroup, index) in [['business_name', 'full_name', 'status'], ['email', 'phone'], ['vat_tax_id', 'created_at'], []]"
+                        v-for="(columnGroup, index) in [['business_name', 'full_name', 'status'], ['email', 'phone'], ['vat_tax_id', 'sales_rep_name', 'created_at'], []]"
                     >
                         <p class="text-gray-600 dark:text-gray-300">
                             <span class="[&>*]:after:content-['_/_']">
@@ -149,6 +149,13 @@
                                 @lang('b2b::app.admin.companies.index.datagrid.vat-tax-id')
                             </span>
                             <p class="break-words text-sm text-gray-700 dark:text-gray-200">@{{ record.vat_tax_id || '—' }}</p>
+                        </div>
+
+                        <div class="flex flex-col gap-0.5">
+                            <span class="text-xs uppercase tracking-wide text-gray-400 dark:text-gray-500">
+                                @lang('b2b::app.admin.companies.index.datagrid.sales-representative')
+                            </span>
+                            <p class="break-words text-sm text-gray-700 dark:text-gray-200">@{{ record.sales_rep_name || '—' }}</p>
                         </div>
 
                         <div class="flex flex-col gap-0.5">

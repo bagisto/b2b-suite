@@ -23,8 +23,6 @@
             $isDraft = $quote->state === 'quotation' && $quote->status === 'draft';
             $isDraftOrCompletedStatus = in_array($quote->status, ['draft', 'purchase_order', 'expired', 'completed', 'accepted', 'rejected', 'ordered']);
             $isOpenOrNegotiation = in_array($quote->status, ['open', 'negotiation']);
-            $canCustomerApprove = (bool) core()->getConfigData('b2b.quotes.settings.can_customer_approve_quote');
-            $isNegotiation = $quote->state === 'quotation' && $quote->status === 'negotiation';
             $isOrderedOrRejected = in_array($quote->status, ['draft', 'ordered', 'completed', 'rejected']);
         @endphp
 
@@ -87,15 +85,6 @@
                         ])
                     @endif
 
-                    @if ($canCustomerApprove && $isAdminLastQuotation && $isNegotiation)
-                        <!-- Accept Quote -->
-                        @include('b2b::shop.customers.account.quotes.view.partials.modal', [
-                            'action'      => 'accept',
-                            'buttonText'  => 'btn-accept-quote',
-                            'buttonClass' => 'secondary-button',
-                        ])
-                    @endif
-
                     @if (! $isOrderedOrRejected)
                         <!-- Reject Quote -->
                         @include('b2b::shop.customers.account.quotes.view.partials.modal', [
@@ -111,7 +100,7 @@
         @include('b2b::shop.customers.account.quotes.view.index', ['quote' => $quote])
 
         <!-- Quote Items -->
-        @include('b2b::shop.customers.account.quotes.view.items', ['quote' => $quote])
+        @include('b2b::shop.customers.account.quotes.view.items', ['quote' => $quote, 'isAdminLastQuotation' => $isAdminLastQuotation])
 
         <!-- Quote Attachments -->
         @include('b2b::shop.customers.account.quotes.view.attachments', ['quote' => $quote])

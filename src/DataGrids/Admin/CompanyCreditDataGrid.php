@@ -3,6 +3,7 @@
 namespace Webkul\B2BSuite\DataGrids\Admin;
 
 use Illuminate\Support\Facades\DB;
+use Webkul\B2BSuite\Models\Customer;
 use Webkul\DataGrid\DataGrid;
 
 class CompanyCreditDataGrid extends DataGrid
@@ -47,6 +48,11 @@ class CompanyCreditDataGrid extends DataGrid
         $this->addFilter('outstanding_balance', 'company_credits.outstanding_balance');
         $this->addFilter('available_credit', DB::raw($available));
         $this->addFilter('status', 'company_credits.status');
+
+        // A sales rep only sees credit for the companies they manage; super-admins see all.
+        if ($repId = Customer::salesRepScopeId()) {
+            $queryBuilder->where('customers.sales_rep_id', $repId);
+        }
 
         return $queryBuilder;
     }

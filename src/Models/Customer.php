@@ -35,6 +35,7 @@ class Customer extends BaseCustomer
         'type',
         'company_role_id',
         'company_catalog_id',
+        'sales_rep_id',
     ];
 
     /**
@@ -52,6 +53,96 @@ class Customer extends BaseCustomer
     public function companyCatalog(): BelongsTo
     {
         return $this->belongsTo(CompanyCatalogProxy::modelClass(), 'company_catalog_id');
+    }
+
+    /**
+     * The admin user assigned as the company's sales representative / account manager.
+     */
+    public function salesRep(): BelongsTo
+    {
+        return $this->belongsTo(\Webkul\User\Models\AdminProxy::modelClass(), 'sales_rep_id');
+    }
+
+    /**
+     * The admin id that a non-super-admin (a sales rep) should be scoped to — they only
+     * see data for companies they manage. Returns null for super-admins (role
+     * permission_type "all") and when unauthenticated, meaning "no scoping / see all".
+     */
+    public static function salesRepScopeId(): ?int
+    {
+        $admin = auth()->guard('admin')->user();
+
+        if (! $admin || optional($admin->role)->permission_type === 'all') {
+            return null;
+        }
+
+        return $admin->id;
+    }
+
+    /**
+     * Whether the current admin may access data belonging to the given company. Super-admins
+     * always can; a sales rep only for the companies they manage. Used to guard direct-URL
+     * access (datagrid scoping alone only hides listing rows).
+     */
+    public static function repCanAccessCompany(?int $companyId): bool
+    {
+        $repId = self::salesRepScopeId();
+
+        if ($repId === null) {
+            return true;
+        }
+
+        return $companyId
+            && self::where('id', $companyId)->where('sales_rep_id', $repId)->exists();
+    }
+
+    /**
+     * Whether the current admin may access the given (shared) company catalog. Super-admins
+     * always can; a sales rep when the catalog is assigned to a company they manage — which
+     * is exactly when it appears in their scoped catalog listing.
+     */
+    public static function repCanAccessCatalog(?int $catalogId): bool
+    {
+        $repId = self::salesRepScopeId();
+
+        if ($repId === null) {
+            return true;
+        }
+
+        return $catalogId
+            && self::where('sales_rep_id', $repId)->where('company_catalog_id', $catalogId)->exists();
+    }
+
+    /**
+     * Whether the current admin may EDIT/DELETE the given catalog. Super-admins always can;
+     * any other admin only for catalogs they created. Admins who can merely view a shared
+     * catalog (a company they manage is assigned) but did not create it get a read-only view.
+     */
+    public static function repCanEditCatalog(?int $catalogId): bool
+    {
+        if (self::salesRepScopeId() === null) {
+            return true;
+        }
+
+        $adminId = auth()->guard('admin')->user()?->id;
+
+        return $catalogId
+            && $adminId
+            && CompanyCatalogProxy::modelClass()::where('id', $catalogId)
+                ->where('created_by', $adminId)
+                ->exists();
+    }
+
+    /**
+     * The company's business name (from the company flat, current locale first), or null
+     * when none has been set.
+     */
+    public function businessName(): ?string
+    {
+        $flat = $this->company_flats->firstWhere('locale', app()->getLocale())
+            ?? $this->company_flats->first();
+
+        return $flat?->business_name ?: null;
     }
 
     /**

@@ -8,14 +8,25 @@
 
     <x-slot:content>
         <div class="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
-            <!-- Company Name -->
+            <!-- Business Name -->
+            <div class="border-b border-zinc-200 py-3 dark:border-gray-800">
+                <span class="text-xs text-gray-500 dark:text-gray-400">
+                    @lang('b2b::app.admin.quotes.view.business-name')
+                </span>
+
+                <p class="mt-1 break-words text-sm font-medium text-gray-800 dark:text-white">
+                    {{ $quote->company?->businessName() ?: '—' }}
+                </p>
+            </div>
+
+            <!-- Contact Name -->
             <div class="border-b border-zinc-200 py-3 dark:border-gray-800">
                 <span class="text-xs text-gray-500 dark:text-gray-400">
                     @lang('b2b::app.admin.quotes.view.company-name')
                 </span>
 
                 <p class="mt-1 break-words text-sm font-medium text-gray-800 dark:text-white">
-                    {{ $quote->company->name }}
+                    {{ $quote->company?->name }}
                 </p>
             </div>
 
@@ -48,7 +59,7 @@
                 </span>
 
                 <p class="mt-1 break-words text-sm font-medium text-gray-800 dark:text-white">
-                    {{ $quote->agent->name }}
+                    {{ $quote->company?->salesRep?->name ?? '—' }}
                 </p>
             </div>
 
@@ -59,7 +70,7 @@
                 </span>
 
                 <p class="mt-1 break-words text-sm font-medium text-gray-800 dark:text-white">
-                    {{ $quote->agent->email }}
+                    {{ $quote->company?->salesRep?->email ?? '—' }}
                 </p>
             </div>
         </div>

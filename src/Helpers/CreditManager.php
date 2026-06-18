@@ -74,7 +74,9 @@ class CreditManager
             'credit_limit' => 0,
             'outstanding_balance' => 0,
             'allow_exceed_limit' => false,
-            'status' => true,
+            // New credit accounts start disabled with a zero limit; an admin enables them
+            // and sets a limit from the Company Credit settings.
+            'status' => false,
         ]);
     }
 

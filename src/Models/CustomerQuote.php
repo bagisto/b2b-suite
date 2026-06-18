@@ -104,11 +104,73 @@ class CustomerQuote extends Model implements CustomerQuoteContract
     ];
 
     /**
+     * Admin badge palette: status => admin theme `label-*` class. Single source of truth
+     * for the admin datagrids (quote + purchase order) and the admin view pages, so the
+     * listing badge and the view-page badge always share a colour for a given status.
+     */
+    public const STATUS_LABEL_CLASSES = [
+        self::STATUS_DRAFT       => 'label-info',
+        self::STATUS_OPEN        => 'label-pending',
+        self::STATUS_NEGOTIATION => 'label-closed',
+        self::STATUS_ACCEPTED    => 'label-processing',
+        self::STATUS_ORDERED     => 'label-completed',
+        self::STATUS_COMPLETED   => 'label-active',
+        self::STATUS_EXPIRED     => 'label-canceled',
+        self::STATUS_REJECTED    => 'label-canceled',
+    ];
+
+    /**
+     * Storefront badge palette: status => [text colour, background colour]. Inline-styled
+     * (purge-proof) single source of truth for the shop datagrids and the
+     * x-b2b::quote-status-badge component used on the shop view pages.
+     */
+    public const STATUS_COLORS = [
+        self::STATUS_DRAFT       => ['#3f3f46', '#f4f4f5'],
+        self::STATUS_OPEN        => ['#0044F2', '#e6edff'],
+        self::STATUS_NEGOTIATION => ['#9a6700', '#fff3da'],
+        self::STATUS_ACCEPTED    => ['#1f7a33', '#e7f6ea'],
+        self::STATUS_ORDERED     => ['#060c3b', '#e8eaf2'],
+        self::STATUS_COMPLETED   => ['#1f7a33', '#e7f6ea'],
+        self::STATUS_EXPIRED     => ['#52525b', '#f4f4f5'],
+        self::STATUS_REJECTED    => ['#b42318', '#fde8e6'],
+    ];
+
+    /**
      * Returns the status label array.
      */
     public static function statusLabel()
     {
         return self::$statusLabel;
+    }
+
+    /**
+     * Admin theme `label-*` class for a status (defaults to label-info if unknown).
+     */
+    public static function statusLabelClass(?string $status): string
+    {
+        return self::STATUS_LABEL_CLASSES[$status] ?? 'label-info';
+    }
+
+    /**
+     * [text colour, background colour] for a storefront status badge.
+     */
+    public static function statusColor(?string $status): array
+    {
+        return self::STATUS_COLORS[$status] ?? ['#3f3f46', '#f4f4f5'];
+    }
+
+    /**
+     * Inline-styled storefront status pill HTML — used by the shop datagrids so they match
+     * the x-b2b::quote-status-badge component rendered on the shop view pages.
+     */
+    public static function statusBadge(?string $status, ?string $label = null): string
+    {
+        [$text, $bg] = self::statusColor($status);
+
+        $label = $label ?? \Illuminate\Support\Str::title((string) $status);
+
+        return '<span class="inline-flex items-center whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold"'
+            .' style="color: '.$text.'; background-color: '.$bg.';">'.e($label).'</span>';
     }
 
     /**

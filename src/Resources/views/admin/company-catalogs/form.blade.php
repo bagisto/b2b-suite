@@ -3,6 +3,8 @@
     $products ??= collect();
     $companies ??= collect();
     $mode ??= 'create';
+    // Read-only when a non-creator (non-super-admin) opens a shared catalog. Create is always editable.
+    $canEdit ??= true;
 
     $normalizeLeaf = fn($l) => [
         'id' => $l['id'],
@@ -137,17 +139,32 @@
                 @lang('b2b::app.admin.company-catalogs.' . $mode . '.back-btn')
             </a>
 
-            <button
-                type="button"
-                class="primary-button"
-                @click="$emitter.emit('b2b-open-category-preview')"
-            >
-                @lang('b2b::app.admin.company-catalogs.' . $mode . '.save-btn')
-            </button>
+            @if ($canEdit)
+                <button
+                    type="button"
+                    class="primary-button"
+                    @click="$emitter.emit('b2b-open-category-preview')"
+                >
+                    @lang('b2b::app.admin.company-catalogs.' . $mode . '.save-btn')
+                </button>
+            @endif
         </div>
     </div>
 
-    <v-company-catalog></v-company-catalog>
+    @unless ($canEdit)
+        <!-- Read-only notice for non-creator viewers of a shared catalog. -->
+        <div
+            class="mt-4 flex items-start gap-2 rounded-lg p-3"
+            style="background-color: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25);"
+        >
+            <span class="icon-information shrink-0 text-xl" style="color: #f59e0b;"></span>
+            <p class="text-sm text-gray-700 dark:text-gray-200">
+                @lang('b2b::app.admin.company-catalogs.read-only-note')
+            </p>
+        </div>
+    @endunless
+
+    <v-company-catalog :can-edit="{{ $canEdit ? 'true' : 'false' }}"></v-company-catalog>
 </x-admin::form>
 
 @pushOnce('scripts')
@@ -190,6 +207,7 @@
                                     />
 
                                     <button
+                                        v-if="canEdit"
                                         type="button"
                                         class="secondary-button flex items-center gap-1.5 !rounded-lg"
                                         @click="openAssignModal"
@@ -201,9 +219,9 @@
                                 </div>
                             </div>
 
-                            <!-- Mass Action Bar (Shown only when products are selected.) -->
+                            <!-- Mass Action Bar (Shown only when products are selected and the catalog is editable.) -->
                             <div
-                                v-if="selectedCount"
+                                v-if="selectedCount && canEdit"
                                 class="mt-4 flex flex-wrap items-center gap-2.5 rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-gray-800 dark:bg-gray-950"
                             >
                                 <span class="text-sm font-medium text-gray-700 dark:text-gray-200">
@@ -227,14 +245,19 @@
                                         <option value="discount">@lang('b2b::app.admin.company-catalogs.discount')</option>
                                     </select>
 
-                                    <input
-                                        type="number"
-                                        min="0"
-                                        step="0.01"
-                                        v-model="massValue"
-                                        class="w-28 rounded-lg border border-gray-200 px-3 py-1.5 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white"
-                                        :placeholder="massType === 'discount' ? '%' : '@lang('b2b::app.admin.company-catalogs.value')'"
-                                    >
+                                    <div class="relative">
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            max="100"
+                                            step="0.01"
+                                            v-model="massValue"
+                                            class="w-24 rounded-lg border border-gray-200 px-3 py-1.5 text-sm ltr:pr-7 rtl:pl-7 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+                                            placeholder="0"
+                                        >
+
+                                        <span class="pointer-events-none absolute top-1.5 text-sm text-gray-400 ltr:right-3 rtl:left-3">%</span>
+                                    </div>
                                 </template>
 
                                 <button
@@ -267,6 +290,7 @@
                                         <tr class="text-left text-xs font-medium uppercase text-gray-500">
                                             <th class="px-3 py-4">
                                                 <input
+                                                    v-if="canEdit"
                                                     type="checkbox"
                                                     class="cursor-pointer"
                                                     :checked="allSelected"
@@ -312,6 +336,7 @@
                                             >
                                                 <td class="px-3 py-3">
                                                     <input
+                                                        v-if="canEdit"
                                                         type="checkbox"
                                                         class="cursor-pointer"
                                                         :checked="isLeafSelected(product, product.leaves[0])"
@@ -332,6 +357,7 @@
                                                             <span class="text-xs text-gray-500">@{{ product.sku }}</span>
 
                                                             <span
+                                                                v-if="canEdit"
                                                                 class="mt-1 cursor-pointer text-xs font-medium text-blue-500 hover:underline"
                                                                 @click="openTierModal(product.leaves[0], product.image)"
                                                             >
@@ -353,16 +379,18 @@
 
                                                 <td class="px-4 py-3">
                                                     <select
+                                                        v-if="canEdit"
                                                         class="rounded-lg border border-gray-200 px-2.5 py-1.5 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white"
                                                         v-model="product.leaves[0].price_type"
                                                     >
                                                         <option value="fixed">@lang('b2b::app.admin.company-catalogs.flat')</option>
                                                         <option value="discount">@lang('b2b::app.admin.company-catalogs.discount')</option>
                                                     </select>
+                                                    <span v-else class="text-sm text-gray-500 dark:text-gray-400">—</span>
                                                 </td>
 
                                                 <td class="px-4 py-3">
-                                                    <div class="relative w-28">
+                                                    <div v-if="canEdit" class="relative w-28">
                                                         <input
                                                             type="number" step="0.01" min="0"
                                                             class="w-28 rounded-lg border border-gray-200 px-3 py-1.5 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white"
@@ -372,12 +400,13 @@
                                                         >
                                                         <span v-if="product.leaves[0].price_type === 'discount'" class="pointer-events-none absolute top-1.5 text-sm text-gray-400 ltr:right-3 rtl:left-3">%</span>
                                                     </div>
+                                                    <span v-else class="text-sm text-gray-500 dark:text-gray-400">—</span>
                                                 </td>
 
                                                 <td class="whitespace-nowrap px-4 py-3 text-sm font-semibold text-gray-800 dark:text-white">@{{ newPrice(product.leaves[0]) }}</td>
 
                                                 <td class="px-4 py-3 text-right">
-                                                    <span class="icon-delete cursor-pointer text-xl text-gray-500 transition-all hover:text-red-600" @click="removeProduct(product.id)"></span>
+                                                    <span v-if="canEdit" class="icon-delete cursor-pointer text-xl text-gray-500 transition-all hover:text-red-600" @click="removeProduct(product.id)"></span>
                                                 </td>
                                             </tr>
 
@@ -388,6 +417,7 @@
                                             >
                                                 <td class="px-3 py-3">
                                                     <input
+                                                        v-if="canEdit"
                                                         type="checkbox"
                                                         class="cursor-pointer"
                                                         :checked="isBookingSelected(product)"
@@ -418,7 +448,7 @@
                                                 </td>
 
                                                 <td class="px-4 py-3 text-right">
-                                                    <span class="icon-delete cursor-pointer text-xl text-gray-500 transition-all hover:text-red-600" @click="removeProduct(product.id)"></span>
+                                                    <span v-if="canEdit" class="icon-delete cursor-pointer text-xl text-gray-500 transition-all hover:text-red-600" @click="removeProduct(product.id)"></span>
                                                 </td>
                                             </tr>
 
@@ -427,6 +457,7 @@
                                                 <tr class="border-t border-gray-100 bg-gray-50 transition-all dark:border-gray-800 dark:bg-gray-950">
                                                     <td class="px-3 py-3">
                                                         <input
+                                                            v-if="canEdit"
                                                             type="checkbox"
                                                             class="cursor-pointer"
                                                             :checked="isProductSelected(product)"
@@ -470,7 +501,7 @@
                                                     </td>
 
                                                     <td class="px-4 py-3 text-right">
-                                                        <span class="icon-delete cursor-pointer text-xl text-gray-500 transition-all hover:text-red-600" @click="removeProduct(product.id)"></span>
+                                                        <span v-if="canEdit" class="icon-delete cursor-pointer text-xl text-gray-500 transition-all hover:text-red-600" @click="removeProduct(product.id)"></span>
                                                     </td>
                                                 </tr>
 
@@ -482,6 +513,7 @@
                                                 >
                                                     <td class="px-3 py-2.5">
                                                         <input
+                                                            v-if="canEdit"
                                                             type="checkbox"
                                                             class="cursor-pointer"
                                                             :checked="isLeafSelected(product, leaf)"
@@ -495,6 +527,7 @@
                                                             <span class="text-xs text-gray-500">@{{ leaf.sku }}</span>
 
                                                             <span
+                                                                v-if="canEdit"
                                                                 class="mt-1 cursor-pointer text-xs font-medium text-blue-500 hover:underline"
                                                                 @click="openTierModal(leaf, product.image)"
                                                             >
@@ -515,16 +548,18 @@
 
                                                     <td class="px-4 py-2.5">
                                                         <select
+                                                            v-if="canEdit"
                                                             class="rounded-lg border border-gray-200 px-2.5 py-1.5 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white"
                                                             v-model="leaf.price_type"
                                                         >
                                                             <option value="fixed">@lang('b2b::app.admin.company-catalogs.flat')</option>
                                                             <option value="discount">@lang('b2b::app.admin.company-catalogs.discount')</option>
                                                         </select>
+                                                        <span v-else class="text-sm text-gray-500 dark:text-gray-400">—</span>
                                                     </td>
 
                                                     <td class="px-4 py-2.5">
-                                                        <div class="relative w-28">
+                                                        <div v-if="canEdit" class="relative w-28">
                                                             <input
                                                                 type="number" step="0.01" min="0"
                                                                 class="w-28 rounded-lg border border-gray-200 px-3 py-1.5 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white"
@@ -534,6 +569,7 @@
                                                             >
                                                             <span v-if="leaf.price_type === 'discount'" class="pointer-events-none absolute top-1.5 text-sm text-gray-400 ltr:right-3 rtl:left-3">%</span>
                                                         </div>
+                                                        <span v-else class="text-sm text-gray-500 dark:text-gray-400">—</span>
                                                     </td>
 
                                                     <td class="whitespace-nowrap px-4 py-2.5 text-sm font-semibold text-gray-800 dark:text-white">@{{ newPrice(leaf) }}</td>
@@ -659,6 +695,7 @@
                                     />
 
                                     <button
+                                        v-if="canEdit"
                                         type="button"
                                         class="secondary-button flex items-center gap-1.5 !rounded-lg"
                                         @click="openCompanyModal"
@@ -670,9 +707,9 @@
                                 </div>
                             </div>
 
-                            <!-- Mass Action Bar -->
+                            <!-- Mass Action Bar (editable catalogs only) -->
                             <div
-                                v-if="companySelectedCount"
+                                v-if="companySelectedCount && canEdit"
                                 class="mt-4 flex flex-wrap items-center gap-2.5 rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-gray-800 dark:bg-gray-950"
                             >
                                 <span class="text-sm font-medium text-gray-700 dark:text-gray-200">
@@ -713,6 +750,7 @@
                                         <tr class="text-left text-xs font-medium uppercase text-gray-500">
                                             <th class="px-3 py-4">
                                                 <input
+                                                    v-if="canEdit"
                                                     type="checkbox"
                                                     class="cursor-pointer"
                                                     :checked="companyAllSelected"
@@ -760,6 +798,7 @@
                                         >
                                             <td class="px-3 py-3">
                                                 <input
+                                                    v-if="canEdit"
                                                     type="checkbox"
                                                     class="cursor-pointer"
                                                     v-model="company.selected"
@@ -773,7 +812,7 @@
                                             <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">@{{ company.email }}</td>
 
                                             <td class="px-4 py-3 text-right">
-                                                <span class="icon-delete cursor-pointer text-xl text-gray-500 transition-all hover:text-red-600" @click="removeCompany(company.id)"></span>
+                                                <span v-if="canEdit" class="icon-delete cursor-pointer text-xl text-gray-500 transition-all hover:text-red-600" @click="removeCompany(company.id)"></span>
                                             </td>
                                         </tr>
 
@@ -1522,6 +1561,13 @@
         app.component('v-company-catalog', {
             template: '#v-company-catalog-template',
 
+            props: {
+                canEdit: {
+                    type: Boolean,
+                    default: true,
+                },
+            },
+
             data() {
                 return {
                     products: @json($initialProducts),
@@ -1940,10 +1986,12 @@
                     }
 
                     if (this.massAction === 'update-price') {
-                        if (this.massValue === '' || isNaN(parseFloat(this.massValue))) {
+                        const percent = parseFloat(this.massValue);
+
+                        if (this.massValue === '' || isNaN(percent) || percent < 0 || percent > 100) {
                             this.$emitter.emit('add-flash', {
                                 type: 'warning',
-                                message: "@lang('b2b::app.admin.company-catalogs.enter-price-value')",
+                                message: "@lang('b2b::app.admin.company-catalogs.enter-discount-percent')",
                             });
 
                             return;
@@ -2014,9 +2062,31 @@
 
                     const targets = selected.length ? selected : this.allLeaves;
 
+                    const percent = parseFloat(this.massValue);
+
+                    /**
+                     * The admin always enters a discount %. For "Discount" it is stored as-is
+                     * (a percentage off). For "Flat" the % is applied to each product's own
+                     * base price and the resulting amount is stored as that product's flat
+                     * (fixed) catalog price — so one percentage yields the correct per-product
+                     * price.
+                     */
                     targets.forEach(leaf => {
-                        leaf.price_type = this.massType;
-                        leaf.price_value = this.massValue;
+                        if (this.massType === 'fixed') {
+                            const base = parseFloat(leaf.price) || 0;
+
+                            let discounted = base - (base * percent / 100);
+
+                            if (discounted < 0) {
+                                discounted = 0;
+                            }
+
+                            leaf.price_type = 'fixed';
+                            leaf.price_value = Number(discounted.toFixed(2));
+                        } else {
+                            leaf.price_type = 'discount';
+                            leaf.price_value = percent;
+                        }
                     });
 
                     /**

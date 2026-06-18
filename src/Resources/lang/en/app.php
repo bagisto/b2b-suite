@@ -29,7 +29,7 @@ return [
 
                         'settings' => [
                             'title' => 'Quotations & Purchase Orders Settings',
-                            'info' => 'Configure quote & purchase order system parameters (procurement method, default prefix and default padding, etc.)',
+                            'info' => 'Configure quote & purchase order parameters — numbering, expiration, minimum amount and attachments.',
                             'minimum-amount' => 'Minimum Cart Amount',
                             'minimum-amount-message' => 'Minimum Amount Message',
                             'default-expiration-period' => 'Default Expiration Period',
@@ -39,50 +39,12 @@ return [
                             'days' => 'Days',
                             'weeks' => 'Weeks',
                             'months' => 'Months',
-                            'min-quantity' => 'Min Quantity',
                             'quote-prefix' => 'Quotation Prefix',
                             'po-prefix' => 'Purchase Order Prefix',
                             'default-padding' => 'Default padding',
                             'quote-prefix-info' => 'Prefix used during quotation increment number generation.',
                             'po-prefix-info' => 'Prefix used during purchase order increment number generation.',
                             'default-padding-info' => 'Padding for quotation/purchase order increment number generation.',
-                            'approve-quote-title' => 'Allow Customer to Approve Quote',
-                            'approve-quote-info' => 'If enabled, customers can approve the quotation from their account.',
-
-                            'procurement-method' => [
-                                'title' => 'Procurement Method',
-                                'info' => 'It will trigger a draft purchase order to buy the required purchase order quantities to the suppliers.',
-                                'manual' => 'Manual',
-                                'automatic' => 'Automatic',
-                            ],
-                        ],
-
-                        'email-options' => [
-                            'title' => 'Email Options',
-                            'info' => 'Set quotation template, purchase order template and cancel order template.',
-                            'from-address' => 'From Address',
-                            'from-name' => 'From Name',
-
-                            'quotation-template' => [
-                                'title' => 'Quotation Template',
-                                'default' => 'Quotation Email template (Default)',
-                                'pickup-order' => 'New Pickup Order',
-                                'pickup-order-guest' => 'New Pickup Order For Guest',
-                            ],
-
-                            'purchase-order-template' => [
-                                'title' => 'Purchase order template',
-                                'default' => 'Order Email template (Default)',
-                                'pickup-order' => 'New Pickup Order',
-                                'pickup-order-guest' => 'New Pickup Order For Guest',
-                            ],
-
-                            'cancel-order-template' => [
-                                'title' => 'Cancel order template',
-                                'default' => 'Cancel Order Email Template (Default)',
-                                'pickup-order' => 'New Pickup Order',
-                                'pickup-order-guest' => 'New Pickup Order For Guest',
-                            ],
                         ],
                     ],
 
@@ -124,6 +86,8 @@ return [
             'update-success' => 'Company catalog updated successfully.',
             'delete-success' => 'Company catalog deleted successfully.',
             'delete-failed' => 'Company catalog could not be deleted.',
+            'read-only-note' => 'This shared catalog was created by another user, so it is read-only for you. To request a change, please contact or report to your super admin.',
+            'not-owner' => 'You can only edit or delete catalogs you created. Please contact or report to your super admin.',
 
             'index' => [
                 'title' => 'Company Catalogs',
@@ -140,6 +104,7 @@ return [
                     'created-at' => 'Created At',
                     'edit' => 'Edit',
                     'delete' => 'Delete',
+                    'view' => 'View',
                 ],
             ],
 
@@ -216,6 +181,7 @@ return [
             'update-price' => 'Update Price',
             'delete-action' => 'Delete',
             'enter-price-value' => 'Enter a price value to apply.',
+            'enter-discount-percent' => 'Enter a discount percentage between 0 and 100.',
             'confirm-update-price' => 'This will update the catalog price for :count selected product(s).',
             'confirm-delete' => 'This will remove :count selected product(s) from this catalog.',
             'confirm-remove-companies' => 'This will remove :count selected company(ies) from this catalog.',
@@ -413,6 +379,12 @@ return [
         ],
 
         'companies' => [
+            'sales-rep' => [
+                'title' => 'Sales Representative',
+                'label' => 'Assigned Sales Representative',
+                'none' => 'No representative assigned',
+            ],
+
             'credit' => [
                 'title' => 'Company Credit',
                 'manage' => 'Manage Credit',
@@ -476,6 +448,7 @@ return [
                     'business-name' => 'Business Name',
                     'website-url' => 'Website URL',
                     'vat-tax-id' => 'VAT Tax ID',
+                    'sales-representative' => 'Sales Representative',
                     'status' => 'Status',
                     'created-at' => 'Created At',
                     'active' => 'Active',
@@ -577,6 +550,7 @@ return [
                     'company-email' => 'Company Email',
                     'customer-email' => 'Customer Email',
                     'agent' => 'Admin User',
+                    'sales-representative' => 'Sales Representative',
                     'base_total' => 'Base Total',
                     'negotiated_total' => 'Negotiated Total',
                     'items' => 'Quotation Items',
@@ -651,7 +625,8 @@ return [
                 'created-at' => 'Created At',
                 'expiration-date' => 'Expiration Date',
                 'company-information' => 'Company Information',
-                'company-name' => 'Name',
+                'business-name' => 'Business Name',
+                'company-name' => 'Contact Name',
                 'company-email' => 'Email',
                 'company-phone' => 'Phone',
                 'sr-name' => 'Sales Representative Name',
@@ -670,9 +645,15 @@ return [
                 'discount-on-total' => 'Discount on Total',
                 'you-save' => 'You save',
                 'send-quotation' => 'Send Quotation',
+                'revise-quotation' => 'Revise Quotation',
+                'customer-accepted-note' => 'The customer accepted this quotation. If you’d like, you can still revise it and send the customer a new offer.',
+                'customer-rejected-note' => 'The customer rejected this quotation — no worries, you can revise it and send it again.',
+                'admin-rejected-note' => 'You rejected this quotation. You can still revise it and send the customer a new offer.',
                 'send-quotation-info' => 'Set a discount per item and/or on the whole quotation, then review and send it to the customer.',
                 'review-info' => 'Please review the quotation summary before sending it to the customer.',
+                'next' => 'Next',
                 'confirm-send' => 'Confirm & Send Quotation',
+                'confirm-revise' => 'Confirm & Revise Quotation',
                 'back' => 'Back',
                 'remove-item' => 'Remove item',
                 'min-one-item' => 'A quotation must have at least one item.',
@@ -701,11 +682,8 @@ return [
                 'quote-rejected-message' => 'You have rejected this quotation.',
                 'un-authorized-quote' => 'You are not authorized to perform this action.',
                 'quote-not-found' => 'Quotation not found.',
-                'btn-accept-quote' => 'Accept Last Quotation',
-                'accept-quote' => 'Accept Quotation',
                 'btn-reject-quote' => 'Reject Quotation',
                 'reject-quote' => 'Reject This Quotation',
-                'quote-accepted' => 'Quotation accepted successfully.',
                 'quote-rejected' => 'Quotation rejected successfully.',
 
             ],
@@ -954,6 +932,19 @@ return [
 
         'customers' => [
             'account' => [
+                'profile' => [
+                    'profile-information' => 'Profile Information',
+                    'company-information' => 'Company Information',
+                    'business-name' => 'Business Name',
+                    'role' => 'Your Role',
+                    'company-email' => 'Company Email',
+                    'company-phone' => 'Company Phone',
+                    'credit-limit' => 'Credit Limit',
+                    'available-credit' => 'Available Credit',
+                    'edit-company' => 'Edit',
+                    'view-company-profile' => 'View Company Profile',
+                ],
+
                 'requisitions' => [
                     'title' => 'Requisition Lists',
                     'add-title' => 'Create Requisition List',
@@ -1040,6 +1031,7 @@ return [
                             'quote-id' => 'ID',
                             'name' => 'Quotation Name',
                             'company' => 'Company',
+                            'customer' => 'Customer',
                             'company-email' => 'Company Email',
                             'agent' => 'Admin User',
                             'base_total' => 'Base Total',
@@ -1084,6 +1076,7 @@ return [
                         'negotiated-total' => 'Negotiated Total',
                         'quote-items' => 'Quotation Items',
                         'btn-add-to-cart' => 'Add To Cart',
+                        'btn-accept-add-to-cart' => 'Accept & Add To Cart',
                         'item-updated' => 'Quotation items updated by :name.',
                         'product' => 'Product',
                         'sku' => 'SKU',
@@ -1102,7 +1095,8 @@ return [
                         'no-attachments' => 'No attachments found.',
                         'download' => 'Download',
                         'company-information' => 'Company Information',
-                        'company-name' => 'Name',
+                        'business-name' => 'Business Name',
+                        'company-name' => 'Contact Name',
                         'company-email' => 'Email',
                         'company-phone' => 'Phone',
                         'sr-name' => 'Sales Representative Name',
@@ -1138,13 +1132,9 @@ return [
                         'delete-quote-msg' => 'Are you sure you want to delete this quotation?',
                         'quote-deleted' => 'Quotation deleted successfully.',
                         'drafted' => 'Drafted',
-                        'btn-accept-quote' => 'Accept Last Quotation',
-                        'accept-quote' => 'Accept Quotation',
                         'btn-reject-quote' => 'Reject Quotation',
                         'reject-quote' => 'Reject This Quotation',
-                        'accept-quote-msg' => 'Are you sure you want to accept this quotation?',
                         'reject-quote-msg' => 'Are you sure you want to reject this quotation?',
-                        'quote-accepted' => 'Quotation accepted successfully.',
                         'quote-item-updated' => 'Quotation item(s) updated successfully.',
                         'quote-rejected' => 'Quotation rejected successfully.',
                     ],

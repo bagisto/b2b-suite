@@ -64,7 +64,7 @@ class PurchaseOrderController extends Controller
         }
 
         $quote = $this->customerQuoteRepository
-            ->with(['company', 'agent', 'attachments'])
+            ->with(['company', 'company.salesRep', 'company.company_flats', 'agent', 'attachments'])
             ->findOneWhere($quoteConditions);
 
         if (! $quote) {

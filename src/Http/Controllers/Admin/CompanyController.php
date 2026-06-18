@@ -12,11 +12,13 @@ use Webkul\Admin\Http\Requests\MassUpdateRequest;
 use Webkul\B2BSuite\DataGrids\Admin\CompanyDataGrid;
 use Webkul\B2BSuite\Http\Requests\CompanyRequest;
 use Webkul\B2BSuite\Http\Resources\CustomerResource;
+use Webkul\B2BSuite\Models\Customer;
 use Webkul\B2BSuite\Repositories\CompanyAttributeGroupRepository;
 use Webkul\B2BSuite\Repositories\CompanyAttributeValueRepository;
 use Webkul\B2BSuite\Repositories\CompanyFlatRepository;
 use Webkul\B2BSuite\Repositories\CompanyRoleRepository;
 use Webkul\Customer\Repositories\CustomerRepository;
+use Webkul\User\Repositories\AdminRepository;
 
 class CompanyController extends Controller
 {
@@ -28,7 +30,8 @@ class CompanyController extends Controller
         protected CompanyFlatRepository $customerFlatRepository,
         protected CompanyAttributeGroupRepository $companyAttributeGroupRepository,
         protected CompanyAttributeValueRepository $companyAttributeValueRepository,
-        protected CompanyRoleRepository $companyRoleRepository
+        protected CompanyRoleRepository $companyRoleRepository,
+        protected AdminRepository $adminRepository
     ) {}
 
     /**
@@ -48,15 +51,19 @@ class CompanyController extends Controller
      */
     public function get(): JsonResponse
     {
+        $repId = Customer::salesRepScopeId();
+
         $companies = $this->customerRepository
             ->findWhere(['type' => 'company'])
+            ->when($repId, fn ($companies) => $companies->where('sales_rep_id', $repId))
             ->map(function ($company) {
                 return [
                     'id' => $company->id,
                     'name' => $company->first_name.' '.$company->last_name,
                     'email' => $company->email,
                 ];
-            });
+            })
+            ->values();
 
         return new JsonResponse($companies);
     }
@@ -68,8 +75,11 @@ class CompanyController extends Controller
     {
         $data = request()->all();
 
-        $customers = $this->customerRepository->scopeQuery(function ($query) use ($data) {
+        $repId = Customer::salesRepScopeId();
+
+        $customers = $this->customerRepository->scopeQuery(function ($query) use ($data, $repId) {
             return $query->whereIn('type', [$data['type'] ?? 'company', 'company'])
+                ->when($repId, fn ($q) => $q->where('sales_rep_id', $repId))
                 ->where(function ($q) use ($data) {
                     $q->where('email', 'like', '%'.urldecode($data['query']).'%')
                         ->orWhere(DB::raw('CONCAT(first_name, " ", last_name)'), 'like', '%'.urldecode($data['query']).'%');
@@ -91,7 +101,9 @@ class CompanyController extends Controller
             },
         ])->orderBy('column', 'asc')->orderBy('position', 'asc')->get();
 
-        return view('b2b::admin.companies.create', compact('attributeGroups'));
+        $admins = $this->adminRepository->all();
+
+        return view('b2b::admin.companies.create', compact('attributeGroups', 'admins'));
     }
 
     /**
@@ -135,6 +147,9 @@ class CompanyController extends Controller
          */
         $data['type'] = 'company';
 
+        // Assigned sales rep (empty select = unassigned).
+        $data['sales_rep_id'] = $request->input('sales_rep_id') ?: null;
+
         $customer = $this->customerRepository->create($data);
 
         $this->companyAttributeValueRepository->saveValues(
@@ -170,13 +185,17 @@ class CompanyController extends Controller
     {
         $company = $this->customerRepository->findOrFail($id);
 
+        abort_unless(Customer::repCanAccessCompany((int) $id), 403);
+
         $attributeGroups = $this->companyAttributeGroupRepository->with([
             'custom_attributes' => function ($query) {
                 $query->orderBy('pivot_position', 'asc');
             },
         ])->orderBy('column', 'asc')->orderBy('position', 'asc')->get();
 
-        return view('b2b::admin.companies.edit', compact('company', 'attributeGroups'));
+        $admins = $this->adminRepository->all();
+
+        return view('b2b::admin.companies.edit', compact('company', 'attributeGroups', 'admins'));
     }
 
     /**
@@ -184,6 +203,8 @@ class CompanyController extends Controller
      */
     public function update(CompanyRequest $request, $id)
     {
+        abort_unless(Customer::repCanAccessCompany((int) $id), 403);
+
         Event::dispatch('customer.update.before', $id);
 
         $customer = $this->customerRepository->findOrFail($id);
@@ -214,6 +235,9 @@ class CompanyController extends Controller
          * was previously stored with the wrong type).
          */
         $data['type'] = 'company';
+
+        // Assigned sales rep (empty select = unassigned).
+        $data['sales_rep_id'] = $request->input('sales_rep_id') ?: null;
 
         $wasPending = ! $customer->status;
 
@@ -247,6 +271,8 @@ class CompanyController extends Controller
     {
         $company = $this->customerRepository->findOrFail($id);
 
+        abort_unless(Customer::repCanAccessCompany((int) $id), 403);
+
         $status = (int) (bool) request()->input('status', 1);
 
         $company->update(['status' => $status]);
@@ -268,6 +294,8 @@ class CompanyController extends Controller
         $companies = $this->customerRepository->findWhereIn('id', $massUpdateRequest->input('indices'));
 
         foreach ($companies as $company) {
+            abort_unless(Customer::repCanAccessCompany($company->id), 403);
+
             $company->update(['status' => $status]);
 
             Event::dispatch('b2b.company.'.($status ? 'approved' : 'disabled'), $company);
@@ -283,6 +311,8 @@ class CompanyController extends Controller
      */
     public function destroy($id)
     {
+        abort_unless(Customer::repCanAccessCompany((int) $id), 403);
+
         try {
             $this->customerRepository->delete($id);
 
@@ -308,6 +338,8 @@ class CompanyController extends Controller
              * Ensure that customers do not have any active orders before performing deletion.
              */
             foreach ($customers as $customer) {
+                abort_unless(Customer::repCanAccessCompany($customer->id), 403);
+
                 if ($this->customerRepository->haveActiveOrders($customer)) {
                     throw new \Exception(trans('admin::app.customers.customers.index.datagrid.order-pending'));
                 }

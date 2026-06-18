@@ -47,7 +47,7 @@
                     <div
                         class="flex select-none items-center gap-2.5"
                         :class="{ 'b2b-dg-divider': index > 0 }"
-                        v-for="(columnGroup, index) in [['quotation_number', 'name', 'status'], ['company_name', 'customer_name', 'created_at'], ['base_total', 'negotiated_total', 'expiration_date'], ['items']]"
+                        v-for="(columnGroup, index) in [['quotation_number', 'name', 'status'], ['company_name', 'agent_name', 'customer_name', 'created_at'], ['base_total', 'negotiated_total', 'expiration_date'], ['items']]"
                     >
                         <p class="text-gray-600 dark:text-gray-300">
                             <span class="[&>*]:after:content-['_/_']">
@@ -124,6 +124,16 @@
 
                             <p class="break-words text-sm font-medium text-gray-800 dark:text-white">
                                 @{{ record.company_name }}
+                            </p>
+                        </div>
+
+                        <div class="flex flex-col gap-0.5">
+                            <span class="text-xs uppercase tracking-wide text-gray-400 dark:text-gray-500">
+                                @lang('b2b::app.admin.quotes.index.datagrid.sales-representative')
+                            </span>
+
+                            <p class="break-words text-sm text-gray-700 dark:text-gray-300">
+                                @{{ record.agent_name || '—' }}
                             </p>
                         </div>
 

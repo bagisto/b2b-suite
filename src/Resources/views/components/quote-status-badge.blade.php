@@ -2,21 +2,11 @@
 
 @php
     /**
-     * Status → [text color, background color]. Inline styles are used so the badge
-     * renders correctly without relying on a global stylesheet / Tailwind purge.
+     * Colours come from the single source of truth on the model (shared with the shop
+     * datagrids) so the listing badge and this view-page badge always match. Inline styles
+     * keep the badge purge-proof.
      */
-    $colors = [
-        'draft'       => ['#3f3f46', '#f4f4f5'],
-        'open'        => ['#0044F2', '#e6edff'],
-        'negotiation' => ['#9a6700', '#fff3da'],
-        'accepted'    => ['#1f7a33', '#e7f6ea'],
-        'ordered'     => ['#060c3b', '#e8eaf2'],
-        'completed'   => ['#1f7a33', '#e7f6ea'],
-        'expired'     => ['#52525b', '#f4f4f5'],
-        'rejected'    => ['#b42318', '#fde8e6'],
-    ];
-
-    [$textColor, $bgColor] = $colors[$status] ?? ['#3f3f46', '#f4f4f5'];
+    [$textColor, $bgColor] = \Webkul\B2BSuite\Models\CustomerQuote::statusColor($status);
 
     $labelKey = 'b2b::app.shop.customers.account.quotes.view.'.$status;
     $label = trans($labelKey);

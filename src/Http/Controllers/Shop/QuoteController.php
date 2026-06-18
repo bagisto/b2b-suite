@@ -12,7 +12,6 @@ use Webkul\B2BSuite\Http\Requests\QuoteRequest;
 use Webkul\B2BSuite\Models\CustomerQuote;
 use Webkul\B2BSuite\Repositories\CustomerQuoteAttachmentRepository;
 use Webkul\B2BSuite\Repositories\CustomerQuoteMessageRepository;
-use Webkul\B2BSuite\Repositories\CustomerQuoteQuotationRepository;
 use Webkul\B2BSuite\Repositories\CustomerQuoteRepository;
 use Webkul\Customer\Repositories\CustomerRepository;
 use Webkul\Shop\Http\Controllers\Controller;
@@ -30,7 +29,6 @@ class QuoteController extends Controller
         protected AdminRepository $adminRepository,
         protected CustomerQuoteRepository $customerQuoteRepository,
         protected CustomerQuoteMessageRepository $customerQuoteMessageRepository,
-        protected CustomerQuoteQuotationRepository $customerQuoteQuotationRepository,
         protected CustomerQuoteAttachmentRepository $customerQuoteAttachmentRepository,
     ) {}
 
@@ -68,7 +66,7 @@ class QuoteController extends Controller
             'po_number' => $quoteNumber['po_number'],
             'customer_id' => $customer->id,
             'company_id' => $customerCompany ? $customerCompany->id : null,
-            'agent_id' => $this->adminRepository->first()?->id ?? null,
+            'agent_id' => $customerCompany?->sales_rep_id ?? $this->adminRepository->first()?->id ?? null,
             'customer_name' => $customer->name,
             'expiration_date' => now()->addDays($defaultExpirationDays)->toDateString(),
         ], $quoteRequest->only([
@@ -115,7 +113,7 @@ class QuoteController extends Controller
             }
         }
 
-        $quote = $this->customerQuoteRepository->with(['company', 'agent', 'attachments'])->findOneWhere($quoteConditions);
+        $quote = $this->customerQuoteRepository->with(['company', 'company.salesRep', 'company.company_flats', 'agent', 'attachments'])->findOneWhere($quoteConditions);
 
         if (! $quote) {
             session()->flash('error', trans('b2b::app.shop.customers.account.quotes.not-found'));
@@ -191,10 +189,7 @@ class QuoteController extends Controller
         $currentAdmin = $this->customerRepository->find(auth()->guard('customer')->user()->id);
 
         try {
-            $quoteConditions = [
-                'id' => $id,
-                'status' => CustomerQuote::STATUS_ACCEPTED,
-            ];
+            $quoteConditions = ['id' => $id];
 
             if ($currentAdmin->type === 'company') {
                 $quoteConditions['company_id'] = $currentAdmin->id;
@@ -214,6 +209,29 @@ class QuoteController extends Controller
                 session()->flash('error', trans('b2b::app.shop.customers.account.quotes.view.un-authorized-quote'));
 
                 return redirect()->back();
+            }
+
+            /**
+             * "Accept & Add to Cart" is the buyer's final confirmation: once the admin has
+             * sent an offer (quote in "negotiation"), accepting marks the quote accepted —
+             * which closes the negotiation thread — and adds the negotiated items to the
+             * cart. An already accepted quote can simply be re-added to the cart.
+             */
+            $adminHasOffered = (bool) $this->customerQuoteMessageRepository->getLastQuotationMessage($quote->id, 'admin');
+
+            $canAccept = $quote->status === CustomerQuote::STATUS_NEGOTIATION && $adminHasOffered;
+
+            if (
+                ! $canAccept
+                && $quote->status !== CustomerQuote::STATUS_ACCEPTED
+            ) {
+                session()->flash('error', trans('b2b::app.shop.customers.account.quotes.view.un-authorized-quote'));
+
+                return redirect()->back();
+            }
+
+            if ($canAccept) {
+                $quote->update(['status' => CustomerQuote::STATUS_ACCEPTED]);
             }
 
             $this->customerQuoteRepository->updateCart($id);
@@ -452,68 +470,6 @@ class QuoteController extends Controller
             return redirect()->back()
                 ->withErrors(['error' => trans('b2b::app.shop.customers.account.quotes.view.error-message')]);
         }
-    }
-
-    /**
-     * Accept this quote.
-     */
-    public function acceptQuote(Request $request, $id)
-    {
-        $request->validate([
-            'message' => 'required|string|max:1000',
-        ]);
-
-        $currentAdmin = $this->customerRepository->find(auth()->guard('customer')->user()->id);
-
-        $quoteConditions = ['id' => $id];
-
-        if ($currentAdmin->type === 'company') {
-            $quoteConditions['company_id'] = $currentAdmin->id;
-        } else {
-            $company = $currentAdmin->companies()->first();
-
-            if ($company) {
-                $quoteConditions['company_id'] = $company->id;
-            } else {
-                $quoteConditions['customer_id'] = $currentAdmin->id;
-            }
-        }
-
-        $quote = $this->customerQuoteRepository->findOneWhere($quoteConditions);
-
-        if (! $quote) {
-            session()->flash('error', trans('b2b::app.shop.customers.account.quotes.view.un-authorized-quote'));
-
-            return redirect()->back();
-        }
-
-        $quote->update(['status' => CustomerQuote::STATUS_ACCEPTED]);
-
-        $quote->messages()->create([
-            'message' => $request->message,
-            'status' => trans('b2b::app.shop.customers.account.quotes.view.'.$quote->status),
-            'user_type' => 'customer',
-            'user_id' => $currentAdmin->id,
-            'created_at' => now(),
-        ]);
-
-        $isAdminLastQuotation = $this->customerQuoteMessageRepository
-            ->getLastQuotationMessage($quote->id, 'admin');
-
-        $this->customerQuoteQuotationRepository->updateOrCreate(
-            [
-                'message_id' => $isAdminLastQuotation?->id,
-                'quote_id' => $quote->id,
-            ],
-            [
-                'is_accepted' => 1,
-                'accepted_by' => 'customer',
-            ]
-        );
-
-        return redirect()
-            ->route('shop.customers.account.quotes.view', $id)
-            ->with('success', trans('b2b::app.shop.customers.account.quotes.view.quote-accepted'));
     }
 
     /**

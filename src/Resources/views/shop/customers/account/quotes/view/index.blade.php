@@ -111,14 +111,25 @@
             @lang('b2b::app.shop.customers.account.quotes.view.company-information')
         </p>
 
-        <!-- Company Name -->
+        <!-- Business Name -->
+        <div class="grid w-full grid-cols-[2fr_3fr] gap-4 border-b border-zinc-200 px-3 py-3 max-md:px-0">
+            <p class="text-sm font-medium">
+                @lang('b2b::app.shop.customers.account.quotes.view.business-name')
+            </p>
+
+            <p class="text-right text-sm font-medium text-zinc-500">
+                {{ $quote->company?->businessName() ?: '—' }}
+            </p>
+        </div>
+
+        <!-- Contact Name -->
         <div class="grid w-full grid-cols-[2fr_3fr] gap-4 border-b border-zinc-200 px-3 py-3 max-md:px-0">
             <p class="text-sm font-medium">
                 @lang('b2b::app.shop.customers.account.quotes.view.company-name')
             </p>
 
             <p class="text-right text-sm font-medium text-zinc-500">
-                {{ $quote->company->name }}
+                {{ $quote->company?->name }}
             </p>
         </div>
 
@@ -157,7 +168,7 @@
             </p>
 
             <p class="text-right text-sm font-medium text-zinc-500">
-                {{ $quote->agent->name }}
+                {{ $quote->company?->salesRep?->name ?? '—' }}
             </p>
         </div>
 
@@ -170,7 +181,7 @@
             </p>
 
             <p class="text-right text-sm font-medium text-zinc-500">
-                {{ $quote->agent->email }}
+                {{ $quote->company?->salesRep?->email ?? '—' }}
             </p>
         </div>
 

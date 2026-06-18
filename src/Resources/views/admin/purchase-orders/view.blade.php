@@ -14,7 +14,7 @@
                 </p>
 
                 <!-- Order Status -->
-                <span class="label-pending mx-1.5 text-sm">
+                <span class="{{ \Webkul\B2BSuite\Models\CustomerQuote::statusLabelClass($quote->status) }} mx-1.5 text-sm">
                     @lang("b2b::app.admin.quotes.view.$quote->status")
                 </span>
             </div>

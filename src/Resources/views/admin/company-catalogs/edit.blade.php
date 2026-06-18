@@ -10,6 +10,7 @@
         'catalog'   => $catalog,
         'products'  => $products,
         'companies' => $companies,
+        'canEdit'   => $canEdit,
         'action'    => route('admin.b2b.company_catalogs.update', $catalog->id),
         'method'    => 'PUT',
     ])

@@ -13,6 +13,11 @@
         'discount_value' => $item->discount_value !== null ? (float) $item->discount_value : '',
         'removed'        => false,
     ])->values();
+
+    // Once an offer has been sent (negotiation) — or the customer has decided
+    // (accepted/rejected) — sending again is a revision. Only the first send
+    // (status "open") reads "Send Quotation".
+    $isRevision = in_array($quote->status, ['negotiation', 'accepted', 'rejected']);
 @endphp
 
 @pushOnce('styles')
@@ -21,6 +26,21 @@
            holds an items table). Core's max-md:w-[90%] still caps it on mobile. */
         .box-shadow:has(.b2b-quote-modal) {
             max-width: 56rem !important;
+
+            /* Standard tall-modal layout: cap the card to the viewport and turn it into a
+               flex column so the header and footer stay pinned while only the body scrolls
+               (instead of the whole card — and the Send button — scrolling off-screen). */
+            display: flex;
+            flex-direction: column;
+            max-height: 90vh;
+        }
+
+        /* The body is the wrapper div that directly holds the editor form — it is the only
+           scroll region; min-height:0 lets a flex child shrink so overflow can kick in. */
+        .box-shadow:has(.b2b-quote-modal) > div:has(> .b2b-quote-modal) {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-y: auto;
         }
     </style>
 @endPushOnce
@@ -44,13 +64,13 @@
                 class="primary-button"
                 @click="openEditor"
             >
-                @lang('b2b::app.admin.quotes.view.send-quotation')
+                @lang('b2b::app.admin.quotes.view.'.($isRevision ? 'revise-quotation' : 'send-quotation'))
             </button>
 
             <x-admin::modal ref="negotiationModal">
                 <x-slot:header>
                     <p class="text-lg font-bold text-gray-800 dark:text-white">
-                        @lang('b2b::app.admin.quotes.view.send-quotation')
+                        @lang('b2b::app.admin.quotes.view.'.($isRevision ? 'revise-quotation' : 'send-quotation'))
                     </p>
                 </x-slot>
 
@@ -318,7 +338,7 @@
                         class="primary-button"
                         @click="review"
                     >
-                        @lang('b2b::app.admin.quotes.view.send-quotation')
+                        @lang('b2b::app.admin.quotes.view.next')
                     </button>
 
                     <!-- Preview step -->
@@ -337,7 +357,7 @@
                         class="primary-button ltr:ml-2.5 rtl:mr-2.5"
                         @click="$refs.form.submit()"
                     >
-                        @lang('b2b::app.admin.quotes.view.confirm-send')
+                        @lang('b2b::app.admin.quotes.view.'.($isRevision ? 'confirm-revise' : 'confirm-send'))
                     </button>
                 </x-slot>
             </x-admin::modal>

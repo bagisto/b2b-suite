@@ -99,8 +99,6 @@ Route::group(['middleware' => ['theme', 'locale', 'currency'], 'prefix' => 'cust
 
             Route::post('{id}/send-message', 'sendMessage')->name('shop.customers.account.quotes.send_message');
 
-            Route::post('{id}/accept-quote', 'acceptQuote')->name('shop.customers.account.quotes.accept_quote');
-
             Route::post('{id}/reject-quote', 'rejectQuote')->name('shop.customers.account.quotes.reject_quote');
         });
 

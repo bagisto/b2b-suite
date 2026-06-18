@@ -7,6 +7,7 @@ use Webkul\Admin\Http\Controllers\Controller;
 use Webkul\B2BSuite\DataGrids\Admin\CompanyCreditDataGrid;
 use Webkul\B2BSuite\DataGrids\Admin\CompanyCreditTransactionDataGrid;
 use Webkul\B2BSuite\Helpers\CreditManager;
+use Webkul\B2BSuite\Models\Customer;
 use Webkul\Customer\Repositories\CustomerRepository;
 
 class CompanyCreditController extends Controller
@@ -39,6 +40,8 @@ class CompanyCreditController extends Controller
     {
         $company = $this->customerRepository->findOrFail($id);
 
+        abort_unless(Customer::repCanAccessCompany((int) $id), 403);
+
         $credit = $this->creditManager->getOrCreate($company->id);
 
         if (request()->ajax()) {
@@ -63,6 +66,8 @@ class CompanyCreditController extends Controller
     public function updateLimit($id)
     {
         $company = $this->customerRepository->findOrFail($id);
+
+        abort_unless(Customer::repCanAccessCompany((int) $id), 403);
 
         $data = request()->validate([
             'credit_limit' => ['required', 'numeric', 'min:0'],
@@ -91,6 +96,8 @@ class CompanyCreditController extends Controller
     public function reimburse($id)
     {
         $company = $this->customerRepository->findOrFail($id);
+
+        abort_unless(Customer::repCanAccessCompany((int) $id), 403);
 
         $credit = $this->creditManager->getOrCreate($company->id);
 

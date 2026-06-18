@@ -13,16 +13,31 @@
                 @endif
             </p>
 
-            @if (
-                $quote->items->count()
-                && $quote->state == 'quotation'
-                && $quote->status == 'accepted'
-            )
+            @php
+                /**
+                 * The buyer can accept the admin's offer (still in "negotiation") which adds
+                 * the negotiated items to the cart and confirms the quote, or simply re-add an
+                 * already accepted quote to the cart.
+                 */
+                $canAcceptOffer = $quote->state == 'quotation'
+                    && $quote->status == 'negotiation'
+                    && ! empty($isAdminLastQuotation ?? null);
+
+                $showAddToCart = $quote->items->count()
+                    && $quote->state == 'quotation'
+                    && ($canAcceptOffer || $quote->status == 'accepted');
+            @endphp
+
+            @if ($showAddToCart)
                 <button
                     type="submit"
                     class="primary-button mb-4 cursor-pointer p-3 text-sm"
                 >
-                    @lang('b2b::app.shop.customers.account.quotes.view.btn-add-to-cart')
+                    @if ($canAcceptOffer)
+                        @lang('b2b::app.shop.customers.account.quotes.view.btn-accept-add-to-cart')
+                    @else
+                        @lang('b2b::app.shop.customers.account.quotes.view.btn-add-to-cart')
+                    @endif
                 </button>
             @endif
         </div>
