@@ -15,6 +15,7 @@ use Webkul\B2BSuite\DataGrids\Admin\CustomerQuoteDataGrid;
 use Webkul\B2BSuite\Http\Requests\QuoteRequest;
 use Webkul\B2BSuite\Models\Customer;
 use Webkul\B2BSuite\Models\CustomerQuote;
+use Webkul\B2BSuite\Notifications\Notifier;
 use Webkul\B2BSuite\Repositories\CustomerQuoteMessageRepository;
 use Webkul\B2BSuite\Repositories\CustomerQuoteRepository;
 use Webkul\Checkout\Repositories\CartRepository;
@@ -221,6 +222,9 @@ class QuoteController extends Controller
                 'created_at' => now(),
             ]);
 
+            // Notify the buyer that the seller posted a new message.
+            Notifier::quote($quote, 'message', 'buyer');
+
             if ($request->expectsJson()) {
                 return response()->json([
                     'message' => trans('b2b::app.admin.quotes.view.success-message'),
@@ -290,6 +294,9 @@ class QuoteController extends Controller
 
             $this->customerQuoteRepository->createOrUpdateMessageQuotation($data, $id);
 
+            // Notify the buyer that the seller sent/revised a quotation.
+            Notifier::quote($quote->refresh(), 'sent', 'buyer');
+
             return redirect()->route('admin.b2b.quotes.view', $id)
                 ->with('success', trans('b2b::app.admin.quotes.view.quote-submitted'));
 
@@ -331,6 +338,9 @@ class QuoteController extends Controller
                 'user_id' => auth()->guard('admin')->user()->id,
                 'created_at' => now(),
             ]);
+
+            // Notify the buyer that the seller rejected the quote.
+            Notifier::quote($quote, 'rejected', 'buyer');
 
             return redirect()->route('admin.b2b.quotes.view', $id)
                 ->with('success', trans('b2b::app.admin.quotes.view.quote-rejected'));
@@ -377,6 +387,9 @@ class QuoteController extends Controller
                 'user_id' => auth()->guard('admin')->user()->id,
                 'created_at' => now(),
             ]);
+
+            // Notify the buyer that the seller accepted the quote.
+            Notifier::quote($quote, 'accepted', 'buyer');
 
             return redirect()->route('admin.b2b.quotes.view', $id)
                 ->with('success', trans('b2b::app.admin.quotes.view.quote-accepted'));

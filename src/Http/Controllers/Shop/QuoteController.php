@@ -10,6 +10,7 @@ use Illuminate\View\View;
 use Webkul\B2BSuite\DataGrids\Shop\CustomerQuoteDataGrid;
 use Webkul\B2BSuite\Http\Requests\QuoteRequest;
 use Webkul\B2BSuite\Models\CustomerQuote;
+use Webkul\B2BSuite\Notifications\Notifier;
 use Webkul\B2BSuite\Repositories\CustomerQuoteAttachmentRepository;
 use Webkul\B2BSuite\Repositories\CustomerQuoteMessageRepository;
 use Webkul\B2BSuite\Repositories\CustomerQuoteRepository;
@@ -79,6 +80,11 @@ class QuoteController extends Controller
         $quote = $this->customerQuoteRepository->create($data);
 
         Event::dispatch('b2b.quote.create.after', $quote);
+
+        // Notify the sales rep of a new quote request (drafts notify on submit instead).
+        if ($quote->status !== CustomerQuote::STATUS_DRAFT) {
+            Notifier::quote($quote, 'requested', 'admin');
+        }
 
         session()->flash('success', trans('b2b::app.shop.checkout.cart.request-quote.create-success'));
 
@@ -232,6 +238,9 @@ class QuoteController extends Controller
 
             if ($canAccept) {
                 $quote->update(['status' => CustomerQuote::STATUS_ACCEPTED]);
+
+                // Notify the sales rep that the buyer accepted the offer.
+                Notifier::quote($quote, 'accepted', 'admin');
             }
 
             $this->customerQuoteRepository->updateCart($id);
@@ -338,6 +347,9 @@ class QuoteController extends Controller
                     $quote->update(['status' => CustomerQuote::STATUS_OPEN]);
                 }
 
+                // Notify the sales rep that the buyer submitted their draft request.
+                Notifier::quote($quote->refresh(), 'requested', 'admin');
+
                 return redirect()
                     ->route('shop.customers.account.quotes.view', $id)
                     ->with('success', trans('b2b::app.shop.customers.account.quotes.view.quote-submitted'));
@@ -368,6 +380,9 @@ class QuoteController extends Controller
             } else {
                 $quote->update(['status' => CustomerQuote::STATUS_NEGOTIATION]);
             }
+
+            // Notify the sales rep that the buyer sent a counter-offer.
+            Notifier::quote($quote->refresh(), 'countered', 'admin');
 
             return redirect()
                 ->route('shop.customers.account.quotes.view', $id)
@@ -473,6 +488,9 @@ class QuoteController extends Controller
                 'created_at' => now(),
             ]);
 
+            // Notify the sales rep that the buyer posted a new message.
+            Notifier::quote($quote, 'message', 'admin');
+
             if ($request->expectsJson()) {
                 return response()->json([
                     'message' => trans('b2b::app.shop.customers.account.quotes.view.success-message'),
@@ -537,6 +555,9 @@ class QuoteController extends Controller
                 'user_id' => $currentAdmin->id,
                 'created_at' => now(),
             ]);
+
+            // Notify the sales rep that the buyer rejected the quote.
+            Notifier::quote($quote, 'rejected', 'admin');
 
             return redirect()
                 ->route('shop.customers.account.quotes.view', $id)

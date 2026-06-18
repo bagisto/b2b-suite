@@ -197,6 +197,150 @@ return [
     ],
 
     /**
+     * B2B email notifications — one admin toggle per notification (all enabled by default).
+     */
+    [
+        'key' => 'b2b.email_notifications',
+        'name' => 'b2b::app.admin.configuration.index.b2b.email-notifications.title',
+        'info' => 'b2b::app.admin.configuration.index.b2b.email-notifications.info',
+        'icon' => 'settings/store.svg',
+        'sort' => 4,
+    ], [
+        'key' => 'b2b.email_notifications.settings',
+        'name' => 'b2b::app.admin.configuration.index.b2b.email-notifications.settings.title',
+        'info' => 'b2b::app.admin.configuration.index.b2b.email-notifications.settings.info',
+        'sort' => 1,
+        'fields' => [
+            /**
+             * Company onboarding.
+             */
+            [
+                'name' => 'company_registered',
+                'title' => 'b2b::app.admin.configuration.index.b2b.email-notifications.settings.company-registered',
+                'info' => 'b2b::app.admin.configuration.index.b2b.email-notifications.settings.company-registered-info',
+                'type' => 'boolean',
+                'default' => true,
+                'channel_based' => true,
+                'locale_based' => false,
+            ], [
+                'name' => 'company_approved',
+                'title' => 'b2b::app.admin.configuration.index.b2b.email-notifications.settings.company-approved',
+                'info' => 'b2b::app.admin.configuration.index.b2b.email-notifications.settings.company-approved-info',
+                'type' => 'boolean',
+                'default' => true,
+                'channel_based' => true,
+                'locale_based' => false,
+            ], [
+                'name' => 'company_disabled',
+                'title' => 'b2b::app.admin.configuration.index.b2b.email-notifications.settings.company-disabled',
+                'info' => 'b2b::app.admin.configuration.index.b2b.email-notifications.settings.company-disabled-info',
+                'type' => 'boolean',
+                'default' => true,
+                'channel_based' => true,
+                'locale_based' => false,
+            ], [
+                'name' => 'user_created',
+                'title' => 'b2b::app.admin.configuration.index.b2b.email-notifications.settings.user-created',
+                'info' => 'b2b::app.admin.configuration.index.b2b.email-notifications.settings.user-created-info',
+                'type' => 'boolean',
+                'default' => true,
+                'channel_based' => true,
+                'locale_based' => false,
+            ],
+
+            /**
+             * Company credit.
+             */
+            [
+                'name' => 'credit_updated',
+                'title' => 'b2b::app.admin.configuration.index.b2b.email-notifications.settings.credit-updated',
+                'info' => 'b2b::app.admin.configuration.index.b2b.email-notifications.settings.credit-updated-info',
+                'type' => 'boolean',
+                'default' => true,
+                'channel_based' => true,
+                'locale_based' => false,
+            ], [
+                'name' => 'credit_reimbursed',
+                'title' => 'b2b::app.admin.configuration.index.b2b.email-notifications.settings.credit-reimbursed',
+                'info' => 'b2b::app.admin.configuration.index.b2b.email-notifications.settings.credit-reimbursed-info',
+                'type' => 'boolean',
+                'default' => true,
+                'channel_based' => true,
+                'locale_based' => false,
+            ],
+
+            /**
+             * Quote negotiation (in flow order).
+             */
+            [
+                'name' => 'quote_requested',
+                'title' => 'b2b::app.admin.configuration.index.b2b.email-notifications.settings.quote-requested',
+                'info' => 'b2b::app.admin.configuration.index.b2b.email-notifications.settings.quote-requested-info',
+                'type' => 'boolean',
+                'default' => true,
+                'channel_based' => true,
+                'locale_based' => false,
+            ], [
+                'name' => 'quotation_sent',
+                'title' => 'b2b::app.admin.configuration.index.b2b.email-notifications.settings.quotation-sent',
+                'info' => 'b2b::app.admin.configuration.index.b2b.email-notifications.settings.quotation-sent-info',
+                'type' => 'boolean',
+                'default' => true,
+                'channel_based' => true,
+                'locale_based' => false,
+            ], [
+                'name' => 'quote_countered',
+                'title' => 'b2b::app.admin.configuration.index.b2b.email-notifications.settings.quote-countered',
+                'info' => 'b2b::app.admin.configuration.index.b2b.email-notifications.settings.quote-countered-info',
+                'type' => 'boolean',
+                'default' => true,
+                'channel_based' => true,
+                'locale_based' => false,
+            ], [
+                'name' => 'quote_message',
+                'title' => 'b2b::app.admin.configuration.index.b2b.email-notifications.settings.quote-message',
+                'info' => 'b2b::app.admin.configuration.index.b2b.email-notifications.settings.quote-message-info',
+                'type' => 'boolean',
+                'default' => true,
+                'channel_based' => true,
+                'locale_based' => false,
+            ], [
+                'name' => 'quote_accepted',
+                'title' => 'b2b::app.admin.configuration.index.b2b.email-notifications.settings.quote-accepted',
+                'info' => 'b2b::app.admin.configuration.index.b2b.email-notifications.settings.quote-accepted-info',
+                'type' => 'boolean',
+                'default' => true,
+                'channel_based' => true,
+                'locale_based' => false,
+            ], [
+                'name' => 'quote_rejected',
+                'title' => 'b2b::app.admin.configuration.index.b2b.email-notifications.settings.quote-rejected',
+                'info' => 'b2b::app.admin.configuration.index.b2b.email-notifications.settings.quote-rejected-info',
+                'type' => 'boolean',
+                'default' => true,
+                'channel_based' => true,
+                'locale_based' => false,
+            ], [
+                'name' => 'quote_ordered',
+                'title' => 'b2b::app.admin.configuration.index.b2b.email-notifications.settings.quote-ordered',
+                'info' => 'b2b::app.admin.configuration.index.b2b.email-notifications.settings.quote-ordered-info',
+                'type' => 'boolean',
+                'default' => true,
+                'channel_based' => true,
+                'locale_based' => false,
+            ], [
+                'name' => 'purchase_order_placed',
+                'title' => 'b2b::app.admin.configuration.index.b2b.email-notifications.settings.purchase-order-placed',
+                'info' => 'b2b::app.admin.configuration.index.b2b.email-notifications.settings.purchase-order-placed-info',
+                'type' => 'boolean',
+                'default' => true,
+                'channel_based' => true,
+                'locale_based' => false,
+            ],
+        ],
+    ],
+
+    /**
      * Pay By Credit payment method (visible only to companies with credit).
      */
     [

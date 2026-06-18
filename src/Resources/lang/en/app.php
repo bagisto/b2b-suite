@@ -59,6 +59,50 @@ return [
                             'active-info' => 'When enabled, companies with a credit limit can pay using "Pay By Credit" at checkout.',
                         ],
                     ],
+
+                    'email-notifications' => [
+                        'title' => 'B2B Email Notifications',
+                        'info' => 'Choose which B2B email notifications are sent.',
+
+                        'settings' => [
+                            'title' => 'Notification Settings',
+                            'info' => 'Toggle each notification on or off. Buyer emails go to the company; seller emails go to the assigned sales rep (or the store email).',
+
+                            // Company onboarding.
+                            'company-registered' => 'Company Registered',
+                            'company-registered-info' => 'Emails the sales team when a new company registers and is awaiting approval.',
+                            'company-approved' => 'Company Approved',
+                            'company-approved-info' => 'Emails the buyer when their company account is approved.',
+                            'company-disabled' => 'Company Disabled',
+                            'company-disabled-info' => 'Emails the buyer when their company account is disabled.',
+                            'user-created' => 'New Sub-User Welcome',
+                            'user-created-info' => 'Emails a newly created company sub-user to welcome them.',
+
+                            // Company credit.
+                            'credit-updated' => 'Credit Limit Updated',
+                            'credit-updated-info' => 'Emails the buyer when their company credit limit is changed.',
+                            'credit-reimbursed' => 'Credit Payment Recorded',
+                            'credit-reimbursed-info' => 'Emails the buyer when a payment is recorded against their balance.',
+
+                            // Quote negotiation (in flow order).
+                            'quote-requested' => 'Quote Requested',
+                            'quote-requested-info' => 'Emails the assigned sales rep when a buyer submits a quotation request.',
+                            'quotation-sent' => 'Quotation Sent or Revised',
+                            'quotation-sent-info' => 'Emails the buyer when the seller sends or revises a quotation.',
+                            'quote-countered' => 'Quote Counter-Offer',
+                            'quote-countered-info' => 'Emails the sales rep when the buyer responds with a counter-offer.',
+                            'quote-message' => 'New Negotiation Message',
+                            'quote-message-info' => 'Emails the other party when a new message is posted in the negotiation thread.',
+                            'quote-accepted' => 'Quote Accepted',
+                            'quote-accepted-info' => 'Emails the other party when a quotation is accepted.',
+                            'quote-rejected' => 'Quote Rejected',
+                            'quote-rejected-info' => 'Emails the other party when a quotation is rejected.',
+                            'quote-ordered' => 'Quote Converted to Order',
+                            'quote-ordered-info' => 'Emails the buyer when their quotation is converted into an order.',
+                            'purchase-order-placed' => 'Purchase Order Placed',
+                            'purchase-order-placed-info' => 'Emails the sales rep when a purchase order is placed.',
+                        ],
+                    ],
                 ],
 
                 'sales' => [
@@ -1385,6 +1429,108 @@ return [
         'invalid-file-format' => 'Invalid file format. Supported formats: :formats',
         'request-submitted' => 'Your quotation request has been submitted successfully.',
         'request-failed' => 'Failed to submit quotation request. Please try again.',
+    ],
+
+    'emails' => [
+        'dear' => 'Dear :name,',
+        'team' => 'Team',
+
+        'quote' => [
+            'reference' => 'Reference',
+            'name' => 'Name',
+            'status' => 'Status',
+            'total' => 'Negotiated Total',
+            'cta' => 'View Quotation',
+
+            'requested' => [
+                'subject' => 'New Quotation Request :id',
+                'title' => 'New quotation request',
+                'greeting' => 'A buyer has submitted quotation request :ref. Please review it and send your offer.',
+            ],
+            'sent' => [
+                'subject' => 'Your Quotation :id Has Been Updated',
+                'title' => 'You have a new quotation',
+                'greeting' => 'The seller has sent an offer for quotation :ref. Review the pricing and respond when you are ready.',
+            ],
+            'countered' => [
+                'subject' => 'Counter-Offer on Quotation :id',
+                'title' => 'Buyer sent a counter-offer',
+                'greeting' => 'The buyer has responded with a counter-offer on quotation :ref. Please review it.',
+            ],
+            'accepted' => [
+                'subject' => 'Quotation :id Accepted',
+                'title' => 'Quotation accepted',
+                'greeting' => 'Quotation :ref has been accepted.',
+            ],
+            'rejected' => [
+                'subject' => 'Quotation :id Rejected',
+                'title' => 'Quotation rejected',
+                'greeting' => 'Quotation :ref has been rejected.',
+            ],
+            'message' => [
+                'subject' => 'New Message on Quotation :id',
+                'title' => 'New message',
+                'greeting' => 'There is a new message on quotation :ref.',
+            ],
+            'ordered' => [
+                'subject' => 'Quotation :id Converted to an Order',
+                'title' => 'Your order is confirmed',
+                'greeting' => 'Quotation :ref has been converted into an order. Thank you for your business!',
+            ],
+            'po_placed' => [
+                'subject' => 'New Purchase Order :id',
+                'title' => 'New purchase order',
+                'greeting' => 'Purchase order :ref has been placed.',
+            ],
+        ],
+
+        'company' => [
+            'registered' => [
+                'subject' => 'New Company Registration: :company',
+                'title' => 'New company registration',
+                'greeting' => 'The company :company has registered and is awaiting approval.',
+                'cta' => 'Review Company',
+            ],
+            'approved' => [
+                'subject' => 'Your Company Account Is Approved',
+                'title' => 'Your company is approved',
+                'greeting' => 'Good news! :company has been approved. You can now sign in and start ordering.',
+                'cta' => 'Go to Store',
+            ],
+            'disabled' => [
+                'subject' => 'Your Company Account Status Has Changed',
+                'title' => 'Company account disabled',
+                'greeting' => 'The account for :company has been disabled. Please contact us for assistance.',
+                'cta' => 'Contact Store',
+            ],
+        ],
+
+        'credit' => [
+            'cta' => 'Go to Account',
+            'new-limit' => 'New credit limit',
+            'amount-reimbursed' => 'Amount received',
+            'available' => 'Available credit',
+
+            'updated' => [
+                'subject' => 'Your Company Credit Limit Was Updated',
+                'title' => 'Credit limit updated',
+                'greeting' => 'Your company credit limit has been updated.',
+            ],
+            'reimbursed' => [
+                'subject' => 'Payment Received on Your Company Credit',
+                'title' => 'Payment recorded',
+                'greeting' => 'We have recorded a payment against your company credit balance.',
+            ],
+        ],
+
+        'user' => [
+            'created' => [
+                'subject' => 'Your Account Has Been Created',
+                'title' => 'Welcome aboard',
+                'greeting' => 'An account has been created for you with the email :email. You can sign in to get started.',
+                'cta' => 'Sign In',
+            ],
+        ],
     ],
 
     'commands' => [

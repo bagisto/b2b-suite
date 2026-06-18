@@ -3,6 +3,7 @@
 namespace Webkul\B2BSuite\Listeners;
 
 use Webkul\B2BSuite\Models\CustomerQuote;
+use Webkul\B2BSuite\Notifications\Notifier;
 use Webkul\Sales\Contracts\Invoice as InvoiceContract;
 use Webkul\Sales\Contracts\Order as OrderContract;
 use Webkul\Sales\Contracts\Shipment as ShipmentContract;
@@ -43,6 +44,11 @@ class Order extends Base
             $isQuote->status = $quoteStatus;
             $isQuote->order_id = $order->id;
             $isQuote->save();
+
+            // The quote has been converted into a purchase order: confirm to the buyer and
+            // alert the sales rep.
+            Notifier::quote($isQuote, 'ordered', 'buyer');
+            Notifier::quote($isQuote, 'po_placed', 'admin');
         }
 
         $this->chargeCompanyCredit($order);

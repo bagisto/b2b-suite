@@ -8,6 +8,7 @@ use Webkul\B2BSuite\DataGrids\Admin\CompanyCreditDataGrid;
 use Webkul\B2BSuite\DataGrids\Admin\CompanyCreditTransactionDataGrid;
 use Webkul\B2BSuite\Helpers\CreditManager;
 use Webkul\B2BSuite\Models\Customer;
+use Webkul\B2BSuite\Notifications\Notifier;
 use Webkul\Customer\Repositories\CustomerRepository;
 
 class CompanyCreditController extends Controller
@@ -85,6 +86,9 @@ class CompanyCreditController extends Controller
             'comment' => $data['comment'] ?? null,
         ], $this->actor());
 
+        // Notify the buyer that their credit limit changed.
+        Notifier::credit($company, 'updated', ['amount' => (float) $data['credit_limit']]);
+
         session()->flash('success', trans('b2b::app.admin.companies.credit.limit-updated'));
 
         return redirect()->route('admin.b2b.companies.credit', $company->id);
@@ -115,6 +119,9 @@ class CompanyCreditController extends Controller
             'reference' => $data['reference'] ?? null,
             'comment' => $data['comment'] ?? null,
         ], $this->actor());
+
+        // Notify the buyer that a payment was recorded against their balance.
+        Notifier::credit($company, 'reimbursed', ['amount' => (float) $data['amount']]);
 
         session()->flash('success', trans('b2b::app.admin.companies.credit.reimbursed'));
 

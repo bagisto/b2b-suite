@@ -1,0 +1,28 @@
+<?php
+
+namespace Webkul\B2BSuite\Mail;
+
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Mail\Mailable as BaseMailable;
+use Illuminate\Mail\Message;
+use Illuminate\Queue\SerializesModels;
+
+class Mailable extends BaseMailable implements ShouldQueue
+{
+    use Queueable, SerializesModels;
+
+    /**
+     * Add the configured store sender to the message (mirrors the core Shop/Admin mailables).
+     *
+     * @param  Message  $message
+     */
+    protected function buildFrom($message): self
+    {
+        ! empty($this->from)
+            ? $message->from($this->from[0]['address'], $this->from[0]['name'])
+            : $message->from(core()->getSenderEmailDetails()['email'], core()->getSenderEmailDetails()['name']);
+
+        return $this;
+    }
+}

@@ -6,6 +6,7 @@ use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvi
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use Webkul\B2BSuite\Listeners\Company;
+use Webkul\B2BSuite\Listeners\CompanyNotification;
 use Webkul\B2BSuite\Listeners\Order;
 
 class EventServiceProvider extends ServiceProvider
@@ -25,6 +26,19 @@ class EventServiceProvider extends ServiceProvider
         ],
         'customer.update.after' => [
             [Company::class, 'afterUpdate'],
+        ],
+
+        /**
+         * Company lifecycle email notifications.
+         */
+        'b2b.company.registered' => [
+            [CompanyNotification::class, 'registered'],
+        ],
+        'b2b.company.approved' => [
+            [CompanyNotification::class, 'approved'],
+        ],
+        'b2b.company.disabled' => [
+            [CompanyNotification::class, 'disabled'],
         ],
 
         /**

@@ -12,6 +12,7 @@ use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Webkul\Admin\Mail\Customer\NewCustomerNotification;
 use Webkul\B2BSuite\DataGrids\Shop\UserDataGrid;
+use Webkul\B2BSuite\Notifications\Notifier;
 use Webkul\B2BSuite\Repositories\CompanyRoleRepository;
 use Webkul\Core\Rules\PhoneNumber;
 use Webkul\Customer\Repositories\CustomerGroupRepository;
@@ -139,6 +140,9 @@ class UserController extends Controller
         Event::dispatch('customer.create.after', $customer);
 
         Event::dispatch('customer.registration.after', $customer);
+
+        // Welcome the newly created company sub-user.
+        Notifier::user($customer);
 
         if (request()->hasFile('image')) {
             $this->customerRepository->uploadImages($data, $customer);
