@@ -11,6 +11,51 @@
     <x-b2b::tree.radio />
 @endif
 
+@pushOnce('styles')
+    <style>
+        /**
+         * Hierarchy is shown with proper connector lines (the shop theme purges the icon
+         * font the tree was relying on). Each child draws a vertical trunk segment plus a
+         * horizontal tick into its row; the last child stops the trunk at its centre to
+         * form a clean corner — so a childless top-level feature (Company Credit, Quick
+         * Orders) clearly sits at the root, not under the feature above it.
+         */
+        .tree-children {
+            position: relative;
+            margin-inline-start: 1rem;
+            padding-inline-start: 1rem;
+        }
+
+        .tree-children > div {
+            position: relative;
+        }
+
+        /* Vertical trunk: full height for middle children, half (corner) for the last. */
+        .tree-children > div::before {
+            content: "";
+            position: absolute;
+            inset-inline-start: -1rem;
+            top: 0;
+            height: 100%;
+            border-inline-start: 1px solid #d4d4d8;
+        }
+
+        .tree-children > div:last-child::before {
+            height: 50%;
+        }
+
+        /* Horizontal tick from the trunk into the child row. */
+        .tree-children > div::after {
+            content: "";
+            position: absolute;
+            inset-inline-start: -1rem;
+            top: 50%;
+            width: 0.875rem;
+            border-top: 1px solid #d4d4d8;
+        }
+    </style>
+@endPushOnce
+
 <v-tree-view
     {{ $attributes->except(['input-type', 'selection-type']) }}
     input-type="{{ $inputType }}"
@@ -272,16 +317,8 @@
 
             template: `
                 <div>
-                    <!-- Parent Item Row -->
-                    <div class="flex items-center gap-2 py-1">
-                        <i 
-                            v-if="hasChildren"
-                            :class="toggleIconClasses"
-                        ></i>
-                        <span v-else class="w-5"></span>
-
-                        <i :class="folderIconClasses"></i>
-
+                    <!-- Item Row -->
+                    <div class="flex items-center py-1">
                         <component
                             :is="inputComponent"
                             :id="itemId"
@@ -292,7 +329,7 @@
                         />
                     </div>
 
-                    <!-- Children Items (Nested with indentation) -->
+                    <!-- Children Items (Nested with connector lines) -->
                     <div v-if="hasChildren" class="tree-children">
                         <tree-item
                             v-for="(child, key) in item[childrenField]"
@@ -329,23 +366,6 @@
             computed: {
                 hasChildren() {
                     return Object.entries(this.item[this.childrenField] || {}).length > 0;
-                },
-
-                toggleIconClasses() {
-                    return [
-                        'text-xl',
-                        'cursor-pointer',
-                        'transition-all',
-                        'hover:bg-gray-100',
-                        'rounded-md'
-                    ];
-                },
-
-                folderIconClasses() {
-                    return [
-                        this.hasChildren ? 'icon-folder' : 'icon-attribute',
-                        'text-2xl'
-                    ];
                 },
 
                 inputComponent() {

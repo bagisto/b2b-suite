@@ -203,7 +203,7 @@ class UserController extends Controller
     public function invite(Request $request)
     {
         $this->validate($request, [
-            'user_email'      => ['required', 'email'],
+            'user_email' => ['required', 'email'],
             'company_role_id' => ['required'],
         ]);
 
@@ -239,7 +239,7 @@ class UserController extends Controller
 
         // The chosen role must belong to this company.
         $role = $this->companyRoleRepository->findOneWhere([
-            'id'          => $request->input('company_role_id'),
+            'id' => $request->input('company_role_id'),
             'customer_id' => $companyId,
         ]);
 
@@ -251,18 +251,18 @@ class UserController extends Controller
         // Reuse an existing pending invitation for this email (re-send) so duplicates can't pile up.
         $existing = $this->companyInvitationRepository->findOneWhere([
             'company_id' => $companyId,
-            'email'      => $email,
-            'status'     => CompanyInvitation::STATUS_PENDING,
+            'email' => $email,
+            'status' => CompanyInvitation::STATUS_PENDING,
         ]);
 
         $data = [
-            'company_id'      => $companyId,
-            'email'           => $email,
+            'company_id' => $companyId,
+            'email' => $email,
             'company_role_id' => $request->input('company_role_id'),
-            'invited_by'      => $currentAdmin->id,
-            'token'           => Str::random(48),
-            'status'          => CompanyInvitation::STATUS_PENDING,
-            'expires_at'      => now()->addDays(7),
+            'invited_by' => $currentAdmin->id,
+            'token' => Str::random(48),
+            'status' => CompanyInvitation::STATUS_PENDING,
+            'expires_at' => now()->addDays(7),
         ];
 
         $invitation = $existing
@@ -297,9 +297,9 @@ class UserController extends Controller
             : ($currentAdmin->companies()->first()?->id ?? $currentAdmin->id);
 
         $invitation = $this->companyInvitationRepository->findOneWhere([
-            'id'         => $id,
+            'id' => $id,
             'company_id' => $companyId,
-            'status'     => CompanyInvitation::STATUS_PENDING,
+            'status' => CompanyInvitation::STATUS_PENDING,
         ]);
 
         if (! $invitation) {
@@ -483,10 +483,31 @@ class UserController extends Controller
                 ->where('customer_id', $user->id)
                 ->where('company_id', $companyId)
                 ->update([
-                    'customer_name'  => $user->name,
+                    'customer_name' => $user->name,
                     'customer_email' => $user->email,
-                    'customer_id'    => null,
+                    'customer_id' => null,
                 ]);
+
+            /**
+             * Requisition lists are personal B2B lists the member can no longer reach once
+             * detached, and they are not shared with the company — so they would only linger
+             * as orphaned rows. Delete the member's lists for this company (their items are
+             * removed explicitly and also cascade via the requisition_list_id foreign key).
+             */
+            $requisitionListIds = DB::table('customer_requisition_lists')
+                ->where('customer_id', $user->id)
+                ->where('company_id', $companyId)
+                ->pluck('id');
+
+            if ($requisitionListIds->isNotEmpty()) {
+                DB::table('customer_requisition_list_products')
+                    ->whereIn('requisition_list_id', $requisitionListIds)
+                    ->delete();
+
+                DB::table('customer_requisition_lists')
+                    ->whereIn('id', $requisitionListIds)
+                    ->delete();
+            }
 
             $data = ['company_role_id' => null];
 

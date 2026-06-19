@@ -234,7 +234,7 @@
 
                         <button
                             type="button"
-                            class="secondary-button mt-auto rounded-lg px-6 py-2.5 text-sm"
+                            class="secondary-button mt-auto self-end rounded-lg px-6 py-2.5 text-sm"
                             :disabled="! multipleSKUs.trim().length"
                             :class="{ 'cursor-not-allowed': ! multipleSKUs.trim().length }"
                             :style="! multipleSKUs.trim().length ? 'opacity: 0.5;' : ''"

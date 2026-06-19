@@ -28,7 +28,14 @@
 
         $b2bCredit = $b2bCreditManager->isActive() ? $b2bCreditManager->companyCreditFor($b2bCustomer) : null;
 
-        $b2bShowCredit = $b2bCredit && $b2bCredit->status;
+        /**
+         * Credit is shown here only to members whose role grants the company-credit
+         * permission — mirroring the dedicated credit page guard, so it can't leak to a
+         * member who isn't allowed to see company credit.
+         */
+        $b2bShowCredit = $b2bCredit
+            && $b2bCredit->status
+            && customer_bouncer()->hasPermission('account.company_credit');
 
         $b2bAvailable = $b2bShowCredit ? $b2bCreditManager->availableCredit($b2bCredit) : null;
 

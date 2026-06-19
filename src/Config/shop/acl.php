@@ -4,274 +4,108 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Default Shop Account ACLs
+    | Company (B2B) Feature ACLs
     |--------------------------------------------------------------------------
     |
-    | Including standard Bagisto customer account menu items so they can
-    | also be permission-controlled under the B2B Suite company roles.
+    | Only company features are permission-controlled by company roles. Personal
+    | account features (profile, address, orders, downloadables, reviews, wishlist,
+    | GDPR) are intentionally NOT listed here — a member always controls their own
+    | account and CustomerBouncer always allows those keys.
     |
-    */ [
-        'key' => 'profile',
-        'name' => 'b2b::app.shop.acl.profile',
-        'route' => 'shop.customers.account.profile.index',
-        'sort' => 1,
-    ], [
-        'key' => 'profile.view',
-        'name' => 'b2b::app.shop.acl.view',
-        'route' => 'shop.customers.account.profile.index',
-        'sort' => 1,
-    ], [
-        'key' => 'profile.edit',
-        'name' => 'b2b::app.shop.acl.edit',
-        'route' => 'shop.customers.account.profile.edit',
-        'sort' => 2,
-    ], [
-        'key' => 'profile.update',
-        'name' => 'b2b::app.shop.acl.update',
-        'route' => 'shop.customers.account.profile.update',
-        'sort' => 3,
-    ], [
-        'key' => 'profile.delete',
-        'name' => 'b2b::app.shop.acl.delete',
-        'route' => 'shop.customers.account.profile.destroy',
-        'sort' => 4,
-    ],
-    [
-        'key' => 'address',
-        'name' => 'b2b::app.shop.acl.address',
-        'route' => 'shop.customers.account.addresses.index',
-        'sort' => 2,
-    ], [
-        'key' => 'address.view',
-        'name' => 'b2b::app.shop.acl.view',
-        'route' => 'shop.customers.account.addresses.index',
-        'sort' => 1,
-    ], [
-        'key' => 'address.create',
-        'name' => 'b2b::app.shop.acl.create',
-        'route' => 'shop.customers.account.addresses.create',
-        'sort' => 2,
-    ], [
-        'key' => 'address.edit',
-        'name' => 'b2b::app.shop.acl.edit',
-        'route' => 'shop.customers.account.addresses.edit',
-        'sort' => 3,
-    ], [
-        'key' => 'address.update',
-        'name' => 'b2b::app.shop.acl.update',
-        'route' => 'shop.customers.account.addresses.update',
-        'sort' => 4,
-    ], [
-        'key' => 'address.delete',
-        'name' => 'b2b::app.shop.acl.delete',
-        'route' => 'shop.customers.account.addresses.delete',
-        'sort' => 5,
-    ],
-    [
-        'key' => 'orders',
-        'name' => 'b2b::app.shop.acl.orders',
-        'route' => 'shop.customers.account.orders.index',
-        'sort' => 3,
-    ], [
-        'key' => 'orders.view',
-        'name' => 'b2b::app.shop.acl.view',
-        'route' => 'shop.customers.account.orders.view',
-        'sort' => 1,
-    ], [
-        'key' => 'orders.reorder',
-        'name' => 'b2b::app.shop.acl.reorder',
-        'route' => 'shop.customers.account.orders.reorder',
-        'sort' => 2,
-    ], [
-        'key' => 'orders.cancel',
-        'name' => 'b2b::app.shop.acl.cancel',
-        'route' => 'shop.customers.account.orders.cancel',
-        'sort' => 3,
-    ], [
-        'key' => 'orders.print_invoice',
-        'name' => 'b2b::app.shop.acl.print-invoice',
-        'route' => 'shop.customers.account.orders.print_invoice',
-        'sort' => 4,
-    ],
-    [
-        'key' => 'downloadables',
-        'name' => 'b2b::app.shop.acl.downloadables',
-        'route' => 'shop.customers.account.downloadable_products.index',
-        'sort' => 4,
-    ], [
-        'key' => 'downloadables.download',
-        'name' => 'b2b::app.shop.acl.download',
-        'route' => 'shop.customers.account.downloadable_products.download',
-        'sort' => 1,
-    ],
-    [
-        'key' => 'reviews',
-        'name' => 'b2b::app.shop.acl.reviews',
-        'route' => 'shop.customers.account.reviews.index',
-        'sort' => 5,
-    ], [
-        'key' => 'reviews.index',
-        'name' => 'b2b::app.shop.acl.view',
-        'route' => 'shop.customers.account.reviews.index',
-        'sort' => 1,
-    ],
-    [
-        'key' => 'wishlist',
-        'name' => 'b2b::app.shop.acl.wishlist',
-        'route' => 'shop.customers.account.wishlist.index',
-        'sort' => 6,
-    ],
-    [
-        'key' => 'wishlist.view',
-        'name' => 'b2b::app.shop.acl.view',
-        'route' => 'shop.customers.account.wishlist.index',
-        'sort' => 1,
-    ], [
-        'key' => 'gdpr_data_request',
-        'name' => 'b2b::app.shop.acl.gdpr-request',
-        'route' => 'shop.customers.account.gdpr.index',
-        'sort' => 7,
-    ],
-    [
-        'key' => 'gdpr_data_request.view',
-        'name' => 'b2b::app.shop.acl.view',
-        'route' => 'shop.customers.account.gdpr.index',
-        'sort' => 1,
-    ],
+    | Following the core admin ACL pattern, a permission's `route` may be a single
+    | route OR an array of routes — so one key (e.g. `create` / `edit`) gates both
+    | the form and every write/action endpoint it owns (store, update, …). Read-only
+    | helper endpoints (AJAX lookups, item lists) are folded into the parent feature
+    | rather than given their own toggle.
+    |
+    | Ordered to match the account menu (config/shop/menu.php).
+    |
+    */
 
     /*
     |--------------------------------------------------------------------------
     | Company Profile ACLs
     |--------------------------------------------------------------------------
-    |
-    | Grants a member access to view and edit the company's profile.
-    |
     */
     [
         'key' => 'company_profile',
         'name' => 'b2b::app.shop.acl.company-profile',
         'route' => 'shop.companies.account.profile.index',
-        'sort' => 8,
-    ], [
-        'key' => 'company_profile.view',
-        'name' => 'b2b::app.shop.acl.view',
-        'route' => 'shop.companies.account.profile.index',
         'sort' => 1,
     ], [
         'key' => 'company_profile.edit',
         'name' => 'b2b::app.shop.acl.edit',
-        'route' => 'shop.companies.account.profile.update',
-        'sort' => 2,
+        'route' => [
+            'shop.companies.account.profile.edit',
+            'shop.companies.account.profile.update',
+        ],
+        'sort' => 1,
     ],
 
     /*
     |--------------------------------------------------------------------------
     | Company Credit ACLs
     |--------------------------------------------------------------------------
-    |
-    | All ACLs related to the company credit dashboard will be placed here.
-    |
     */
     [
         'key' => 'company_credit',
         'name' => 'b2b::app.shop.acl.company-credit',
         'route' => 'shop.customers.account.credit.index',
-        'sort' => 9,
-    ], [
-        'key' => 'company_credit.view',
-        'name' => 'b2b::app.shop.acl.view',
-        'route' => 'shop.customers.account.credit.index',
-        'sort' => 1,
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Requisitions ACLs
-    |--------------------------------------------------------------------------
-    |
-    | All ACLs related to requisitions will be placed here.
-    |
-    */
-    [
-        'key' => 'requisitions',
-        'name' => 'b2b::app.shop.acl.requisitions',
-        'route' => 'shop.customers.account.requisitions.index',
-        'sort' => 9,
-    ], [
-        'key' => 'requisitions.create',
-        'name' => 'b2b::app.shop.acl.create',
-        'route' => 'shop.customers.account.requisitions.create',
-        'sort' => 1,
-    ], [
-        'key' => 'requisitions.edit',
-        'name' => 'b2b::app.shop.acl.edit',
-        'route' => 'shop.customers.account.requisitions.edit',
         'sort' => 2,
-    ], [
-        'key' => 'requisitions.delete',
-        'name' => 'b2b::app.shop.acl.delete',
-        'route' => 'shop.customers.account.requisitions.delete',
-        'sort' => 3,
-    ], [
-        'key' => 'requisitions.list',
-        'name' => 'b2b::app.shop.acl.list',
-        'route' => 'shop.customers.account.requisitions.list',
-        'sort' => 4,
-    ], [
-        'key' => 'requisitions.get_product',
-        'name' => 'b2b::app.shop.acl.get-product',
-        'route' => 'shop.customers.account.requisitions.get_product',
-        'sort' => 5,
     ],
 
     /*
     |--------------------------------------------------------------------------
     | Quotes ACLs
     |--------------------------------------------------------------------------
-    |
-    | All ACLs related to quotes will be placed here.
-    |
     */
     [
         'key' => 'quotes',
         'name' => 'b2b::app.shop.acl.quotes',
-        'route' => 'shop.customers.account.quotes.index',
-        'sort' => 10,
+        'route' => [
+            'shop.customers.account.quotes.index',
+            'shop.customers.account.quotes.get_product',
+        ],
+        'sort' => 3,
     ], [
         'key' => 'quotes.view',
         'name' => 'b2b::app.shop.acl.view',
-        'route' => 'shop.customers.account.quotes.view',
+        'route' => [
+            'shop.customers.account.quotes.view',
+            'shop.customers.account.quotes.download',
+            'shop.customers.account.quotes.submit_quote',
+            'shop.customers.account.quotes.update',
+            'shop.customers.account.quotes.add_to_cart',
+        ],
         'sort' => 1,
-    ], [
-        'key' => 'quotes.delete',
-        'name' => 'b2b::app.shop.acl.delete',
-        'route' => 'shop.customers.account.quotes.delete_quote',
-        'sort' => 2,
     ], [
         'key' => 'quotes.messages',
         'name' => 'b2b::app.shop.acl.messages',
-        'route' => 'shop.customers.account.quotes.messages',
-        'sort' => 3,
+        'route' => [
+            'shop.customers.account.quotes.messages',
+            'shop.customers.account.quotes.send_message',
+        ],
+        'sort' => 2,
     ], [
-        'key' => 'quotes.get_product',
-        'name' => 'b2b::app.shop.acl.get-product',
-        'route' => 'shop.customers.account.quotes.get_product',
-        'sort' => 4,
+        'key' => 'quotes.delete',
+        'name' => 'b2b::app.shop.acl.delete',
+        'route' => [
+            'shop.customers.account.quotes.delete_quote',
+            'shop.customers.account.quotes.reject_quote',
+        ],
+        'sort' => 3,
     ],
 
     /*
     |--------------------------------------------------------------------------
     | Purchase Orders ACLs
     |--------------------------------------------------------------------------
-    |
-    | All ACLs related to purchase orders will be placed here.
-    |
     */
     [
         'key' => 'purchase_orders',
         'name' => 'b2b::app.shop.acl.purchase-orders',
         'route' => 'shop.customers.account.purchase_orders.index',
-        'sort' => 11,
+        'sort' => 4,
     ], [
         'key' => 'purchase_orders.view',
         'name' => 'b2b::app.shop.acl.view',
@@ -281,22 +115,68 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Requisitions ACLs
+    |--------------------------------------------------------------------------
+    */
+    [
+        'key' => 'requisitions',
+        'name' => 'b2b::app.shop.acl.requisitions',
+        'route' => [
+            'shop.customers.account.requisitions.index',
+            'shop.customers.account.requisitions.list',
+            'shop.customers.account.requisitions.items',
+            'shop.customers.account.requisitions.get_product',
+        ],
+        'sort' => 5,
+    ], [
+        'key' => 'requisitions.create',
+        'name' => 'b2b::app.shop.acl.create',
+        'route' => [
+            'shop.customers.account.requisitions.create',
+            'shop.customers.account.requisitions.store',
+        ],
+        'sort' => 1,
+    ], [
+        'key' => 'requisitions.edit',
+        'name' => 'b2b::app.shop.acl.edit',
+        'route' => [
+            'shop.customers.account.requisitions.edit',
+            'shop.customers.account.requisitions.update',
+            'shop.customers.account.requisitions.add_product',
+            'shop.customers.account.requisitions.update_items',
+            'shop.customers.account.requisitions.move_to_cart',
+        ],
+        'sort' => 2,
+    ], [
+        'key' => 'requisitions.delete',
+        'name' => 'b2b::app.shop.acl.delete',
+        'route' => [
+            'shop.customers.account.requisitions.delete',
+            'shop.customers.account.requisitions.delete_items',
+        ],
+        'sort' => 3,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Quick Orders ACLs
     |--------------------------------------------------------------------------
     |
-    | All ACLs related to quick orders will be placed here.
+    | A single feature — every endpoint (search, sku lookup, sample, add) is part
+    | of using quick orders, so they all sit under the one parent key.
     |
     */
     [
         'key' => 'quick_orders',
         'name' => 'b2b::app.shop.acl.quick-orders',
-        'route' => 'shop.customers.account.quick_orders.index',
-        'sort' => 12,
-    ], [
-        'key' => 'quick_orders.view',
-        'name' => 'b2b::app.shop.acl.view',
-        'route' => 'shop.customers.account.quick_orders.index',
-        'sort' => 1,
+        'route' => [
+            'shop.customers.account.quick_orders.index',
+            'shop.customers.account.quick_orders.search',
+            'shop.customers.account.quick_orders.fetchBySkus',
+            'shop.customers.account.quick_orders.downloadSample',
+            'shop.customers.account.quick_orders.store',
+        ],
+        'sort' => 6,
     ],
 
     /*
@@ -304,23 +184,33 @@ return [
     | Company Users ACLs
     |--------------------------------------------------------------------------
     |
-    | All ACLs related to company users will be placed here.
+    | Inviting / adding an existing platform user are part of "create"; revoking a
+    | pending invitation is part of "edit" (managing members).
     |
     */
     [
         'key' => 'users',
         'name' => 'b2b::app.shop.acl.users',
         'route' => 'shop.customers.account.users.index',
-        'sort' => 13,
+        'sort' => 7,
     ], [
         'key' => 'users.create',
         'name' => 'b2b::app.shop.acl.create',
-        'route' => 'shop.customers.account.users.create',
+        'route' => [
+            'shop.customers.account.users.create',
+            'shop.customers.account.users.store',
+            'shop.customers.account.users.add_existing',
+            'shop.customers.account.users.invite',
+        ],
         'sort' => 1,
     ], [
         'key' => 'users.edit',
         'name' => 'b2b::app.shop.acl.edit',
-        'route' => 'shop.customers.account.users.edit',
+        'route' => [
+            'shop.customers.account.users.edit',
+            'shop.customers.account.users.update',
+            'shop.customers.account.users.revoke_invitation',
+        ],
         'sort' => 2,
     ], [
         'key' => 'users.delete',
@@ -333,24 +223,27 @@ return [
     |--------------------------------------------------------------------------
     | Company Roles ACLs
     |--------------------------------------------------------------------------
-    |
-    | All ACLs related to company roles will be placed here.
-    |
     */
     [
         'key' => 'roles',
         'name' => 'b2b::app.shop.acl.roles',
         'route' => 'shop.customers.account.roles.index',
-        'sort' => 14,
+        'sort' => 8,
     ], [
         'key' => 'roles.create',
         'name' => 'b2b::app.shop.acl.create',
-        'route' => 'shop.customers.account.roles.create',
+        'route' => [
+            'shop.customers.account.roles.create',
+            'shop.customers.account.roles.store',
+        ],
         'sort' => 1,
     ], [
         'key' => 'roles.edit',
         'name' => 'b2b::app.shop.acl.edit',
-        'route' => 'shop.customers.account.roles.edit',
+        'route' => [
+            'shop.customers.account.roles.edit',
+            'shop.customers.account.roles.update',
+        ],
         'sort' => 2,
     ], [
         'key' => 'roles.delete',
