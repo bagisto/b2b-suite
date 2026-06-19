@@ -21,7 +21,7 @@
 
         <!-- Page Header -->
         <div class="flex items-center justify-between gap-4 max-sm:flex-wrap">
-            <div class="flex items-center gap-2.5">
+            <div class="flex items-center gap-3">
                 <!-- Back Button (mobile) -->
                 <a
                     class="grid md:hidden"
@@ -52,6 +52,41 @@
         {!! view_render_event('bagisto.shop.customers.account.quick_orders.after') !!}
 
     </div>
+
+    @pushOnce('styles')
+        <style>
+            /**
+             * Selected-products filter box. Padding / icon offset / width live here because the
+             * arbitrary + ltr/rtl utility variants are purged out of the B2B shop bundle.
+             */
+            .b2b-qo-filter {
+                position: relative;
+                width: 18rem;
+            }
+
+            @media (max-width: 767px) {
+                .b2b-qo-filter {
+                    width: 100%;
+                }
+            }
+
+            .b2b-qo-filter > input {
+                width: 100%;
+                padding: 0.5rem 0.75rem 0.5rem 2.25rem;
+            }
+
+            .b2b-qo-filter > input:focus {
+                border-color: #2563eb;
+            }
+
+            .b2b-qo-filter > .icon-search {
+                position: absolute;
+                top: 50%;
+                inset-inline-start: 0.65rem;
+                transform: translateY(-50%);
+            }
+        </style>
+    @endPushOnce
 
     @pushOnce('scripts')
         @php
@@ -96,7 +131,7 @@
                     <div v-if="searchedProducts.length" class="mt-4">
                         <div
                             ref="resultsBox"
-                            class="grid gap-2.5 overflow-y-auto pr-1"
+                            class="grid gap-3 overflow-y-auto pr-1"
                             style="max-height: 26rem;"
                             @scroll="onResultsScroll"
                         >
@@ -186,7 +221,7 @@
                             <span class="icon-listing grid h-10 w-10 shrink-0 place-items-center rounded-full bg-blue-50 text-xl text-blue-600"></span>
 
                             <h3 class="text-base font-semibold text-gray-900">
-                                @lang('b2b::app.shop.customers.account.quick-orders.enter-multiple-skus')
+                                @lang('b2b::app.shop.customers.account.quick-orders.multiple-skus')
                             </h3>
                         </div>
 
@@ -231,7 +266,7 @@
 
                             <a
                                 href="{{ route('shop.customers.account.quick_orders.downloadSample') }}"
-                                class="inline-flex items-center gap-1 font-medium text-blue-600 hover:underline"
+                                class="inline-flex items-center gap-1 font-medium text-blue-600"
                             >
                                 <span class="icon-download text-base"></span>
 
@@ -247,22 +282,90 @@
                     class="overflow-hidden rounded-xl border border-zinc-200 bg-white"
                 >
                     <!-- Header -->
-                    <div class="flex items-center gap-2 border-b border-zinc-200 px-6 py-4 max-md:px-4">
-                        <span class="icon-cart text-xl text-gray-700"></span>
+                    <div class="flex items-center justify-between gap-3 border-b border-zinc-200 px-6 py-4 max-md:flex-wrap max-md:px-4">
+                        <div class="flex items-center gap-2">
+                            <span class="icon-cart text-xl text-gray-700"></span>
 
-                        <h3 class="text-base font-semibold text-gray-900">
-                            @lang('b2b::app.shop.customers.account.quick-orders.selected-products') (@{{ selectedProducts.length }})
-                        </h3>
+                            <h3 class="text-base font-semibold text-gray-900">
+                                @lang('b2b::app.shop.customers.account.quick-orders.selected-products') (@{{ selectedProducts.length }})
+                            </h3>
+                        </div>
+
+                        <!-- Filter selected products -->
+                        <div class="b2b-qo-filter">
+                            <span class="icon-search text-lg text-gray-400"></span>
+
+                            <input
+                                type="text"
+                                v-model="selectedSearch"
+                                class="rounded-lg border border-zinc-300 text-sm text-gray-700 outline-none transition-all"
+                                placeholder="@lang('b2b::app.shop.customers.account.quick-orders.filter-selected')"
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Mass actions -->
+                    <div
+                        v-if="paginatedSelected.length"
+                        class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 bg-gray-50 px-6 py-3 max-md:px-4"
+                    >
+                        <label class="flex cursor-pointer items-center gap-3 text-sm font-medium text-gray-700">
+                            <input
+                                type="checkbox"
+                                class="h-4 w-4 cursor-pointer"
+                                style="accent-color: #2563eb;"
+                                :checked="isPageAllChecked"
+                                @change="togglePage"
+                            >
+
+                            <span v-if="checkedIds.length">
+                                @{{ checkedIds.length }} @lang('b2b::app.shop.customers.account.quick-orders.selected-count')
+                            </span>
+
+                            <span v-else>
+                                @lang('b2b::app.shop.customers.account.quick-orders.select-all-page')
+                            </span>
+                        </label>
+
+                        <div v-if="checkedIds.length" class="flex items-center gap-3">
+                            <!-- Extend selection to all filtered products (every page) -->
+                            <button
+                                v-if="checkedIds.length < filteredSelected.length"
+                                type="button"
+                                class="secondary-button rounded-lg px-4 py-2 text-sm font-medium"
+                                @click="selectAllFiltered"
+                            >
+                                @lang('b2b::app.shop.customers.account.quick-orders.select-all') (@{{ filteredSelected.length }})
+                            </button>
+
+                            <!-- Remove the checked products -->
+                            <button
+                                type="button"
+                                class="rounded-lg px-4 py-2 text-sm font-medium text-white transition-all"
+                                style="background-color: #dc2626;"
+                                @click="removeChecked"
+                            >
+                                @lang('b2b::app.shop.customers.account.quick-orders.remove-selected')
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Items -->
                     <div
-                        v-for="(product, index) in selectedProducts"
+                        v-for="product in paginatedSelected"
                         :key="product.id"
                         class="flex items-center justify-between gap-3 border-b border-zinc-100 px-6 py-4 transition-all last:border-b-0 hover:bg-gray-50/60 max-md:flex-wrap max-md:px-4"
                     >
                         <!-- Information -->
                         <div class="flex items-center gap-3">
+                            <input
+                                type="checkbox"
+                                class="h-4 w-4 shrink-0 cursor-pointer"
+                                style="accent-color: #2563eb;"
+                                :checked="checkedIds.includes(product.id)"
+                                @change="toggleCheck(product.id)"
+                            >
+
                             <div class="h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-zinc-100">
                                 <template v-if="! product.images.length">
                                     <img
@@ -314,6 +417,46 @@
                             </button>
                         </div>
                     </div>
+
+                    <!-- No matches for the filter -->
+                    <div
+                        v-if="! paginatedSelected.length"
+                        class="px-6 py-10 text-center text-sm text-gray-500 max-md:px-4"
+                    >
+                        @lang('b2b::app.shop.customers.account.quick-orders.no-matching-products')
+                    </div>
+
+                    <!-- Pagination -->
+                    <div
+                        v-if="selectedLastPage > 1"
+                        class="flex items-center justify-between gap-3 border-t border-zinc-200 px-6 py-3 text-sm max-md:px-4"
+                    >
+                        <span class="text-gray-500">
+                            @lang('b2b::app.shop.customers.account.quick-orders.page') @{{ selectedPage }} / @{{ selectedLastPage }}
+                        </span>
+
+                        <div class="flex items-center gap-2">
+                            <button
+                                type="button"
+                                class="grid h-8 w-8 place-items-center rounded-lg border border-zinc-200 text-gray-500 transition-all hover:bg-zinc-100"
+                                :disabled="selectedPage <= 1"
+                                :style="selectedPage <= 1 ? 'opacity: 0.4; cursor: not-allowed;' : ''"
+                                @click="selectedPage > 1 && selectedPage--"
+                            >
+                                <span class="icon-arrow-left rtl:icon-arrow-right"></span>
+                            </button>
+
+                            <button
+                                type="button"
+                                class="grid h-8 w-8 place-items-center rounded-lg border border-zinc-200 text-gray-500 transition-all hover:bg-zinc-100"
+                                :disabled="selectedPage >= selectedLastPage"
+                                :style="selectedPage >= selectedLastPage ? 'opacity: 0.4; cursor: not-allowed;' : ''"
+                                @click="selectedPage < selectedLastPage && selectedPage++"
+                            >
+                                <span class="icon-arrow-right rtl:icon-arrow-left"></span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Submit Button -->
@@ -348,6 +491,10 @@
                         page: 1,
                         lastPage: 1,
                         searchTimer: null,
+                        selectedSearch: '',
+                        selectedPage: 1,
+                        selectedPerPage: 5,
+                        checkedIds: [],
                         maxFileSizeMB: '{{ $maxFileSize }}',
                     }
                 },
@@ -358,7 +505,47 @@
                         clearTimeout(this.searchTimer);
 
                         this.searchTimer = setTimeout(() => this.search(true), 350);
-                    }
+                    },
+
+                    selectedSearch() {
+                        this.selectedPage = 1;
+                    },
+                },
+
+                computed: {
+                    /**
+                     * Selected products filtered by the "filter selected" box (name or SKU).
+                     */
+                    filteredSelected() {
+                        const term = this.selectedSearch.trim().toLowerCase();
+
+                        if (! term) {
+                            return this.selectedProducts;
+                        }
+
+                        return this.selectedProducts.filter(p =>
+                            (p.name || '').toLowerCase().includes(term)
+                            || (p.sku || '').toLowerCase().includes(term)
+                        );
+                    },
+
+                    selectedLastPage() {
+                        return Math.max(1, Math.ceil(this.filteredSelected.length / this.selectedPerPage));
+                    },
+
+                    paginatedSelected() {
+                        const start = (this.selectedPage - 1) * this.selectedPerPage;
+
+                        return this.filteredSelected.slice(start, start + this.selectedPerPage);
+                    },
+
+                    /**
+                     * Whether every product on the current page is checked (drives the header checkbox).
+                     */
+                    isPageAllChecked() {
+                        return this.paginatedSelected.length > 0
+                            && this.paginatedSelected.every(p => this.checkedIds.includes(p.id));
+                    },
                 },
 
                 methods: {
@@ -539,9 +726,47 @@
 
                     removeProduct(productId) {
                         this.selectedProducts = this.selectedProducts.filter(p => p.id !== productId);
+                        this.checkedIds = this.checkedIds.filter(id => id !== productId);
+
+                        this.clampSelectedPage();
 
                         if (this.searchTerm.length > 1) {
                             this.search();
+                        }
+                    },
+
+                    /* ---- Selected-products mass actions ---- */
+
+                    toggleCheck(id) {
+                        const index = this.checkedIds.indexOf(id);
+
+                        index === -1 ? this.checkedIds.push(id) : this.checkedIds.splice(index, 1);
+                    },
+
+                    togglePage() {
+                        const pageIds = this.paginatedSelected.map(p => p.id);
+
+                        this.checkedIds = this.isPageAllChecked
+                            ? this.checkedIds.filter(id => ! pageIds.includes(id))
+                            : [...new Set([...this.checkedIds, ...pageIds])];
+                    },
+
+                    selectAllFiltered() {
+                        this.checkedIds = this.filteredSelected.map(p => p.id);
+                    },
+
+                    removeChecked() {
+                        if (! this.checkedIds.length) return;
+
+                        this.selectedProducts = this.selectedProducts.filter(p => ! this.checkedIds.includes(p.id));
+                        this.checkedIds = [];
+
+                        this.clampSelectedPage();
+                    },
+
+                    clampSelectedPage() {
+                        if (this.selectedPage > this.selectedLastPage) {
+                            this.selectedPage = this.selectedLastPage;
                         }
                     },
 
