@@ -146,6 +146,41 @@ class Notifier
     }
 
     /**
+     * Notify a sub-user that they have been removed from their company and are now a standard
+     * customer.
+     */
+    public static function userRemoved($user): void
+    {
+        if (! self::enabled('user_removed') || ! $user?->email) {
+            return;
+        }
+
+        self::send($user->email, $user->name, trans('b2b::app.emails.user.removed.subject'), 'b2b::emails.user', [
+            'type'     => 'removed',
+            'audience' => 'buyer',
+        ], $user);
+    }
+
+    /**
+     * Email an invitee the link to join a company. Unlike the toggle-gated notifications this
+     * is transactional (it drives the invite flow), so it is gated only by the master switch.
+     */
+    public static function invitation($invitation, string $companyName, ?string $roleName, string $acceptUrl): void
+    {
+        if (! core()->getConfigData('b2b.general.settings.active')) {
+            return;
+        }
+
+        self::send($invitation->email, $invitation->email, trans('b2b::app.emails.invitation.subject', [
+            'company' => $companyName,
+        ]), 'b2b::emails.invitation', [
+            'company'    => $companyName,
+            'role'       => $roleName,
+            'accept_url' => $acceptUrl,
+        ], $invitation);
+    }
+
+    /**
      * Whether the master B2B switch and the given per-notification toggle are both on.
      */
     protected static function enabled(string $key): bool

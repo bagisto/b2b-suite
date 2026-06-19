@@ -30,6 +30,15 @@ class B2BSuite
                 'grouped_products.associated_product',
             ])->findOneByField('sku', $item['sku']);
 
+            /**
+             * Enforce the company-catalog allowlist on SKU/file based adds too (search already
+             * filters; these flows resolve the product directly, so guard them here). isVisible
+             * returns true when no catalog applies, so non-B2B carts are unaffected.
+             */
+            if (! $product || ! $this->productRepository->isVisible($product)) {
+                continue;
+            }
+
             $cartData = $this->prepareCartData($product, $item);
 
             try {

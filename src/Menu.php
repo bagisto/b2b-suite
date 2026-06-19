@@ -47,6 +47,7 @@ class Menu extends BaseMenu
 
                 $b2bKeys = [
                     'account.company_profile',
+                    'account.company_credit',
                     'account.requisitions',
                     'account.quotes',
                     'account.purchase_orders',

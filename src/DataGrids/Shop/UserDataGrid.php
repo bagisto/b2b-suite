@@ -17,6 +17,21 @@ class UserDataGrid extends DataGrid
     protected $primaryColumn = 'user_id';
 
     /**
+     * The viewer's company id. Its owner row is listed (so members see themselves) but kept
+     * non-editable/non-deletable from this grid.
+     *
+     * @var int|null
+     */
+    protected $companyId = null;
+
+    /**
+     * The viewer's own customer id — they can't remove themselves from the company.
+     *
+     * @var int|null
+     */
+    protected $currentUserId = null;
+
+    /**
      * Create a new controller instance.
      *
      * @return void
@@ -33,37 +48,42 @@ class UserDataGrid extends DataGrid
         $tablePrefix = DB::getTablePrefix();
         $customer = auth()->guard('customer')->user();
 
-        $companyId = $customer->type === 'company'
+        $this->currentUserId = $customer->id;
+
+        $this->companyId = $companyId = $customer->type === 'company'
             ? $customer->id
             : DB::table('customer_companies')
                 ->where('customer_id', $customer->id)
                 ->value('company_id');
 
+        /**
+         * List every member of the company — the owner (type "company", self-linked in
+         * customer_companies) and all of its sub-users (type "user") — including the person
+         * viewing the grid, so they always see themselves in the roster.
+         */
         $queryBuilder = DB::table('customers')
-            ->leftJoin('customer_groups', 'customers.customer_group_id', '=', 'customer_groups.id')
+            ->leftJoin('company_roles', 'customers.company_role_id', '=', 'company_roles.id')
+            ->join('customer_companies', function ($join) use ($companyId) {
+                $join->on('customers.id', '=', 'customer_companies.customer_id')
+                    ->where('customer_companies.company_id', $companyId);
+            })
             ->addSelect(
                 'customers.id as user_id',
                 'customers.email',
                 'customers.phone',
-                'customers.gender',
                 'customers.status',
                 'customers.is_suspended',
-                'customer_groups.name as group'
+                'customers.type as customer_type',
+                'company_roles.name as role'
             )
             ->addSelect(DB::raw('CONCAT('.$tablePrefix.'customers.first_name, " ", '.$tablePrefix.'customers.last_name) as full_name'))
-            ->where('customers.type', 'user')
-            ->where('customers.id', '!=', $customer->id)
+            ->whereIn('customers.type', ['company', 'user'])
             ->groupBy('customers.id');
-
-        $queryBuilder = $queryBuilder->join('customer_companies', function ($join) use ($companyId) {
-            $join->on('customers.id', '=', 'customer_companies.customer_id')
-                ->where('customer_companies.company_id', $companyId);
-        });
 
         $this->addFilter('user_id', 'customers.id');
         $this->addFilter('email', 'customers.email');
         $this->addFilter('full_name', DB::raw('CONCAT('.$tablePrefix.'customers.first_name, " ", '.$tablePrefix.'customers.last_name)'));
-        $this->addFilter('group', 'customer_groups.name');
+        $this->addFilter('role', 'company_roles.name');
         $this->addFilter('phone', 'customers.phone');
         $this->addFilter('status', 'customers.status');
 
@@ -137,19 +157,15 @@ class UserDataGrid extends DataGrid
         ]);
 
         $this->addColumn([
-            'index' => 'gender',
-            'label' => trans('b2b::app.shop.customers.account.users.index.datagrid.gender'),
+            'index' => 'role',
+            'label' => trans('b2b::app.shop.customers.account.users.index.datagrid.role'),
             'type' => 'string',
-            'sortable' => true,
-        ]);
-
-        $this->addColumn([
-            'index' => 'group',
-            'label' => trans('b2b::app.shop.customers.account.users.index.datagrid.group'),
-            'type' => 'string',
+            'searchable' => true,
             'filterable' => true,
-            'filterable_type' => 'dropdown',
-            'filterable_options' => $this->customerGroupRepository->all(['name as label', 'name as value'])->toArray(),
+            'sortable' => true,
+            'closure' => function ($row) {
+                return $row->role ?: '—';
+            },
         ]);
 
         $this->addColumn([
@@ -188,15 +204,7 @@ class UserDataGrid extends DataGrid
     public function prepareActions()
     {
         $this->addAction([
-            'icon' => 'icon-bin',
-            'title' => trans('b2b::app.shop.customers.account.users.index.datagrid.delete'),
-            'method' => 'POST',
-            'url' => function ($row) {
-                return route('shop.customers.account.users.delete', $row->user_id);
-            },
-        ]);
-
-        $this->addAction([
+            'index' => 'edit',
             'icon' => 'icon-edit',
             'title' => trans('b2b::app.shop.customers.account.users.index.datagrid.edit'),
             'method' => 'GET',
@@ -204,5 +212,43 @@ class UserDataGrid extends DataGrid
                 return route('shop.customers.account.users.edit', $row->user_id);
             },
         ]);
+
+        $this->addAction([
+            'index' => 'remove',
+            'icon' => 'icon-cancel',
+            'title' => trans('b2b::app.shop.customers.account.users.index.datagrid.remove'),
+            'method' => 'POST',
+            'url' => function ($row) {
+                return route('shop.customers.account.users.delete', $row->user_id);
+            },
+        ]);
+    }
+
+    /**
+     * Strip the company owner's row actions — the owner is shown for context (and tagged in
+     * the view via customer_type) but must not be edited or removed through the sub-user grid.
+     */
+    protected function formatRecords($records): mixed
+    {
+        $records = parent::formatRecords($records);
+
+        foreach ($records as $record) {
+            // The company owner is read-only here.
+            if ((int) $record->user_id === (int) $this->companyId) {
+                $record->actions = [];
+
+                continue;
+            }
+
+            // A member can't remove themselves from the company (edit is still allowed).
+            if ((int) $record->user_id === (int) $this->currentUserId) {
+                $record->actions = array_values(array_filter(
+                    $record->actions,
+                    fn ($action) => ($action['index'] ?? '') !== 'remove'
+                ));
+            }
+        }
+
+        return $records;
     }
 }

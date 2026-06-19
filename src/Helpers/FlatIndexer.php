@@ -36,6 +36,17 @@ class FlatIndexer
     {
         $customer = $this->customerRepository->find($customer->id);
 
+        /**
+         * Only the company owner carries company attribute data. Sub-users (and plain
+         * customers) share their company's details, so they must not get their own
+         * company_flat row — drop any stale one if the record is not a company.
+         */
+        if (($customer->type ?? null) !== 'company') {
+            $this->companyFlatRepository->deleteWhere(['customer_id' => $customer->id]);
+
+            return;
+        }
+
         $this->updateOrCreate($customer);
     }
 

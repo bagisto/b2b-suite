@@ -124,6 +124,7 @@ class QuoteController extends Controller
             'company_id' => $company?->id,
             'agent_id' => $company?->sales_rep_id ?? auth()->guard('admin')->user()->id,
             'customer_name' => $customer->name,
+            'customer_email' => $customer->email,
             'cart' => $cart,
         ], $quoteRequest->only([
             'name',

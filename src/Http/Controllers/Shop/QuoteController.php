@@ -69,6 +69,7 @@ class QuoteController extends Controller
             'company_id' => $customerCompany ? $customerCompany->id : null,
             'agent_id' => $customerCompany?->sales_rep_id ?? $this->adminRepository->first()?->id ?? null,
             'customer_name' => $customer->name,
+            'customer_email' => $customer->email,
             'expiration_date' => now()->addDays($defaultExpirationDays)->toDateString(),
         ], $quoteRequest->only([
             'name',

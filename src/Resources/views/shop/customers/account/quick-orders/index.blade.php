@@ -77,8 +77,7 @@
                             type="text"
                             class="w-full rounded-lg border border-zinc-300 px-5 py-3 text-base text-gray-700 outline-none transition-all focus:border-navyBlue ltr:pr-12 rtl:pl-12"
                             placeholder="@lang('b2b::app.shop.customers.account.quick-orders.search-by-sku-name')"
-                            v-model.lazy="searchTerm"
-                            v-debounce="500"
+                            v-model="searchTerm"
                         />
 
                         <template v-if="isSearching">
@@ -94,7 +93,13 @@
                     </div>
 
                     <!-- Search Results -->
-                    <div v-if="searchedProducts.length" class="mt-4 grid gap-2.5">
+                    <div v-if="searchedProducts.length" class="mt-4">
+                        <div
+                            ref="resultsBox"
+                            class="grid gap-2.5 overflow-y-auto pr-1"
+                            style="max-height: 26rem;"
+                            @scroll="onResultsScroll"
+                        >
                         <div
                             v-for="product in searchedProducts"
                             :key="product.id"
@@ -148,6 +153,28 @@
                                 </span>
                             </button>
                         </div>
+
+                        <!-- Auto load-more spinner (triggered on scroll) -->
+                        <div
+                            v-if="loadingMore"
+                            class="flex items-center justify-center gap-2 py-2 text-sm text-gray-500"
+                        >
+                            <img
+                                class="h-4 w-4 animate-spin"
+                                src="{{ bagisto_asset('images/spinner.svg') }}"
+                            >
+
+                            @lang('b2b::app.shop.customers.account.quick-orders.loading')
+                        </div>
+                        </div>
+                    </div>
+
+                    <!-- No results -->
+                    <div
+                        v-else-if="searchTerm.trim().length > 1 && ! isSearching"
+                        class="mt-4 rounded-lg border border-dashed border-zinc-200 p-6 text-center text-sm text-gray-500"
+                    >
+                        @lang('b2b::app.shop.customers.account.quick-orders.no-products-found')
                     </div>
                 </div>
 
@@ -163,19 +190,19 @@
                             </h3>
                         </div>
 
-                        <x-shop::form.control-group>
-                            <x-shop::form.control-group.control
-                                type="textarea"
-                                rows="4"
-                                v-model="multipleSKUs"
-                                :placeholder="trans('b2b::app.shop.customers.account.quick-orders.enter-multiple-skus')"
-                            />
-                        </x-shop::form.control-group>
+                        <textarea
+                            rows="4"
+                            v-model="multipleSKUs"
+                            class="mb-3 w-full rounded-lg border border-zinc-300 px-4 py-3 text-sm text-gray-700 outline-none transition-all focus:border-navyBlue"
+                            placeholder="@lang('b2b::app.shop.customers.account.quick-orders.enter-multiple-skus')"
+                        ></textarea>
 
                         <button
                             type="button"
                             class="secondary-button mt-auto rounded-lg px-6 py-2.5 text-sm"
-                            v-if="multipleSKUs.length"
+                            :disabled="! multipleSKUs.trim().length"
+                            :class="{ 'cursor-not-allowed': ! multipleSKUs.trim().length }"
+                            :style="! multipleSKUs.trim().length ? 'opacity: 0.5;' : ''"
                             @click="addMultipleSKUs()"
                         >
                             @lang('b2b::app.shop.customers.account.quick-orders.btn-add-to-list')
@@ -192,15 +219,12 @@
                             </h3>
                         </div>
 
-                        <x-shop::form.control-group>
-                            <x-shop::form.control-group.control
-                                type="file"
-                                name="upload_file"
-                                :rules="'mimes:csv|ext:csv|size:{{ $maxFileSize * 1024 }}'"
-                                :placeholder="trans('b2b::app.shop.customers.account.quick-orders.upload-file')"
-                                @change="handleFileUpload"
-                            />
-                        </x-shop::form.control-group>
+                        <input
+                            type="file"
+                            accept=".csv"
+                            class="w-full cursor-pointer rounded-lg border border-zinc-300 px-4 py-2.5 text-sm text-gray-600 outline-none transition-all focus:border-navyBlue"
+                            @change="handleFileUpload"
+                        />
 
                         <div class="mt-2 flex flex-wrap items-center gap-1 text-sm text-gray-500">
                             <span>@lang('b2b::app.shop.customers.account.quick-orders.add-from-file')</span>
@@ -295,7 +319,7 @@
                 <!-- Submit Button -->
                 <div
                     class="flex justify-end max-md:justify-stretch"
-                    v-if="selectedProducts.length || uploadFile"
+                    v-if="selectedProducts.length"
                 >
                     <button
                         type="button"
@@ -320,43 +344,177 @@
                         searchedProducts: [],
                         selectedProducts: [],
                         isSearching: false,
-                        uploadFile: null,
+                        loadingMore: false,
+                        page: 1,
+                        lastPage: 1,
+                        searchTimer: null,
                         maxFileSizeMB: '{{ $maxFileSize }}',
                     }
                 },
 
                 watch: {
-                    searchTerm: function () {
-                        this.search();
+                    searchTerm() {
+                        // Real-time, debounced search as the user types.
+                        clearTimeout(this.searchTimer);
+
+                        this.searchTimer = setTimeout(() => this.search(true), 350);
                     }
                 },
 
                 methods: {
+                    /**
+                     * Parse an uploaded CSV (sku,quantity) on the client and feed its products
+                     * into the same "Selected Products" list as search / multiple SKUs, so the
+                     * user reviews them before adding to cart.
+                     */
                     handleFileUpload($event) {
-                        this.uploadFile = $event.target.files[0] || null;
-                    },
-                    
-                    search() {
-                        if (this.searchTerm.length <= 1) {
-                            this.searchedProducts = [];
+                        const file = $event.target.files[0];
+
+                        if (! file) return;
+
+                        const extension = file.name.split('.').pop().toLowerCase();
+                        const allowedTypes = ['text/csv', 'application/csv', 'application/vnd.ms-excel'];
+
+                        if (! allowedTypes.includes(file.type) && extension !== 'csv') {
+                            this.$emitter.emit('add-flash', { type: 'error', message: "@lang('b2b::app.shop.checkout.cart.invalid-file-type')" });
+                            $event.target.value = '';
                             return;
                         }
 
-                        this.isSearching = true;
+                        if (file.size > this.maxFileSizeMB * 1024 * 1024) {
+                            this.$emitter.emit('add-flash', {
+                                type: 'error',
+                                message: "@lang('b2b::app.shop.checkout.cart.file-size-exceeds')".replace(':size', this.maxFileSizeMB),
+                            });
+                            $event.target.value = '';
+                            return;
+                        }
+
+                        const reader = new FileReader();
+
+                        reader.onload = (e) => {
+                            const lines = e.target.result.split(/\r?\n/).map(l => l.trim()).filter(l => l);
+
+                            // Drop the header row when present.
+                            const rows = (lines[0] && lines[0].toLowerCase().includes('sku')) ? lines.slice(1) : lines;
+
+                            const quantities = {};
+                            const skus = [];
+
+                            rows.forEach(line => {
+                                const [sku, qty] = line.split(',').map(c => (c || '').trim());
+
+                                if (sku) {
+                                    skus.push(sku);
+                                    quantities[sku] = parseInt(qty) || 1;
+                                }
+                            });
+
+                            $event.target.value = '';
+
+                            if (! skus.length) {
+                                this.$emitter.emit('add-flash', { type: 'warning', message: "@lang('b2b::app.shop.customers.account.quick-orders.no-products-found')" });
+                                return;
+                            }
+
+                            this.addSkusToList(skus, quantities);
+                        };
+
+                        reader.readAsText(file);
+                    },
+
+                    /**
+                     * Auto-load the next page of search results when the user scrolls near the
+                     * bottom of the results box.
+                     */
+                    onResultsScroll($event) {
+                        const el = $event.target;
+
+                        if (el.scrollTop + el.clientHeight >= el.scrollHeight - 80) {
+                            this.loadMore();
+                        }
+                    },
+
+                    /**
+                     * Resolve a list of SKUs to catalog products and append them to the selected
+                     * list (shared by the multiple-SKUs box and the file upload).
+                     */
+                    addSkusToList(skus, quantities = {}) {
+                        return this.$axios.post("{{ route('shop.customers.account.quick_orders.fetchBySkus') }}", { skus })
+                        .then((response) => {
+                            let added = 0;
+
+                            response.data.data.forEach(product => {
+                                if (! this.selectedProducts.find(p => p.id === product.id)) {
+                                    this.selectedProducts.push({ ...product, qty: quantities[product.sku] || 1 });
+                                    added++;
+                                }
+                            });
+
+                            // Drop anything just added from the search results.
+                            const ids = this.selectedProducts.map(p => p.id);
+                            this.searchedProducts = this.searchedProducts.filter(p => ! ids.includes(p.id));
+
+                            this.$emitter.emit('add-flash', {
+                                type: added ? 'success' : 'warning',
+                                message: added
+                                    ? "@lang('b2b::app.shop.customers.account.quick-orders.skus-added')"
+                                    : "@lang('b2b::app.shop.customers.account.quick-orders.no-products-found')",
+                            });
+
+                            return added;
+                        })
+                        .catch(() => {
+                            this.$emitter.emit('add-flash', { type: 'error', message: "@lang('b2b::app.shop.checkout.cart.request-failed')" });
+                        });
+                    },
+
+                    search(reset = true) {
+                        const term = this.searchTerm.trim();
+
+                        if (term.length <= 1) {
+                            this.searchedProducts = [];
+                            this.page = 1;
+                            this.lastPage = 1;
+                            return;
+                        }
+
+                        if (reset) {
+                            this.page = 1;
+                            this.isSearching = true;
+                        } else {
+                            this.loadingMore = true;
+                        }
 
                         this.$axios.get("{{ route('shop.customers.account.quick_orders.search') }}", {
-                            params: { query: this.searchTerm, limit: 5 }
+                            params: { query: term, page: this.page }
                         })
                         .then((response) => {
                             this.isSearching = false;
+                            this.loadingMore = false;
 
-                            // filter out already selected products
+                            this.lastPage = response.data.meta?.last_page ?? this.page;
+
+                            // Filter out already selected products and append (or replace on a fresh search).
                             const selectedIds = this.selectedProducts.map(p => p.id);
-                            this.searchedProducts = response.data.data.filter(
-                                p => !selectedIds.includes(p.id)
-                            );
+                            const fresh = response.data.data.filter(p => !selectedIds.includes(p.id));
+
+                            this.searchedProducts = reset ? fresh : this.searchedProducts.concat(fresh);
                         })
-                        .catch(() => { this.isSearching = false; });
+                        .catch(() => {
+                            this.isSearching = false;
+                            this.loadingMore = false;
+                        });
+                    },
+
+                    loadMore() {
+                        if (this.loadingMore || this.page >= this.lastPage) {
+                            return;
+                        }
+
+                        this.page++;
+
+                        this.search(false);
                     },
 
                     addProduct(product) {
@@ -371,23 +529,12 @@
                     },
 
                     addMultipleSKUs() {
-                        if (!this.multipleSKUs.trim()) return;
-
                         const skus = this.multipleSKUs.split(",")
                                      .map(s => s.trim()).filter(s => s);
 
-                        this.$axios.post("{{ route('shop.customers.account.quick_orders.fetchBySkus') }}", {
-                            skus: skus
-                        })
-                        .then((response) => {
-                            response.data.data.forEach(product => {
-                                if (!this.selectedProducts.find(p => p.id === product.id)) {
-                                    this.selectedProducts.push({ ...product, qty: 1 });
-                                }
-                            });
+                        if (! skus.length) return;
 
-                            this.multipleSKUs = '';
-                        });
+                        this.addSkusToList(skus).then(() => { this.multipleSKUs = ''; });
                     },
 
                     removeProduct(productId) {
@@ -399,81 +546,35 @@
                     },
 
                     submitList() {
-                        if (!this.selectedProducts.length && !this.uploadFile) {
-                            this.$emitter.emit('add-flash', { 
-                                type: 'error', 
-                                message: '@lang("b2b::app.shop.checkout.cart.request-failed")' 
+                        if (! this.selectedProducts.length) {
+                            this.$emitter.emit('add-flash', {
+                                type: 'error',
+                                message: '@lang("b2b::app.shop.checkout.cart.request-failed")',
                             });
+
                             return;
                         }
 
-                        const formData = new FormData();
-                            
-                        if (this.selectedProducts.length > 0) {
-                            // formData.append("products", JSON.stringify(
-                            //     this.selectedProducts.map(p => ({
-                            //         id: p.id,
-                            //         qty: p.qty
-                            //     }))
-                            // ));
-
-                            this.selectedProducts.forEach((product, index) => {
-                                formData.append(`products[${index}][sku]`, product.sku);
-                                formData.append(`products[${index}][quantity]`, product.qty);
-                            });
-                        }
-                        
-                        if (this.uploadFile) {
-                            const allowedTypes = ["text/csv", "application/csv", "application/vnd.ms-excel"];
-                            const fileExtension = this.uploadFile.name.split('.').pop().toLowerCase();
-
-                            if (!allowedTypes.includes(this.uploadFile.type) && fileExtension !== 'csv') {
-                                this.$emitter.emit('add-flash', { 
-                                    type: 'error', 
-                                    message: '@lang("b2b::app.shop.checkout.cart.invalid-file-type")' 
-                                });
-                                return;
-                            }
-
-                            const maxSizeBytes = this.maxFileSizeMB * 1024 * 1024;
-                            if (this.uploadFile.size > maxSizeBytes) {
-                                this.$emitter.emit('add-flash', { 
-                                    type: 'error', 
-                                    message: '@lang("b2b::app.shop.checkout.cart.file-size-exceeds")'.replace(':size', this.maxFileSizeMB) 
-                                });
-                                return;
-                            }
-                            
-                            formData.append("upload_file", this.uploadFile);
-                        }
-
-                        this.$axios.post("{{ route('shop.customers.account.quick_orders.store') }}", formData, {
-                            headers: {
-                                'Content-Type': 'multipart/form-data'
-                            }
+                        this.$axios.post("{{ route('shop.customers.account.quick_orders.store') }}", {
+                            products: this.selectedProducts.map(product => ({ sku: product.sku, quantity: product.qty })),
                         })
                         .then((response) => {
-                                if (response.data.status) {
-                                    if (response.data.message) {
-                                        this.$emitter.emit('add-flash', { 
-                                            type: 'success', 
-                                            message: response.data.message 
-                                        });
-                                    }
-                                    if (response.data.redirect_url) {
-                                        window.location.href = response.data.redirect_url;
-                                    }
-                                } else if (response.data.message) {
-                                    this.$emitter.emit('add-flash', { 
-                                        type: 'error', 
-                                        message: response.data.message 
-                                    });
+                            if (response.data.status) {
+                                if (response.data.message) {
+                                    this.$emitter.emit('add-flash', { type: 'success', message: response.data.message });
                                 }
-                            })
+
+                                if (response.data.redirect_url) {
+                                    window.location.href = response.data.redirect_url;
+                                }
+                            } else if (response.data.message) {
+                                this.$emitter.emit('add-flash', { type: 'error', message: response.data.message });
+                            }
+                        })
                         .catch((error) => {
-                            this.$emitter.emit('add-flash', { 
-                                type: 'error', 
-                                message: error.response?.data?.message || '@lang("b2b::app.shop.checkout.cart.request-failed")' 
+                            this.$emitter.emit('add-flash', {
+                                type: 'error',
+                                message: error.response?.data?.message || '@lang("b2b::app.shop.checkout.cart.request-failed")',
                             });
                         });
                     }

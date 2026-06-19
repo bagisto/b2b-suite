@@ -99,9 +99,11 @@ class ProductRepository extends BaseProductRepository
     }
 
     /**
-     * Check whether a product is within the current customer's catalog.
+     * Check whether a product is within the current customer's company catalog. Returns true
+     * when no catalog applies (guests, admins, unassigned customers), so non-catalog flows are
+     * unaffected. Public so SKU/file based flows (quick order) can enforce the same allowlist.
      */
-    protected function isVisible($product): bool
+    public function isVisible($product): bool
     {
         $catalog = $this->companyCatalog();
 

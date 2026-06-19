@@ -72,6 +72,8 @@ class CustomerQuote extends Model implements CustomerQuoteContract
         'description',
         'company_id',
         'customer_id',
+        'customer_name',
+        'customer_email',
         'agent_id',
         'total',
         'base_total',

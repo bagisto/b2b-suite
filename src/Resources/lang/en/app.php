@@ -77,6 +77,8 @@ return [
                             'company-disabled-info' => 'Emails the buyer when their company account is disabled.',
                             'user-created' => 'New Sub-User Welcome',
                             'user-created-info' => 'Emails a newly created company sub-user to welcome them.',
+                            'user-removed' => 'Sub-User Removed',
+                            'user-removed-info' => 'Emails a sub-user when they are removed from the company and revert to a normal customer.',
 
                             // Company credit.
                             'credit-updated' => 'Credit Limit Updated',
@@ -939,6 +941,8 @@ return [
                 'click-to-select-file' => 'Click to select a file or drag and drop here',
                 'file-requirements' => 'Supported formats: :formats. Maximum size: :size.',
                 'invalid-file-format' => 'Invalid file format. Supported formats: :formats',
+                'invalid-file-type' => 'Invalid file type. Please upload a CSV file.',
+                'file-size-exceeds' => 'File size exceeds the maximum allowed size of :size MB.',
                 'file-too-large' => 'File size exceeds the maximum allowed size of :size',
                 'submit-request' => 'Submit Request',
                 'submitting-request' => 'Submitting Request...',
@@ -1231,6 +1235,9 @@ return [
                     'description' => 'Add products to your cart by entering their SKUs and quantities.',
                     'download-sample' => 'Download Sample File',
                     'enter-multiple-skus' => 'Enter multiple SKUs separated by commas.',
+                    'load-more' => 'Load More',
+                    'loading' => 'Loading…',
+                    'skus-added' => 'Matching products were added to your list.',
                     'no-products-found' => 'No products found.',
                     'no-result-found' => 'No results found.',
                     'product-image' => 'Product Image',
@@ -1242,10 +1249,25 @@ return [
                     'upload-file' => 'Upload File',
                 ],
 
+                'invitations' => [
+                    'title' => 'Company Invitation',
+                    'intro' => 'You have been invited to join :company as :role.',
+                    'note' => 'Accepting will add your account to this company and you will use it as a company member.',
+                    'member' => 'Member',
+                    'btn-accept' => 'Accept Invitation',
+                    'btn-decline' => 'Decline',
+                    'invalid' => 'This invitation is no longer valid or is not for your account.',
+                    'already-member' => 'Your account already belongs to a company.',
+                    'accept-success' => 'You have joined the company successfully.',
+                    'decline-success' => 'Invitation declined.',
+                ],
+
                 'users' => [
                     'create-success' => 'User created successfully.',
                     'update-success' => 'User updated successfully.',
                     'delete-success' => 'User deleted successfully.',
+                    'remove-success' => 'User removed from the company. They are now a normal customer.',
+                    'cannot-remove-self' => 'You cannot remove yourself from the company.',
                     'delete-failed' => 'You cannot delete this user.',
                     'edit-fail' => 'You cannot edit this user.',
                     'un-auth-access' => 'You are not authorized to access this action.',
@@ -1253,6 +1275,7 @@ return [
                     'index' => [
                         'title' => 'Company Users',
                         'add-btn' => 'Add User',
+                        'add-existing-btn' => 'Invite User',
                         'empty' => 'No users found for this company.',
 
                         'datagrid' => [
@@ -1269,8 +1292,33 @@ return [
                             'suspended' => 'Yes',
                             'not-suspended' => 'NO',
                             'role' => 'Role',
+                            'owner' => 'Owner',
                             'edit' => 'Edit',
                             'delete' => 'Delete',
+                            'remove' => 'Remove from Company',
+                        ],
+                    ],
+
+                    'existing' => [
+                        'title' => 'Invite Existing User',
+                        'info' => 'Invite a customer who already has an account on the store to join your company. They will receive an email and become a company user once they accept.',
+                        'email' => 'Customer Email',
+                        'email-placeholder' => 'Enter the existing customer\'s email',
+                        'btn-invite' => 'Send Invitation',
+                        'not-found' => 'No customer found with that email address.',
+                        'invalid' => 'This account cannot be invited as a company user.',
+                        'already-member' => 'This customer already belongs to a company.',
+                        'invalid-role' => 'Please choose a valid role.',
+                        'invite-success' => 'Invitation sent to :email.',
+                        'pending-title' => 'Pending Invitations',
+                        'btn-revoke' => 'Revoke',
+                        'revoke-success' => 'Invitation revoked.',
+
+                        'datagrid' => [
+                            'email' => 'Email',
+                            'role' => 'Role',
+                            'invited-on' => 'Invited On',
+                            'expires' => 'Expires',
                         ],
                     ],
 
@@ -1530,6 +1578,23 @@ return [
                 'greeting' => 'An account has been created for you with the email :email. You can sign in to get started.',
                 'cta' => 'Sign In',
             ],
+
+            'removed' => [
+                'subject' => 'Your Company Membership Has Ended',
+                'title' => 'You Are Now a Standard Customer',
+                'greeting' => 'Your account (:email) has been removed from the company. You can still sign in and shop as a normal customer — your order history stays with you.',
+                'cta' => 'Continue Shopping',
+            ],
+        ],
+
+        'invitation' => [
+            'subject' => 'You Are Invited to Join :company',
+            'title' => 'Invitation to Join :company',
+            'greeting' => 'You have been invited to join :company as :role.',
+            'instruction' => 'Click the button below to review and accept the invitation. You will need to sign in with this email address.',
+            'cta' => 'View Invitation',
+            'expires' => 'This invitation expires on :date.',
+            'member' => 'Member',
         ],
     ],
 

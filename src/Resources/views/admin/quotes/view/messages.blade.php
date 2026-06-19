@@ -278,7 +278,7 @@
             data() {
                 return {
                     quote: this.initialQuote,
-                    customerName: '{{ $quote->customer->name }}',
+                    customerName: @json(optional($quote->customer)->name ?: $quote->customer_name),
                     messages: [],
                     messageUrl: '{{ route('admin.b2b.quotes.messages', $quote->id) }}',
                     sendUrl: '{{ route('admin.b2b.quotes.send_message', $quote->id) }}',

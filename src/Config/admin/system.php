@@ -246,6 +246,14 @@ return [
                 'default' => true,
                 'channel_based' => true,
                 'locale_based' => false,
+            ], [
+                'name' => 'user_removed',
+                'title' => 'b2b::app.admin.configuration.index.b2b.email-notifications.settings.user-removed',
+                'info' => 'b2b::app.admin.configuration.index.b2b.email-notifications.settings.user-removed-info',
+                'type' => 'boolean',
+                'default' => true,
+                'channel_based' => true,
+                'locale_based' => false,
             ],
 
             /**

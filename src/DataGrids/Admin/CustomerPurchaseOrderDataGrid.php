@@ -47,7 +47,7 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
                 'customer_quotes.created_at',
                 'customer_quotes.expiration_date'
             )
-            ->addSelect(DB::raw('CONCAT('.$tablePrefix.'customer.first_name, " ", '.$tablePrefix.'customer.last_name) as customer_name'))
+            ->addSelect(DB::raw('COALESCE(NULLIF(TRIM(CONCAT('.$tablePrefix.'customer.first_name, " ", '.$tablePrefix.'customer.last_name)), ""), '.$tablePrefix.'customer_quotes.customer_name) as customer_name'))
             ->addSelect(DB::raw('COALESCE(NULLIF('.$tablePrefix.'company_flat.business_name, ""), CONCAT('.$tablePrefix.'company.first_name, " ", '.$tablePrefix.'company.last_name)) as company_name'))
             ->where('customer_quotes.state', CustomerQuote::STATE_PURCHASE_ORDER)
             ->whereIn('customer_quotes.status', [
@@ -60,7 +60,7 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
         $this->addFilter('status', 'customer_quotes.status');
         $this->addFilter('base_total', 'customer_quotes.base_total');
         $this->addFilter('negotiated_total', 'customer_quotes.negotiated_total');
-        $this->addFilter('customer_name', DB::raw('CONCAT('.$tablePrefix.'customer.first_name, " ", '.$tablePrefix.'customer.last_name)'));
+        $this->addFilter('customer_name', DB::raw('COALESCE(NULLIF(TRIM(CONCAT('.$tablePrefix.'customer.first_name, " ", '.$tablePrefix.'customer.last_name)), ""), '.$tablePrefix.'customer_quotes.customer_name)'));
         $this->addFilter('customer_email', 'customer.email');
         $this->addFilter('company_name', DB::raw('COALESCE(NULLIF('.$tablePrefix.'company_flat.business_name, ""), CONCAT('.$tablePrefix.'company.first_name, " ", '.$tablePrefix.'company.last_name))'));
         $this->addFilter('company_email', 'company.email');

@@ -6,6 +6,7 @@ use Webkul\B2BSuite\Http\Controllers\Shop\QuickOrderController;
 use Webkul\B2BSuite\Http\Controllers\Shop\QuoteController;
 use Webkul\B2BSuite\Http\Controllers\Shop\RequisitionListController;
 use Webkul\B2BSuite\Http\Controllers\Shop\RoleController;
+use Webkul\B2BSuite\Http\Controllers\Shop\InvitationController;
 use Webkul\B2BSuite\Http\Controllers\Shop\UserController;
 use Webkul\Core\Http\Middleware\NoCacheMiddleware;
 use Webkul\Shop\Http\Controllers\Customer\CustomerController;
@@ -136,11 +137,28 @@ Route::group(['middleware' => ['theme', 'locale', 'currency'], 'prefix' => 'cust
 
             Route::post('create', 'store')->name('shop.customers.account.users.store');
 
+            Route::get('add-existing', 'addExisting')->name('shop.customers.account.users.add_existing');
+
+            Route::post('add-existing', 'invite')->name('shop.customers.account.users.invite');
+
+            Route::post('invitations/{id}/revoke', 'revokeInvitation')->name('shop.customers.account.users.revoke_invitation');
+
             Route::get('edit/{id}', 'edit')->name('shop.customers.account.users.edit');
 
             Route::put('edit/{id}', 'update')->name('shop.customers.account.users.update');
 
             Route::post('delete/{id}', 'destroy')->name('shop.customers.account.users.delete');
+        });
+
+        /**
+         * Company invitation accept / decline (invitee side).
+         */
+        Route::controller(InvitationController::class)->prefix('invitations')->group(function () {
+            Route::get('{token}', 'show')->name('shop.customers.account.invitations.show');
+
+            Route::post('{token}/accept', 'accept')->name('shop.customers.account.invitations.accept');
+
+            Route::post('{token}/decline', 'decline')->name('shop.customers.account.invitations.decline');
         });
 
         /**

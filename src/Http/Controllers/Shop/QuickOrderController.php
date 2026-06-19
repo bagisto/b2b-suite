@@ -46,7 +46,7 @@ class QuickOrderController extends Controller
     public function store()
     {
         try {
-            $maxFileSizeMB = core()->getConfigData('b2b.catalog.quick_order.upload_file.max_size') ?? 2;
+            $maxFileSizeMB = (int) (core()->getConfigData('b2b.quotes.settings.maximum_file_size') ?: 2);
 
             $this->validate(request(), [
                 'products' => 'required_without:upload_file|array',
@@ -172,11 +172,15 @@ class QuickOrderController extends Controller
      */
     public function fetchBySkus(Request $request)
     {
-        $skus = $request->get('skus', []);
+        $skus = $request->input('skus', []);
 
         $products = $this->productRepository->scopeQuery(function ($q) use ($skus) {
             return $q->whereIn('sku', $skus);
         })->get();
+
+        // Keep only products inside the customer's company catalog (search already does this;
+        // this direct SKU lookup must too). isVisible() is a no-op when no catalog applies.
+        $products = $products->filter(fn ($product) => $this->productRepository->isVisible($product))->values();
 
         return ProductResource::collection($products);
     }
@@ -186,8 +190,6 @@ class QuickOrderController extends Controller
      */
     public function downloadSample()
     {
-        $samplePath = 'b2b-data/sample/sample_file.csv';
-
-        return Storage::download($samplePath);
+        return Storage::disk('public')->download('b2b-quick-order/samples/sample-file.csv');
     }
 }

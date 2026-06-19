@@ -17,6 +17,7 @@ use Webkul\B2BSuite\Repositories\CompanyAttributeGroupRepository;
 use Webkul\B2BSuite\Repositories\CompanyAttributeValueRepository;
 use Webkul\B2BSuite\Repositories\CompanyFlatRepository;
 use Webkul\B2BSuite\Repositories\CompanyRoleRepository;
+use Webkul\Customer\Repositories\CustomerGroupRepository;
 use Webkul\Customer\Repositories\CustomerRepository;
 use Webkul\User\Repositories\AdminRepository;
 
@@ -27,12 +28,25 @@ class CompanyController extends Controller
      */
     public function __construct(
         protected CustomerRepository $customerRepository,
+        protected CustomerGroupRepository $customerGroupRepository,
         protected CompanyFlatRepository $customerFlatRepository,
         protected CompanyAttributeGroupRepository $companyAttributeGroupRepository,
         protected CompanyAttributeValueRepository $companyAttributeValueRepository,
         protected CompanyRoleRepository $companyRoleRepository,
         protected AdminRepository $adminRepository
     ) {}
+
+    /**
+     * The customer group a new company is created with — the store's configured default
+     * ("general"), falling back to guest only if that group is missing.
+     */
+    protected function defaultCompanyGroupId(): int
+    {
+        $code = core()->getConfigData('customer.settings.create_new_account_options.default_group') ?: 'general';
+
+        return optional($this->customerGroupRepository->findOneWhere(['code' => $code]))->id
+            ?? core()->getGuestCustomerGroup()->id;
+    }
 
     /**
      * Display a listing of the companies.
@@ -137,8 +151,10 @@ class CompanyController extends Controller
             'company_role_id',
         ]));
 
+        // A company defaults to the store's general customer group (not guest), unless the
+        // form explicitly picked one.
         if (empty($data['customer_group_id'])) {
-            $data['customer_group_id'] = core()->getGuestCustomerGroup()->id;
+            $data['customer_group_id'] = $this->defaultCompanyGroupId();
         }
 
         /**
@@ -226,8 +242,11 @@ class CompanyController extends Controller
             'company_role_id',
         ]));
 
+        // Don't touch the customer group when the edit form doesn't include it — otherwise a
+        // routine edit (status, sales rep, …) would wipe the company's general / company-catalog
+        // group back to guest.
         if (empty($data['customer_group_id'])) {
-            $data['customer_group_id'] = core()->getGuestCustomerGroup()->id;
+            unset($data['customer_group_id']);
         }
 
         /**
