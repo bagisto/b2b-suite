@@ -17,11 +17,10 @@ return new class extends Migration
             $table->string('description')->nullable();
             $table->enum('permission_type', ['all', 'custom'])->default('custom');
             $table->json('permissions')->nullable();
-
             $table->integer('customer_id')->unsigned();
-            $table->foreign('customer_id')->references('id')->on('customers')->onDelete('cascade');
-
             $table->timestamps();
+            
+            $table->foreign('customer_id')->references('id')->on('customers')->onDelete('cascade');
         });
     }
 

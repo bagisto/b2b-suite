@@ -19,12 +19,16 @@ return new class extends Migration
             $table->string('name');
             $table->text('description')->nullable();
             $table->integer('company_id')->unsigned();
-            $table->integer('customer_id')->unsigned();
+            $table->integer('customer_id')->unsigned()->nullable();
+            $table->string('customer_name')->nullable();
+            $table->string('customer_email')->nullable();
             $table->integer('agent_id')->unsigned()->nullable();
             $table->decimal('total', 18, 4)->default(0);
             $table->decimal('base_total', 18, 4)->default(0);
             $table->decimal('negotiated_total', 18, 4)->default(0);
             $table->decimal('base_negotiated_total', 18, 4)->default(0);
+            $table->string('discount_type')->nullable();
+            $table->decimal('discount_value', 18, 4)->nullable();
             $table->date('order_date')->nullable();
             $table->date('expected_arrival_date')->nullable();
             $table->date('expiration_date')->nullable();
@@ -35,7 +39,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('company_id')->references('id')->on('customers')->onDelete('cascade');
-            $table->foreign('customer_id')->references('id')->on('customers')->onDelete('cascade');
+            $table->foreign('customer_id')->references('id')->on('customers')->onDelete('set null');
             $table->foreign('agent_id')->references('id')->on('admins')->onDelete('set null');
             $table->foreign('order_id')->references('id')->on('orders')->onDelete('set null');
         });

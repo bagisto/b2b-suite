@@ -28,6 +28,8 @@ return new class extends Migration
             $table->decimal('base_negotiated_price', 18, 4)->default(0);
             $table->decimal('negotiated_total', 18, 4)->default(0);
             $table->decimal('base_negotiated_total', 18, 4)->default(0);
+            $table->string('discount_type')->nullable();
+            $table->decimal('discount_value', 18, 4)->nullable();
             $table->text('note')->nullable();
             $table->enum('status', ['draft', 'open', 'negotiation', 'accepted', 'ordered', 'expired', 'rejected', 'completed'])->default('draft');
             $table->json('additional')->nullable();

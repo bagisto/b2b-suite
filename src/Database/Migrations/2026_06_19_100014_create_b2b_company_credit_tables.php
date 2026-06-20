@@ -16,8 +16,6 @@ return new class extends Migration
             $table->integer('company_id')->unsigned();
             $table->string('credit_currency_code')->nullable();
             $table->decimal('credit_limit', 18, 4)->default(0);
-
-            // Amount the company currently owes; available credit = limit - outstanding_balance.
             $table->decimal('outstanding_balance', 18, 4)->default(0);
             $table->boolean('allow_exceed_limit')->default(false);
             $table->boolean('status')->default(true);
@@ -32,8 +30,6 @@ return new class extends Migration
             $table->integer('company_credit_id')->unsigned();
             $table->enum('operation', ['allocated', 'updated', 'purchased', 'reimbursed', 'refunded', 'reverted']);
             $table->decimal('amount', 18, 4)->default(0);
-
-            // Snapshot of the ledger state after this entry (append-only audit trail).
             $table->decimal('outstanding_balance_after', 18, 4)->default(0);
             $table->decimal('available_credit_after', 18, 4)->default(0);
             $table->decimal('credit_limit_after', 18, 4)->default(0);

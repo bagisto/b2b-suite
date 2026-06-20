@@ -19,6 +19,8 @@ return new class extends Migration
             $table->string('sku');
             $table->string('name');
             $table->integer('qty')->default(1);
+            $table->string('discount_type')->nullable();
+            $table->decimal('discount_value', 12, 4)->nullable();
             $table->decimal('price', 18, 4)->default(0);
             $table->decimal('base_price', 18, 4)->default(0);
             $table->decimal('total', 18, 4)->default(0);
@@ -38,6 +40,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('customer_quote_items');
+        Schema::dropIfExists('customer_quote_quotations');
     }
 };

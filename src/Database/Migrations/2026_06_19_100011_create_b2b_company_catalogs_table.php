@@ -16,18 +16,13 @@ return new class extends Migration
             $table->string('name');
             $table->text('description')->nullable();
             $table->boolean('status')->default(1);
-
-            /**
-             * Each company catalog is backed by a dedicated, hidden customer group.
-             * Catalog prices are stored against this group and resolved through the
-             * core price index; assigned companies' members inherit this group.
-             */
             $table->integer('customer_group_id')->unsigned()->nullable();
-
+            $table->integer('created_by')->unsigned()->nullable();
             $table->timestamps();
 
             $table->index('status');
             $table->foreign('customer_group_id')->references('id')->on('customer_groups')->onDelete('set null');
+            $table->foreign('created_by')->references('id')->on('admins')->onDelete('set null');
         });
     }
 
