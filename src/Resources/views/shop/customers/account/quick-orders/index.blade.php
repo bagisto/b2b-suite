@@ -16,7 +16,6 @@
     </div>
 
     <div class="flex-auto max-md:px-4">
-
         {!! view_render_event('bagisto.shop.customers.account.quick_orders.before') !!}
 
         <!-- Page Header -->
@@ -50,7 +49,6 @@
         </div>
 
         {!! view_render_event('bagisto.shop.customers.account.quick_orders.after') !!}
-
     </div>
 
     @pushOnce('styles')
@@ -135,72 +133,72 @@
                             style="max-height: 26rem;"
                             @scroll="onResultsScroll"
                         >
-                        <div
-                            v-for="product in searchedProducts"
-                            :key="product.id"
-                            class="flex items-center justify-between gap-3 rounded-lg border border-zinc-200 p-3 transition-all hover:border-zinc-300 hover:shadow-sm"
-                        >
-                            <!-- Information -->
-                            <div class="flex items-center gap-3">
-                                <!-- Image -->
-                                <div class="h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-zinc-100">
-                                    <template v-if="! product.images.length">
-                                        <img
-                                            class="h-16 w-16 object-cover"
-                                            src="{{ bagisto_asset('images/small-product-placeholder.webp') }}"
-                                        >
-                                    </template>
+                            <div
+                                v-for="product in searchedProducts"
+                                :key="product.id"
+                                class="flex items-center justify-between gap-3 rounded-lg border border-zinc-200 p-3 transition-all hover:border-zinc-300 hover:shadow-sm"
+                            >
+                                <!-- Information -->
+                                <div class="flex items-center gap-3">
+                                    <!-- Image -->
+                                    <div class="h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-zinc-100">
+                                        <template v-if="! product.images.length">
+                                            <img
+                                                class="h-16 w-16 object-cover"
+                                                src="{{ bagisto_asset('images/small-product-placeholder.webp') }}"
+                                            >
+                                        </template>
 
-                                    <template v-else>
-                                        <img
-                                            class="h-16 w-16 object-cover"
-                                            :src="product.images[0].url"
-                                        >
-                                    </template>
+                                        <template v-else>
+                                            <img
+                                                class="h-16 w-16 object-cover"
+                                                :src="product.images[0].url"
+                                            >
+                                        </template>
+                                    </div>
+
+                                    <!-- Details -->
+                                    <div class="grid gap-0.5">
+                                        <p class="break-all text-sm font-medium text-gray-900">
+                                            @{{ product.name }}
+                                        </p>
+
+                                        <p class="text-xs text-gray-500">
+                                            @lang('b2b::app.shop.customers.account.quick-orders.sku') @{{ product.sku }}
+                                        </p>
+
+                                        <p class="text-sm font-semibold text-gray-900">
+                                            @{{ product.formatted_price }}
+                                        </p>
+                                    </div>
                                 </div>
 
-                                <!-- Details -->
-                                <div class="grid gap-0.5">
-                                    <p class="break-all text-sm font-medium text-gray-900">
-                                        @{{ product.name }}
-                                    </p>
+                                <!-- Action -->
+                                <button
+                                    type="button"
+                                    class="flex shrink-0 items-center gap-1 rounded-lg border border-navyBlue px-4 py-2 text-sm font-medium text-navyBlue transition-all hover:bg-navyBlue hover:text-white max-sm:px-3"
+                                    @click="addProduct(product)"
+                                >
+                                    <span class="icon-plus text-lg"></span>
 
-                                    <p class="text-xs text-gray-500">
-                                        @lang('b2b::app.shop.customers.account.quick-orders.sku') @{{ product.sku }}
-                                    </p>
-
-                                    <p class="text-sm font-semibold text-gray-900">
-                                        @{{ product.formatted_price }}
-                                    </p>
-                                </div>
+                                    <span class="max-sm:hidden">
+                                        @lang('b2b::app.shop.customers.account.quick-orders.btn-add')
+                                    </span>
+                                </button>
                             </div>
 
-                            <!-- Action -->
-                            <button
-                                type="button"
-                                class="flex shrink-0 items-center gap-1 rounded-lg border border-navyBlue px-4 py-2 text-sm font-medium text-navyBlue transition-all hover:bg-navyBlue hover:text-white max-sm:px-3"
-                                @click="addProduct(product)"
+                            <!-- Auto load-more spinner (triggered on scroll) -->
+                            <div
+                                v-if="loadingMore"
+                                class="flex items-center justify-center gap-2 py-2 text-sm text-gray-500"
                             >
-                                <span class="icon-plus text-lg"></span>
+                                <img
+                                    class="h-4 w-4 animate-spin"
+                                    src="{{ bagisto_asset('images/spinner.svg') }}"
+                                >
 
-                                <span class="max-sm:hidden">
-                                    @lang('b2b::app.shop.customers.account.quick-orders.btn-add')
-                                </span>
-                            </button>
-                        </div>
-
-                        <!-- Auto load-more spinner (triggered on scroll) -->
-                        <div
-                            v-if="loadingMore"
-                            class="flex items-center justify-center gap-2 py-2 text-sm text-gray-500"
-                        >
-                            <img
-                                class="h-4 w-4 animate-spin"
-                                src="{{ bagisto_asset('images/spinner.svg') }}"
-                            >
-
-                            @lang('b2b::app.shop.customers.account.quick-orders.loading')
-                        </div>
+                                @lang('b2b::app.shop.customers.account.quick-orders.loading')
+                            </div>
                         </div>
                     </div>
 
@@ -709,7 +707,7 @@
                             this.selectedProducts.push({ ...product, qty: 1 });
                         }
 
-                        // remove from search results
+                        // Remove from search results.
                         this.searchedProducts = this.searchedProducts.filter(
                             p => p.id !== product.id
                         );

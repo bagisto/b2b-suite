@@ -26,7 +26,10 @@
         <span class="icon-sort-left rtl:icon-sort-right text-xl"></span>
     </button>
 
-    <span class="px-1 text-gray-600 dark:text-gray-300" v-text="{{ $page }} + ' / ' + {{ $total }}"></span>
+    <span
+        class="px-1 text-gray-600 dark:text-gray-300"
+        v-text="{{ $page }} + ' / ' + {{ $total }}"
+    ></span>
 
     <button
         type="button"

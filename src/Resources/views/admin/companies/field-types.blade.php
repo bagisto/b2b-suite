@@ -101,7 +101,7 @@
                 {{ $attribute->admin_name }}
             </x-admin::form.control-group.label>
 
-            <select 
+            <select
                 name="{{ $name }}[]"
                 multiple
                 class="control custom-select"
@@ -135,6 +135,7 @@
                 @php
                     $selectedValues = is_array($value) ? $value : explode(',', $value);
                 @endphp
+                
                 @foreach($attribute->options as $option)
                     <div class="flex items-center gap-1.5">
                         <x-admin::form.control-group.control
@@ -145,7 +146,10 @@
                             :checked="in_array($option->id, $selectedOption)"
                         />
                         
-                        <label class="cursor-pointer text-xs font-medium text-gray-600 dark:text-gray-300" for="{{ $name }}_{{ $option->id }}">
+                        <label
+                            class="cursor-pointer text-xs font-medium text-gray-600 dark:text-gray-300"
+                            for="{{ $name }}_{{ $option->id }}"
+                        >
                             {{ $option->admin_name }}
                         </label>
                     </div>
@@ -267,7 +271,11 @@
 
             @if($value && isset($company))
                 <div class="mt-2">
-                    <img src="{{ Storage::url($value) }}" alt="{{ $attribute->admin_name }}" class="h-20 w-20 rounded border">
+                    <img
+                        src="{{ Storage::url($value) }}"
+                        alt="{{ $attribute->admin_name }}"
+                        class="h-20 w-20 rounded border"
+                    >
                     <p class="text-xs text-gray-600 dark:text-gray-300">@lang('b2b::app.admin.companies.current-image')</p>
                 </div>
             @endif

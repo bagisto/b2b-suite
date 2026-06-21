@@ -237,7 +237,10 @@
                     <div class="w-full p-4 border rounded-md transition-all hover:bg-gray-50 [&>*]:border-0 mb-4 last:mb-0">
                         <div class="flex items-center gap-4">
                             @if ($item->product)
-                                <a href="{{ $item->product->url_key }}" class="inline-block h-[60px] w-[60px] flex-shrink-0">
+                                <a
+                                    href="{{ $item->product->url_key }}"
+                                    class="inline-block h-[60px] w-[60px] flex-shrink-0"
+                                >
                                     <img
                                         src="{{ product_image()->getProductBaseImage($item->product)['small_image_url'] }}"
                                         alt="{{ $item->product->name }}"

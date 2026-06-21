@@ -180,14 +180,20 @@
                                             </div>
 
                                             <input
-                                                type="number" min="0" step="0.01"
+                                                type="number"
+                                                min="0"
+                                                step="0.01"
                                                 class="w-20 rounded-lg border border-zinc-200 px-2.5 py-1.5 text-sm"
                                                 placeholder="0"
                                                 v-model="row.discount_value"
                                                 :name="`items[${row.id}][discount_value]`"
                                             >
 
-                                            <input type="hidden" :name="`items[${row.id}][discount_type]`" :value="row.discount_type">
+                                            <input
+                                                type="hidden"
+                                                :name="`items[${row.id}][discount_type]`"
+                                                :value="row.discount_type"
+                                            >
                                         </div>
                                     </td>
 
@@ -195,7 +201,9 @@
 
                                     <td class="px-4 py-3">
                                         <input
-                                            type="number" min="1" step="1"
+                                            type="number"
+                                            min="1"
+                                            step="1"
                                             class="w-20 rounded-lg border border-zinc-200 px-2.5 py-1.5 text-sm"
                                             v-model="row.negotiated_qty"
                                             :name="`items[${row.id}][negotiated_qty]`"

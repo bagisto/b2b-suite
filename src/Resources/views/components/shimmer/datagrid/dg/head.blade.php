@@ -6,18 +6,30 @@
 --}}
 <div class="b2b-dg-head border-b px-4 py-2.5 dark:border-gray-800">
     <div>
-        <div class="shimmer" style="height: 16px; width: 70%; max-width: 150px;"></div>
+        <div
+            class="shimmer"
+            style="height: 16px; width: 70%; max-width: 150px;"
+        ></div>
     </div>
 
     <div class="b2b-dg-divider">
-        <div class="shimmer" style="height: 16px; width: 72%; max-width: 150px;"></div>
+        <div
+            class="shimmer"
+            style="height: 16px; width: 72%; max-width: 150px;"
+        ></div>
     </div>
 
     <div class="b2b-dg-divider">
-        <div class="shimmer" style="height: 16px; width: 64%; max-width: 130px;"></div>
+        <div
+            class="shimmer"
+            style="height: 16px; width: 64%; max-width: 130px;"
+        ></div>
     </div>
 
     <div class="b2b-dg-divider">
-        <div class="shimmer" style="height: 16px; width: 50%; max-width: 90px;"></div>
+        <div
+            class="shimmer"
+            style="height: 16px; width: 50%; max-width: 90px;"
+        ></div>
     </div>
 </div>

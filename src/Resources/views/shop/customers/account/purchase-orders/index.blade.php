@@ -103,11 +103,13 @@
                         <div class="b2b-dg-divider flex flex-col gap-3">
                             <div class="flex flex-col gap-0.5">
                                 <span class="text-xs uppercase tracking-wide text-zinc-400">@lang('b2b::app.shop.customers.account.quotes.index.datagrid.customer')</span>
+
                                 <p class="break-words text-sm font-medium text-zinc-800">@{{ record.customer_name || '—' }}</p>
                             </div>
 
                             <div class="flex flex-col gap-0.5">
                                 <span class="text-xs uppercase tracking-wide text-zinc-400">@lang('b2b::app.shop.customers.account.quotes.index.datagrid.created-at')</span>
+
                                 <p class="text-sm text-zinc-600">@{{ record.created_at }}</p>
                             </div>
                         </div>
@@ -116,11 +118,13 @@
                         <div class="b2b-dg-divider flex flex-col gap-3">
                             <div class="flex flex-col gap-0.5">
                                 <span class="text-xs uppercase tracking-wide text-zinc-400">@lang('b2b::app.shop.customers.account.quotes.index.datagrid.base_total')</span>
+
                                 <p class="text-sm font-medium text-zinc-700">@{{ record.base_total }}</p>
                             </div>
 
                             <div class="flex flex-col gap-0.5">
                                 <span class="text-xs uppercase tracking-wide text-zinc-400">@lang('b2b::app.shop.customers.account.quotes.index.datagrid.negotiated_total')</span>
+                                
                                 <p class="text-base font-bold text-zinc-800">@{{ record.negotiated_total }}</p>
                             </div>
                         </div>

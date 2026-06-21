@@ -53,7 +53,6 @@
             <div class="mt-3.5 flex gap-2.5 max-xl:flex-wrap">
                 <!-- Left Sub Component -->
                 <div class="flex flex-1 flex-col gap-2 overflow-auto max-xl:flex-auto">
-
                     {!! view_render_event('bagisto.admin.b2b.attributes.edit.card.label.before', ['attribute' => $attribute]) !!}
 
                     <!-- Label -->

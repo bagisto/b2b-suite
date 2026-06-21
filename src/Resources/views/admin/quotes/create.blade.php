@@ -1,5 +1,5 @@
 <x-admin::layouts>
-    <!-- Title of the page -->
+    <!-- Title of the Page -->
     <x-slot:title>
         @lang('b2b::app.admin.quotes.create.title', ['name' => $cart->customer->name])
     </x-slot>

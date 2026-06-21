@@ -15,8 +15,15 @@
             @endphp
 
             @if (Str::startsWith($attachment->mime_type, 'image/'))
-                <a href="{{ $downloadUrl }}" title="@lang('b2b::app.shop.customers.account.quotes.view.download')">
-                    <img src="{{ asset('storage/' . $attachment->path) }}" alt="{{ $attachment->name }}" class="h-[100px] w-[100px] cursor-pointer rounded border border-gray-300 object-cover hover:shadow" />
+                <a
+                    href="{{ $downloadUrl }}"
+                    title="@lang('b2b::app.shop.customers.account.quotes.view.download')"
+                >
+                    <img
+                        src="{{ asset('storage/' . $attachment->path) }}"
+                        alt="{{ $attachment->name }}"
+                        class="h-[100px] w-[100px] cursor-pointer rounded border border-gray-300 object-cover hover:shadow"
+                    />
                 </a>
             @else
                 <a
@@ -27,7 +34,10 @@
                     <span class="icon-download shrink-0 text-3xl text-navyBlue"></span>
 
                     <div class="min-w-0">
-                        <p class="text-sm font-medium text-gray-800" style="max-width: 16rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ $attachment->name }}</p>
+                        <p
+                            class="text-sm font-medium text-gray-800"
+                            style="max-width: 16rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
+                        >{{ $attachment->name }}</p>
                         <p class="text-xs uppercase text-zinc-500">{{ pathinfo($attachment->name, PATHINFO_EXTENSION) }}</p>
                     </div>
                 </a>

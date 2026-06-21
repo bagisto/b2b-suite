@@ -13,7 +13,7 @@
         </x-slot>
 
         <x-slot:content>
-            <!-- Items Fields-->
+            <!-- Items Fields -->
             @if (isset($action) && $action == 'submit')
                 @include('b2b::admin.quotes.view.item-fields', ['quote' => $quote])
             @endif

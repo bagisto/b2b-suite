@@ -186,6 +186,5 @@
         </div>
 
         {!! view_render_event("bagisto.shop.customers.account.quote.view_form_controls.controls.agent_email.after", ['quote' => $quote]) !!}
-
     </div>
 </div>

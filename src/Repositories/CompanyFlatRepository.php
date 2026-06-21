@@ -145,7 +145,7 @@ class CompanyFlatRepository extends Repository
     public function syncForCustomer(int $customerId, array $data): void
     {
         $locales = core()->getAllLocales();
-        
+
         $channels = core()->getAllChannels();
 
         foreach ($locales as $locale) {

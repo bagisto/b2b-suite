@@ -28,7 +28,7 @@
         </p>
 
         <x-shop::form :action="route('shop.customers.account.users.invite')">
-            <!-- Email of the existing platform customer -->
+            <!-- Email of the existing platform customer. -->
             <x-shop::form.control-group>
                 <x-shop::form.control-group.label class="required">
                     @lang('b2b::app.shop.customers.account.users.existing.email')
@@ -81,7 +81,7 @@
             </button>
         </x-shop::form>
 
-        <!-- Pending invitations -->
+        <!-- Pending Invitations -->
         <div class="mt-12">
             <p class="mb-4 text-xl font-medium text-gray-800 max-md:text-lg">
                 @lang('b2b::app.shop.customers.account.users.existing.pending-title')

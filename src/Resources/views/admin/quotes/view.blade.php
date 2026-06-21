@@ -93,7 +93,7 @@
         @if ($hasQuoteActions) style="min-height: 40px;" @endif
     >
         @if (! $isOrderedOrCompletedOrRejected)
-            <!-- Reject Quotation (kept less prominent than the primary action) -->
+            <!-- Reject Quotation (kept less prominent than the primary action). -->
             @include('b2b::admin.quotes.view.partials.modal', [
                 'action'      => 'reject',
                 'buttonText'  => 'btn-reject-quote',
@@ -102,7 +102,7 @@
         @endif
 
         @if ($canAdminAccept)
-            <!-- Accept the buyer's quotation -->
+            <!-- Accept the buyer's quotation. -->
             @include('b2b::admin.quotes.view.partials.modal', [
                 'action'           => 'accept',
                 'buttonText'       => 'btn-accept-quote',
@@ -112,13 +112,13 @@
         @endif
 
         @if ($canSendQuotation)
-            <!-- Send Quotation (per-item & whole-quote discounts) — primary, on the right -->
+            <!-- Send Quotation (per-item & whole-quote discounts) — primary, on the right. -->
             @include('b2b::admin.quotes.view.negotiation')
         @endif
     </div>
 
     <div class="mt-5">
-        <!-- Quote details: Information + Company side by side; stacks to one column below 1280px -->
+        <!-- Quote details: Information + Company side by side; stacks to one column below 1280px. -->
         <div class="b2b-view-columns mt-3.5">
             <!-- Left Component -->
             <div class="flex flex-col gap-2">

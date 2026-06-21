@@ -32,7 +32,7 @@
             </div>
 
             <div class="flex items-center gap-2.5 max-sm:gap-1.5">
-                <!-- Add an existing platform customer as a company user -->
+                <!-- Add an existing platform customer as a company user. -->
                 <a
                     href="{{ route('shop.customers.account.users.add_existing') }}"
                     class="secondary-button border-zinc-200 px-5 py-3 font-normal max-md:rounded-lg max-md:py-2 max-sm:py-1.5 max-sm:text-sm"
@@ -51,7 +51,7 @@
 
         {!! view_render_event('bagisto.shop.customers.account.users.list.before') !!}
 
-        <!-- Company users (responsive multi-row grid: stacks to one column on mobile) -->
+        <!-- Company users (responsive multi-row grid: stacks to one column on mobile). -->
         <x-shop::datagrid
             :src="route('shop.customers.account.users.index')"
             :isMultiRow="true"
@@ -140,7 +140,7 @@
                             <span class="text-sm text-zinc-700">@{{ record.phone || '—' }}</span>
                         </div>
 
-                        <!-- Role + status -->
+                        <!-- Role + Status -->
                         <div class="b2b-dg-divider flex flex-col items-start gap-2">
                             <span class="rounded-md bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-700">
                                 @{{ record.role }}

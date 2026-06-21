@@ -329,7 +329,7 @@
                                             v-for="product in paginatedProducts"
                                             :key="product.id"
                                         >
-                                            <!-- Single-leaf product (simple / virtual / downloadable): price edited inline -->
+                                            <!-- Single-leaf product (simple / virtual / downloadable): price edited inline. -->
                                             <tr
                                                 v-if="product.priceable && ! product.is_composite"
                                                 class="border-t border-gray-100 transition-all hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-950"

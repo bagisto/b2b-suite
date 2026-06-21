@@ -37,5 +37,4 @@
     <x-admin::datagrid :src="route('admin.b2b.attributes.index')" />
 
     {!! view_render_event('bagisto.admin.b2b.attributes.list.after') !!}
-
 </x-admin::layouts>

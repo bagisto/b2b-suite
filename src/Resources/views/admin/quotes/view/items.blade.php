@@ -75,7 +75,10 @@
                         <tr class="border-b dark:border-gray-800">
                             <td class="px-4 py-2 text-gray-600 dark:text-gray-300">
                                 @if ($item->product)
-                                    <a href="{{ route('admin.catalog.products.edit', $item->product->id) }}" class="inline-block h-[60px] w-[60px]">
+                                    <a
+                                        href="{{ route('admin.catalog.products.edit', $item->product->id) }}"
+                                        class="inline-block h-[60px] w-[60px]"
+                                    >
                                         <img
                                             src="{{ product_image()->getProductBaseImage($item->product)['small_image_url'] }}"
                                             alt="{{ $item->product->name }}"
@@ -188,7 +191,10 @@
                 <div class="rounded border border-gray-200 p-3 dark:border-gray-800">
                     <div class="flex gap-3">
                         @if ($item->product)
-                            <a href="{{ route('admin.catalog.products.edit', $item->product->id) }}" class="inline-block h-[60px] w-[60px] shrink-0">
+                            <a
+                                href="{{ route('admin.catalog.products.edit', $item->product->id) }}"
+                                class="inline-block h-[60px] w-[60px] shrink-0"
+                            >
                                 <img
                                     src="{{ product_image()->getProductBaseImage($item->product)['small_image_url'] }}"
                                     alt="{{ $item->product->name }}"

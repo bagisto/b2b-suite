@@ -19,8 +19,8 @@
                     @lang('b2b::app.admin.company-attributes.mapping.back-btn')
                 </a>
 
-                <button 
-                    type="submit" 
+                <button
+                    type="submit"
                     class="primary-button"
                 >
                     @lang('b2b::app.admin.company-attributes.mapping.save-btn')

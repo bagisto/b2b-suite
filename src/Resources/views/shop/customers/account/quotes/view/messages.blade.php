@@ -194,7 +194,11 @@
                 >
                     <template v-if="hasActiveFilters">
                         <p class="mb-2">@lang('b2b::app.shop.customers.account.quotes.view.no-messages-filtered')</p>
-                        <button @click="clearFilters" type="button" class="text-navyBlue underline">
+                        <button
+                            @click="clearFilters"
+                            type="button"
+                            class="text-navyBlue underline"
+                        >
                             @lang('b2b::app.shop.customers.account.quotes.view.clear-filters')
                         </button>
                     </template>

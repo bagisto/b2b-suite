@@ -237,7 +237,7 @@
                             <!-- Modal Footer -->
                             <x-slot:footer>
                                 <!-- Save Button -->
-                                <x-admin::button
+                                <x-shop::button
                                     button-type="button"
                                     class="primary-button"
                                     :title="trans('b2b::app.shop.customers.account.requisitions.index.create.btn-save')"
@@ -245,12 +245,12 @@
                                     ::disabled="isLoading"
                                 />
                             </x-slot>
-                        </x-admin::modal>
+                        </x-shop::modal>
 
                         {!! view_render_event('bagisto.shop.customers.account.requisitions.create_form_controls.after') !!}
 
                     </form>
-                </x-admin::form>
+                </x-shop::form>
             </div>
         </script>
 

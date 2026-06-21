@@ -7,8 +7,8 @@
         <div class="relative">
             <div class="relative h-[60px] max-h-[60px] w-full max-w-[60px] rounded">
                 @if ($item->product?->images->count() > 0)
-                    <img 
-                        class="h-full w-full rounded" 
+                    <img
+                        class="h-full w-full rounded"
                         src="{{ $item->product->base_image_url }}"
                     >
 

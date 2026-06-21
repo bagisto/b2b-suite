@@ -42,7 +42,7 @@
     </div>
 
     <div class="mt-5">
-        <!-- PO details: Information + Company side by side; stacks to one column below 1280px -->
+        <!-- PO details: Information + Company side by side; stacks to one column below 1280px. -->
         <div class="b2b-view-columns mt-3.5">
             <!-- Left Component -->
             <div class="flex flex-col gap-2">

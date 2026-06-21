@@ -130,7 +130,11 @@
 
                 <div class="mt-6 rounded">
                     <x-shop::form :action="route('shop.customers.register.store')">
-                        <input type="hidden" name="account_type" value="personal">
+                        <input
+                            type="hidden"
+                            name="account_type"
+                            value="personal"
+                        >
 
                         {!! view_render_event('bagisto.shop.customers.signup_form_controls.before') !!}
 
@@ -341,7 +345,11 @@
                         :action="route('shop.companies.register.store')"
                         enctype="multipart/form-data"
                     >
-                        <input type="hidden" name="account_type" value="company">
+                        <input
+                            type="hidden"
+                            name="account_type"
+                            value="company"
+                        >
 
                         @foreach ($attributes as $attribute)
                             <x-shop::form.control-group>

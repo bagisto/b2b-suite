@@ -77,24 +77,28 @@
             <!-- Business Name -->
             <div class="grid w-full grid-cols-[2fr_3fr] border-b border-zinc-100 py-3">
                 <p class="text-sm font-medium">@lang('b2b::app.shop.customers.account.profile.business-name')</p>
+
                 <p class="text-sm font-medium text-zinc-500">{{ $b2bBusinessName ?: $b2bCompany->name }}</p>
             </div>
 
             <!-- Your Role -->
             <div class="grid w-full grid-cols-[2fr_3fr] border-b border-zinc-100 py-3">
                 <p class="text-sm font-medium">@lang('b2b::app.shop.customers.account.profile.role')</p>
+
                 <p class="text-sm font-medium text-zinc-500">{{ $b2bRole?->name ?? '—' }}</p>
             </div>
 
             <!-- Company Email -->
             <div class="grid w-full grid-cols-[2fr_3fr] border-b border-zinc-100 py-3">
                 <p class="text-sm font-medium">@lang('b2b::app.shop.customers.account.profile.company-email')</p>
+
                 <p class="text-sm font-medium text-zinc-500">{{ $b2bCompany->email ?: '—' }}</p>
             </div>
 
             <!-- Company Phone -->
             <div class="grid w-full grid-cols-[2fr_3fr] {{ $b2bShowCredit ? 'border-b border-zinc-100' : '' }} py-3">
                 <p class="text-sm font-medium">@lang('b2b::app.shop.customers.account.profile.company-phone')</p>
+
                 <p class="text-sm font-medium text-zinc-500">{{ $b2bCompany->phone ?: '—' }}</p>
             </div>
 
@@ -102,12 +106,14 @@
                 <!-- Credit Limit -->
                 <div class="grid w-full grid-cols-[2fr_3fr] border-b border-zinc-100 py-3">
                     <p class="text-sm font-medium">@lang('b2b::app.shop.customers.account.profile.credit-limit')</p>
+
                     <p class="text-sm font-medium text-zinc-500">{{ core()->formatBasePrice($b2bCredit->credit_limit) }}</p>
                 </div>
 
                 <!-- Available Credit -->
                 <div class="grid w-full grid-cols-[2fr_3fr] py-3">
                     <p class="text-sm font-medium">@lang('b2b::app.shop.customers.account.profile.available-credit')</p>
+                    
                     <p class="text-sm font-medium {{ $b2bAvailable > 0 ? 'text-green-700' : 'text-zinc-500' }}">{{ core()->formatBasePrice($b2bAvailable) }}</p>
                 </div>
             @endif

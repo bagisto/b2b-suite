@@ -21,7 +21,6 @@
     @endphp
 
     <div class="flex-auto max-md:px-4">
-
         {!! view_render_event('bagisto.shop.customers.account.company-profile.before', ['customer' => $customer]) !!}
 
         <x-shop::form
@@ -116,10 +115,8 @@
             @endif
 
             {!! view_render_event('bagisto.shop.customers.account.company-profile.controls.after', ['customer' => $customer]) !!}
-
         </x-shop::form>
 
         {!! view_render_event('bagisto.shop.customers.account.company-profile.after', ['customer' => $customer]) !!}
-
     </div>
 </x-shop::layouts.account>

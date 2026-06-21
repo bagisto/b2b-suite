@@ -85,11 +85,12 @@
                         <div v-html="record.status"></div>
                     </div>
 
-                    <!-- Credit limit -->
+                    <!-- Credit Limit -->
                     <div class="b2b-dg-divider flex flex-col gap-0.5">
                         <span class="text-xs uppercase tracking-wide text-gray-400 dark:text-gray-500">
                             @lang('b2b::app.admin.companies.credit.credit-limit')
                         </span>
+
                         <p class="text-base font-medium text-gray-800 dark:text-white">@{{ $admin.formatPrice(record.credit_limit) }}</p>
                     </div>
 
@@ -99,6 +100,7 @@
                             <span class="text-xs uppercase tracking-wide text-gray-400 dark:text-gray-500">
                                 @lang('b2b::app.admin.companies.credit.outstanding-balance')
                             </span>
+
                             <p
                                 class="text-sm font-medium"
                                 :class="parseFloat(record.outstanding_balance) > 0 ? 'text-red-600' : 'text-gray-700 dark:text-gray-200'"
@@ -109,6 +111,7 @@
                             <span class="text-xs uppercase tracking-wide text-gray-400 dark:text-gray-500">
                                 @lang('b2b::app.admin.companies.credit.available-credit')
                             </span>
+                            
                             <p
                                 class="text-sm font-bold"
                                 :class="parseFloat(record.available_credit) > 0 ? 'text-green-600' : 'text-gray-800 dark:text-white'"

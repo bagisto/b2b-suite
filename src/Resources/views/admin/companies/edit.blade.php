@@ -3,7 +3,7 @@
         @lang('b2b::app.admin.companies.edit.title')
     </x-slot>
 
-    {!! view_render_event('bagisto.admin.b2b.companies.dit.before', ['company' => $company]) !!}
+    {!! view_render_event('bagisto.admin.b2b.companies.edit.before', ['company' => $company]) !!}
 
     <!-- Input Form -->
     <x-admin::form
@@ -11,7 +11,7 @@
         method="PUT"
         enctype="multipart/form-data"
     >
-        {!! view_render_event('bagisto.admin.b2b.companies.dit.edit_form_controls.before', ['company' => $company]) !!}
+        {!! view_render_event('bagisto.admin.b2b.companies.edit.edit_form_controls.before', ['company' => $company]) !!}
 
         <!-- Actions Buttons -->
         <div class="flex items-center justify-between gap-4 max-sm:flex-wrap">
@@ -116,8 +116,8 @@
             </div>
         </div>
 
-        {!! view_render_event('bagisto.admin.b2b.companies.dit.edit_form_controls.after', ['company' => $company]) !!}
+        {!! view_render_event('bagisto.admin.b2b.companies.edit.edit_form_controls.after', ['company' => $company]) !!}
     </x-admin::form>
 
-    {!! view_render_event('bagisto.admin.b2b.companies.dit.after', ['company' => $company]) !!}
+    {!! view_render_event('bagisto.admin.b2b.companies.edit.after', ['company' => $company]) !!}
 </x-admin::layouts>

@@ -120,7 +120,7 @@
 
                     <!-- Actions -->
                     <div class="b2b-dg-divider flex items-start justify-end gap-1.5">
-                        <!-- Creator / super-admin: full controls (settings + edit + delete) -->
+                        <!-- Creator / super-admin: full controls (settings + edit + delete). -->
                         <template v-if="{{ $isSuperAdmin ? 'true' : 'false' }} || record.created_by == {{ $currentAdminId }}">
                             <!-- Update general settings (modal) -->
                             <span
@@ -139,7 +139,7 @@
                             </template>
                         </template>
 
-                        <!-- Other admins: read-only view of the shared catalog -->
+                        <!-- Other admins: read-only view of the shared catalog. -->
                         <a
                             v-else
                             :href="'{{ route('admin.b2b.company_catalogs.edit', 'ID_PLACEHOLDER') }}'.replace('ID_PLACEHOLDER', record.id)"
@@ -152,7 +152,7 @@
         </template>
     </x-admin::datagrid>
 
-    <!-- General settings modal (create + edit), opened via the emitter from the listing -->
+    <!-- General settings modal (create + edit), opened via the emitter from the listing. -->
     @if (bouncer()->hasPermission('b2b.company-catalogs.create') || bouncer()->hasPermission('b2b.company-catalogs.edit'))
         <v-catalog-settings
             create-url="{{ route('admin.b2b.company_catalogs.store') }}"

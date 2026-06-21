@@ -101,7 +101,11 @@
 
                         <!-- Removed line items (deleted on send) -->
                         <template v-for="id in removedIds" :key="'removed-' + id">
-                            <input type="hidden" name="removed_items[]" :value="id">
+                            <input
+                                type="hidden"
+                                name="removed_items[]"
+                                :value="id"
+                            >
                         </template>
 
                         <!-- ============ STEP 1: EDIT ============ -->
@@ -175,7 +179,11 @@
                                                         :name="`items[${row.id}][discount_value]`"
                                                     >
 
-                                                    <input type="hidden" :name="`items[${row.id}][discount_type]`" :value="row.discount_type">
+                                                    <input
+                                                        type="hidden"
+                                                        :name="`items[${row.id}][discount_type]`"
+                                                        :value="row.discount_type"
+                                                    >
                                                 </div>
                                             </td>
 
@@ -243,7 +251,11 @@
                                             name="total_discount_value"
                                         >
 
-                                        <input type="hidden" name="total_discount_type" :value="totalType">
+                                        <input
+                                            type="hidden"
+                                            name="total_discount_type"
+                                            :value="totalType"
+                                        >
                                     </div>
                                 </div>
 

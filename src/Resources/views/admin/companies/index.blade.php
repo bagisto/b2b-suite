@@ -33,7 +33,7 @@
 
             <template v-else>
                 <div class="b2b-company-head border-b px-4 py-2.5 dark:border-gray-800">
-                    <!-- Select all -->
+                    <!-- Select All -->
                     <p v-if="available.massActions.length">
                         <label for="mass_action_select_all_records">
                             <input
@@ -47,6 +47,7 @@
                             <span class="icon-uncheckbox peer-checked:icon-checked cursor-pointer rounded-md text-2xl peer-checked:text-blue-600"></span>
                         </label>
                     </p>
+
                     <p v-else></p>
 
                     <div
@@ -107,6 +108,7 @@
                             <span class="icon-uncheckbox peer-checked:icon-checked cursor-pointer rounded-md text-2xl peer-checked:text-blue-600"></span>
                         </label>
                     </p>
+
                     <p v-else></p>
 
                     <!-- Identity -->
@@ -131,6 +133,7 @@
                             <span class="text-xs uppercase tracking-wide text-gray-400 dark:text-gray-500">
                                 @lang('b2b::app.admin.companies.index.datagrid.email')
                             </span>
+
                             <p class="break-words text-sm text-gray-700 dark:text-gray-200">@{{ record.email || '—' }}</p>
                         </div>
 
@@ -138,6 +141,7 @@
                             <span class="text-xs uppercase tracking-wide text-gray-400 dark:text-gray-500">
                                 @lang('b2b::app.admin.companies.index.datagrid.phone')
                             </span>
+
                             <p class="text-sm text-gray-700 dark:text-gray-200">@{{ record.phone || '—' }}</p>
                         </div>
                     </div>
@@ -148,6 +152,7 @@
                             <span class="text-xs uppercase tracking-wide text-gray-400 dark:text-gray-500">
                                 @lang('b2b::app.admin.companies.index.datagrid.vat-tax-id')
                             </span>
+
                             <p class="break-words text-sm text-gray-700 dark:text-gray-200">@{{ record.vat_tax_id || '—' }}</p>
                         </div>
 
@@ -155,6 +160,7 @@
                             <span class="text-xs uppercase tracking-wide text-gray-400 dark:text-gray-500">
                                 @lang('b2b::app.admin.companies.index.datagrid.sales-representative')
                             </span>
+
                             <p class="break-words text-sm text-gray-700 dark:text-gray-200">@{{ record.sales_rep_name || '—' }}</p>
                         </div>
 
@@ -162,6 +168,7 @@
                             <span class="text-xs uppercase tracking-wide text-gray-400 dark:text-gray-500">
                                 @lang('b2b::app.admin.companies.index.datagrid.created-at')
                             </span>
+                            
                             <p class="text-sm text-gray-600 dark:text-gray-300">@{{ record.created_at }}</p>
                         </div>
                     </div>

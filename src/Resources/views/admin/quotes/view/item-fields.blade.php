@@ -1,5 +1,3 @@
-
-                    
 <div class="overflow-x-auto">
     <table class="w-full border text-left text-sm">
         <thead class="bg-gray-100">
@@ -22,15 +20,15 @@
                     <td class="px-4 py-2">
                         <div class="grid">
                             @if ($item->product)
-                                <a 
-                                    href="{{ route('admin.catalog.products.edit', $item->product->id) }}" 
+                                <a
+                                    href="{{ route('admin.catalog.products.edit', $item->product->id) }}"
                                     class="inline-block h-[60px] w-[60px]"
                                 >
-                                    <img 
-                                        src="{{ product_image()->getProductBaseImage($item->product)['small_image_url'] }}" 
-                                        alt="{{ $item->product->name }}" 
-                                        class="h-full w-full rounded border border-gray-300 object-cover hover:shadow" 
-                                        title="{{ $item->product->name }}" 
+                                    <img
+                                        src="{{ product_image()->getProductBaseImage($item->product)['small_image_url'] }}"
+                                        alt="{{ $item->product->name }}"
+                                        class="h-full w-full rounded border border-gray-300 object-cover hover:shadow"
+                                        title="{{ $item->product->name }}"
                                     />
                                 </a>
                             @else

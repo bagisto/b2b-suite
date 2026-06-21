@@ -200,7 +200,10 @@
                 class="grid justify-center justify-items-center gap-3.5 px-2.5 py-10"
                 v-else
             >
-                <img src="{{ bagisto_asset('images/icon-add-product.svg') }}" class="h-20 w-20 dark:mix-blend-exclusion dark:invert">
+                <img
+                    src="{{ bagisto_asset('images/icon-add-product.svg') }}"
+                    class="h-20 w-20 dark:mix-blend-exclusion dark:invert"
+                >
                 
                 <div class="flex flex-col items-center gap-1.5">
                     <p class="text-base font-semibold text-gray-400">

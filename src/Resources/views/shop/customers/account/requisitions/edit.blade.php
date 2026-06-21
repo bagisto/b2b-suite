@@ -16,7 +16,6 @@
     </div>
 
     <div class="flex-auto max-md:px-4">
-
         {!! view_render_event('bagisto.shop.customers.account.requisition.edit.before', ['requisition' => $requisition]) !!}
 
         <!-- Page Header -->
@@ -51,7 +50,6 @@
         </div>
 
         {!! view_render_event('bagisto.shop.customers.account.requisition.edit.after', ['requisition' => $requisition]) !!}
-
     </div>
 
     @pushOnce('scripts')

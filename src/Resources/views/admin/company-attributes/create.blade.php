@@ -55,7 +55,6 @@
         >
             <!-- Body Content -->
             <div class="mt-3.5 flex gap-2.5 max-xl:flex-wrap">
-
                 {!! view_render_event('bagisto.admin.b2b.attributes.create.card.label.before') !!}
 
                 <!-- Left Sub Component -->
@@ -545,7 +544,6 @@
                 </div>
 
                 {!! view_render_event('bagisto.admin.b2b.attributes.create.card.general.after') !!}
-
             </div>
 
             <!-- Add Options Model Form -->

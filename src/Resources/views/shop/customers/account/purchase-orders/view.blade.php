@@ -16,7 +16,6 @@
     </div>
 
     <div class="flex-auto">
-    
         {!! view_render_event('bagisto.shop.customers.account.purchase_order.view.before', ['quote' => $quote]) !!}
 
         <!-- Page Header -->
@@ -59,6 +58,5 @@
         @include('b2b::shop.customers.account.quotes.view.messages', ['quote' => $quote, 'isAdminLastQuotation' => $isAdminLastQuotation])
 
         {!! view_render_event('bagisto.shop.customers.account.purchase_order.view.after', ['quote' => $quote]) !!}
-    
     </div>
 </x-shop::layouts.account>
