@@ -136,7 +136,7 @@ class CompanyCreditDataGrid extends DataGrid
                 'icon' => 'icon-edit',
                 'title' => trans('b2b::app.admin.companies.credit.manage'),
                 'method' => 'GET',
-                'url' => fn ($row) => route('admin.b2b.companies.credit', $row->company_id),
+                'url' => fn ($row) => route('admin.b2b.company_credits.view', $row->company_id),
             ]);
         }
     }

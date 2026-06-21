@@ -59,9 +59,17 @@ class Menu extends BaseMenu
                 $canShowWishlist = ! (bool) core()->getConfigData('customer.settings.wishlist.wishlist_option');
                 $canShowGdpr = ! (bool) core()->getConfigData('general.gdpr.settings.enabled');
 
+                /**
+                 * Hide the company-credit link when the credit feature is globally disabled
+                 * (the page itself already 404s via CreditManager::isActive()); every other
+                 * B2B item stays gated by the customer's role permissions below.
+                 */
+                $hideCredit = ! (bool) core()->getConfigData('b2b.credit.settings.active');
+
                 $this->configMenu = $configMenu
                     ->reject(fn ($item) => ($item['key'] == 'account.wishlist' && $canShowWishlist) ||
-                        ($item['key'] == 'account.gdpr_data_request' && $canShowGdpr)
+                        ($item['key'] == 'account.gdpr_data_request' && $canShowGdpr) ||
+                        ($item['key'] == 'account.company_credit' && $hideCredit)
                     )
                     ->filter(function ($item) use ($customer, $b2bKeys) {
                         $key = $item['key'];

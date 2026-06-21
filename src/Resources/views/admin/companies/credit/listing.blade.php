@@ -9,11 +9,11 @@
         </p>
 
         <div class="flex items-center gap-x-2.5">
-            <x-admin::datagrid.export src="{{ route('admin.b2b.companies.credits.index') }}" />
+            <x-admin::datagrid.export src="{{ route('admin.b2b.company_credits.index') }}" />
         </div>
     </div>
 
-    <x-admin::datagrid :src="route('admin.b2b.companies.credits.index')" :isMultiRow="true">
+    <x-admin::datagrid :src="route('admin.b2b.company_credits.index')" :isMultiRow="true">
         <!-- Header -->
         <template #header="{ isLoading, available, applied, sort }">
             <template v-if="isLoading">
@@ -70,7 +70,7 @@
                     <div class="flex flex-col gap-2">
                         <a
                             class="w-fit text-base font-semibold text-gray-800 transition-all hover:text-blue-600 dark:text-white"
-                            :href=`{{ route('admin.b2b.companies.index') }}/${record.company_id}/credit`
+                            :href=`{{ route('admin.b2b.company_credits.index') }}/${record.company_id}`
                         >
                             @{{ record.company_name }}
                         </a>
@@ -123,7 +123,7 @@
                     <div class="b2b-dg-divider flex items-start justify-end">
                         <a
                             class="secondary-button"
-                            :href=`{{ route('admin.b2b.companies.index') }}/${record.company_id}/credit`
+                            :href=`{{ route('admin.b2b.company_credits.index') }}/${record.company_id}`
                         >
                             @lang('b2b::app.admin.companies.credit.manage')
                         </a>

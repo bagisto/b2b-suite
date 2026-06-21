@@ -56,7 +56,7 @@ return [
     [
         'key' => 'b2b.company-credit',
         'name' => 'b2b::app.admin.acl.company-credit',
-        'route' => 'admin.b2b.companies.credits.index',
+        'route' => 'admin.b2b.company_credits.index',
         'sort' => 2,
     ],
 

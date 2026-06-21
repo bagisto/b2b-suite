@@ -23,7 +23,7 @@
             </a>
 
             <!-- Credit Settings — Opens a modal. -->
-            <x-admin::form :action="route('admin.b2b.companies.credit.limit', $company->id)">
+            <x-admin::form :action="route('admin.b2b.company_credits.update_limit', $company->id)">
                 <x-admin::modal>
                     <x-slot:toggle>
                         <button
@@ -51,6 +51,13 @@
                                 :value="(float) $credit->credit_limit"
                             />
                             <x-admin::form.control-group.error control-name="credit_limit" />
+
+                            @if ((float) $credit->outstanding_balance > 0)
+                                <!-- Over-Limit Warning -->
+                                <p class="mt-2 text-xs leading-relaxed text-red-600">
+                                    @lang('b2b::app.admin.companies.credit.over-limit-note', ['amount' => core()->formatBasePrice((float) $credit->outstanding_balance)])
+                                </p>
+                            @endif
                         </x-admin::form.control-group>
 
                         <x-admin::form.control-group class="flex items-center gap-2">
@@ -85,7 +92,7 @@
 
             <!-- Reimburse (offline payment) — opens a modal; available even when the
                  balance is settled or in advance, so further payments can be recorded. -->
-            <x-admin::form :action="route('admin.b2b.companies.credit.reimburse', $company->id)">
+            <x-admin::form :action="route('admin.b2b.company_credits.reimburse', $company->id)">
                 <x-admin::modal>
                     <x-slot:toggle>
                         <button
@@ -210,7 +217,7 @@
         <p class="mb-3 text-base font-semibold text-gray-800 dark:text-white">@lang('b2b::app.admin.companies.credit.history')</p>
 
         <x-admin::datagrid
-            :src="route('admin.b2b.companies.credit', $company->id)"
+            :src="route('admin.b2b.company_credits.view', $company->id)"
             :isMultiRow="true"
         >
             <!-- Header -->

@@ -93,14 +93,14 @@ Route::group(['middleware' => ['admin', NoCacheMiddleware::class], 'prefix' => c
     /**
      * Company credit (Pay By Credit) management.
      */
-    Route::controller(CompanyCreditController::class)->prefix('companies')->group(function () {
-        Route::get('credits', 'index')->name('admin.b2b.companies.credits.index');
+    Route::controller(CompanyCreditController::class)->prefix('company-credits')->group(function () {
+        Route::get('', 'index')->name('admin.b2b.company_credits.index');
 
-        Route::get('{id}/credit', 'show')->name('admin.b2b.companies.credit');
+        Route::get('{id}', 'show')->name('admin.b2b.company_credits.view');
 
-        Route::post('{id}/credit/limit', 'updateLimit')->name('admin.b2b.companies.credit.limit');
+        Route::post('{id}/limit', 'updateLimit')->name('admin.b2b.company_credits.update_limit');
 
-        Route::post('{id}/credit/reimburse', 'reimburse')->name('admin.b2b.companies.credit.reimburse');
+        Route::post('{id}/reimburse', 'reimburse')->name('admin.b2b.company_credits.reimburse');
     });
 
     /**

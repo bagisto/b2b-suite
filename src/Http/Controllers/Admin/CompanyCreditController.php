@@ -91,7 +91,7 @@ class CompanyCreditController extends Controller
 
         session()->flash('success', trans('b2b::app.admin.companies.credit.limit-updated'));
 
-        return redirect()->route('admin.b2b.companies.credit', $company->id);
+        return redirect()->route('admin.b2b.company_credits.view', $company->id);
     }
 
     /**
@@ -127,7 +127,7 @@ class CompanyCreditController extends Controller
 
         session()->flash('success', trans('b2b::app.admin.companies.credit.reimbursed'));
 
-        return redirect()->route('admin.b2b.companies.credit', $company->id);
+        return redirect()->route('admin.b2b.company_credits.view', $company->id);
     }
 
     /**

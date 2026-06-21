@@ -118,7 +118,11 @@ class CreditManager
 
             $isFirst = $credit->transactions()->count() === 0;
 
-            $credit->credit_limit = (float) ($data['credit_limit'] ?? $credit->credit_limit);
+            $previousLimit = (float) $credit->credit_limit;
+
+            $newLimit = (float) ($data['credit_limit'] ?? $credit->credit_limit);
+
+            $credit->credit_limit = $newLimit;
 
             if (! empty($data['credit_currency_code'])) {
                 $credit->credit_currency_code = $data['credit_currency_code'];
@@ -135,15 +139,25 @@ class CreditManager
             $credit->save();
 
             /**
-             * Only the first time credit is granted is recorded (as an allocation). Later
-             * limit changes are configuration, not money movements, so they are not written
-             * to the ledger.
+             * The first grant is recorded as an allocation; every later limit change is
+             * recorded as an update — capturing the signed delta and the resulting
+             * available-credit snapshot — so the ledger always explains how available
+             * credit moved. A reduction below the outstanding balance simply pushes
+             * available negative (over-limit) without touching what the company owes.
              */
             if ($isFirst) {
                 $this->ledger(
                     $credit,
                     CompanyCreditTransaction::OPERATION_ALLOCATED,
-                    (float) $credit->credit_limit,
+                    $newLimit,
+                    ['comment' => $data['comment'] ?? null],
+                    $actor
+                );
+            } elseif (abs($newLimit - $previousLimit) >= 0.0001) {
+                $this->ledger(
+                    $credit,
+                    CompanyCreditTransaction::OPERATION_UPDATED,
+                    $newLimit - $previousLimit,
                     ['comment' => $data['comment'] ?? null],
                     $actor
                 );

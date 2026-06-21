@@ -78,7 +78,7 @@ class CompanyCreditTransactionDataGrid extends DataGrid
             'filterable' => true,
             'filterable_type' => 'dropdown',
             'filterable_options' => collect([
-                'allocated', 'purchased', 'reimbursed', 'refunded', 'reverted',
+                'allocated', 'updated', 'purchased', 'reimbursed', 'refunded', 'reverted',
             ])->map(fn ($operation) => [
                 'label' => trans('b2b::app.shop.customers.account.company-credit.operations.'.$operation),
                 'value' => $operation,
@@ -106,16 +106,21 @@ class CompanyCreditTransactionDataGrid extends DataGrid
             'sortable' => true,
             'closure' => function ($row) {
                 /**
-                 * From the available-credit perspective: a purchase consumes credit (− red);
-                 * an allocation, payment, refund or reversal frees / grants credit (+ green).
+                 * From the available-credit perspective: a purchase — or a limit reduction —
+                 * consumes credit (− red); an allocation, limit increase, payment, refund or
+                 * reversal frees / grants credit (+ green). A limit update stores a signed
+                 * delta, so its sign follows the delta rather than the operation.
                  */
-                $isDebit = $row->operation_raw === 'purchased';
+                $amount = (float) $row->amount;
+
+                $isDebit = $row->operation_raw === 'purchased'
+                    || ($row->operation_raw === 'updated' && $amount < 0);
 
                 $color = $isDebit ? 'text-red-600' : 'text-green-700';
 
                 $sign = $isDebit ? '− ' : '+ ';
 
-                return '<span class="font-medium '.$color.'">'.$sign.core()->formatBasePrice($row->amount).'</span>';
+                return '<span class="font-medium '.$color.'">'.$sign.core()->formatBasePrice(abs($amount)).'</span>';
             },
         ]);
 
