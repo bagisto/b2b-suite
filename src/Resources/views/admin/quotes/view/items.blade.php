@@ -49,7 +49,7 @@
     @else
         <!-- Desktop: table -->
         <div class="overflow-x-auto p-4 max-md:hidden">
-            <table class="w-full border text-left text-sm dark:border-gray-800">
+            <table class="w-full border ltr:text-left rtl:text-right text-sm dark:border-gray-800">
                 <thead class="bg-gray-100 dark:bg-gray-800">
                     <tr>
                         <th class="border-b px-4 py-2 text-gray-600 dark:border-gray-800 dark:text-gray-300">@lang('b2b::app.admin.quotes.view.product')</th>
@@ -58,11 +58,11 @@
 
                         @if ($hasNegotiated)
                             <th class="border-b px-4 py-2 text-gray-600 dark:border-gray-800 dark:text-gray-300">@lang('b2b::app.admin.quotes.view.discount')</th>
-                            <th class="border-b px-4 py-2 text-right text-gray-600 dark:border-gray-800 dark:text-gray-300">@lang('b2b::app.admin.quotes.view.negotiated-price')</th>
+                            <th class="border-b px-4 py-2 ltr:text-right rtl:text-left text-gray-600 dark:border-gray-800 dark:text-gray-300">@lang('b2b::app.admin.quotes.view.negotiated-price')</th>
                         @endif
 
                         <th class="border-b px-4 py-2 text-gray-600 dark:border-gray-800 dark:text-gray-300">@lang('b2b::app.admin.quotes.view.quantity')</th>
-                        <th class="border-b px-4 py-2 text-right text-gray-600 dark:border-gray-800 dark:text-gray-300">@lang('b2b::app.admin.quotes.view.sub-total')</th>
+                        <th class="border-b px-4 py-2 ltr:text-right rtl:text-left text-gray-600 dark:border-gray-800 dark:text-gray-300">@lang('b2b::app.admin.quotes.view.sub-total')</th>
                     </tr>
                 </thead>
 
@@ -134,12 +134,12 @@
                                         <span class="text-zinc-400">—</span>
                                     @endif
                                 </td>
-                                <td class="px-4 py-2 text-right font-semibold text-gray-600 dark:text-gray-300">{{ core()->formatBasePrice($itemNegotiatedPrice($item)) }}</td>
+                                <td class="px-4 py-2 ltr:text-right rtl:text-left font-semibold text-gray-600 dark:text-gray-300">{{ core()->formatBasePrice($itemNegotiatedPrice($item)) }}</td>
                             @endif
 
                             <td class="px-4 py-2 text-gray-600 dark:text-gray-300">{{ $hasNegotiated ? $item->negotiated_qty : $item->qty }}</td>
 
-                            <td class="px-4 py-2 text-right font-semibold text-gray-600 dark:text-gray-300">
+                            <td class="px-4 py-2 ltr:text-right rtl:text-left font-semibold text-gray-600 dark:text-gray-300">
                                 {{ $hasNegotiated
                                     ? core()->formatBasePrice($itemNegotiatedPrice($item) * $item->negotiated_qty)
                                     : core()->formatBasePrice($item->base_price * $item->qty) }}
@@ -151,30 +151,30 @@
                 <tfoot>
                     @if ($hasNegotiated)
                         <tr class="border-t dark:border-gray-800">
-                            <td colspan="6" class="px-4 py-2 text-right font-bold text-gray-600 dark:text-gray-300">@lang('b2b::app.admin.quotes.view.sub-total')</td>
-                            <td colspan="1" class="px-4 py-2 text-right font-bold text-zinc-500 dark:text-gray-300">{{ core()->formatBasePrice($negotiatedSubTotal) }}</td>
+                            <td colspan="6" class="px-4 py-2 ltr:text-right rtl:text-left font-bold text-gray-600 dark:text-gray-300">@lang('b2b::app.admin.quotes.view.sub-total')</td>
+                            <td colspan="1" class="px-4 py-2 ltr:text-right rtl:text-left font-bold text-zinc-500 dark:text-gray-300">{{ core()->formatBasePrice($negotiatedSubTotal) }}</td>
                         </tr>
 
                         @if ($discountOnTotal > 0)
                             <tr class="border-t dark:border-gray-800">
-                                <td colspan="6" class="px-4 py-2 text-right font-bold text-gray-600 dark:text-gray-300">
+                                <td colspan="6" class="px-4 py-2 ltr:text-right rtl:text-left font-bold text-gray-600 dark:text-gray-300">
                                     @lang('b2b::app.admin.quotes.view.discount-on-total')
                                     @if ($quote->discount_type && (float) $quote->discount_value > 0)
                                         <span class="font-normal text-zinc-500">({{ $quote->discount_type === 'percent' ? (float) $quote->discount_value . '%' : core()->formatBasePrice($quote->discount_value) }})</span>
                                     @endif
                                 </td>
-                                <td colspan="1" class="px-4 py-2 text-right font-bold text-green-600">− {{ core()->formatBasePrice($discountOnTotal) }}</td>
+                                <td colspan="1" class="px-4 py-2 ltr:text-right rtl:text-left font-bold text-green-600">− {{ core()->formatBasePrice($discountOnTotal) }}</td>
                             </tr>
                         @endif
 
                         <tr class="border-t dark:border-gray-800">
-                            <td colspan="6" class="px-4 py-2 text-right font-bold text-gray-600 dark:text-gray-300">@lang('b2b::app.admin.quotes.view.negotiated-total')</td>
-                            <td colspan="1" class="px-4 py-2 text-right font-bold text-gray-800 dark:text-white">{{ core()->formatBasePrice($quote->base_negotiated_total) }}</td>
+                            <td colspan="6" class="px-4 py-2 ltr:text-right rtl:text-left font-bold text-gray-600 dark:text-gray-300">@lang('b2b::app.admin.quotes.view.negotiated-total')</td>
+                            <td colspan="1" class="px-4 py-2 ltr:text-right rtl:text-left font-bold text-gray-800 dark:text-white">{{ core()->formatBasePrice($quote->base_negotiated_total) }}</td>
                         </tr>
                     @else
                         <tr class="border-t dark:border-gray-800">
-                            <td colspan="4" class="px-4 py-2 text-right font-bold text-gray-600 dark:text-gray-300">@lang('b2b::app.admin.quotes.view.grand-total')</td>
-                            <td colspan="1" class="px-4 py-2 text-right font-bold text-gray-800 dark:text-white">{{ core()->formatBasePrice($quote->base_total) }}</td>
+                            <td colspan="4" class="px-4 py-2 ltr:text-right rtl:text-left font-bold text-gray-600 dark:text-gray-300">@lang('b2b::app.admin.quotes.view.grand-total')</td>
+                            <td colspan="1" class="px-4 py-2 ltr:text-right rtl:text-left font-bold text-gray-800 dark:text-white">{{ core()->formatBasePrice($quote->base_total) }}</td>
                         </tr>
                     @endif
                 </tfoot>
@@ -216,23 +216,23 @@
 
                     <div class="mt-3 grid grid-cols-2 gap-y-1.5 border-t border-gray-100 pt-3 text-sm dark:border-gray-800">
                         <span class="text-gray-500 dark:text-gray-400">@lang('b2b::app.admin.quotes.view.price')</span>
-                        <span class="text-right font-medium text-gray-800 dark:text-white">{{ core()->formatBasePrice($item->base_price) }}</span>
+                        <span class="ltr:text-right rtl:text-left font-medium text-gray-800 dark:text-white">{{ core()->formatBasePrice($item->base_price) }}</span>
 
                         @if ($hasNegotiated && $item->discount_type && (float) $item->discount_value > 0)
                             <span class="text-gray-500 dark:text-gray-400">@lang('b2b::app.admin.quotes.view.discount')</span>
-                            <span class="text-right font-medium text-green-600">{{ $item->discount_type === 'percent' ? (float) $item->discount_value . '%' : core()->formatBasePrice($item->discount_value) }}</span>
+                            <span class="ltr:text-right rtl:text-left font-medium text-green-600">{{ $item->discount_type === 'percent' ? (float) $item->discount_value . '%' : core()->formatBasePrice($item->discount_value) }}</span>
                         @endif
 
                         @if ($hasNegotiated)
                             <span class="text-gray-500 dark:text-gray-400">@lang('b2b::app.admin.quotes.view.negotiated-price')</span>
-                            <span class="text-right font-semibold text-gray-800 dark:text-white">{{ core()->formatBasePrice($itemNegotiatedPrice($item)) }}</span>
+                            <span class="ltr:text-right rtl:text-left font-semibold text-gray-800 dark:text-white">{{ core()->formatBasePrice($itemNegotiatedPrice($item)) }}</span>
                         @endif
 
                         <span class="text-gray-500 dark:text-gray-400">@lang('b2b::app.admin.quotes.view.quantity')</span>
-                        <span class="text-right font-medium text-gray-800 dark:text-white">{{ $hasNegotiated ? $item->negotiated_qty : $item->qty }}</span>
+                        <span class="ltr:text-right rtl:text-left font-medium text-gray-800 dark:text-white">{{ $hasNegotiated ? $item->negotiated_qty : $item->qty }}</span>
 
                         <span class="text-gray-500 dark:text-gray-400">@lang('b2b::app.admin.quotes.view.sub-total')</span>
-                        <span class="text-right font-semibold text-gray-800 dark:text-white">
+                        <span class="ltr:text-right rtl:text-left font-semibold text-gray-800 dark:text-white">
                             {{ $hasNegotiated
                                 ? core()->formatBasePrice($itemNegotiatedPrice($item) * $item->negotiated_qty)
                                 : core()->formatBasePrice($item->base_price * $item->qty) }}

@@ -123,15 +123,15 @@
                                             class="flex items-center justify-between rounded-lg bg-zinc-50 p-2.5"
                                         >
                                             <div class="flex items-center">
-                                                <span class="icon-file mr-2 text-xl text-navyBlue"></span>
+                                                <span class="icon-file ltr:mr-2 rtl:ml-2 text-xl text-navyBlue"></span>
 
-                                                <div class="text-left">
+                                                <div class="ltr:text-left rtl:text-right">
                                                     <p class="text-sm font-medium text-gray-900">@{{ file.name }}</p>
                                                     <p class="text-xs text-gray-500">@{{ formatFileSize(file.size) }}</p>
                                                 </div>
                                             </div>
 
-                                            <button type="button" @click="removeFile(idx)" class="ml-3 text-red-500 hover:text-red-700">
+                                            <button type="button" @click="removeFile(idx)" class="ltr:ml-3 rtl:mr-3 text-red-500 hover:text-red-700">
                                                 <span class="icon-cancel text-lg"></span>
                                             </button>
                                         </div>

@@ -52,7 +52,7 @@
                                             <button
                                                 type="button"
                                                 @click="removeCompany(company)"
-                                                class="icon-cross ml-2 cursor-pointer"
+                                                class="icon-cross ltr:ml-2 rtl:mr-2 cursor-pointer"
                                             >
                                             </button>
                                         </span>

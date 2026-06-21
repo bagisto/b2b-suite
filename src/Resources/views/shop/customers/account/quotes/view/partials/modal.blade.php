@@ -66,7 +66,7 @@
                     />
 
                     <x-shop::form.control-group.error
-                        class="text-left"
+                        class="ltr:text-left rtl:text-right"
                         control-name="message"
                     />
                 </x-shop::form.control-group>

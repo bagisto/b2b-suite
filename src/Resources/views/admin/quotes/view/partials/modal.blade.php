@@ -28,7 +28,7 @@
                 />
 
                 <x-admin::form.control-group.error
-                    class="text-left"
+                    class="ltr:text-left rtl:text-right"
                     control-name="message"
                 />
             </x-admin::form.control-group>

@@ -117,7 +117,7 @@
                 @lang('b2b::app.shop.customers.account.quotes.view.business-name')
             </p>
 
-            <p class="text-right text-sm font-medium text-zinc-500">
+            <p class="ltr:text-right rtl:text-left text-sm font-medium text-zinc-500">
                 {{ $quote->company?->businessName() ?: '—' }}
             </p>
         </div>
@@ -128,7 +128,7 @@
                 @lang('b2b::app.shop.customers.account.quotes.view.company-name')
             </p>
 
-            <p class="text-right text-sm font-medium text-zinc-500">
+            <p class="ltr:text-right rtl:text-left text-sm font-medium text-zinc-500">
                 {{ $quote->company?->name }}
             </p>
         </div>
@@ -141,7 +141,7 @@
                 @lang('b2b::app.shop.customers.account.quotes.view.company-email')
             </p>
 
-            <p class="text-right text-sm font-medium text-zinc-500">
+            <p class="ltr:text-right rtl:text-left text-sm font-medium text-zinc-500">
                 {{ $quote->company->email }}
             </p>
         </div>
@@ -154,7 +154,7 @@
                 @lang('b2b::app.shop.customers.account.quotes.view.company-phone')
             </p>
 
-            <p class="text-right text-sm font-medium text-zinc-500">
+            <p class="ltr:text-right rtl:text-left text-sm font-medium text-zinc-500">
                 {{ $quote->company->phone }}
             </p>
         </div>
@@ -167,7 +167,7 @@
                 @lang('b2b::app.shop.customers.account.quotes.view.sr-name')
             </p>
 
-            <p class="text-right text-sm font-medium text-zinc-500">
+            <p class="ltr:text-right rtl:text-left text-sm font-medium text-zinc-500">
                 {{ $quote->company?->salesRep?->name ?? '—' }}
             </p>
         </div>
@@ -180,7 +180,7 @@
                 @lang('b2b::app.shop.customers.account.quotes.view.sr-email')
             </p>
 
-            <p class="text-right text-sm font-medium text-zinc-500">
+            <p class="ltr:text-right rtl:text-left text-sm font-medium text-zinc-500">
                 {{ $quote->company?->salesRep?->email ?? '—' }}
             </p>
         </div>

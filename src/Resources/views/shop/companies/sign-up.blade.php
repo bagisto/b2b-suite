@@ -68,7 +68,7 @@
                     type="button"
                     id="tab-personal"
                     onclick="b2bSwitchTab('personal')"
-                    class="b2b-account-card group flex items-start gap-4 rounded-xl border border-zinc-200 p-5 text-left transition-all hover:border-navyBlue {{ $activeTab === 'personal' ? 'b2b-tab-active' : '' }}"
+                    class="b2b-account-card group flex items-start gap-4 rounded-xl border border-zinc-200 p-5 ltr:text-left rtl:text-right transition-all hover:border-navyBlue {{ $activeTab === 'personal' ? 'b2b-tab-active' : '' }}"
                 >
                     <span class="b2b-icon-badge flex items-center justify-center rounded-full bg-lightOrange text-navyBlue">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -92,7 +92,7 @@
                     type="button"
                     id="tab-company"
                     onclick="b2bSwitchTab('company')"
-                    class="b2b-account-card group flex items-start gap-4 rounded-xl border border-zinc-200 p-5 text-left transition-all hover:border-navyBlue {{ $activeTab === 'company' ? 'b2b-tab-active' : '' }}"
+                    class="b2b-account-card group flex items-start gap-4 rounded-xl border border-zinc-200 p-5 ltr:text-left rtl:text-right transition-all hover:border-navyBlue {{ $activeTab === 'company' ? 'b2b-tab-active' : '' }}"
                 >
                     <span class="b2b-icon-badge flex items-center justify-center rounded-full bg-lightOrange text-navyBlue">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

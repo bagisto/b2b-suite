@@ -3,7 +3,7 @@
         <!-- Group Container -->
         <div class="flex items-center">
             <!-- Toggle -->
-            <div class="shimmer mr-1 h-4 w-4"></div>
+            <div class="shimmer ltr:mr-1 rtl:ml-1 h-4 w-4"></div>
 
             <!-- Group Name -->
             <div class="group_node flex max-w-max gap-1.5 py-1.5 ltr:pr-1.5 rtl:pl-1.5">

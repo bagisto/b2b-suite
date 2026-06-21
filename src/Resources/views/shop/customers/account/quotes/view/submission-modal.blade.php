@@ -120,13 +120,13 @@
                     <div class="overflow-x-auto rounded-lg border border-zinc-200">
                         <table class="w-full" style="min-width: 40rem;">
                             <thead class="bg-zinc-50">
-                                <tr class="text-left text-xs font-medium uppercase text-zinc-500">
+                                <tr class="ltr:text-left rtl:text-right text-xs font-medium uppercase text-zinc-500">
                                     <th class="px-4 py-3">@lang('b2b::app.shop.customers.account.quotes.view.name')</th>
                                     <th class="px-4 py-3">@lang('b2b::app.shop.customers.account.quotes.view.price')</th>
                                     <th class="px-4 py-3">@lang('b2b::app.shop.customers.account.quotes.view.discount')</th>
                                     <th class="px-4 py-3">@lang('b2b::app.shop.customers.account.quotes.view.negotiated-price')</th>
                                     <th class="px-4 py-3">@lang('b2b::app.shop.customers.account.quotes.view.quantity')</th>
-                                    <th class="px-4 py-3 text-right">@lang('b2b::app.shop.customers.account.quotes.view.sub-total')</th>
+                                    <th class="px-4 py-3 ltr:text-right rtl:text-left">@lang('b2b::app.shop.customers.account.quotes.view.sub-total')</th>
                                 </tr>
                             </thead>
 
@@ -210,7 +210,7 @@
                                         >
                                     </td>
 
-                                    <td class="whitespace-nowrap px-4 py-3 text-right text-sm font-semibold text-zinc-800">@{{ money(rowTotal(row)) }}</td>
+                                    <td class="whitespace-nowrap px-4 py-3 ltr:text-right rtl:text-left text-sm font-semibold text-zinc-800">@{{ money(rowTotal(row)) }}</td>
                                 </tr>
                             </tbody>
                         </table>

@@ -287,7 +287,7 @@
                                     </colgroup>
 
                                     <thead class="bg-gray-50 dark:bg-gray-800">
-                                        <tr class="text-left text-xs font-medium uppercase text-gray-500">
+                                        <tr class="ltr:text-left rtl:text-right text-xs font-medium uppercase text-gray-500">
                                             <th class="px-3 py-4">
                                                 <input
                                                     v-if="canEdit"
@@ -405,7 +405,7 @@
 
                                                 <td class="whitespace-nowrap px-4 py-3 text-sm font-semibold text-gray-800 dark:text-white">@{{ newPrice(product.leaves[0]) }}</td>
 
-                                                <td class="px-4 py-3 text-right">
+                                                <td class="px-4 py-3 ltr:text-right rtl:text-left">
                                                     <span v-if="canEdit" class="icon-delete cursor-pointer text-xl text-gray-500 transition-all hover:text-red-600" @click="removeProduct(product.id)"></span>
                                                 </td>
                                             </tr>
@@ -447,7 +447,7 @@
                                                     @lang('b2b::app.admin.company-catalogs.visibility-only')
                                                 </td>
 
-                                                <td class="px-4 py-3 text-right">
+                                                <td class="px-4 py-3 ltr:text-right rtl:text-left">
                                                     <span v-if="canEdit" class="icon-delete cursor-pointer text-xl text-gray-500 transition-all hover:text-red-600" @click="removeProduct(product.id)"></span>
                                                 </td>
                                             </tr>
@@ -500,7 +500,7 @@
                                                         </span>
                                                     </td>
 
-                                                    <td class="px-4 py-3 text-right">
+                                                    <td class="px-4 py-3 ltr:text-right rtl:text-left">
                                                         <span v-if="canEdit" class="icon-delete cursor-pointer text-xl text-gray-500 transition-all hover:text-red-600" @click="removeProduct(product.id)"></span>
                                                     </td>
                                                 </tr>
@@ -747,7 +747,7 @@
                                     </colgroup>
 
                                     <thead class="bg-gray-50 dark:bg-gray-800">
-                                        <tr class="text-left text-xs font-medium uppercase text-gray-500">
+                                        <tr class="ltr:text-left rtl:text-right text-xs font-medium uppercase text-gray-500">
                                             <th class="px-3 py-4">
                                                 <input
                                                     v-if="canEdit"
@@ -811,7 +811,7 @@
 
                                             <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">@{{ company.email }}</td>
 
-                                            <td class="px-4 py-3 text-right">
+                                            <td class="px-4 py-3 ltr:text-right rtl:text-left">
                                                 <span v-if="canEdit" class="icon-delete cursor-pointer text-xl text-gray-500 transition-all hover:text-red-600" @click="removeCompany(company.id)"></span>
                                             </td>
                                         </tr>
@@ -903,7 +903,7 @@
                                     </colgroup>
 
                                     <thead class="sticky top-0 z-10 bg-gray-50 dark:bg-gray-800">
-                                        <tr class="text-left text-xs font-medium uppercase text-gray-500">
+                                        <tr class="ltr:text-left rtl:text-right text-xs font-medium uppercase text-gray-500">
                                             <th class="px-3 py-4">
                                                 <input
                                                     type="checkbox"
@@ -1019,7 +1019,7 @@
 
                                                 <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-600 dark:text-gray-300">@{{ product.formatted_price }}</td>
 
-                                                <td class="px-4 py-3 text-right">
+                                                <td class="px-4 py-3 ltr:text-right rtl:text-left">
                                                     <span
                                                         v-if="isAssigned(product.id)"
                                                         class="whitespace-nowrap text-xs font-medium text-green-600"
@@ -1103,7 +1103,7 @@
                                     </colgroup>
 
                                     <thead class="sticky top-0 z-10 bg-gray-50 dark:bg-gray-800">
-                                        <tr class="text-left text-xs font-medium uppercase text-gray-500">
+                                        <tr class="ltr:text-left rtl:text-right text-xs font-medium uppercase text-gray-500">
                                             <th class="px-3 py-4">
                                                 <input
                                                     type="checkbox"
@@ -1189,7 +1189,7 @@
 
                                                 <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">@{{ company.email }}</td>
 
-                                                <td class="px-4 py-3 text-right">
+                                                <td class="px-4 py-3 ltr:text-right rtl:text-left">
                                                     <span
                                                         v-if="isCompanyAssigned(company.id)"
                                                         class="whitespace-nowrap text-xs font-medium text-green-600"
@@ -1466,7 +1466,7 @@
                                 </colgroup>
 
                                 <thead class="bg-gray-50 dark:bg-gray-800">
-                                    <tr class="text-left text-xs font-medium uppercase text-gray-500">
+                                    <tr class="ltr:text-left rtl:text-right text-xs font-medium uppercase text-gray-500">
                                         <th class="px-4 py-3">@lang('b2b::app.admin.company-catalogs.tier-qty')</th>
                                         <th class="px-4 py-3">@lang('b2b::app.admin.company-catalogs.price-type')</th>
                                         <th class="px-4 py-3">@lang('b2b::app.admin.company-catalogs.value')</th>
@@ -1523,7 +1523,7 @@
 
                                         <td class="whitespace-nowrap px-4 py-2.5 text-sm font-semibold text-gray-800 dark:text-white">@{{ unitPrice(tierModalLeaf, brk) }}</td>
 
-                                        <td class="px-4 py-2.5 text-right">
+                                        <td class="px-4 py-2.5 ltr:text-right rtl:text-left">
                                             <span class="icon-delete cursor-pointer text-xl text-gray-500 transition-all hover:text-red-600" @click="removeBreak(i)"></span>
                                         </td>
                                     </tr>

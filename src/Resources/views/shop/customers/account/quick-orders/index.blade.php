@@ -129,7 +129,7 @@
                     <div v-if="searchedProducts.length" class="mt-4">
                         <div
                             ref="resultsBox"
-                            class="grid gap-3 overflow-y-auto pr-1"
+                            class="grid gap-3 overflow-y-auto ltr:pr-1 rtl:pl-1"
                             style="max-height: 26rem;"
                             @scroll="onResultsScroll"
                         >

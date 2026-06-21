@@ -1,5 +1,5 @@
 <div class="overflow-x-auto">
-    <table class="w-full border text-left text-sm">
+    <table class="w-full border ltr:text-left rtl:text-right text-sm">
         <thead class="bg-gray-100">
             <tr>
                 <th class="px-4 py-2">

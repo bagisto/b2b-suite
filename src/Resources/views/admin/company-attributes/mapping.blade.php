@@ -162,7 +162,7 @@
                                                     :key="locale.code"
                                                     class="relative"
                                                 >
-                                                    <span class="absolute left-2 top-1/2 -translate-y-1/2 text-[11px] uppercase text-gray-400">
+                                                    <span class="absolute ltr:left-2 rtl:right-2 top-1/2 -translate-y-1/2 text-[11px] uppercase text-gray-400">
                                                         @{{ locale.code }}
                                                     </span>
 
@@ -171,7 +171,7 @@
                                                         :name="'attribute_groups[' + element.id + '][locales][' + locale.code + ']'"
                                                         :value="getTranslationName(element, locale.code)"
                                                         @input="updateTranslationName(element,locale.code, $event.target.value)"
-                                                        class="group_node w-full rounded-md border border-gray-300 bg-gray-50 py-1.5 pl-9 pr-2 text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
+                                                        class="group_node w-full rounded-md border border-gray-300 bg-gray-50 py-1.5 ltr:pl-9 rtl:pr-9 ltr:pr-2 rtl:pl-2 text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
                                                         :placeholder="locale.name"
                                                     />
                                                 </div>

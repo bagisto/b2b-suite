@@ -152,7 +152,7 @@
                         </div>
 
                         <div class="flex flex-col gap-2">
-                            <p class="flex flex-col gap-1 text-right text-base font-semibold text-gray-800 dark:text-white">
+                            <p class="flex flex-col gap-1 ltr:text-right rtl:text-left text-base font-semibold text-gray-800 dark:text-white">
                                 <template v-if="displayTax.subtotal == 'including_tax'">
                                     @{{ item.formatted_total_incl_tax }}
                                 </template>
@@ -177,7 +177,7 @@
                             <x-admin::quantity-changer
                                 ::name="'qty[' + item.id + ']'"
                                 ::value="item.quantity"
-                                class="w-max gap-x-4 rounded-l px-4 py-1"
+                                class="w-max gap-x-4 ltr:rounded-l rtl:rounded-r px-4 py-1"
                                 @change="updateItem(item, $event)"
                             />
                         </div>
@@ -309,7 +309,7 @@
                                 as="div"
                             >
                                 <form @submit="handleSubmit($event, addToCart)">
-                                    <div class="grid place-content-start gap-2 text-right">
+                                    <div class="grid place-content-start gap-2 ltr:text-right rtl:text-left">
                                         <p class="font-semibold text-gray-800 dark:text-white">
                                             @{{ product.formatted_price }}
                                         </p>

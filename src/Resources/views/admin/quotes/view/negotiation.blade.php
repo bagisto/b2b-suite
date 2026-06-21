@@ -117,13 +117,13 @@
                             <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-800">
                                 <table class="w-full" style="min-width: 46rem;">
                                     <thead class="bg-gray-50 dark:bg-gray-800">
-                                        <tr class="text-left text-xs font-medium uppercase text-gray-500">
+                                        <tr class="ltr:text-left rtl:text-right text-xs font-medium uppercase text-gray-500">
                                             <th class="px-4 py-3">@lang('b2b::app.admin.quotes.view.name')</th>
                                             <th class="px-4 py-3">@lang('b2b::app.admin.quotes.view.price')</th>
                                             <th class="px-4 py-3">@lang('b2b::app.admin.quotes.view.discount')</th>
                                             <th class="px-4 py-3">@lang('b2b::app.admin.quotes.view.negotiated-price')</th>
                                             <th class="px-4 py-3">@lang('b2b::app.admin.quotes.view.quantity')</th>
-                                            <th class="px-4 py-3 text-right">@lang('b2b::app.admin.quotes.view.sub-total')</th>
+                                            <th class="px-4 py-3 ltr:text-right rtl:text-left">@lang('b2b::app.admin.quotes.view.sub-total')</th>
                                             <th class="px-4 py-3"></th>
                                         </tr>
                                     </thead>
@@ -200,11 +200,11 @@
                                                 >
                                             </td>
 
-                                            <td class="whitespace-nowrap px-4 py-3 text-right text-sm font-semibold text-gray-800 dark:text-white">
+                                            <td class="whitespace-nowrap px-4 py-3 ltr:text-right rtl:text-left text-sm font-semibold text-gray-800 dark:text-white">
                                                 @{{ money(rowTotal(row)) }}
                                             </td>
 
-                                            <td class="px-4 py-3 text-right">
+                                            <td class="px-4 py-3 ltr:text-right rtl:text-left">
                                                 <span
                                                     class="icon-delete cursor-pointer text-xl text-gray-500 transition-all hover:text-red-600"
                                                     title="@lang('b2b::app.admin.quotes.view.remove-item')"
@@ -304,11 +304,11 @@
                             <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-800">
                                 <table class="w-full" style="min-width: 34rem;">
                                     <thead class="bg-gray-50 dark:bg-gray-800">
-                                        <tr class="text-left text-xs font-medium uppercase text-gray-500">
+                                        <tr class="ltr:text-left rtl:text-right text-xs font-medium uppercase text-gray-500">
                                             <th class="px-4 py-3">@lang('b2b::app.admin.quotes.view.name')</th>
                                             <th class="px-4 py-3">@lang('b2b::app.admin.quotes.view.negotiated-price')</th>
                                             <th class="px-4 py-3">@lang('b2b::app.admin.quotes.view.quantity')</th>
-                                            <th class="px-4 py-3 text-right">@lang('b2b::app.admin.quotes.view.sub-total')</th>
+                                            <th class="px-4 py-3 ltr:text-right rtl:text-left">@lang('b2b::app.admin.quotes.view.sub-total')</th>
                                         </tr>
                                     </thead>
 
@@ -324,7 +324,7 @@
                                             </td>
                                             <td class="whitespace-nowrap px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200">@{{ money(discountedPrice(row)) }}</td>
                                             <td class="px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200">@{{ row.negotiated_qty }}</td>
-                                            <td class="whitespace-nowrap px-4 py-2.5 text-right text-sm font-semibold text-gray-800 dark:text-white">@{{ money(rowTotal(row)) }}</td>
+                                            <td class="whitespace-nowrap px-4 py-2.5 ltr:text-right rtl:text-left text-sm font-semibold text-gray-800 dark:text-white">@{{ money(rowTotal(row)) }}</td>
                                         </tr>
                                     </tbody>
                                 </table>

@@ -19,6 +19,7 @@ module.exports = {
 
         path.join(__dirname, "src/Resources/views/admin/**/*.blade.php"),
         path.join(__dirname, "src/Resources/views/components/**/*.blade.php"),
+        path.join(__dirname, "publishables/resources/vendor/admin/**/*.blade.php"),
     ],
 
     theme: admin.theme,

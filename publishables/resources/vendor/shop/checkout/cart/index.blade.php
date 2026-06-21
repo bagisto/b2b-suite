@@ -150,7 +150,7 @@
                                     </span>
 
                                     @if (auth()->guard()->check())
-                                        <span class="mx-2.5 border-r-2 border-zinc-200"></span>
+                                        <span class="mx-2.5 ltr:border-r-2 rtl:border-l-2 border-zinc-200"></span>
 
                                         <span
                                             class="cursor-pointer text-base text-blue-700 max-sm:text-xs"
@@ -340,7 +340,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="text-right max-md:hidden">
+                                    <div class="ltr:text-right rtl:text-left max-md:hidden">
                                         {!! view_render_event('bagisto.shop.checkout.cart.total.before') !!}
 
                                         <template v-if="displayTax.prices == 'including_tax'">

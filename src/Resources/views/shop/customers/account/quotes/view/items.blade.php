@@ -82,7 +82,7 @@
 
             <!-- For Desktop View -->
             <div class="overflow-x-auto max-md:hidden">
-                <table class="w-full border text-left text-sm">
+                <table class="w-full border ltr:text-left rtl:text-right text-sm">
                     <thead class="bg-gray-100">
                         <tr>
                             <th class="px-4 py-2">@lang('b2b::app.shop.customers.account.quotes.view.product')</th>
@@ -91,11 +91,11 @@
 
                             @if ($isNegotiated)
                                 <th class="px-4 py-2">@lang('b2b::app.shop.customers.account.quotes.view.discount')</th>
-                                <th class="px-4 py-2 text-right">@lang('b2b::app.shop.customers.account.quotes.view.negotiated-price')</th>
+                                <th class="px-4 py-2 ltr:text-right rtl:text-left">@lang('b2b::app.shop.customers.account.quotes.view.negotiated-price')</th>
                             @endif
 
                             <th class="px-4 py-2">@lang('b2b::app.shop.customers.account.quotes.view.quantity')</th>
-                            <th class="px-4 py-2 text-right">@lang('b2b::app.shop.customers.account.quotes.view.sub-total')</th>
+                            <th class="px-4 py-2 ltr:text-right rtl:text-left">@lang('b2b::app.shop.customers.account.quotes.view.sub-total')</th>
                         </tr>
                     </thead>
 
@@ -174,14 +174,14 @@
                                     </td>
 
                                     <!-- Negotiated Price (after the item discount) -->
-                                    <td class="px-4 py-2 text-right font-semibold">
+                                    <td class="px-4 py-2 ltr:text-right rtl:text-left font-semibold">
                                         {{ core()->formatPrice($itemNegotiatedPrice($item), $quote->currency_code) }}
                                     </td>
                                 @endif
 
                                 <td class="px-4 py-2">{{ $isNegotiated ? $item->negotiated_qty : $item->qty }}</td>
 
-                                <td class="px-4 py-2 text-right font-semibold">
+                                <td class="px-4 py-2 ltr:text-right rtl:text-left font-semibold">
                                     @if ($isNegotiated)
                                         {{ core()->formatPrice($itemNegotiatedPrice($item) * $item->negotiated_qty, $quote->currency_code) }}
                                     @else
@@ -196,14 +196,14 @@
                         @if ($isNegotiated)
                             <!-- Sub Total (after per-item discounts) -->
                             <tr class="border-t">
-                                <td colspan="6" class="px-4 py-2 text-right font-bold">@lang('b2b::app.shop.customers.account.quotes.view.sub-total')</td>
-                                <td colspan="1" class="px-4 py-2 text-right font-bold text-zinc-500">{{ core()->formatPrice($negotiatedSubTotal, $quote->currency_code) }}</td>
+                                <td colspan="6" class="px-4 py-2 ltr:text-right rtl:text-left font-bold">@lang('b2b::app.shop.customers.account.quotes.view.sub-total')</td>
+                                <td colspan="1" class="px-4 py-2 ltr:text-right rtl:text-left font-bold text-zinc-500">{{ core()->formatPrice($negotiatedSubTotal, $quote->currency_code) }}</td>
                             </tr>
 
                             @if ($discountOnTotal > 0)
                                 <!-- Whole-quote discount -->
                                 <tr class="border-t">
-                                    <td colspan="6" class="px-4 py-2 text-right font-bold">
+                                    <td colspan="6" class="px-4 py-2 ltr:text-right rtl:text-left font-bold">
                                         @lang('b2b::app.shop.customers.account.quotes.view.discount-on-total')
 
                                         @if ($quote->discount_type && (float) $quote->discount_value > 0)
@@ -212,19 +212,19 @@
                                                 : core()->formatPrice($quote->discount_value, $quote->currency_code) }})</span>
                                         @endif
                                     </td>
-                                    <td colspan="1" class="px-4 py-2 text-right font-bold text-green-700">− {{ core()->formatPrice($discountOnTotal, $quote->currency_code) }}</td>
+                                    <td colspan="1" class="px-4 py-2 ltr:text-right rtl:text-left font-bold text-green-700">− {{ core()->formatPrice($discountOnTotal, $quote->currency_code) }}</td>
                                 </tr>
                             @endif
 
                             <!-- Negotiated Total (final) -->
                             <tr class="border-t">
-                                <td colspan="6" class="px-4 py-2 text-right font-bold">@lang('b2b::app.shop.customers.account.quotes.view.negotiated-total')</td>
-                                <td colspan="1" class="px-4 py-2 text-right text-lg font-bold text-navyBlue">{{ core()->formatPrice($quote->negotiated_total, $quote->currency_code) }}</td>
+                                <td colspan="6" class="px-4 py-2 ltr:text-right rtl:text-left font-bold">@lang('b2b::app.shop.customers.account.quotes.view.negotiated-total')</td>
+                                <td colspan="1" class="px-4 py-2 ltr:text-right rtl:text-left text-lg font-bold text-navyBlue">{{ core()->formatPrice($quote->negotiated_total, $quote->currency_code) }}</td>
                             </tr>
                         @else
                             <tr class="border-t">
-                                <td colspan="4" class="px-4 py-2 text-right font-bold">@lang('b2b::app.shop.customers.account.quotes.view.grand-total')</td>
-                                <td colspan="1" class="px-4 py-2 text-right text-lg font-bold text-navyBlue">{{ core()->formatPrice($quote->total, $quote->currency_code) }}</td>
+                                <td colspan="4" class="px-4 py-2 ltr:text-right rtl:text-left font-bold">@lang('b2b::app.shop.customers.account.quotes.view.grand-total')</td>
+                                <td colspan="1" class="px-4 py-2 ltr:text-right rtl:text-left text-lg font-bold text-navyBlue">{{ core()->formatPrice($quote->total, $quote->currency_code) }}</td>
                             </tr>
                         @endif
                     </tfoot>

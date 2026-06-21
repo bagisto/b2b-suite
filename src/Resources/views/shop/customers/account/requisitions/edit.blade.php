@@ -405,7 +405,7 @@
                                 </div>
 
                                 <!-- Desktop Total & Remove -->
-                                <div class="grid content-start justify-items-end gap-2 text-right max-md:hidden">
+                                <div class="grid content-start justify-items-end gap-2 ltr:text-right rtl:text-left max-md:hidden">
                                     {!! view_render_event('bagisto.shop.customers.account.requisition.total.before') !!}
 
                                     <p class="text-base font-semibold text-gray-900">
