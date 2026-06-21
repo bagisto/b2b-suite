@@ -59,7 +59,8 @@ The **Bagisto B2B Ecommerce** enhances your Bagisto store with advanced Business
 
 ### 2. Requirements:
 
-* **Bagisto**: v2.3.x
+* **Bagisto**: v2.4.x
+* **PHP**: 8.3 or higher
 
 ---
 
@@ -71,16 +72,17 @@ The **Bagisto B2B Ecommerce** enhances your Bagisto store with advanced Business
 composer require bagisto/b2b-suite
 ```
 
-### 2. Register the Service Provider
+#### Step 2: Register the Service Provider
 
-In `bootstrap/providers.php`:
+Add the provider to the array returned by `bootstrap/providers.php` (Bagisto v2.4.x runs on Laravel 12, which registers providers here rather than in `config/app.php`):
 
-> **Note:** Autoloading via Composer’s package auto-discovery is **not possible** for this provider. The registry order matters—`B2BSuiteServiceProvider` must be listed **after** the Shop package or at the end of the providers array. Auto-discovery would load it too early, which can cause issues.
+> **Note:** Composer package auto-discovery is **not possible** for this provider. Order matters—`B2BSuiteServiceProvider` must be listed **after** the Shop package (or last in the array). Auto-discovery would load it too early, which can cause issues.
 
 ```php
-'providers' => [
+return [
+    // ...other service providers
     Webkul\B2BSuite\Providers\B2BSuiteServiceProvider::class,
-],
+];
 ```
 
 #### Step 3: Run the installation command
