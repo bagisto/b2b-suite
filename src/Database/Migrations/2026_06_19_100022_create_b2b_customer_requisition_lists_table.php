@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('customer_requisition_lists', function (Blueprint $table) {
+        Schema::create('b2b_customer_requisition_lists', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->text('description')->nullable();
@@ -34,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('customer_requisition_lists');
+        Schema::dropIfExists('b2b_customer_requisition_lists');
     }
 };

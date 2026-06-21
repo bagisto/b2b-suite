@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('customer_quote_quotations', function (Blueprint $table) {
+        Schema::create('b2b_customer_quote_quotations', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('message_id')->unsigned();
             $table->integer('quote_id')->unsigned();
@@ -29,9 +29,9 @@ return new class extends Migration
             $table->string('accepted_by');
             $table->timestamps();
 
-            $table->foreign('quote_id')->references('id')->on('customer_quotes')->onDelete('cascade');
-            $table->foreign('quote_item_id')->references('id')->on('customer_quote_items')->onDelete('cascade');
-            $table->foreign('message_id')->references('id')->on('customer_quote_messages')->onDelete('cascade');
+            $table->foreign('quote_id')->references('id')->on('b2b_customer_quotes')->onDelete('cascade');
+            $table->foreign('quote_item_id')->references('id')->on('b2b_customer_quote_items')->onDelete('cascade');
+            $table->foreign('message_id')->references('id')->on('b2b_customer_quote_messages')->onDelete('cascade');
         });
     }
 
@@ -40,6 +40,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('customer_quote_quotations');
+        Schema::dropIfExists('b2b_customer_quote_quotations');
     }
 };

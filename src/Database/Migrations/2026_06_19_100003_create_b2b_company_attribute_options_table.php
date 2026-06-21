@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('company_attribute_options', function (Blueprint $table) {
+        Schema::create('b2b_company_attribute_options', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_attribute_id')
-                ->constrained()
+                ->constrained(table: 'b2b_company_attributes', indexName: 'b2b_comp_attr_opt_attr_fk')
                 ->cascadeOnDelete();
             $table->string('admin_name')->nullable();
             $table->integer('sort_order')->nullable();
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('company_attribute_options');
+        Schema::dropIfExists('b2b_company_attribute_options');
     }
 };

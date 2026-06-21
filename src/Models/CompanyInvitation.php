@@ -8,13 +8,32 @@ use Webkul\Customer\Models\CustomerProxy;
 
 class CompanyInvitation extends Model
 {
+    /**
+     * Invitation sent, awaiting the invitee's response.
+     */
     public const STATUS_PENDING = 'pending';
 
+    /**
+     * Invitation accepted — the invitee joined the company.
+     */
     public const STATUS_ACCEPTED = 'accepted';
 
+    /**
+     * Invitation declined by the invitee.
+     */
     public const STATUS_DECLINED = 'declined';
 
+    /**
+     * Invitation revoked by the company before it was answered.
+     */
     public const STATUS_REVOKED = 'revoked';
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'b2b_company_invitations';
 
     /**
      * The attributes that are mass assignable.

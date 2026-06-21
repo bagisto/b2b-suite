@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('company_attribute_group_mappings', function (Blueprint $table) {
+        Schema::create('b2b_company_attribute_group_mappings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_attribute_id')
-                ->constrained(indexName: 'company_attr_id_foreign')
+                ->constrained(table: 'b2b_company_attributes', indexName: 'company_attr_id_foreign')
                 ->onDelete('cascade');
             $table->foreignId('company_attribute_group_id')
-                ->constrained(indexName: 'company_attr_group_id_foreign')
+                ->constrained(table: 'b2b_company_attribute_groups', indexName: 'company_attr_group_id_foreign')
                 ->cascadeOnDelete();
             $table->integer('position')->nullable();
         });
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('company_attribute_group_mappings');
+        Schema::dropIfExists('b2b_company_attribute_group_mappings');
     }
 };

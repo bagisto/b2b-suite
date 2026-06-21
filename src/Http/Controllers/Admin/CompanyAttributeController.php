@@ -60,7 +60,7 @@ class CompanyAttributeController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'code' => ['required', 'not_in:type,company_attributes', 'unique:company_attributes,code', new Code],
+            'code' => ['required', 'not_in:type,b2b_company_attributes', 'unique:b2b_company_attributes,code', new Code],
             'admin_name' => 'required',
             'type' => 'required',
             'default_value' => 'in:0,1',
@@ -100,7 +100,7 @@ class CompanyAttributeController extends Controller
     public function update(Request $request, int $id): RedirectResponse
     {
         $request->validate([
-            'code' => ['required', 'not_in:type,company_attributes', 'unique:company_attributes,code,'.$id, new Code],
+            'code' => ['required', 'not_in:type,b2b_company_attributes', 'unique:b2b_company_attributes,code,'.$id, new Code],
             'admin_name' => 'required',
             'type' => 'required',
             'default_value' => 'in:0,1',
@@ -197,10 +197,14 @@ class CompanyAttributeController extends Controller
             'custom_attributes',
         ])->all();
 
-        // Get locales in a more reliable way
+        /**
+         * Get locales in a more reliable way
+         */
         $locales = core()->getAllLocales();
 
-        // Ensure we have the right structure for the frontend
+        /**
+         * Ensure we have the right structure for the frontend
+         */
         $localesArray = $locales->map(function ($locale) {
             return [
                 'id' => $locale->id,

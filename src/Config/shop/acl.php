@@ -30,14 +30,14 @@ return [
     [
         'key' => 'company_profile',
         'name' => 'b2b::app.shop.acl.company-profile',
-        'route' => 'shop.companies.account.profile.index',
+        'route' => 'shop.customers.account.company_profile.index',
         'sort' => 1,
     ], [
         'key' => 'company_profile.edit',
         'name' => 'b2b::app.shop.acl.edit',
         'route' => [
-            'shop.companies.account.profile.edit',
-            'shop.companies.account.profile.update',
+            'shop.customers.account.company_profile.edit',
+            'shop.customers.account.company_profile.update',
         ],
         'sort' => 1,
     ],

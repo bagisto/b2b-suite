@@ -18,7 +18,7 @@
         @break
 
     @case('boolean')
-        {{ $value ? trans('b2b::app.shop.companies.account.profile.index.yes') : trans('b2b::app.shop.companies.account.profile.index.no') }}
+        {{ $value ? trans('b2b::app.shop.customers.account.company-profile.index.yes') : trans('b2b::app.shop.customers.account.company-profile.index.no') }}
         @break
 
     @case('image')

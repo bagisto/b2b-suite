@@ -7,11 +7,16 @@ use Illuminate\Support\Facades\DB;
 
 class CompanyAttributeGroupMappingTableSeeder extends Seeder
 {
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     */
     public function run(array $parameters = [])
     {
-        DB::table('company_attribute_group_mappings')->truncate();
+        DB::table('b2b_company_attribute_group_mappings')->delete();
 
-        DB::table('company_attribute_group_mappings')->insert([
+        DB::table('b2b_company_attribute_group_mappings')->insert([
             /**
              * General Group Attributes
              */

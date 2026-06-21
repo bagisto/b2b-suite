@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('company_roles', function (Blueprint $table) {
+        Schema::create('b2b_company_roles', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->string('description')->nullable();
@@ -19,7 +19,7 @@ return new class extends Migration
             $table->json('permissions')->nullable();
             $table->integer('customer_id')->unsigned();
             $table->timestamps();
-            
+
             $table->foreign('customer_id')->references('id')->on('customers')->onDelete('cascade');
         });
     }
@@ -29,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('company_roles');
+        Schema::dropIfExists('b2b_company_roles');
     }
 };

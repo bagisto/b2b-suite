@@ -54,7 +54,7 @@
             <div class="flex flex-wrap items-center gap-3">
                 @if ($b2bCanEditCompany)
                     <a
-                        href="{{ route('shop.companies.account.profile.edit') }}"
+                        href="{{ route('shop.customers.account.company_profile.edit') }}"
                         class="secondary-button border-zinc-200 px-5 py-2 text-sm font-normal"
                     >
                         @lang('b2b::app.shop.customers.account.profile.edit-company')
@@ -63,7 +63,7 @@
 
                 @if ($b2bCanViewCompany)
                     <a
-                        href="{{ route('shop.companies.account.profile.index') }}"
+                        href="{{ route('shop.customers.account.company_profile.index') }}"
                         class="secondary-button border-zinc-200 px-5 py-2 text-sm font-normal"
                     >
                         @lang('b2b::app.shop.customers.account.profile.view-company-profile')

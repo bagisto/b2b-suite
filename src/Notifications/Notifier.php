@@ -16,65 +16,35 @@ use Webkul\B2BSuite\Models\CustomerQuote;
 class Notifier
 {
     /**
-     * Quote type => admin-config toggle key.
-     */
-    public const QUOTE_TOGGLES = [
-        'requested' => 'quote_requested',
-        'sent'      => 'quotation_sent',
-        'countered' => 'quote_countered',
-        'accepted'  => 'quote_accepted',
-        'rejected'  => 'quote_rejected',
-        'message'   => 'quote_message',
-        'ordered'   => 'quote_ordered',
-        'po_placed' => 'purchase_order_placed',
-    ];
-
-    /**
      * Company type => toggle key + audience.
      */
     public const COMPANY_TOGGLES = [
         'registered' => ['company_registered', 'admin'],
-        'approved'   => ['company_approved', 'buyer'],
-        'disabled'   => ['company_disabled', 'buyer'],
+        'approved' => ['company_approved', 'buyer'],
+        'disabled' => ['company_disabled', 'buyer'],
     ];
 
     /**
      * Credit type => toggle key.
      */
     public const CREDIT_TOGGLES = [
-        'updated'    => 'credit_updated',
+        'updated' => 'credit_updated',
         'reimbursed' => 'credit_reimbursed',
     ];
 
     /**
-     * Notify about a quote/purchase-order lifecycle event.
-     *
-     * @param  string  $type      One of self::QUOTE_TOGGLES keys.
-     * @param  string  $audience  "buyer" (company) or "admin" (sales rep).
+     * Quote type => admin-config toggle key.
      */
-    public static function quote(CustomerQuote $quote, string $type, string $audience): void
-    {
-        $toggle = self::QUOTE_TOGGLES[$type] ?? null;
-
-        if (! $toggle || ! self::enabled($toggle)) {
-            return;
-        }
-
-        [$email, $name] = $audience === 'admin'
-            ? self::salesRep($quote->company)
-            : (self::buyer($quote->company) ?? [null, null]);
-
-        if (! $email) {
-            return;
-        }
-
-        $label = $quote->state === CustomerQuote::STATE_PURCHASE_ORDER ? $quote->po_number : $quote->quotation_number;
-
-        self::send($email, $name, trans("b2b::app.emails.quote.$type.subject", ['id' => $label]), 'b2b::emails.quote', [
-            'type'     => $type,
-            'audience' => $audience,
-        ], $quote);
-    }
+    public const QUOTE_TOGGLES = [
+        'requested' => 'quote_requested',
+        'sent' => 'quotation_sent',
+        'countered' => 'quote_countered',
+        'accepted' => 'quote_accepted',
+        'rejected' => 'quote_rejected',
+        'message' => 'quote_message',
+        'ordered' => 'quote_ordered',
+        'po_placed' => 'purchase_order_placed',
+    ];
 
     /**
      * Notify about a company registration / approval / status change.
@@ -98,9 +68,59 @@ class Notifier
         self::send($email, $name, trans("b2b::app.emails.company.$type.subject", [
             'company' => $company->businessName() ?: $company->name,
         ]), 'b2b::emails.company', [
-            'type'     => $type,
+            'type' => $type,
             'audience' => $config[1],
         ], $company);
+    }
+
+    /**
+     * Notify a newly created company sub-user.
+     */
+    public static function user($user): void
+    {
+        if (! self::enabled('user_created') || ! $user?->email) {
+            return;
+        }
+
+        self::send($user->email, $user->name, trans('b2b::app.emails.user.created.subject'), 'b2b::emails.user', [
+            'type' => 'created',
+            'audience' => 'buyer',
+        ], $user);
+    }
+
+    /**
+     * Notify a sub-user that they have been removed from their company and are now a standard
+     * customer.
+     */
+    public static function userRemoved($user): void
+    {
+        if (! self::enabled('user_removed') || ! $user?->email) {
+            return;
+        }
+
+        self::send($user->email, $user->name, trans('b2b::app.emails.user.removed.subject'), 'b2b::emails.user', [
+            'type' => 'removed',
+            'audience' => 'buyer',
+        ], $user);
+    }
+
+    /**
+     * Email an invitee the link to join a company. Unlike the toggle-gated notifications this
+     * is transactional (it drives the invite flow), so it is gated only by the master switch.
+     */
+    public static function invitation($invitation, string $companyName, ?string $roleName, string $acceptUrl): void
+    {
+        if (! core()->getConfigData('b2b.general.settings.active')) {
+            return;
+        }
+
+        self::send($invitation->email, $invitation->email, trans('b2b::app.emails.invitation.subject', [
+            'company' => $companyName,
+        ]), 'b2b::emails.invitation', [
+            'company' => $companyName,
+            'role' => $roleName,
+            'accept_url' => $acceptUrl,
+        ], $invitation);
     }
 
     /**
@@ -125,59 +145,39 @@ class Notifier
         self::send($email, $name, trans("b2b::app.emails.credit.$type.subject", [
             'company' => $company->businessName() ?: $company->name,
         ]), 'b2b::emails.credit', array_merge([
-            'type'     => $type,
+            'type' => $type,
             'audience' => 'buyer',
         ], $meta), $company);
     }
 
     /**
-     * Notify a newly created company sub-user.
+     * Notify about a quote/purchase-order lifecycle event.
+     *
+     * @param  string  $type  One of self::QUOTE_TOGGLES keys.
+     * @param  string  $audience  "buyer" (company) or "admin" (sales rep).
      */
-    public static function user($user): void
+    public static function quote(CustomerQuote $quote, string $type, string $audience): void
     {
-        if (! self::enabled('user_created') || ! $user?->email) {
+        $toggle = self::QUOTE_TOGGLES[$type] ?? null;
+
+        if (! $toggle || ! self::enabled($toggle)) {
             return;
         }
 
-        self::send($user->email, $user->name, trans('b2b::app.emails.user.created.subject'), 'b2b::emails.user', [
-            'type'     => 'created',
-            'audience' => 'buyer',
-        ], $user);
-    }
+        [$email, $name] = $audience === 'admin'
+            ? self::salesRep($quote->company)
+            : (self::buyer($quote->company) ?? [null, null]);
 
-    /**
-     * Notify a sub-user that they have been removed from their company and are now a standard
-     * customer.
-     */
-    public static function userRemoved($user): void
-    {
-        if (! self::enabled('user_removed') || ! $user?->email) {
+        if (! $email) {
             return;
         }
 
-        self::send($user->email, $user->name, trans('b2b::app.emails.user.removed.subject'), 'b2b::emails.user', [
-            'type'     => 'removed',
-            'audience' => 'buyer',
-        ], $user);
-    }
+        $label = $quote->state === CustomerQuote::STATE_PURCHASE_ORDER ? $quote->po_number : $quote->quotation_number;
 
-    /**
-     * Email an invitee the link to join a company. Unlike the toggle-gated notifications this
-     * is transactional (it drives the invite flow), so it is gated only by the master switch.
-     */
-    public static function invitation($invitation, string $companyName, ?string $roleName, string $acceptUrl): void
-    {
-        if (! core()->getConfigData('b2b.general.settings.active')) {
-            return;
-        }
-
-        self::send($invitation->email, $invitation->email, trans('b2b::app.emails.invitation.subject', [
-            'company' => $companyName,
-        ]), 'b2b::emails.invitation', [
-            'company'    => $companyName,
-            'role'       => $roleName,
-            'accept_url' => $acceptUrl,
-        ], $invitation);
+        self::send($email, $name, trans("b2b::app.emails.quote.$type.subject", ['id' => $label]), 'b2b::emails.quote', [
+            'type' => $type,
+            'audience' => $audience,
+        ], $quote);
     }
 
     /**
@@ -191,7 +191,9 @@ class Notifier
 
         $value = core()->getConfigData('b2b.email_notifications.settings.'.$key);
 
-        // Default to enabled when the toggle has never been saved.
+        /**
+         * Default to enabled when the toggle has never been saved.
+         */
         return $value === null ? true : (bool) $value;
     }
 

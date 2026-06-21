@@ -22,32 +22,32 @@ class CompanyCreditDataGrid extends DataGrid
     {
         $tablePrefix = DB::getTablePrefix();
 
-        $companyName = 'COALESCE(NULLIF('.$tablePrefix.'company_flat.business_name, ""), CONCAT('.$tablePrefix.'customers.first_name, " ", '.$tablePrefix.'customers.last_name))';
-        $available = $tablePrefix.'company_credits.credit_limit - '.$tablePrefix.'company_credits.outstanding_balance';
+        $companyName = 'COALESCE(NULLIF('.$tablePrefix.'b2b_company_flat.business_name, ""), CONCAT('.$tablePrefix.'customers.first_name, " ", '.$tablePrefix.'customers.last_name))';
+        $available = $tablePrefix.'b2b_company_credits.credit_limit - '.$tablePrefix.'b2b_company_credits.outstanding_balance';
 
-        $queryBuilder = DB::table('company_credits')
-            ->leftJoin('customers', 'company_credits.company_id', '=', 'customers.id')
-            ->leftJoin('company_flat', function ($join) {
-                $join->on('company_credits.company_id', '=', 'company_flat.customer_id')
-                    ->where('company_flat.locale', '=', app()->getLocale());
+        $queryBuilder = DB::table('b2b_company_credits')
+            ->leftJoin('customers', 'b2b_company_credits.company_id', '=', 'customers.id')
+            ->leftJoin('b2b_company_flat', function ($join) {
+                $join->on('b2b_company_credits.company_id', '=', 'b2b_company_flat.customer_id')
+                    ->where('b2b_company_flat.locale', '=', app()->getLocale());
             })
             ->select(
-                'company_credits.id',
-                'company_credits.company_id',
+                'b2b_company_credits.id',
+                'b2b_company_credits.company_id',
                 'customers.email as company_email',
-                'company_credits.credit_limit',
-                'company_credits.outstanding_balance',
-                'company_credits.status',
+                'b2b_company_credits.credit_limit',
+                'b2b_company_credits.outstanding_balance',
+                'b2b_company_credits.status',
                 DB::raw($companyName.' as company_name'),
                 DB::raw('('.$available.') as available_credit')
             );
 
         $this->addFilter('company_name', DB::raw($companyName));
         $this->addFilter('company_email', 'customers.email');
-        $this->addFilter('credit_limit', 'company_credits.credit_limit');
-        $this->addFilter('outstanding_balance', 'company_credits.outstanding_balance');
+        $this->addFilter('credit_limit', 'b2b_company_credits.credit_limit');
+        $this->addFilter('outstanding_balance', 'b2b_company_credits.outstanding_balance');
         $this->addFilter('available_credit', DB::raw($available));
-        $this->addFilter('status', 'company_credits.status');
+        $this->addFilter('status', 'b2b_company_credits.status');
 
         // A sales rep only sees credit for the companies they manage; super-admins see all.
         if ($repId = Customer::salesRepScopeId()) {

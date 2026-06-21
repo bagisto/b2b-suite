@@ -25,27 +25,27 @@ class CompanyCreditTransactionDataGrid extends DataGrid
      */
     public function prepareQueryBuilder()
     {
-        $queryBuilder = DB::table('company_credit_transactions')
-            ->leftJoin('orders', 'company_credit_transactions.order_id', '=', 'orders.id')
-            ->where('company_credit_transactions.company_credit_id', $this->companyCreditId)
+        $queryBuilder = DB::table('b2b_company_credit_transactions')
+            ->leftJoin('orders', 'b2b_company_credit_transactions.order_id', '=', 'orders.id')
+            ->where('b2b_company_credit_transactions.company_credit_id', $this->companyCreditId)
             ->select(
-                'company_credit_transactions.id',
-                'company_credit_transactions.operation',
+                'b2b_company_credit_transactions.id',
+                'b2b_company_credit_transactions.operation',
                 // Raw copy of the operation: the operation column's closure overwrites
                 // `operation` with badge HTML, so later closures read this untouched value.
-                'company_credit_transactions.operation as operation_raw',
-                'company_credit_transactions.amount',
-                'company_credit_transactions.available_credit_after',
-                'company_credit_transactions.order_id',
-                'company_credit_transactions.reference',
-                'company_credit_transactions.comment',
-                'company_credit_transactions.created_at',
+                'b2b_company_credit_transactions.operation as operation_raw',
+                'b2b_company_credit_transactions.amount',
+                'b2b_company_credit_transactions.available_credit_after',
+                'b2b_company_credit_transactions.order_id',
+                'b2b_company_credit_transactions.reference',
+                'b2b_company_credit_transactions.comment',
+                'b2b_company_credit_transactions.created_at',
                 'orders.increment_id as order_increment_id'
             );
 
-        $this->addFilter('operation', 'company_credit_transactions.operation');
-        $this->addFilter('amount', 'company_credit_transactions.amount');
-        $this->addFilter('created_at', 'company_credit_transactions.created_at');
+        $this->addFilter('operation', 'b2b_company_credit_transactions.operation');
+        $this->addFilter('amount', 'b2b_company_credit_transactions.amount');
+        $this->addFilter('created_at', 'b2b_company_credit_transactions.created_at');
 
         return $queryBuilder;
     }
@@ -152,13 +152,5 @@ class CompanyCreditTransactionDataGrid extends DataGrid
                 return $parts ? implode('<br>', $parts) : '<span class="text-gray-400">—</span>';
             },
         ]);
-    }
-
-    /**
-     * Prepare actions.
-     */
-    public function prepareActions()
-    {
-        // Read-only audit ledger — no row actions.
     }
 }

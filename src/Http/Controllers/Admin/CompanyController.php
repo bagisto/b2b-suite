@@ -4,7 +4,6 @@ namespace Webkul\B2BSuite\Http\Controllers\Admin;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Webkul\Admin\Http\Controllers\Controller;
 use Webkul\Admin\Http\Requests\MassDestroyRequest;
@@ -37,18 +36,6 @@ class CompanyController extends Controller
     ) {}
 
     /**
-     * The customer group a new company is created with — the store's configured default
-     * ("general"), falling back to guest only if that group is missing.
-     */
-    protected function defaultCompanyGroupId(): int
-    {
-        $code = core()->getConfigData('customer.settings.create_new_account_options.default_group') ?: 'general';
-
-        return optional($this->customerGroupRepository->findOneWhere(['code' => $code]))->id
-            ?? core()->getGuestCustomerGroup()->id;
-    }
-
-    /**
      * Display a listing of the companies.
      */
     public function index()
@@ -58,50 +45,6 @@ class CompanyController extends Controller
         }
 
         return view('b2b::admin.companies.index');
-    }
-
-    /**
-     * Get companies for autocomplete.
-     */
-    public function get(): JsonResponse
-    {
-        $repId = Customer::salesRepScopeId();
-
-        $companies = $this->customerRepository
-            ->findWhere(['type' => 'company'])
-            ->when($repId, fn ($companies) => $companies->where('sales_rep_id', $repId))
-            ->map(function ($company) {
-                return [
-                    'id' => $company->id,
-                    'name' => $company->first_name.' '.$company->last_name,
-                    'email' => $company->email,
-                ];
-            })
-            ->values();
-
-        return new JsonResponse($companies);
-    }
-
-    /**
-     * Result of search companies/customers.
-     */
-    public function search(): JsonResource
-    {
-        $data = request()->all();
-
-        $repId = Customer::salesRepScopeId();
-
-        $customers = $this->customerRepository->scopeQuery(function ($query) use ($data, $repId) {
-            return $query->whereIn('type', [$data['type'] ?? 'company', 'company'])
-                ->when($repId, fn ($q) => $q->where('sales_rep_id', $repId))
-                ->where(function ($q) use ($data) {
-                    $q->where('email', 'like', '%'.urldecode($data['query']).'%')
-                        ->orWhere(DB::raw('CONCAT(first_name, " ", last_name)'), 'like', '%'.urldecode($data['query']).'%');
-                })
-                ->orderBy('created_at', 'desc');
-        })->get();
-
-        return CustomerResource::collection($customers);
     }
 
     /**
@@ -151,8 +94,10 @@ class CompanyController extends Controller
             'company_role_id',
         ]));
 
-        // A company defaults to the store's general customer group (not guest), unless the
-        // form explicitly picked one.
+        /**
+         * A company defaults to the store's general customer group (not guest), unless the
+         * form explicitly picked one.
+         */
         if (empty($data['customer_group_id'])) {
             $data['customer_group_id'] = $this->defaultCompanyGroupId();
         }
@@ -163,7 +108,9 @@ class CompanyController extends Controller
          */
         $data['type'] = 'company';
 
-        // Assigned sales rep (empty select = unassigned).
+        /**
+         * Assigned sales rep (empty select = unassigned).
+         */
         $data['sales_rep_id'] = $request->input('sales_rep_id') ?: null;
 
         $customer = $this->customerRepository->create($data);
@@ -242,9 +189,11 @@ class CompanyController extends Controller
             'company_role_id',
         ]));
 
-        // Don't touch the customer group when the edit form doesn't include it — otherwise a
-        // routine edit (status, sales rep, …) would wipe the company's general / company-catalog
-        // group back to guest.
+        /**
+         * Don't touch the customer group when the edit form doesn't include it — otherwise a
+         * routine edit (status, sales rep, …) would wipe the company's general / company-catalog
+         * group back to guest.
+         */
         if (empty($data['customer_group_id'])) {
             unset($data['customer_group_id']);
         }
@@ -255,7 +204,9 @@ class CompanyController extends Controller
          */
         $data['type'] = 'company';
 
-        // Assigned sales rep (empty select = unassigned).
+        /**
+         * Assigned sales rep (empty select = unassigned).
+         */
         $data['sales_rep_id'] = $request->input('sales_rep_id') ?: null;
 
         $wasPending = ! $customer->status;
@@ -304,6 +255,30 @@ class CompanyController extends Controller
     }
 
     /**
+     * Remove the specified company from storage.
+     */
+    public function destroy($id)
+    {
+        abort_unless(Customer::repCanAccessCompany((int) $id), 403);
+
+        try {
+            Event::dispatch('customer.delete.before', $id);
+
+            $this->customerRepository->delete($id);
+
+            Event::dispatch('customer.delete.after', $id);
+
+            return response()->json([
+                'message' => trans('b2b::app.admin.companies.delete-success'),
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => trans('b2b::app.admin.companies.delete-failed'),
+            ], 500);
+        }
+    }
+
+    /**
      * Mass approve/disable companies.
      */
     public function massUpdateStatus(MassUpdateRequest $massUpdateRequest): JsonResponse
@@ -346,26 +321,6 @@ class CompanyController extends Controller
     }
 
     /**
-     * Remove the specified company from storage.
-     */
-    public function destroy($id)
-    {
-        abort_unless(Customer::repCanAccessCompany((int) $id), 403);
-
-        try {
-            $this->customerRepository->delete($id);
-
-            return response()->json([
-                'message' => trans('b2b::app.admin.companies.delete-success'),
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => trans('b2b::app.admin.companies.delete-failed'),
-            ], 500);
-        }
-    }
-
-    /**
      * Remove the specified resources from database.
      */
     public function massDestroy(MassDestroyRequest $massDestroyRequest): JsonResponse
@@ -403,5 +358,61 @@ class CompanyController extends Controller
                 'message' => trans('b2b::app.admin.companies.delete-failed'),
             ], 500);
         }
+    }
+
+    /**
+     * Get companies for autocomplete.
+     */
+    public function get(): JsonResponse
+    {
+        $repId = Customer::salesRepScopeId();
+
+        $companies = $this->customerRepository
+            ->findWhere(['type' => 'company'])
+            ->when($repId, fn ($companies) => $companies->where('sales_rep_id', $repId))
+            ->map(function ($company) {
+                return [
+                    'id' => $company->id,
+                    'name' => $company->first_name.' '.$company->last_name,
+                    'email' => $company->email,
+                ];
+            })
+            ->values();
+
+        return new JsonResponse($companies);
+    }
+
+    /**
+     * Result of search companies/customers.
+     */
+    public function search(): JsonResource
+    {
+        $data = request()->all();
+
+        $repId = Customer::salesRepScopeId();
+
+        $customers = $this->customerRepository->scopeQuery(function ($query) use ($data, $repId) {
+            return $query->whereIn('type', [$data['type'] ?? 'company', 'company'])
+                ->when($repId, fn ($q) => $q->where('sales_rep_id', $repId))
+                ->where(function ($q) use ($data) {
+                    $q->where('email', 'like', '%'.urldecode($data['query']).'%')
+                        ->orWhereRaw('CONCAT(first_name, " ", last_name) like ?', ['%'.urldecode($data['query']).'%']);
+                })
+                ->orderBy('created_at', 'desc');
+        })->get();
+
+        return CustomerResource::collection($customers);
+    }
+
+    /**
+     * The customer group a new company is created with — the store's configured default
+     * ("general"), falling back to guest only if that group is missing.
+     */
+    protected function defaultCompanyGroupId(): int
+    {
+        $code = core()->getConfigData('customer.settings.create_new_account_options.default_group') ?: 'general';
+
+        return optional($this->customerGroupRepository->findOneWhere(['code' => $code]))->id
+            ?? core()->getGuestCustomerGroup()->id;
     }
 }

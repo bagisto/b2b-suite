@@ -30,6 +30,40 @@ class CategoryRepository extends BaseCategoryRepository
     protected ?array $allowedIds = null;
 
     /**
+     * {@inheritdoc}
+     */
+    public function getVisibleCategoryTree($id = null)
+    {
+        if (! $this->companyCatalog()) {
+            return parent::getVisibleCategoryTree($id);
+        }
+
+        $allowed = $this->allowedCategoryIds();
+
+        return $id
+            ? $this->model::orderBy('position', 'ASC')->where('status', 1)->whereIn('id', $allowed)->descendantsAndSelf($id)->toTree($id)
+            : $this->model::orderBy('position', 'ASC')->where('status', 1)->whereIn('id', $allowed)->get()->toTree();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function findBySlug($slug)
+    {
+        $category = parent::findBySlug($slug);
+
+        if (
+            $category
+            && $this->companyCatalog()
+            && ! in_array($category->id, $this->allowedCategoryIds())
+        ) {
+            return null;
+        }
+
+        return $category;
+    }
+
+    /**
      * Resolve the active company catalog for the current storefront customer (or null).
      */
     protected function companyCatalog()
@@ -90,39 +124,5 @@ class CategoryRepository extends BaseCategoryRepository
         $adminPrefix = trim((string) config('app.admin_url', 'admin'), '/') ?: 'admin';
 
         return request()->is($adminPrefix) || request()->is($adminPrefix.'/*');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getVisibleCategoryTree($id = null)
-    {
-        if (! $this->companyCatalog()) {
-            return parent::getVisibleCategoryTree($id);
-        }
-
-        $allowed = $this->allowedCategoryIds();
-
-        return $id
-            ? $this->model::orderBy('position', 'ASC')->where('status', 1)->whereIn('id', $allowed)->descendantsAndSelf($id)->toTree($id)
-            : $this->model::orderBy('position', 'ASC')->where('status', 1)->whereIn('id', $allowed)->get()->toTree();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function findBySlug($slug)
-    {
-        $category = parent::findBySlug($slug);
-
-        if (
-            $category
-            && $this->companyCatalog()
-            && ! in_array($category->id, $this->allowedCategoryIds())
-        ) {
-            return null;
-        }
-
-        return $category;
     }
 }

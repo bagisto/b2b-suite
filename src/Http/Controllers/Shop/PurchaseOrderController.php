@@ -18,9 +18,9 @@ class PurchaseOrderController extends Controller
      * @return void
      */
     public function __construct(
-        protected CustomerRepository $customerRepository,
         protected CustomerQuoteRepository $customerQuoteRepository,
         protected CustomerQuoteMessageRepository $customerQuoteMessageRepository,
+        protected CustomerRepository $customerRepository,
     ) {}
 
     /**

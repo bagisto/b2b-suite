@@ -8,7 +8,7 @@ use Webkul\Core\Eloquent\Repository;
 class CompanyCatalogRepository extends Repository
 {
     /**
-     * Specify Model class name.
+     * Specify model class name.
      */
     public function model()
     {

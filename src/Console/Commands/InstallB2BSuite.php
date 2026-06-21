@@ -20,17 +20,7 @@ class InstallB2BSuite extends Command
      *
      * @var string
      */
-    protected $description = '';
-
-    /**
-     * Create a new command instance.
-     */
-    public function __construct()
-    {
-        $this->description = trans('marketplace::app.commands.install.description');
-
-        parent::__construct();
-    }
+    protected $description = 'Install and configure B2B Suite for Bagisto.';
 
     /**
      * Install and configure B2B Suite.

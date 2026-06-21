@@ -22,7 +22,7 @@
                 @lang('b2b::app.admin.companies.credit.back')
             </a>
 
-            <!-- Credit settings — opens a modal -->
+            <!-- Credit Settings — Opens a modal. -->
             <x-admin::form :action="route('admin.b2b.companies.credit.limit', $company->id)">
                 <x-admin::modal>
                     <x-slot:toggle>
@@ -70,47 +70,47 @@
             <!-- Reimburse (offline payment) — opens a modal; available even when the
                  balance is settled or in advance, so further payments can be recorded -->
             <x-admin::form :action="route('admin.b2b.companies.credit.reimburse', $company->id)">
-                    <x-admin::modal>
-                        <x-slot:toggle>
-                            <button type="button" class="primary-button">
-                                @lang('b2b::app.admin.companies.credit.reimburse')
-                            </button>
-                        </x-slot>
+                <x-admin::modal>
+                    <x-slot:toggle>
+                        <button type="button" class="primary-button">
+                            @lang('b2b::app.admin.companies.credit.reimburse')
+                        </button>
+                    </x-slot>
 
-                        <x-slot:header>
-                            <p class="text-lg font-bold text-gray-800 dark:text-white">
-                                @lang('b2b::app.admin.companies.credit.reimburse')
-                            </p>
-                        </x-slot>
+                    <x-slot:header>
+                        <p class="text-lg font-bold text-gray-800 dark:text-white">
+                            @lang('b2b::app.admin.companies.credit.reimburse')
+                        </p>
+                    </x-slot>
 
-                        <x-slot:content>
-                            <x-admin::form.control-group>
-                                <x-admin::form.control-group.label class="required">@lang('b2b::app.admin.companies.credit.amount')</x-admin::form.control-group.label>
-                                <x-admin::form.control-group.control
-                                    type="text"
-                                    name="amount"
-                                    rules="required|decimal:0,4|min_value:0.01"
-                                    :placeholder="max(0, (float) $credit->outstanding_balance)"
-                                />
-                                <x-admin::form.control-group.error control-name="amount" />
-                            </x-admin::form.control-group>
+                    <x-slot:content>
+                        <x-admin::form.control-group>
+                            <x-admin::form.control-group.label class="required">@lang('b2b::app.admin.companies.credit.amount')</x-admin::form.control-group.label>
+                            <x-admin::form.control-group.control
+                                type="text"
+                                name="amount"
+                                rules="required|decimal:0,4|min_value:0.01"
+                                :placeholder="max(0, (float) $credit->outstanding_balance)"
+                            />
+                            <x-admin::form.control-group.error control-name="amount" />
+                        </x-admin::form.control-group>
 
-                            <x-admin::form.control-group>
-                                <x-admin::form.control-group.label>@lang('b2b::app.admin.companies.credit.reference')</x-admin::form.control-group.label>
-                                <x-admin::form.control-group.control type="text" name="reference" />
-                            </x-admin::form.control-group>
+                        <x-admin::form.control-group>
+                            <x-admin::form.control-group.label>@lang('b2b::app.admin.companies.credit.reference')</x-admin::form.control-group.label>
+                            <x-admin::form.control-group.control type="text" name="reference" />
+                        </x-admin::form.control-group>
 
-                            <x-admin::form.control-group class="!mb-0">
-                                <x-admin::form.control-group.label>@lang('b2b::app.admin.companies.credit.comment')</x-admin::form.control-group.label>
-                                <x-admin::form.control-group.control type="textarea" name="comment" rows="2" />
-                            </x-admin::form.control-group>
-                        </x-slot>
+                        <x-admin::form.control-group class="!mb-0">
+                            <x-admin::form.control-group.label>@lang('b2b::app.admin.companies.credit.comment')</x-admin::form.control-group.label>
+                            <x-admin::form.control-group.control type="textarea" name="comment" rows="2" />
+                        </x-admin::form.control-group>
+                    </x-slot>
 
-                        <x-slot:footer>
-                            <button type="submit" class="primary-button">@lang('b2b::app.admin.companies.credit.reimburse-btn')</button>
-                        </x-slot>
-                    </x-admin::modal>
-                </x-admin::form>
+                    <x-slot:footer>
+                        <button type="submit" class="primary-button">@lang('b2b::app.admin.companies.credit.reimburse-btn')</button>
+                    </x-slot>
+                </x-admin::modal>
+            </x-admin::form>
         </div>
     </div>
 

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('company_attribute_values', function (Blueprint $table) {
+        Schema::create('b2b_company_attribute_values', function (Blueprint $table) {
             $table->id();
             $table->string('locale')->nullable();
             $table->string('channel')->nullable();
@@ -23,7 +23,7 @@ return new class extends Migration
             $table->date('date_value')->nullable();
             $table->json('json_value')->nullable();
             $table->unsignedInteger('customer_id');
-            $table->foreignId('company_attribute_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('company_attribute_id')->constrained(table: 'b2b_company_attributes', indexName: 'b2b_comp_attr_val_attr_fk')->cascadeOnDelete();
             $table->string('unique_id')->nullable();
 
             $table->unique([
@@ -42,6 +42,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('company_attribute_values');
+        Schema::dropIfExists('b2b_company_attribute_values');
     }
 };

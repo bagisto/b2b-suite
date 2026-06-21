@@ -25,9 +25,9 @@ class RequisitionListController extends Controller
      * @return void
      */
     public function __construct(
+        protected CustomerRequisitionRepository $customerRequisitionRepository,
         protected CustomerRepository $customerRepository,
         protected ProductRepository $productRepository,
-        protected CustomerRequisitionRepository $customerRequisitionRepository,
     ) {}
 
     /**
@@ -46,6 +46,32 @@ class RequisitionListController extends Controller
         $totalRequisitionList = $this->customerRequisitionRepository->findByField('customer_id', $customerId);
 
         return view('b2b::shop.customers.account.requisitions.index')->with('totalRequisition', $totalRequisitionList->count());
+    }
+
+    /**
+     * For editing the existing addresses of current logged in customer.
+     */
+    public function list(): JsonResponse
+    {
+        $requisitions = $this->customerRequisitionRepository->findWhere([
+            'status' => CustomerRequisitionList::STATUS_ACTIVE,
+            'customer_id' => auth()->guard('customer')->user()->id,
+        ])
+            ->sortByDesc('created_at')
+            ->take(5)
+            ->map(function ($requisition) {
+                return [
+                    'id' => $requisition->id,
+                    'name' => $requisition->name,
+                ];
+            });
+
+        $totalRequisition = $this->customerRequisitionRepository->count();
+
+        return new JsonResponse([
+            'requisitions' => $requisitions,
+            'allow_new_list' => (int) core()->getConfigData('b2b.general.settings.no_requisition_list') > $totalRequisition,
+        ]);
     }
 
     /**
@@ -162,6 +188,61 @@ class RequisitionListController extends Controller
     }
 
     /**
+     * Updates the quantity of the items present in the requisition list.
+     */
+    public function updateItems(): JsonResponse
+    {
+        $this->validate(request(), [
+            'requisition_id' => 'required|exists:b2b_customer_requisition_lists,id',
+            'qty' => 'array',
+        ]);
+
+        try {
+            $data = request()->all();
+
+            $requisition = $this->customerRequisitionRepository->with(['items'])->findOneWhere([
+                'id' => $data['requisition_id'],
+                'customer_id' => auth()->guard('customer')->user()->id,
+            ]);
+
+            if (! $requisition) {
+                abort(404);
+            }
+
+            $qtyArray = $data['qty'] ?? [];
+
+            $requisitionItems = $qtyArray ? $requisition->items->whereIn('id', array_keys($qtyArray)) : $requisition->items;
+
+            foreach ($requisitionItems as $item) {
+                $qty = $qtyArray[$item->id] ?? 1;
+
+                $additional = $item->additional ? json_decode($item->additional, true) : [];
+
+                $item->update([
+                    'qty' => $qty,
+                    'total' => $item->price * $qty,
+                    'base_total' => $item->base_price * $qty,
+                    'additional' => $additional ? json_encode(array_merge($additional, ['quantity' => $qty])) : null,
+                ]);
+            }
+
+            /**
+             * Reload updated items
+             */
+            $updatedItems = $requisition->items()->get();
+
+            return new JsonResponse([
+                'data' => RequisitionItemResource::collection($updatedItems),
+                'message' => trans('b2b::app.shop.customers.account.requisitions.item-updated'),
+            ]);
+        } catch (\Exception $exception) {
+            return new JsonResponse([
+                'message' => $exception->getMessage(),
+            ]);
+        }
+    }
+
+    /**
      * Delete address of the current customer.
      */
     public function destroy(int $id): JsonResponse
@@ -184,6 +265,42 @@ class RequisitionListController extends Controller
         return new JsonResponse([
             'message' => trans('b2b::app.shop.customers.account.requisitions.delete-success'),
             'redirect_url' => route('shop.customers.account.requisitions.index'),
+        ]);
+    }
+
+    /**
+     * Removes the item from the requisition if it exists.
+     */
+    public function destroyItems(): JsonResponse
+    {
+        $this->validate(request(), [
+            'requisition_id' => 'required|exists:b2b_customer_requisition_lists,id',
+            'requisition_item_ids' => 'required|array',
+        ]);
+
+        $requisition = $this->customerRequisitionRepository->findOneWhere([
+            'id' => request()->input('requisition_id'),
+            'customer_id' => auth()->guard('customer')->user()->id,
+        ]);
+
+        if (! $requisition) {
+            abort(404);
+        }
+
+        $requisitionItems = $requisition->items->whereIn('id', request()->input('requisition_item_ids'));
+
+        foreach ($requisitionItems as $item) {
+            $item->delete();
+        }
+
+        /**
+         * Reload updated items
+         */
+        $updatedItems = $requisition->items()->get();
+
+        return new JsonResponse([
+            'data' => RequisitionItemResource::collection($updatedItems),
+            'message' => trans('b2b::app.shop.customers.account.requisitions.success-remove'),
         ]);
     }
 
@@ -237,32 +354,6 @@ class RequisitionListController extends Controller
     }
 
     /**
-     * For editing the existing addresses of current logged in customer.
-     */
-    public function list(): JsonResponse
-    {
-        $requisitions = $this->customerRequisitionRepository->findWhere([
-            'status' => CustomerRequisitionList::STATUS_ACTIVE,
-            'customer_id' => auth()->guard('customer')->user()->id,
-        ])
-            ->sortByDesc('created_at')
-            ->take(5)
-            ->map(function ($requisition) {
-                return [
-                    'id' => $requisition->id,
-                    'name' => $requisition->name,
-                ];
-            });
-
-        $totalRequisition = $this->customerRequisitionRepository->count();
-
-        return new JsonResponse([
-            'requisitions' => $requisitions,
-            'allow_new_list' => (int) core()->getConfigData('b2b.general.settings.no_requisition_list') > $totalRequisition,
-        ]);
-    }
-
-    /**
      * Get the requisition items.
      */
     public function getItems(): JsonResponse
@@ -287,7 +378,7 @@ class RequisitionListController extends Controller
     public function moveToCart(): JsonResponse
     {
         $this->validate(request(), [
-            'requisition_id' => 'required|exists:customer_requisition_lists,id',
+            'requisition_id' => 'required|exists:b2b_customer_requisition_lists,id',
             'ids' => 'required|array',
         ]);
 
@@ -321,93 +412,6 @@ class RequisitionListController extends Controller
 
         return new JsonResponse([
             'redirect_url' => route('shop.checkout.cart.index'),
-        ]);
-    }
-
-    /**
-     * Updates the quantity of the items present in the requisition list.
-     */
-    public function updateItems(): JsonResponse
-    {
-        $this->validate(request(), [
-            'requisition_id' => 'required|exists:customer_requisition_lists,id',
-            'qty' => 'array',
-        ]);
-
-        try {
-            $data = request()->all();
-
-            $requisition = $this->customerRequisitionRepository->with(['items'])->findOneWhere([
-                'id' => $data['requisition_id'],
-                'customer_id' => auth()->guard('customer')->user()->id,
-            ]);
-
-            if (! $requisition) {
-                abort(404);
-            }
-
-            $qtyArray = $data['qty'] ?? [];
-
-            $requisitionItems = $qtyArray ? $requisition->items->whereIn('id', array_keys($qtyArray)) : $requisition->items;
-
-            foreach ($requisitionItems as $item) {
-                $qty = $qtyArray[$item->id] ?? 1;
-
-                $additional = $item->additional ? json_decode($item->additional, true) : [];
-
-                $item->update([
-                    'qty' => $qty,
-                    'total' => $item->price * $qty,
-                    'base_total' => $item->base_price * $qty,
-                    'additional' => $additional ? json_encode(array_merge($additional, ['quantity' => $qty])) : null,
-                ]);
-            }
-
-            // Reload updated items
-            $updatedItems = $requisition->items()->get();
-
-            return new JsonResponse([
-                'data' => RequisitionItemResource::collection($updatedItems),
-                'message' => trans('b2b::app.shop.customers.account.requisitions.item-updated'),
-            ]);
-        } catch (\Exception $exception) {
-            return new JsonResponse([
-                'message' => $exception->getMessage(),
-            ]);
-        }
-    }
-
-    /**
-     * Removes the item from the requisition if it exists.
-     */
-    public function destroyItems(): JsonResponse
-    {
-        $this->validate(request(), [
-            'requisition_id' => 'required|exists:customer_requisition_lists,id',
-            'requisition_item_ids' => 'required|array',
-        ]);
-
-        $requisition = $this->customerRequisitionRepository->findOneWhere([
-            'id' => request()->input('requisition_id'),
-            'customer_id' => auth()->guard('customer')->user()->id,
-        ]);
-
-        if (! $requisition) {
-            abort(404);
-        }
-
-        $requisitionItems = $requisition->items->whereIn('id', request()->input('requisition_item_ids'));
-
-        foreach ($requisitionItems as $item) {
-            $item->delete();
-        }
-
-        // Reload updated items
-        $updatedItems = $requisition->items()->get();
-
-        return new JsonResponse([
-            'data' => RequisitionItemResource::collection($updatedItems),
-            'message' => trans('b2b::app.shop.customers.account.requisitions.success-remove'),
         ]);
     }
 }

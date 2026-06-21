@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('company_catalogs', function (Blueprint $table) {
+        Schema::create('b2b_company_catalogs', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->text('description')->nullable();
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('company_catalogs');
+        Schema::dropIfExists('b2b_company_catalogs');
     }
 };

@@ -6,17 +6,6 @@ use Webkul\B2BSuite\Facades\B2BSuite;
 
 /**
  * -------------------------
- * B2B Suite Acl helper.
- * -------------------------
- */
-if (! function_exists('b2b_acl')) {
-    function b2b_acl(): Acl
-    {
-        return app(Acl::class);
-    }
-}
-/**
- * -------------------------
  * B2B Suite helper.
  * -------------------------
  */
@@ -34,10 +23,28 @@ if (! function_exists('b2b')) {
 
 /**
  * -------------------------
+ * B2B Suite Acl helper.
+ * -------------------------
+ */
+if (! function_exists('b2b_acl')) {
+    /**
+     * B2B Suite ACL helper.
+     */
+    function b2b_acl(): Acl
+    {
+        return app(Acl::class);
+    }
+}
+
+/**
+ * -------------------------
  * Customer Bouncer helper.
  * -------------------------
  */
 if (! function_exists('customer_bouncer')) {
+    /**
+     * Customer Bouncer helper.
+     */
     function customer_bouncer(): CustomerBouncer
     {
         return app()->make(CustomerBouncer::class);

@@ -2,16 +2,30 @@
 
 namespace Webkul\B2BSuite\Listeners;
 
+use Webkul\B2BSuite\Helpers\CreditManager;
 use Webkul\B2BSuite\Models\CustomerQuote;
 use Webkul\B2BSuite\Notifications\Notifier;
+use Webkul\B2BSuite\Repositories\CustomerQuoteRepository;
 use Webkul\Sales\Contracts\Invoice as InvoiceContract;
 use Webkul\Sales\Contracts\Order as OrderContract;
 use Webkul\Sales\Contracts\Shipment as ShipmentContract;
 use Webkul\Sales\Models\Order as SalesOrder;
+use Webkul\Sales\Repositories\OrderRepository;
 use Webkul\Shop\Listeners\Base;
 
 class Order extends Base
 {
+    /**
+     * Create a new listener instance.
+     *
+     * @return void
+     */
+    public function __construct(
+        protected CustomerQuoteRepository $customerQuoteRepository,
+        protected OrderRepository $orderRepository,
+        protected CreditManager $creditManager,
+    ) {}
+
     /**
      * After order is created.
      *
@@ -26,6 +40,7 @@ class Order extends Base
         $quoteStatus = CustomerQuote::STATUS_ORDERED;
 
         $isQuote = false;
+
         foreach ($order->items as $orderItem) {
             if (
                 isset($orderItem->additional['quote_id'])
@@ -45,39 +60,15 @@ class Order extends Base
             $isQuote->order_id = $order->id;
             $isQuote->save();
 
-            // The quote has been converted into a purchase order: confirm to the buyer and
-            // alert the sales rep.
+            /**
+             * The quote has been converted into a purchase order: confirm to the buyer and
+             * alert the sales rep.
+             */
             Notifier::quote($isQuote, 'ordered', 'buyer');
             Notifier::quote($isQuote, 'po_placed', 'admin');
         }
 
         $this->chargeCompanyCredit($order);
-    }
-
-    /**
-     * Charge a "Pay By Credit" order to the buyer's company credit (one purchase ledger
-     * entry per order). No-op for any other payment method.
-     */
-    public function chargeCompanyCredit(OrderContract $order): void
-    {
-        if ($order->payment?->method !== 'paybycredit') {
-            return;
-        }
-
-        $creditManager = app('Webkul\B2BSuite\Helpers\CreditManager');
-
-        if (! $creditManager->isActive()) {
-            return;
-        }
-
-        if (! $credit = $creditManager->companyCreditFor($order->customer)) {
-            return;
-        }
-
-        $creditManager->purchase($credit, (float) $order->base_grand_total, $order->id, [
-            'type' => 'customer',
-            'id' => $order->customer_id,
-        ]);
     }
 
     /**
@@ -89,17 +80,15 @@ class Order extends Base
             return;
         }
 
-        $creditManager = app('Webkul\B2BSuite\Helpers\CreditManager');
-
-        if (! $creditManager->isActive()) {
+        if (! $this->creditManager->isActive()) {
             return;
         }
 
-        if (! $credit = $creditManager->companyCreditFor($order->customer)) {
+        if (! $credit = $this->creditManager->companyCreditFor($order->customer)) {
             return;
         }
 
-        $creditManager->revert($credit, (float) $order->base_grand_total, $order->id, [
+        $this->creditManager->revert($credit, (float) $order->base_grand_total, $order->id, [
             'type' => 'system',
         ]);
     }
@@ -111,7 +100,7 @@ class Order extends Base
      */
     public function afterUpdated(InvoiceContract|ShipmentContract $invoiceOrShipment)
     {
-        $order = app('Webkul\Sales\Repositories\OrderRepository')->find($invoiceOrShipment->order->id);
+        $order = $this->orderRepository->find($invoiceOrShipment->order->id);
 
         if (
             ! (bool) core()->getConfigData('b2b.general.settings.active')
@@ -122,14 +111,14 @@ class Order extends Base
 
         $quoteStatus = CustomerQuote::STATUS_COMPLETED;
 
-        $customerQuoteRepository = app('Webkul\B2BSuite\Repositories\CustomerQuoteRepository');
-        $quote = $customerQuoteRepository->findOneByField('order_id', $order->id);
+        $quote = $this->customerQuoteRepository->findOneByField('order_id', $order->id);
 
         if (! $quote || $quote->status == $quoteStatus) {
             return;
         }
 
         $isQuote = false;
+
         foreach ($order->items as $orderItem) {
             if (
                 isset($orderItem->additional['quote_id'])
@@ -151,13 +140,35 @@ class Order extends Base
     }
 
     /**
-     * Update quote status
+     * Charge a "Pay By Credit" order to the buyer's company credit (one purchase ledger
+     * entry per order). No-op for any other payment method.
+     */
+    public function chargeCompanyCredit(OrderContract $order): void
+    {
+        if ($order->payment?->method !== 'paybycredit') {
+            return;
+        }
+
+        if (! $this->creditManager->isActive()) {
+            return;
+        }
+
+        if (! $credit = $this->creditManager->companyCreditFor($order->customer)) {
+            return;
+        }
+
+        $this->creditManager->purchase($credit, (float) $order->base_grand_total, $order->id, [
+            'type' => 'customer',
+            'id' => $order->customer_id,
+        ]);
+    }
+
+    /**
+     * Update quote status.
      */
     public function updateQuoteStatus($quoteData, $quoteStatus): ?CustomerQuote
     {
-        $customerQuoteRepository = app('Webkul\B2BSuite\Repositories\CustomerQuoteRepository');
-
-        $quote = $customerQuoteRepository->find($quoteData['quote_id']);
+        $quote = $this->customerQuoteRepository->find($quoteData['quote_id']);
 
         if (! $quote) {
             return null;

@@ -16,6 +16,13 @@ class PayByCredit extends Payment
     protected $code = 'paybycredit';
 
     /**
+     * Create a new payment method instance.
+     *
+     * @return void
+     */
+    public function __construct(protected CreditManager $creditManager) {}
+
+    /**
      * Get redirect url (offline method — none).
      */
     public function getRedirectUrl() {}
@@ -45,16 +52,26 @@ class PayByCredit extends Payment
         $credit = $this->companyCredit();
 
         if ($credit) {
-            $creditManager = app(CreditManager::class);
-
-            if (! $creditManager->canAfford($credit, (float) $this->cart->base_grand_total)) {
+            if (! $this->creditManager->canAfford($credit, (float) $this->cart->base_grand_total)) {
                 return trans('b2b::app.shop.checkout.pay-by-credit.insufficient', [
-                    'available' => core()->formatBasePrice($creditManager->availableCredit($credit)),
+                    'available' => core()->formatBasePrice($this->creditManager->availableCredit($credit)),
                 ]);
             }
         }
 
         return $this->getConfigData('description');
+    }
+
+    /**
+     * Get payment method image.
+     *
+     * @return string
+     */
+    public function getImage()
+    {
+        $url = $this->getConfigData('image');
+
+        return $url ? Storage::url($url) : bagisto_asset('images/cash-on-delivery.png', 'shop');
     }
 
     /**
@@ -75,26 +92,12 @@ class PayByCredit extends Payment
             return null;
         }
 
-        $creditManager = app(CreditManager::class);
-
-        if (! $creditManager->isActive()) {
+        if (! $this->creditManager->isActive()) {
             return null;
         }
 
-        $credit = $creditManager->companyCreditFor($this->cart->customer);
+        $credit = $this->creditManager->companyCreditFor($this->cart->customer);
 
         return ($credit && $credit->status) ? $credit : null;
-    }
-
-    /**
-     * Get payment method image.
-     *
-     * @return string
-     */
-    public function getImage()
-    {
-        $url = $this->getConfigData('image');
-
-        return $url ? Storage::url($url) : bagisto_asset('images/cash-on-delivery.png', 'shop');
     }
 }

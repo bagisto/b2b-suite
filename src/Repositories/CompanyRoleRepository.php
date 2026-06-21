@@ -20,7 +20,7 @@ class CompanyRoleRepository extends Repository
     }
 
     /**
-     * Specify Model class name.
+     * Specify model class name.
      */
     public function model()
     {
@@ -33,8 +33,8 @@ class CompanyRoleRepository extends Repository
     public function countCustomersWithAllAccess(): int
     {
         return $this->customerRepository->getModel()::query()
-            ->leftJoin('company_roles', 'customers.company_role_id', '=', 'company_roles.id')
-            ->where('company_roles.permission_type', 'all')
+            ->leftJoin('b2b_company_roles', 'customers.company_role_id', '=', 'b2b_company_roles.id')
+            ->where('b2b_company_roles.permission_type', 'all')
             ->get()
             ->count();
     }

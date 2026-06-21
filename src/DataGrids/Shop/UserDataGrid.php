@@ -52,7 +52,7 @@ class UserDataGrid extends DataGrid
 
         $this->companyId = $companyId = $customer->type === 'company'
             ? $customer->id
-            : DB::table('customer_companies')
+            : DB::table('b2b_customer_companies')
                 ->where('customer_id', $customer->id)
                 ->value('company_id');
 
@@ -62,10 +62,10 @@ class UserDataGrid extends DataGrid
          * viewing the grid, so they always see themselves in the roster.
          */
         $queryBuilder = DB::table('customers')
-            ->leftJoin('company_roles', 'customers.company_role_id', '=', 'company_roles.id')
-            ->join('customer_companies', function ($join) use ($companyId) {
-                $join->on('customers.id', '=', 'customer_companies.customer_id')
-                    ->where('customer_companies.company_id', $companyId);
+            ->leftJoin('b2b_company_roles', 'customers.company_role_id', '=', 'b2b_company_roles.id')
+            ->join('b2b_customer_companies', function ($join) use ($companyId) {
+                $join->on('customers.id', '=', 'b2b_customer_companies.customer_id')
+                    ->where('b2b_customer_companies.company_id', $companyId);
             })
             ->addSelect(
                 'customers.id as user_id',
@@ -74,7 +74,7 @@ class UserDataGrid extends DataGrid
                 'customers.status',
                 'customers.is_suspended',
                 'customers.type as customer_type',
-                'company_roles.name as role'
+                'b2b_company_roles.name as role'
             )
             ->addSelect(DB::raw('CONCAT('.$tablePrefix.'customers.first_name, " ", '.$tablePrefix.'customers.last_name) as full_name'))
             ->whereIn('customers.type', ['company', 'user'])
@@ -83,7 +83,7 @@ class UserDataGrid extends DataGrid
         $this->addFilter('user_id', 'customers.id');
         $this->addFilter('email', 'customers.email');
         $this->addFilter('full_name', DB::raw('CONCAT('.$tablePrefix.'customers.first_name, " ", '.$tablePrefix.'customers.last_name)'));
-        $this->addFilter('role', 'company_roles.name');
+        $this->addFilter('role', 'b2b_company_roles.name');
         $this->addFilter('phone', 'customers.phone');
         $this->addFilter('status', 'customers.status');
 

@@ -24,35 +24,35 @@ class CustomerQuoteDataGrid extends DataGrid
     {
         $tablePrefix = DB::getTablePrefix();
 
-        $queryBuilder = DB::table('customer_quotes')
+        $queryBuilder = DB::table('b2b_customer_quotes')
             ->distinct()
-            ->leftJoin('customers as company', 'customer_quotes.company_id', '=', 'company.id')
-            ->leftJoin('customers as customer', 'customer_quotes.customer_id', '=', 'customer.id')
+            ->leftJoin('customers as company', 'b2b_customer_quotes.company_id', '=', 'company.id')
+            ->leftJoin('customers as customer', 'b2b_customer_quotes.customer_id', '=', 'customer.id')
             ->leftJoin('admins as agent', 'company.sales_rep_id', '=', 'agent.id')
-            ->leftJoin('company_flat', function ($join) {
-                $join->on('customer_quotes.company_id', '=', 'company_flat.customer_id')
-                    ->where('company_flat.locale', '=', app()->getLocale());
+            ->leftJoin('b2b_company_flat', function ($join) {
+                $join->on('b2b_customer_quotes.company_id', '=', 'b2b_company_flat.customer_id')
+                    ->where('b2b_company_flat.locale', '=', app()->getLocale());
             })
             ->addSelect(
-                'customer_quotes.id as quote_id',
-                'customer_quotes.quotation_number',
-                'customer_quotes.name',
+                'b2b_customer_quotes.id as quote_id',
+                'b2b_customer_quotes.quotation_number',
+                'b2b_customer_quotes.name',
                 'agent.name as agent_name',
-                'customer_quotes.base_total',
-                'customer_quotes.negotiated_total',
-                'customer_quotes.status',
-                'customer_quotes.order_id',
-                'customer_quotes.soft_deleted',
-                'customer_quotes.created_at',
-                'customer_quotes.expiration_date'
+                'b2b_customer_quotes.base_total',
+                'b2b_customer_quotes.negotiated_total',
+                'b2b_customer_quotes.status',
+                'b2b_customer_quotes.order_id',
+                'b2b_customer_quotes.soft_deleted',
+                'b2b_customer_quotes.created_at',
+                'b2b_customer_quotes.expiration_date'
             )
-            ->addSelect(DB::raw('COALESCE(NULLIF(TRIM(CONCAT('.$tablePrefix.'customer.first_name, " ", '.$tablePrefix.'customer.last_name)), ""), '.$tablePrefix.'customer_quotes.customer_name) as customer_name'))
-            ->addSelect(DB::raw('COALESCE(NULLIF('.$tablePrefix.'company_flat.business_name, ""), CONCAT('.$tablePrefix.'company.first_name, " ", '.$tablePrefix.'company.last_name)) as company_name'))
-            ->whereIn('customer_quotes.state', [
+            ->addSelect(DB::raw('COALESCE(NULLIF(TRIM(CONCAT('.$tablePrefix.'customer.first_name, " ", '.$tablePrefix.'customer.last_name)), ""), '.$tablePrefix.'b2b_customer_quotes.customer_name) as customer_name'))
+            ->addSelect(DB::raw('COALESCE(NULLIF('.$tablePrefix.'b2b_company_flat.business_name, ""), CONCAT('.$tablePrefix.'company.first_name, " ", '.$tablePrefix.'company.last_name)) as company_name'))
+            ->whereIn('b2b_customer_quotes.state', [
                 CustomerQuote::STATE_QUOTATION,
                 CustomerQuote::STATE_PURCHASE_ORDER,
             ])
-            ->whereIn('customer_quotes.status', [
+            ->whereIn('b2b_customer_quotes.status', [
                 CustomerQuote::STATUS_OPEN,
                 CustomerQuote::STATUS_NEGOTIATION,
                 CustomerQuote::STATUS_ACCEPTED,
@@ -61,20 +61,20 @@ class CustomerQuoteDataGrid extends DataGrid
                 CustomerQuote::STATUS_COMPLETED,
             ])
             ->where(function ($query) {
-                $query->where('customer_quotes.status', '!=', CustomerQuote::STATUS_DRAFT)
-                    ->orWhereNotNull('customer_quotes.soft_deleted');
+                $query->where('b2b_customer_quotes.status', '!=', CustomerQuote::STATUS_DRAFT)
+                    ->orWhereNotNull('b2b_customer_quotes.soft_deleted');
             });
 
-        $this->addFilter('quotation_number', 'customer_quotes.quotation_number');
-        $this->addFilter('name', 'customer_quotes.name');
-        $this->addFilter('status', 'customer_quotes.status');
-        $this->addFilter('base_total', 'customer_quotes.base_total');
-        $this->addFilter('negotiated_total', 'customer_quotes.negotiated_total');
-        $this->addFilter('customer_name', DB::raw('COALESCE(NULLIF(TRIM(CONCAT('.$tablePrefix.'customer.first_name, " ", '.$tablePrefix.'customer.last_name)), ""), '.$tablePrefix.'customer_quotes.customer_name)'));
-        $this->addFilter('company_name', DB::raw('COALESCE(NULLIF('.$tablePrefix.'company_flat.business_name, ""), CONCAT('.$tablePrefix.'company.first_name, " ", '.$tablePrefix.'company.last_name))'));
+        $this->addFilter('quotation_number', 'b2b_customer_quotes.quotation_number');
+        $this->addFilter('name', 'b2b_customer_quotes.name');
+        $this->addFilter('status', 'b2b_customer_quotes.status');
+        $this->addFilter('base_total', 'b2b_customer_quotes.base_total');
+        $this->addFilter('negotiated_total', 'b2b_customer_quotes.negotiated_total');
+        $this->addFilter('customer_name', DB::raw('COALESCE(NULLIF(TRIM(CONCAT('.$tablePrefix.'customer.first_name, " ", '.$tablePrefix.'customer.last_name)), ""), '.$tablePrefix.'b2b_customer_quotes.customer_name)'));
+        $this->addFilter('company_name', DB::raw('COALESCE(NULLIF('.$tablePrefix.'b2b_company_flat.business_name, ""), CONCAT('.$tablePrefix.'company.first_name, " ", '.$tablePrefix.'company.last_name))'));
         $this->addFilter('agent_name', 'agent.name');
-        $this->addFilter('created_at', 'customer_quotes.created_at');
-        $this->addFilter('expiration_date', 'customer_quotes.expiration_date');
+        $this->addFilter('created_at', 'b2b_customer_quotes.created_at');
+        $this->addFilter('expiration_date', 'b2b_customer_quotes.expiration_date');
 
         // A sales rep only sees quotes for the companies they manage; super-admins see all.
         if ($repId = Customer::salesRepScopeId()) {

@@ -31,12 +31,12 @@ changes. The essentials:
 
 Assign a catalog to companies → controls product **visibility (allowlist)**, **category
 visibility** and **pricing** for their members. Each catalog is backed by a hidden customer
-group (`company_catalogs.customer_group_id`). Pricing writes per-leaf **fixed / percentage /
+group (`b2b_company_catalogs.customer_group_id`). Pricing writes per-leaf **fixed / percentage /
 quantity-tier** rows to `product_customer_group_prices` + reindex (no core indexer changes);
 product visibility is enforced by the extended `ProductRepository` (Prettus criterion +
 PDP/cart guards) and category visibility by the extended `CategoryRepository` (filtered
 tree + 404 on disallowed slugs) — both bound in `B2BSuiteManager`. Visible categories are
-**derived** from the assigned products (+ ancestors) into `company_catalog_categories` on
+**derived** from the assigned products (+ ancestors) into `b2b_company_catalog_categories` on
 save. Helper logic lives in `Helpers/CompanyCatalog.php`. See AGENTS.md → *Company Catalog*
 for the full design.
 
@@ -49,12 +49,30 @@ php artisan optimize:clear
 
 ## Conventions
 
-- Repositories for DB access; Proxies for cross-package model type-hints.
+- **All DB access via repositories** — no `DB` facade or `Proxy::…::query()` in
+  controllers / helpers / listeners / datagrids (only `DB::transaction()` and `Schema::`
+  metadata are allowed). Proxies are for cross-package model type-hints in relationships only;
+  for queries Prettus can't express, add a method to the repository.
+- **`b2b_` prefix** on every package-owned table; reference it everywhere — model `$table`,
+  FKs, `DB::raw`, and `exists:`/`unique:` rules. Each concrete model sets an explicit `$table`
+  (core-table-backed models like `Customer` inherit it).
+- **Member ordering** — constructors: repositories first, then helpers. Controllers: RESTful
+  lifecycle → mass actions → other endpoints → protected helpers. Models (Laravel-standard):
+  constants → Laravel props (`$table`/`$fillable`/`$casts`/`$timestamps`) → extra props →
+  methods (relationships → accessors → overrides → helpers → static). Properties/constants
+  before methods; every constant gets its own docblock.
+- **Docblocks** on every method/property/constant — one-line, punctuated. Inline notes use
+  `/** … */`, not `//`.
+- **Events:** symmetric `*.before`/`*.after` on CRUD mutations. **Migrations:** one `create_*`
+  per table (`b2b_`-prefixed), core-table `add_*` last, explicit short FK names,
+  `constrained(table: …)`. **Seeders:** `delete()` not `truncate()` (no FK-check toggling).
+  **No dead code** (drop `parent::`-only overrides and unused members).
 - Add new translation keys for **all** locales (currently `en` only) and run
   `php artisan bagisto:translations:check`. Mind the lang array nesting.
 - `vendor/bin/pint` for style; `php artisan optimize:clear` after provider/config/route changes.
 - **Comments in Blade-embedded Vue/CSS** use multi-line JSDoc blocks (`/** … */`,
   capitalised and punctuated) — one consistent style per view.
+- Full detail in [AGENTS.md](./AGENTS.md) → *Conventions*.
 
 ## Gotchas (these have caused real bugs — see AGENTS.md → *Vue inside Blade*)
 

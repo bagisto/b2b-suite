@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('company_credits', function (Blueprint $table) {
+        Schema::create('b2b_company_credits', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('company_id')->unsigned();
             $table->string('credit_currency_code')->nullable();
@@ -25,7 +25,7 @@ return new class extends Migration
             $table->foreign('company_id')->references('id')->on('customers')->onDelete('cascade');
         });
 
-        Schema::create('company_credit_transactions', function (Blueprint $table) {
+        Schema::create('b2b_company_credit_transactions', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('company_credit_id')->unsigned();
             $table->enum('operation', ['allocated', 'updated', 'purchased', 'reimbursed', 'refunded', 'reverted']);
@@ -40,7 +40,7 @@ return new class extends Migration
             $table->integer('actor_id')->unsigned()->nullable();
             $table->timestamps();
 
-            $table->foreign('company_credit_id')->references('id')->on('company_credits')->onDelete('cascade');
+            $table->foreign('company_credit_id')->references('id')->on('b2b_company_credits')->onDelete('cascade');
             $table->foreign('order_id')->references('id')->on('orders')->onDelete('set null');
         });
     }
@@ -50,7 +50,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('company_credit_transactions');
-        Schema::dropIfExists('company_credits');
+        Schema::dropIfExists('b2b_company_credit_transactions');
+        Schema::dropIfExists('b2b_company_credits');
     }
 };

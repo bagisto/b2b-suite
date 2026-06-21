@@ -1,7 +1,7 @@
 <x-shop::layouts.account>
     <!-- Page Title -->
     <x-slot:title>
-        @lang('b2b::app.shop.companies.account.profile.index.title')
+        @lang('b2b::app.shop.customers.account.company-profile.index.title')
     </x-slot>
 
     <!-- Breadcrumbs -->
@@ -22,10 +22,10 @@
 
     <div class="flex-auto max-md:px-4">
 
-        {!! view_render_event('bagisto.shop.companies.account.profile.before', ['customer' => $customer]) !!}
+        {!! view_render_event('bagisto.shop.customers.account.company-profile.before', ['customer' => $customer]) !!}
 
         <x-shop::form
-            action="{{ route('shop.companies.account.profile.update', $customer->id) }}"
+            action="{{ route('shop.customers.account.company_profile.update', $customer->id) }}"
             enctype="multipart/form-data"
             method="PUT"
         >
@@ -35,23 +35,23 @@
                     <!-- Back Button (mobile) -->
                     <a
                         class="grid md:hidden"
-                        href="{{ route('shop.companies.account.profile.index') }}"
+                        href="{{ route('shop.customers.account.company_profile.index') }}"
                     >
                         <span class="icon-arrow-left rtl:icon-arrow-right text-2xl"></span>
                     </a>
 
                     <h2 class="text-2xl font-medium max-md:text-xl max-sm:text-base">
-                        @lang('b2b::app.shop.companies.account.profile.index.title')
+                        @lang('b2b::app.shop.customers.account.company-profile.index.title')
                     </h2>
                 </div>
 
                 <div class="flex items-center gap-x-2.5">
                     <!-- Back Button (desktop) -->
                     <a
-                        href="{{ route('shop.companies.account.profile.index') }}"
+                        href="{{ route('shop.customers.account.company_profile.index') }}"
                         class="transparent-button px-5 py-2.5 hover:bg-gray-100 max-md:hidden"
                     >
-                        @lang('b2b::app.shop.companies.account.profile.edit.btn-back')
+                        @lang('b2b::app.shop.customers.account.company-profile.edit.btn-back')
                     </a>
 
                     <!-- Save Button (hidden for view-only members) -->
@@ -60,17 +60,17 @@
                             type="submit"
                             class="primary-button rounded-lg px-8 py-2.5 text-center text-base max-md:px-6 max-md:py-2 max-md:text-sm"
                         >
-                            @lang('b2b::app.shop.companies.account.profile.index.save-btn')
+                            @lang('b2b::app.shop.customers.account.company-profile.index.save-btn')
                         </button>
                     @endif
                 </div>
             </div>
 
             <p class="mt-1.5 text-sm text-gray-500">
-                @lang('b2b::app.shop.companies.account.profile.index.info')
+                @lang('b2b::app.shop.customers.account.company-profile.index.info')
             </p>
 
-            {!! view_render_event('bagisto.shop.companies.account.profile.controls.before', ['customer' => $customer]) !!}
+            {!! view_render_event('bagisto.shop.customers.account.company-profile.controls.before', ['customer' => $customer]) !!}
 
             @php
                 $column1 = $attributeGroups->where('column', 1);
@@ -80,7 +80,7 @@
             @if ($attributeGroups->isEmpty())
                 <div class="mt-6 flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-zinc-200 bg-white py-16 text-center">
                     <p class="text-base font-medium text-gray-600">
-                        @lang('b2b::app.shop.companies.account.profile.index.no-attributes')
+                        @lang('b2b::app.shop.customers.account.company-profile.index.no-attributes')
                     </p>
                 </div>
             @else
@@ -90,7 +90,7 @@
                     <div class="flex flex-1 flex-col gap-6 max-xl:flex-auto max-md:gap-4">
                         @foreach ($column1 as $group)
                             @if ($group->custom_attributes->isNotEmpty())
-                                @include('b2b::shop.companies.account.profile.partials.group', [
+                                @include('b2b::shop.customers.account.company-profile.partials.group', [
                                     'group'    => $group,
                                     'customer' => $customer,
                                 ])
@@ -103,7 +103,7 @@
                         <div class="flex w-[400px] max-w-full flex-col gap-6 max-sm:w-full max-md:gap-4">
                             @foreach ($column2 as $group)
                                 @if ($group->custom_attributes->isNotEmpty())
-                                    @include('b2b::shop.companies.account.profile.partials.group', [
+                                    @include('b2b::shop.customers.account.company-profile.partials.group', [
                                         'group'    => $group,
                                         'customer' => $customer,
                                     ])
@@ -115,11 +115,11 @@
                 </fieldset>
             @endif
 
-            {!! view_render_event('bagisto.shop.companies.account.profile.controls.after', ['customer' => $customer]) !!}
+            {!! view_render_event('bagisto.shop.customers.account.company-profile.controls.after', ['customer' => $customer]) !!}
 
         </x-shop::form>
 
-        {!! view_render_event('bagisto.shop.companies.account.profile.after', ['customer' => $customer]) !!}
+        {!! view_render_event('bagisto.shop.customers.account.company-profile.after', ['customer' => $customer]) !!}
 
     </div>
 </x-shop::layouts.account>

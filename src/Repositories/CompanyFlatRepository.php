@@ -9,7 +9,7 @@ use Webkul\Core\Eloquent\Repository;
 class CompanyFlatRepository extends Repository
 {
     /**
-     * Specify Model class name
+     * Specify model class name.
      */
     public function model(): string
     {
@@ -94,6 +94,34 @@ class CompanyFlatRepository extends Repository
     }
 
     /**
+     * Paginate companies (with their currently assigned catalog) for the catalog picker,
+     * searchable by business name / email and scoped to a sales rep when provided.
+     */
+    public function searchCompaniesForPicker(?string $query, $repId, string $sort, string $order, int $perPage = 10)
+    {
+        return $this->model
+            ->leftJoin('customers', 'b2b_company_flat.customer_id', '=', 'customers.id')
+            ->leftJoin('b2b_company_catalogs', 'customers.company_catalog_id', '=', 'b2b_company_catalogs.id')
+            ->where('customers.type', 'company')
+            ->where('b2b_company_flat.locale', app()->getLocale())
+            ->when($repId, fn ($builder) => $builder->where('customers.sales_rep_id', $repId))
+            ->when((string) $query !== '', function ($builder) use ($query) {
+                $builder->where(function ($sub) use ($query) {
+                    $sub->where('b2b_company_flat.business_name', 'like', '%'.$query.'%')
+                        ->orWhere('b2b_company_flat.email', 'like', '%'.$query.'%');
+                });
+            })
+            ->select(
+                'b2b_company_flat.customer_id as id',
+                'b2b_company_flat.business_name',
+                'b2b_company_flat.email',
+                'b2b_company_catalogs.name as current_catalog'
+            )
+            ->orderBy($sort, $order)
+            ->paginate($perPage);
+    }
+
+    /**
      * Create or update customer flat record.
      */
     public function createOrUpdate(array $data): CompanyFlatContract
@@ -117,6 +145,7 @@ class CompanyFlatRepository extends Repository
     public function syncForCustomer(int $customerId, array $data): void
     {
         $locales = core()->getAllLocales();
+        
         $channels = core()->getAllChannels();
 
         foreach ($locales as $locale) {

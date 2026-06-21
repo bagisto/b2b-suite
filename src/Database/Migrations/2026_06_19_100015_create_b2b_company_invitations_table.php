@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('company_invitations', function (Blueprint $table) {
+        Schema::create('b2b_company_invitations', function (Blueprint $table) {
             $table->id();
             $table->integer('company_id')->unsigned();
             $table->string('email');
@@ -23,7 +23,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('company_id')->references('id')->on('customers')->onDelete('cascade');
-            $table->foreign('company_role_id')->references('id')->on('company_roles')->onDelete('set null');
+            $table->foreign('company_role_id')->references('id')->on('b2b_company_roles')->onDelete('set null');
         });
     }
 
@@ -32,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('company_invitations');
+        Schema::dropIfExists('b2b_company_invitations');
     }
 };

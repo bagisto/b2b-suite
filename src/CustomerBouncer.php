@@ -7,10 +7,13 @@ use Webkul\B2BSuite\Repositories\CompanyRoleRepository;
 class CustomerBouncer
 {
     /**
-     * Permission types
+     * Full-access permission type — grants every company feature.
      */
     public const PERMISSION_TYPE_ALL = 'all';
 
+    /**
+     * Custom permission type allows selecting specific permissions from the list of company features.
+     */
     public const PERMISSION_TYPE_CUSTOM = 'custom';
 
     /**
@@ -21,14 +24,19 @@ class CustomerBouncer
     public const B2B_KEYS = [
         'account.company_profile',
         'account.company_credit',
-        'account.requisitions',
         'account.quotes',
         'account.purchase_orders',
+        'account.requisitions',
         'account.quick_orders',
         'account.users',
         'account.roles',
     ];
 
+    /**
+     * Create a new bouncer instance.
+     *
+     * @return void
+     */
     public function __construct(protected CompanyRoleRepository $roleRepo) {}
 
     /**
@@ -50,7 +58,9 @@ class CustomerBouncer
             return true;
         }
 
-        // A plain customer (no company role) cannot reach company features.
+        /**
+         * A plain customer (no company role) cannot reach company features.
+         */
         if (! $customer->company_role_id && $customer->type !== 'company') {
             return false;
         }
@@ -88,6 +98,18 @@ class CustomerBouncer
     }
 
     /**
+     * Abort unauthorized actions.
+     */
+    public static function allow(string $permission): void
+    {
+        $instance = app(self::class);
+
+        if (! $instance->hasPermission($permission)) {
+            abort(401, 'Unauthorized action.');
+        }
+    }
+
+    /**
      * Whether the given ACL key belongs to a company (B2B) feature.
      */
     protected function isCompanyPermission(string $permission): bool
@@ -99,17 +121,5 @@ class CustomerBouncer
         }
 
         return false;
-    }
-
-    /**
-     * Abort unauthorized actions.
-     */
-    public static function allow(string $permission): void
-    {
-        $instance = app(self::class);
-
-        if (! $instance->hasPermission($permission)) {
-            abort(401, 'Unauthorized action.');
-        }
     }
 }

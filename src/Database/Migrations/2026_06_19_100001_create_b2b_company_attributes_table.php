@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('company_attributes', function (Blueprint $table) {
+        Schema::create('b2b_company_attributes', function (Blueprint $table) {
             $table->id();
             $table->string('code')->unique();
             $table->string('admin_name');
@@ -36,6 +36,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('company_attributes');
+        Schema::dropIfExists('b2b_company_attributes');
     }
 };

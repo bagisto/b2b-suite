@@ -8,15 +8,20 @@ use Illuminate\Support\Facades\DB;
 
 class CompanyAttributeOptionTableSeeder extends Seeder
 {
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     */
     public function run(array $parameters = [])
     {
-        DB::table('company_attribute_options')->truncate();
+        DB::table('b2b_company_attribute_option_translations')->delete();
 
-        DB::table('company_attribute_option_translations')->truncate();
+        DB::table('b2b_company_attribute_options')->delete();
 
         $attributeOptions = [];
 
-        DB::table('company_attribute_options')->insert(
+        DB::table('b2b_company_attribute_options')->insert(
             collect($attributeOptions)->map(function ($option) {
                 return Arr::except($option, ['name']);
             })->toArray()
@@ -35,6 +40,6 @@ class CompanyAttributeOptionTableSeeder extends Seeder
             });
         })->toArray();
 
-        DB::table('company_attribute_option_translations')->insert($translations);
+        DB::table('b2b_company_attribute_option_translations')->insert($translations);
     }
 }

@@ -22,30 +22,30 @@ class CompanyCatalogDataGrid extends DataGrid
     {
         $tablePrefix = DB::getTablePrefix();
 
-        $queryBuilder = DB::table('company_catalogs')
+        $queryBuilder = DB::table('b2b_company_catalogs')
             ->select(
-                'company_catalogs.id',
-                'company_catalogs.name',
-                'company_catalogs.description',
-                'company_catalogs.status',
-                'company_catalogs.status as status_value',
-                'company_catalogs.created_by',
-                'company_catalogs.created_at',
-                DB::raw('(SELECT COUNT(*) FROM '.$tablePrefix.'company_catalog_products WHERE '.$tablePrefix.'company_catalog_products.company_catalog_id = '.$tablePrefix.'company_catalogs.id) as products_count'),
-                DB::raw('(SELECT COUNT(*) FROM '.$tablePrefix.'customers WHERE '.$tablePrefix.'customers.company_catalog_id = '.$tablePrefix.'company_catalogs.id) as companies_count')
+                'b2b_company_catalogs.id',
+                'b2b_company_catalogs.name',
+                'b2b_company_catalogs.description',
+                'b2b_company_catalogs.status',
+                'b2b_company_catalogs.status as status_value',
+                'b2b_company_catalogs.created_by',
+                'b2b_company_catalogs.created_at',
+                DB::raw('(SELECT COUNT(*) FROM '.$tablePrefix.'b2b_company_catalog_products WHERE '.$tablePrefix.'b2b_company_catalog_products.company_catalog_id = '.$tablePrefix.'b2b_company_catalogs.id) as products_count'),
+                DB::raw('(SELECT COUNT(*) FROM '.$tablePrefix.'customers WHERE '.$tablePrefix.'customers.company_catalog_id = '.$tablePrefix.'b2b_company_catalogs.id) as companies_count')
             );
 
-        $this->addFilter('id', 'company_catalogs.id');
-        $this->addFilter('name', 'company_catalogs.name');
-        $this->addFilter('status', 'company_catalogs.status');
-        $this->addFilter('created_at', 'company_catalogs.created_at');
+        $this->addFilter('id', 'b2b_company_catalogs.id');
+        $this->addFilter('name', 'b2b_company_catalogs.name');
+        $this->addFilter('status', 'b2b_company_catalogs.status');
+        $this->addFilter('created_at', 'b2b_company_catalogs.created_at');
 
         /**
          * A sales rep only sees catalogs assigned to a company they manage; super-admins
          * see every catalog.
          */
         if ($repId = Customer::salesRepScopeId()) {
-            $queryBuilder->whereIn('company_catalogs.id', function ($query) use ($repId) {
+            $queryBuilder->whereIn('b2b_company_catalogs.id', function ($query) use ($repId) {
                 $query->select('company_catalog_id')
                     ->from('customers')
                     ->where('sales_rep_id', $repId)

@@ -8,11 +8,16 @@ use Illuminate\Support\Str;
 
 class CompanyAttributeTableSeeder extends Seeder
 {
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     */
     public function run(array $parameters = [])
     {
-        DB::table('company_attributes')->truncate();
+        DB::table('b2b_company_attribute_translations')->delete();
 
-        DB::table('company_attribute_translations')->truncate();
+        DB::table('b2b_company_attributes')->delete();
 
         $attributes = [
             [
@@ -184,7 +189,7 @@ class CompanyAttributeTableSeeder extends Seeder
             ], $attribute);
         })->toArray();
 
-        DB::table('company_attributes')->insert($attributes);
+        DB::table('b2b_company_attributes')->insert($attributes);
 
         $translations = collect($attributes)->flatMap(function ($attribute) use ($parameters) {
             return collect($parameters['locales'])->map(function ($locale) use ($attribute) {
@@ -201,6 +206,6 @@ class CompanyAttributeTableSeeder extends Seeder
             });
         })->toArray();
 
-        DB::table('company_attribute_translations')->insert($translations);
+        DB::table('b2b_company_attribute_translations')->insert($translations);
     }
 }

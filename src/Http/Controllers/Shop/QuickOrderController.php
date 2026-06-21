@@ -22,10 +22,10 @@ class QuickOrderController extends Controller
      * @return void
      */
     public function __construct(
+        protected ProductRepository $productRepository,
         protected CustomerRepository $customerRepository,
         protected CustomerGroupRepository $customerGroupRepository,
         protected CompanyRoleRepository $companyRoleRepository,
-        protected ProductRepository $productRepository,
     ) {}
 
     /**
@@ -178,8 +178,10 @@ class QuickOrderController extends Controller
             return $q->whereIn('sku', $skus);
         })->get();
 
-        // Keep only products inside the customer's company catalog (search already does this;
-        // this direct SKU lookup must too). isVisible() is a no-op when no catalog applies.
+        /**
+         * Keep only products inside the customer's company catalog (search already does this;
+         * this direct SKU lookup must too). isVisible() is a no-op when no catalog applies.
+         */
         $products = $products->filter(fn ($product) => $this->productRepository->isVisible($product))->values();
 
         return ProductResource::collection($products);

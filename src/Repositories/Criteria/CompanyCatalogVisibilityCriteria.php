@@ -27,7 +27,7 @@ class CompanyCatalogVisibilityCriteria implements CriteriaInterface
 
         return $model->whereIn('products.id', function ($query) use ($catalogId) {
             $query->select('product_id')
-                ->from('company_catalog_products')
+                ->from('b2b_company_catalog_products')
                 ->where('company_catalog_id', $catalogId);
         });
     }

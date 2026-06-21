@@ -13,7 +13,7 @@ class CompanyAttributeDataGrid extends DataGrid
      */
     public function prepareQueryBuilder(): Builder
     {
-        return DB::table('company_attributes')
+        return DB::table('b2b_company_attributes')
             ->select(
                 'id',
                 'code',

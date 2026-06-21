@@ -31,7 +31,7 @@ class CustomerQuoteRepository extends Repository
     }
 
     /**
-     * Specify Model class name.
+     * Specify model class name.
      */
     public function model()
     {
@@ -73,62 +73,6 @@ class CustomerQuoteRepository extends Repository
         Cart::removeCart($cart);
 
         return $quote;
-    }
-
-    /**
-     * Prepare cart data for storage.
-     */
-    private function prepareCartData($cart, $quote = null): array
-    {
-        if ($quote) {
-            return [
-                'items' => $cart->items->map(function ($item) use ($quote) {
-                    return [
-                        'customer_quote_id' => $quote->id,
-                        'product_id' => $item->product_id,
-                        'type' => $item->product->type,
-                        'sku' => $item->product->sku,
-                        'name' => $item->product->name,
-                        'qty' => $item->quantity,
-                        'negotiated_qty' => $item->quantity,
-                        'price' => $item->price,
-                        'base_price' => $item->base_price,
-                        'total' => $item->total,
-                        'base_total' => $item->base_total,
-                        'negotiated_price' => $item->price,
-                        'base_negotiated_price' => $item->base_price,
-                        'negotiated_total' => $item->total,
-                        'base_negotiated_total' => $item->base_total,
-                        'note' => '',
-                        'status' => $quote->status,
-                        'additional' => json_encode($item->additional),
-                    ];
-                })->toArray(),
-            ];
-        }
-
-        return [
-            'cart_id' => $cart->id,
-            'total' => $cart->grand_total,
-            'base_total' => $cart->base_grand_total,
-            'negotiated_total' => $cart->grand_total,
-            'base_negotiated_total' => $cart->base_grand_total,
-        ];
-    }
-
-    /**
-     * Calculate expiration date based on configuration.
-     */
-    private function calculateExpirationDate(): Carbon
-    {
-        $period = (int) core()->getConfigData('b2b.quotes.settings.default_expiration_period', 30);
-        $unit = core()->getConfigData('b2b.quotes.settings.expiration_period_unit', 'days');
-
-        return match ($unit) {
-            'weeks' => now()->addWeeks($period),
-            'months' => now()->addMonths($period),
-            default => now()->addDays($period),
-        };
     }
 
     /**
@@ -421,5 +365,61 @@ class CustomerQuoteRepository extends Repository
         }
 
         return round(max(0, $amount - $value), 4);
+    }
+
+    /**
+     * Prepare cart data for storage.
+     */
+    private function prepareCartData($cart, $quote = null): array
+    {
+        if ($quote) {
+            return [
+                'items' => $cart->items->map(function ($item) use ($quote) {
+                    return [
+                        'customer_quote_id' => $quote->id,
+                        'product_id' => $item->product_id,
+                        'type' => $item->product->type,
+                        'sku' => $item->product->sku,
+                        'name' => $item->product->name,
+                        'qty' => $item->quantity,
+                        'negotiated_qty' => $item->quantity,
+                        'price' => $item->price,
+                        'base_price' => $item->base_price,
+                        'total' => $item->total,
+                        'base_total' => $item->base_total,
+                        'negotiated_price' => $item->price,
+                        'base_negotiated_price' => $item->base_price,
+                        'negotiated_total' => $item->total,
+                        'base_negotiated_total' => $item->base_total,
+                        'note' => '',
+                        'status' => $quote->status,
+                        'additional' => json_encode($item->additional),
+                    ];
+                })->toArray(),
+            ];
+        }
+
+        return [
+            'cart_id' => $cart->id,
+            'total' => $cart->grand_total,
+            'base_total' => $cart->base_grand_total,
+            'negotiated_total' => $cart->grand_total,
+            'base_negotiated_total' => $cart->base_grand_total,
+        ];
+    }
+
+    /**
+     * Calculate expiration date based on configuration.
+     */
+    private function calculateExpirationDate(): Carbon
+    {
+        $period = (int) core()->getConfigData('b2b.quotes.settings.default_expiration_period', 30);
+        $unit = core()->getConfigData('b2b.quotes.settings.expiration_period_unit', 'days');
+
+        return match ($unit) {
+            'weeks' => now()->addWeeks($period),
+            'months' => now()->addMonths($period),
+            default => now()->addDays($period),
+        };
     }
 }

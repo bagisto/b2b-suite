@@ -2,6 +2,7 @@
 
 namespace Webkul\B2BSuite\Http\Controllers\Shop;
 
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Event;
 use Illuminate\View\View;
 use Webkul\B2BSuite\Models\CompanyInvitation;
@@ -24,7 +25,7 @@ class InvitationController extends Controller
     /**
      * Show the invitation so the logged-in invitee can accept or decline it.
      *
-     * @return View|\Illuminate\Http\RedirectResponse
+     * @return View|RedirectResponse
      */
     public function show(string $token)
     {
@@ -45,7 +46,7 @@ class InvitationController extends Controller
     /**
      * Accept the invitation: the logged-in customer becomes a company user with the invited role.
      *
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function accept(string $token)
     {
@@ -57,12 +58,8 @@ class InvitationController extends Controller
             return redirect()->route('shop.customers.account.profile.index');
         }
 
-        // Resolve through the repository so we get the B2B customer model (the auth guard
-        // returns the core Customer, which has no companies() relation).
         $customer = $this->customerRepository->find(auth()->guard('customer')->user()->id);
 
-        // The customer must not already belong to another company (members carry a company
-        // role / company link; a plain customer is also type "user", so don't infer from type).
         if ($customer->company_role_id || $customer->companies()->exists()) {
             session()->flash('error', trans('b2b::app.shop.customers.account.invitations.already-member'));
 
@@ -72,7 +69,7 @@ class InvitationController extends Controller
         Event::dispatch('customer.update.before', $customer->id);
 
         $customer = $this->customerRepository->update([
-            'type'            => 'user',
+            'type' => 'user',
             'company_role_id' => $invitation->company_role_id,
         ], $customer->id);
 
@@ -90,7 +87,7 @@ class InvitationController extends Controller
     /**
      * Decline the invitation.
      *
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function decline(string $token)
     {

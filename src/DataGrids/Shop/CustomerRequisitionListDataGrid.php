@@ -22,25 +22,25 @@ class CustomerRequisitionListDataGrid extends DataGrid
     {
         $tablePrefix = DB::getTablePrefix();
 
-        $queryBuilder = DB::table('customer_requisition_lists')
+        $queryBuilder = DB::table('b2b_customer_requisition_lists')
             ->distinct()
             ->addSelect(
-                'customer_requisition_lists.id as requisition_id',
-                'customer_requisition_lists.customer_id',
-                'customer_requisition_lists.name',
-                'customer_requisition_lists.description',
-                'customer_requisition_lists.status',
-                'customer_requisition_lists.is_default',
-                'customer_requisition_lists.updated_at',
+                'b2b_customer_requisition_lists.id as requisition_id',
+                'b2b_customer_requisition_lists.customer_id',
+                'b2b_customer_requisition_lists.name',
+                'b2b_customer_requisition_lists.description',
+                'b2b_customer_requisition_lists.status',
+                'b2b_customer_requisition_lists.is_default',
+                'b2b_customer_requisition_lists.updated_at',
             )
-            ->where('customer_requisition_lists.customer_id', auth()->guard('customer')->user()->id);
+            ->where('b2b_customer_requisition_lists.customer_id', auth()->guard('customer')->user()->id);
 
-        $this->addFilter('requisition_id', 'customer_requisition_lists.requisition_id');
-        $this->addFilter('name', 'customer_requisition_lists.name');
-        $this->addFilter('description', 'customer_requisition_lists.description');
-        $this->addFilter('status', 'customer_requisition_lists.status');
-        $this->addFilter('is_default', 'customer_requisition_lists.is_default');
-        $this->addFilter('updated_at', 'customer_requisition_lists.updated_at');
+        $this->addFilter('requisition_id', 'b2b_customer_requisition_lists.requisition_id');
+        $this->addFilter('name', 'b2b_customer_requisition_lists.name');
+        $this->addFilter('description', 'b2b_customer_requisition_lists.description');
+        $this->addFilter('status', 'b2b_customer_requisition_lists.status');
+        $this->addFilter('is_default', 'b2b_customer_requisition_lists.is_default');
+        $this->addFilter('updated_at', 'b2b_customer_requisition_lists.updated_at');
 
         return $queryBuilder;
     }
@@ -86,7 +86,7 @@ class CustomerRequisitionListDataGrid extends DataGrid
             'filterable' => true,
             'sortable' => true,
             'closure' => function ($row) {
-                return DB::table('customer_requisition_list_products')
+                return DB::table('b2b_customer_requisition_list_products')
                     ->where('requisition_list_id', $row->requisition_id)
                     ->count();
             },

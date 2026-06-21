@@ -42,7 +42,7 @@ class CartController extends Controller
     }
 
     /**
-     * Create cart
+     * Create cart.
      */
     public function store(): JsonResource
     {
@@ -110,29 +110,6 @@ class CartController extends Controller
     }
 
     /**
-     * Removes the item from the cart if it exists.
-     */
-    public function destroyItem(int $cartId): JsonResource
-    {
-        $this->validate(request(), [
-            'cart_item_id' => 'required|exists:cart_items,id',
-        ]);
-
-        $cart = $this->cartRepository->findOrFail($cartId);
-
-        Cart::setCart($cart);
-
-        Cart::removeItem(request()->input('cart_item_id'));
-
-        Cart::collectTotals();
-
-        return new JsonResource([
-            'data' => new CartResource(Cart::getCart()),
-            'message' => trans('admin::app.sales.orders.create.cart.success-remove'),
-        ]);
-    }
-
-    /**
      * Updates the quantity of the items present in the cart.
      */
     public function updateItem(int $cartId): JsonResource
@@ -153,5 +130,28 @@ class CartController extends Controller
                 'message' => $exception->getMessage(),
             ]);
         }
+    }
+
+    /**
+     * Removes the item from the cart if it exists.
+     */
+    public function destroyItem(int $cartId): JsonResource
+    {
+        $this->validate(request(), [
+            'cart_item_id' => 'required|exists:cart_items,id',
+        ]);
+
+        $cart = $this->cartRepository->findOrFail($cartId);
+
+        Cart::setCart($cart);
+
+        Cart::removeItem(request()->input('cart_item_id'));
+
+        Cart::collectTotals();
+
+        return new JsonResource([
+            'data' => new CartResource(Cart::getCart()),
+            'message' => trans('admin::app.sales.orders.create.cart.success-remove'),
+        ]);
     }
 }

@@ -4,7 +4,6 @@ namespace Webkul\B2BSuite\Http\Controllers\Shop\API;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\DB;
 use Webkul\B2BSuite\Helpers\CompanyCatalog;
 use Webkul\B2BSuite\Repositories\CustomerQuoteItemRepository;
 use Webkul\CartRule\Repositories\CartRuleCouponRepository;
@@ -98,32 +97,6 @@ class CartController extends BaseCartController
     }
 
     /**
-     * Ensure the product is within the customer's company catalog (allowlist).
-     * Returns true when no catalog restriction applies.
-     */
-    protected function isWithinCompanyCatalog($product): bool
-    {
-        if (! (bool) core()->getConfigData('b2b.general.settings.active')) {
-            return true;
-        }
-
-        $groupId = app(CustomerRepository::class)->getCurrentGroup()?->id;
-
-        $catalog = app(CompanyCatalog::class)->resolveByGroupId($groupId);
-
-        if (! $catalog) {
-            return true;
-        }
-
-        $productId = $product->parent_id ?? $product->id;
-
-        return DB::table('company_catalog_products')
-            ->where('company_catalog_id', $catalog->id)
-            ->where('product_id', $productId)
-            ->exists();
-    }
-
-    /**
      * Updates the quantity of the items present in the cart.
      */
     public function update(): JsonResource
@@ -168,5 +141,30 @@ class CartController extends BaseCartController
                 'message' => $exception->getMessage(),
             ]);
         }
+    }
+
+    /**
+     * Ensure the product is within the customer's company catalog (allowlist).
+     * Returns true when no catalog restriction applies.
+     */
+    protected function isWithinCompanyCatalog($product): bool
+    {
+        if (! (bool) core()->getConfigData('b2b.general.settings.active')) {
+            return true;
+        }
+
+        $groupId = app(CustomerRepository::class)->getCurrentGroup()?->id;
+
+        $catalog = app(CompanyCatalog::class)->resolveByGroupId($groupId);
+
+        if (! $catalog) {
+            return true;
+        }
+
+        $productId = $product->parent_id ?? $product->id;
+
+        return $catalog->products()
+            ->where('products.id', $productId)
+            ->exists();
     }
 }

@@ -6,6 +6,7 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 use Webkul\B2BSuite\Models\Customer;
 use Webkul\DataGrid\DataGrid;
+use Webkul\User\Models\AdminProxy;
 
 class CompanyDataGrid extends DataGrid
 {
@@ -25,36 +26,33 @@ class CompanyDataGrid extends DataGrid
     {
         $tablePrefix = DB::getTablePrefix();
 
-        /**
-         * Query Builder to fetch records from `company_flat` table
-         */
-        $queryBuilder = DB::table('company_flat')
+        $queryBuilder = DB::table('b2b_company_flat')
             ->distinct()
-            ->leftJoin('customers', 'company_flat.customer_id', '=', 'customers.id')
+            ->leftJoin('customers', 'b2b_company_flat.customer_id', '=', 'customers.id')
             ->leftJoin('admins as sales_rep', 'customers.sales_rep_id', '=', 'sales_rep.id')
             ->select(
-                'company_flat.customer_id',
-                'company_flat.email',
-                'company_flat.phone',
-                'company_flat.business_name',
-                'company_flat.website_url',
-                'company_flat.vat_tax_id',
+                'b2b_company_flat.customer_id',
+                'b2b_company_flat.email',
+                'b2b_company_flat.phone',
+                'b2b_company_flat.business_name',
+                'b2b_company_flat.website_url',
+                'b2b_company_flat.vat_tax_id',
                 'sales_rep.name as sales_rep_name',
                 'customers.status',
-                'company_flat.created_at',
-                'company_flat.updated_at'
+                'b2b_company_flat.created_at',
+                'b2b_company_flat.updated_at'
             )
-            ->addSelect(DB::raw('CONCAT('.$tablePrefix.'company_flat.first_name, " ", '.$tablePrefix.'company_flat.last_name) as full_name'))
+            ->addSelect(DB::raw('CONCAT('.$tablePrefix.'b2b_company_flat.first_name, " ", '.$tablePrefix.'b2b_company_flat.last_name) as full_name'))
             ->where('customers.type', 'company')
-            ->where('company_flat.locale', app()->getLocale());
+            ->where('b2b_company_flat.locale', app()->getLocale());
 
-        $this->addFilter('customer_id', 'company_flat.customer_id');
-        $this->addFilter('full_name', DB::raw('CONCAT('.$tablePrefix.'company_flat.first_name, " ", '.$tablePrefix.'company_flat.last_name)'));
-        $this->addFilter('email', 'company_flat.email');
-        $this->addFilter('phone', 'company_flat.phone');
-        $this->addFilter('business_name', 'company_flat.business_name');
-        $this->addFilter('website_url', 'company_flat.website_url');
-        $this->addFilter('vat_tax_id', 'company_flat.vat_tax_id');
+        $this->addFilter('customer_id', 'b2b_company_flat.customer_id');
+        $this->addFilter('full_name', DB::raw('CONCAT('.$tablePrefix.'b2b_company_flat.first_name, " ", '.$tablePrefix.'b2b_company_flat.last_name)'));
+        $this->addFilter('email', 'b2b_company_flat.email');
+        $this->addFilter('phone', 'b2b_company_flat.phone');
+        $this->addFilter('business_name', 'b2b_company_flat.business_name');
+        $this->addFilter('website_url', 'b2b_company_flat.website_url');
+        $this->addFilter('vat_tax_id', 'b2b_company_flat.vat_tax_id');
         $this->addFilter('sales_rep_name', 'sales_rep.name');
         $this->addFilter('status', 'customers.status');
 
@@ -252,7 +250,7 @@ class CompanyDataGrid extends DataGrid
                 'title' => trans('b2b::app.admin.companies.index.datagrid.assign-sales-rep'),
                 'method' => 'POST',
                 'url' => route('admin.b2b.companies.mass_assign_sales_rep'),
-                'options' => \Webkul\User\Models\AdminProxy::modelClass()::orderBy('name')
+                'options' => AdminProxy::modelClass()::orderBy('name')
                     ->get(['id', 'name'])
                     ->map(fn ($admin) => [
                         'label' => $admin->name,

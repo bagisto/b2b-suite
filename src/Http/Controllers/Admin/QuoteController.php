@@ -28,21 +28,12 @@ class QuoteController extends Controller
      * Create a new controller instance.
      */
     public function __construct(
-        protected CartRepository $cartRepository,
-        protected CustomerRepository $customerRepository,
         protected CustomerQuoteRepository $customerQuoteRepository,
         protected CustomerQuoteMessageRepository $customerQuoteMessageRepository,
+        protected CartRepository $cartRepository,
+        protected CustomerRepository $customerRepository,
         protected CustomerGroupRepository $customerGroupRepository
     ) {}
-
-    /**
-     * Abort with 403 when the current admin (a sales rep) may not access this quote's
-     * company. Guards direct-URL access that datagrid scoping does not cover.
-     */
-    protected function authorizeQuoteAccess($quote): void
-    {
-        abort_unless(Customer::repCanAccessCompany($quote?->company_id), 403);
-    }
 
     /**
      * Display a listing of the resource.
@@ -159,7 +150,9 @@ class QuoteController extends Controller
 
         $this->authorizeQuoteAccess($quote);
 
-        // The admin may accept the buyer's offer only when the buyer made the latest quotation.
+        /**
+         * The admin may accept the buyer's offer only when the buyer made the latest quotation.
+         */
         $lastQuotation = $quote->messages()->whereHas('quotations')->orderByDesc('id')->first();
 
         $adminIsLastQuotation = $lastQuotation && $lastQuotation->user_type === 'admin';
@@ -168,7 +161,130 @@ class QuoteController extends Controller
     }
 
     /**
-     * AJAX endpoint for loading messages with pagination and filters
+     * Update the specified resource in storage.
+     *
+     * @return Response
+     */
+    public function update(QuoteRequest $request, int $id)
+    {
+        $this->authorizeQuoteAccess($this->customerQuoteRepository->findOrFail($id));
+
+        Event::dispatch('b2b.quote.update.before', $id);
+
+        $data = $request->only([
+            'name',
+            'description',
+            'company_id',
+            'customer_id',
+            'agent_id',
+            'base_total',
+            'total',
+            'base_negotiated_total',
+            'negotiated_total',
+            'expiration_date',
+            'status',
+        ]);
+
+        $quote = $this->customerQuoteRepository->update($data, $id);
+
+        Event::dispatch('b2b.quote.update.after', $quote);
+
+        session()->flash('success', __('b2b::app.admin.quotes.index.update-success'));
+
+        return redirect()->route('admin.b2b.quotes.index');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        $quote = $this->customerQuoteRepository->findOrFail($id);
+
+        $this->authorizeQuoteAccess($quote);
+
+        try {
+            Event::dispatch('b2b.quote.delete.before', $id);
+
+            $this->customerQuoteRepository->delete($id);
+
+            Event::dispatch('b2b.quote.delete.after', $id);
+
+            return new JsonResponse([
+                'message' => trans('b2b::app.admin.quotes.index.delete-success'),
+            ]);
+        } catch (\Exception $e) {
+        }
+
+        return new JsonResponse([
+            'message' => trans('b2b::app.admin.quotes.index.delete-failed'),
+        ], 500);
+    }
+
+    /**
+     * Mass update quote.
+     *
+     * @return JsonResponse
+     */
+    public function massUpdate(MassUpdateRequest $massUpdateRequest)
+    {
+        try {
+            $quoteIds = $massUpdateRequest->input('indices');
+
+            foreach ($quoteIds as $quoteId) {
+                Event::dispatch('b2b.quotes.mass-update.before', $quoteId);
+
+                $quote = $this->customerQuoteRepository->find($quoteId);
+
+                $this->authorizeQuoteAccess($quote);
+
+                $quote->status = $massUpdateRequest->input('value');
+
+                $quote->save();
+
+                Event::dispatch('b2b.quotes.mass-update.after', $quote);
+            }
+
+            return new JsonResponse([
+                'message' => trans('b2b::app.admin.quotes.index.update-success'),
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Remove the specified resources from database.
+     */
+    public function massDestroy(MassDestroyRequest $massDestroyRequest): JsonResponse
+    {
+        $indices = $massDestroyRequest->input('indices');
+
+        try {
+            foreach ($indices as $index) {
+                $this->authorizeQuoteAccess($this->customerQuoteRepository->findOrFail($index));
+
+                Event::dispatch('b2b.quote.delete.before', $index);
+
+                $this->customerQuoteRepository->delete($index);
+
+                Event::dispatch('b2b.quote.delete.after', $index);
+            }
+
+            return new JsonResponse([
+                'message' => trans('b2b::app.admin.quotes.index.index.mass-delete-success'),
+            ]);
+        } catch (\Exception $exception) {
+            return new JsonResponse([
+                'message' => trans('b2b::app.admin.quotes.index.delete-failed'),
+            ], 500);
+        }
+    }
+
+    /**
+     * AJAX endpoint for loading messages with pagination and filters.
      *
      * @param  int  $id  Quote ID
      * @return JsonResponse
@@ -223,7 +339,9 @@ class QuoteController extends Controller
                 'created_at' => now(),
             ]);
 
-            // Notify the buyer that the seller posted a new message.
+            /**
+             * Notify the buyer that the seller sent a message in the quote thread.
+             */
             Notifier::quote($quote, 'message', 'buyer');
 
             if ($request->expectsJson()) {
@@ -295,7 +413,9 @@ class QuoteController extends Controller
 
             $this->customerQuoteRepository->createOrUpdateMessageQuotation($data, $id);
 
-            // Notify the buyer that the seller sent/revised a quotation.
+            /**
+             * Notify the buyer that the seller sent/revised a quotation.
+             */
             Notifier::quote($quote->refresh(), 'sent', 'buyer');
 
             return redirect()->route('admin.b2b.quotes.view', $id)
@@ -340,7 +460,9 @@ class QuoteController extends Controller
                 'created_at' => now(),
             ]);
 
-            // Notify the buyer that the seller rejected the quote.
+            /**
+             * Notify the buyer that the seller rejected the quote.
+             */
             Notifier::quote($quote, 'rejected', 'buyer');
 
             return redirect()->route('admin.b2b.quotes.view', $id)
@@ -389,7 +511,9 @@ class QuoteController extends Controller
                 'created_at' => now(),
             ]);
 
-            // Notify the buyer that the seller accepted the quote.
+            /**
+             * Notify the buyer that the seller accepted the quote.
+             */
             Notifier::quote($quote, 'accepted', 'buyer');
 
             return redirect()->route('admin.b2b.quotes.view', $id)
@@ -403,125 +527,11 @@ class QuoteController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @return Response
+     * Abort with 403 when the current admin (a sales rep) may not access this quote's
+     * company. Guards direct-URL access that datagrid scoping does not cover.
      */
-    public function update(QuoteRequest $request, int $id)
+    protected function authorizeQuoteAccess($quote): void
     {
-        $this->authorizeQuoteAccess($this->customerQuoteRepository->findOrFail($id));
-
-        Event::dispatch('b2b.quote.update.before', $id);
-
-        $data = $request->only([
-            'name',
-            'description',
-            'company_id',
-            'customer_id',
-            'agent_id',
-            'base_total',
-            'total',
-            'base_negotiated_total',
-            'negotiated_total',
-            'expiration_date',
-            'status',
-        ]);
-
-        $quote = $this->customerQuoteRepository->update($data, $id);
-
-        Event::dispatch('b2b.quote.update.after', $quote);
-
-        session()->flash('success', __('b2b::app.admin.quotes.index.update-success'));
-
-        return redirect()->route('admin.b2b.quotes.index');
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(int $id): JsonResponse
-    {
-        $quote = $this->customerQuoteRepository->findOrFail($id);
-
-        $this->authorizeQuoteAccess($quote);
-
-        try {
-            Event::dispatch('b2b.quote.delete.before', $id);
-
-            $this->customerQuoteRepository->delete($id);
-
-            Event::dispatch('b2b.quote.delete.after', $id);
-
-            return new JsonResponse([
-                'message' => trans('b2b::app.admin.quotes.index.delete-success'),
-            ]);
-        } catch (\Exception $e) {
-        }
-
-        return new JsonResponse([
-            'message' => trans('b2b::app.admin.quotes.index.delete-failed'),
-        ], 500);
-    }
-
-    /**
-     * Remove the specified resources from database.
-     */
-    public function massDestroy(MassDestroyRequest $massDestroyRequest): JsonResponse
-    {
-        $indices = $massDestroyRequest->input('indices');
-
-        try {
-            foreach ($indices as $index) {
-                $this->authorizeQuoteAccess($this->customerQuoteRepository->findOrFail($index));
-
-                Event::dispatch('b2b.quote.delete.before', $index);
-
-                $this->customerQuoteRepository->delete($index);
-
-                Event::dispatch('b2b.quote.delete.after', $index);
-            }
-
-            return new JsonResponse([
-                'message' => trans('b2b::app.admin.quotes.index.index.mass-delete-success'),
-            ]);
-        } catch (\Exception $exception) {
-            return new JsonResponse([
-                'message' => trans('b2b::app.admin.quotes.index.delete-failed'),
-            ], 500);
-        }
-    }
-
-    /**
-     * Mass update quote.
-     *
-     * @return JsonResponse
-     */
-    public function massUpdate(MassUpdateRequest $massUpdateRequest)
-    {
-        try {
-            $quoteIds = $massUpdateRequest->input('indices');
-
-            foreach ($quoteIds as $quoteId) {
-                Event::dispatch('b2b.quotes.mass-update.before', $quoteId);
-
-                $quote = $this->customerQuoteRepository->find($quoteId);
-
-                $this->authorizeQuoteAccess($quote);
-
-                $quote->status = $massUpdateRequest->input('value');
-
-                $quote->save();
-
-                Event::dispatch('b2b.quotes.mass-update.after', $quote);
-            }
-
-            return new JsonResponse([
-                'message' => trans('b2b::app.admin.quotes.index.update-success'),
-            ]);
-        } catch (\Exception $e) {
-            return new JsonResponse([
-                'message' => $e->getMessage(),
-            ], 500);
-        }
+        abort_unless(Customer::repCanAccessCompany($quote?->company_id), 403);
     }
 }

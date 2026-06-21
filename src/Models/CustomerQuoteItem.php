@@ -9,8 +9,18 @@ use Webkul\Product\Models\Product;
 
 class CustomerQuoteItem extends Model implements CustomerQuoteItemContract
 {
-    protected $table = 'customer_quote_items';
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'b2b_customer_quote_items';
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
     protected $fillable = [
         'customer_quote_id',
         'product_id',
@@ -35,11 +45,17 @@ class CustomerQuoteItem extends Model implements CustomerQuoteItemContract
         'additional',
     ];
 
+    /**
+     * The quote this item belongs to.
+     */
     public function quote(): BelongsTo
     {
         return $this->belongsTo(CustomerQuote::class, 'customer_quote_id');
     }
 
+    /**
+     * The product this item references.
+     */
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class, 'product_id');

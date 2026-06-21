@@ -10,7 +10,12 @@ use Webkul\Customer\Models\CustomerProxy;
 
 class CompanyCredit extends Model implements CompanyCreditContract
 {
-    protected $table = 'company_credits';
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'b2b_company_credits';
 
     /**
      * The attributes that are mass assignable.
@@ -39,15 +44,6 @@ class CompanyCredit extends Model implements CompanyCreditContract
     ];
 
     /**
-     * Available credit = limit - what is currently owed (may go negative when the
-     * "allow exceed limit" flag let an order push past the limit).
-     */
-    public function getAvailableCreditAttribute(): float
-    {
-        return (float) $this->credit_limit - (float) $this->outstanding_balance;
-    }
-
-    /**
      * The company (a `customers` row with type = company) this credit belongs to.
      */
     public function company(): BelongsTo
@@ -61,5 +57,14 @@ class CompanyCredit extends Model implements CompanyCreditContract
     public function transactions(): HasMany
     {
         return $this->hasMany(CompanyCreditTransactionProxy::modelClass(), 'company_credit_id');
+    }
+
+    /**
+     * Available credit = limit - what is currently owed (may go negative when the
+     * "allow exceed limit" flag let an order push past the limit).
+     */
+    public function getAvailableCreditAttribute(): float
+    {
+        return (float) $this->credit_limit - (float) $this->outstanding_balance;
     }
 }

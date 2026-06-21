@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('customer_quote_items', function (Blueprint $table) {
+        Schema::create('b2b_customer_quote_items', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('customer_quote_id')->unsigned();
             $table->integer('product_id')->unsigned()->nullable();
@@ -35,7 +35,7 @@ return new class extends Migration
             $table->json('additional')->nullable();
             $table->timestamps();
 
-            $table->foreign('customer_quote_id')->references('id')->on('customer_quotes')->onDelete('cascade');
+            $table->foreign('customer_quote_id')->references('id')->on('b2b_customer_quotes')->onDelete('cascade');
             $table->foreign('product_id')->references('id')->on('products')->onDelete('set null');
         });
     }
@@ -45,6 +45,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('customer_quote_items');
+        Schema::dropIfExists('b2b_customer_quote_items');
     }
 };

@@ -14,7 +14,7 @@ class CompanyFlat extends Model implements CompanyFlatContract
      *
      * @var string
      */
-    protected $table = 'company_flat';
+    protected $table = 'b2b_company_flat';
 
     /**
      * The attributes that aren't mass assignable.

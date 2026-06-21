@@ -24,7 +24,7 @@ class CustomerRequisitionRepository extends Repository
     }
 
     /**
-     * Specify Model class name.
+     * Specify model class name.
      */
     public function model()
     {

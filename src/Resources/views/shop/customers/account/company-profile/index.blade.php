@@ -1,7 +1,7 @@
 <x-shop::layouts.account>
     <!-- Page Title -->
     <x-slot:title>
-        @lang('b2b::app.shop.companies.account.profile.index.title')
+        @lang('b2b::app.shop.customers.account.company-profile.index.title')
     </x-slot>
 
     <!-- Breadcrumbs -->
@@ -24,7 +24,7 @@
 
     <div class="mx-4 flex-auto max-md:mx-6 max-sm:mx-4">
 
-        {!! view_render_event('bagisto.shop.companies.account.profile.before', ['customer' => $customer]) !!}
+        {!! view_render_event('bagisto.shop.customers.account.company-profile.before', ['customer' => $customer]) !!}
 
         <!-- Header -->
         <div class="mb-8 flex items-center justify-between gap-4 max-sm:mb-5 max-sm:flex-wrap">
@@ -37,16 +37,16 @@
                 </a>
 
                 <h2 class="text-2xl font-medium max-md:text-xl max-sm:text-base ltr:ml-2.5 md:ltr:ml-0 rtl:mr-2.5 md:rtl:mr-0">
-                    @lang('b2b::app.shop.companies.account.profile.index.title')
+                    @lang('b2b::app.shop.customers.account.company-profile.index.title')
                 </h2>
             </div>
 
             @if ($canEdit)
                 <a
-                    href="{{ route('shop.companies.account.profile.edit') }}"
+                    href="{{ route('shop.customers.account.company_profile.edit') }}"
                     class="primary-button rounded-lg px-8 py-2.5 text-center text-base max-md:px-6 max-md:py-2 max-md:text-sm"
                 >
-                    @lang('b2b::app.shop.companies.account.profile.index.edit-btn')
+                    @lang('b2b::app.shop.customers.account.company-profile.index.edit-btn')
                 </a>
             @endif
         </div>
@@ -54,7 +54,7 @@
         @if ($column1->isEmpty() && $column2->isEmpty())
             <div class="mt-6 flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-zinc-200 bg-white py-16 text-center">
                 <p class="text-base font-medium text-gray-600">
-                    @lang('b2b::app.shop.companies.account.profile.index.no-attributes')
+                    @lang('b2b::app.shop.customers.account.company-profile.index.no-attributes')
                 </p>
             </div>
         @else
@@ -62,7 +62,7 @@
                 <!-- Left Column -->
                 <div class="flex flex-1 flex-col gap-6 max-md:w-full max-md:flex-auto max-md:gap-4">
                     @foreach ($column1 as $group)
-                        @include('b2b::shop.companies.account.profile.partials.summary-card', ['group' => $group, 'customer' => $customer])
+                        @include('b2b::shop.customers.account.company-profile.partials.summary-card', ['group' => $group, 'customer' => $customer])
                     @endforeach
                 </div>
 
@@ -70,13 +70,13 @@
                 @if ($column2->isNotEmpty())
                     <div class="flex flex-1 flex-col gap-6 max-md:w-full max-md:flex-auto max-md:gap-4">
                         @foreach ($column2 as $group)
-                            @include('b2b::shop.companies.account.profile.partials.summary-card', ['group' => $group, 'customer' => $customer])
+                            @include('b2b::shop.customers.account.company-profile.partials.summary-card', ['group' => $group, 'customer' => $customer])
                         @endforeach
                     </div>
                 @endif
             </div>
         @endif
 
-        {!! view_render_event('bagisto.shop.companies.account.profile.after', ['customer' => $customer]) !!}
+        {!! view_render_event('bagisto.shop.customers.account.company-profile.after', ['customer' => $customer]) !!}
     </div>
 </x-shop::layouts.account>

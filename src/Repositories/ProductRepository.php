@@ -2,7 +2,6 @@
 
 namespace Webkul\B2BSuite\Repositories;
 
-use Illuminate\Support\Facades\DB;
 use Webkul\B2BSuite\Helpers\CompanyCatalog as CompanyCatalogHelper;
 use Webkul\B2BSuite\Repositories\Criteria\CompanyCatalogVisibilityCriteria;
 use Webkul\Product\Contracts\Product;
@@ -31,6 +30,63 @@ class ProductRepository extends BaseProductRepository
      * Whether the visibility criterion has been pushed.
      */
     protected bool $catalogCriteriaApplied = false;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAll(array $params = [])
+    {
+        $this->applyCatalogVisibility();
+
+        return parent::getAll($params);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMaxPrice($params = [])
+    {
+        $this->applyCatalogVisibility();
+
+        return parent::getMaxPrice($params);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function findBySlug(string $slug): ?Product
+    {
+        $product = parent::findBySlug($slug);
+
+        if (
+            $product
+            && ! $this->isVisible($product)
+        ) {
+            return null;
+        }
+
+        return $product;
+    }
+
+    /**
+     * Check whether a product is within the current customer's company catalog. Returns true
+     * when no catalog applies (guests, admins, unassigned customers), so non-catalog flows are
+     * unaffected. Public so SKU/file based flows (quick order) can enforce the same allowlist.
+     */
+    public function isVisible($product): bool
+    {
+        $catalog = $this->companyCatalog();
+
+        if (! $catalog) {
+            return true;
+        }
+
+        $productId = $product->parent_id ?? $product->id;
+
+        return $catalog->products()
+            ->where('products.id', $productId)
+            ->exists();
+    }
 
     /**
      * Resolve the active company catalog for the current customer group (or null).
@@ -96,63 +152,5 @@ class ProductRepository extends BaseProductRepository
         $this->pushCriteria(new CompanyCatalogVisibilityCriteria($catalog->id));
 
         $this->catalogCriteriaApplied = true;
-    }
-
-    /**
-     * Check whether a product is within the current customer's company catalog. Returns true
-     * when no catalog applies (guests, admins, unassigned customers), so non-catalog flows are
-     * unaffected. Public so SKU/file based flows (quick order) can enforce the same allowlist.
-     */
-    public function isVisible($product): bool
-    {
-        $catalog = $this->companyCatalog();
-
-        if (! $catalog) {
-            return true;
-        }
-
-        $productId = $product->parent_id ?? $product->id;
-
-        return DB::table('company_catalog_products')
-            ->where('company_catalog_id', $catalog->id)
-            ->where('product_id', $productId)
-            ->exists();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAll(array $params = [])
-    {
-        $this->applyCatalogVisibility();
-
-        return parent::getAll($params);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getMaxPrice($params = [])
-    {
-        $this->applyCatalogVisibility();
-
-        return parent::getMaxPrice($params);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function findBySlug(string $slug): ?Product
-    {
-        $product = parent::findBySlug($slug);
-
-        if (
-            $product
-            && ! $this->isVisible($product)
-        ) {
-            return null;
-        }
-
-        return $product;
     }
 }

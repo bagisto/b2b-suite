@@ -6,7 +6,7 @@ use Webkul\B2BSuite\Helpers\CompanyCatalog;
 use Webkul\B2BSuite\Helpers\CreditManager;
 use Webkul\B2BSuite\Helpers\FlatIndexer;
 use Webkul\Customer\Contracts\Customer;
-use Webkul\Customer\Models\CustomerProxy;
+use Webkul\Customer\Repositories\CustomerRepository;
 
 class Company
 {
@@ -16,6 +16,7 @@ class Company
      * @return void
      */
     public function __construct(
+        protected CustomerRepository $customerRepository,
         protected FlatIndexer $flatIndexer,
         protected CompanyCatalog $companyCatalog,
         protected CreditManager $creditManager,
@@ -43,7 +44,7 @@ class Company
     }
 
     /**
-     * Update or create customer indices
+     * Update or create customer indices.
      *
      * @param  Customer  $customer
      * @return void
@@ -84,7 +85,7 @@ class Company
             return;
         }
 
-        $company = CustomerProxy::modelClass()::find($companyId);
+        $company = $this->customerRepository->find($companyId);
 
         if (! $company?->company_catalog_id) {
             return;

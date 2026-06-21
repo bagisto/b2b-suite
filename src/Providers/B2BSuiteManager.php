@@ -25,19 +25,11 @@ final class B2BSuiteManager
      */
     public function __construct(private Application $app)
     {
-        $this->registerModels();
-
         $this->registerControllers();
 
-        $this->registerRepositories();
-    }
+        $this->registerModels();
 
-    /**
-     * Register the marketplace models.
-     */
-    private function registerModels(): void
-    {
-        $this->app->concord->registerModel(CustomerContract::class, Customer::class);
+        $this->registerRepositories();
     }
 
     /**
@@ -50,6 +42,14 @@ final class B2BSuiteManager
         $this->app->bind(BaseShopCustomerController::class, ShopCustomerController::class);
 
         $this->app->bind(BaseCartController::class, B2BCartController::class);
+    }
+
+    /**
+     * Register the marketplace models.
+     */
+    private function registerModels(): void
+    {
+        $this->app->concord->registerModel(CustomerContract::class, Customer::class);
     }
 
     /**

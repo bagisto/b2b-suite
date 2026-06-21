@@ -10,7 +10,7 @@ use Webkul\Customer\Contracts\Customer;
 class CompanyAttributeValueRepository extends Repository
 {
     /**
-     * Specify Model class name
+     * Specify model class name.
      */
     public function model(): string
     {
@@ -18,7 +18,7 @@ class CompanyAttributeValueRepository extends Repository
     }
 
     /**
-     * Save attribute values
+     * Save attribute values.
      *
      * @param  array  $data
      * @param  Customer  $customer

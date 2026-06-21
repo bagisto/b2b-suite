@@ -27,26 +27,26 @@ class CompanyInvitationDataGrid extends DataGrid
 
         $companyId = $customer->type === 'company'
             ? $customer->id
-            : DB::table('customer_companies')
+            : DB::table('b2b_customer_companies')
                 ->where('customer_id', $customer->id)
                 ->value('company_id');
 
-        $queryBuilder = DB::table('company_invitations')
-            ->leftJoin('company_roles', 'company_invitations.company_role_id', '=', 'company_roles.id')
+        $queryBuilder = DB::table('b2b_company_invitations')
+            ->leftJoin('b2b_company_roles', 'b2b_company_invitations.company_role_id', '=', 'b2b_company_roles.id')
             ->addSelect(
-                'company_invitations.id as invitation_id',
-                'company_invitations.email',
-                'company_roles.name as role',
-                'company_invitations.expires_at',
-                'company_invitations.created_at'
+                'b2b_company_invitations.id as invitation_id',
+                'b2b_company_invitations.email',
+                'b2b_company_roles.name as role',
+                'b2b_company_invitations.expires_at',
+                'b2b_company_invitations.created_at'
             )
-            ->where('company_invitations.company_id', $companyId)
-            ->where('company_invitations.status', CompanyInvitation::STATUS_PENDING);
+            ->where('b2b_company_invitations.company_id', $companyId)
+            ->where('b2b_company_invitations.status', CompanyInvitation::STATUS_PENDING);
 
-        $this->addFilter('invitation_id', 'company_invitations.id');
-        $this->addFilter('email', 'company_invitations.email');
-        $this->addFilter('role', 'company_roles.name');
-        $this->addFilter('created_at', 'company_invitations.created_at');
+        $this->addFilter('invitation_id', 'b2b_company_invitations.id');
+        $this->addFilter('email', 'b2b_company_invitations.email');
+        $this->addFilter('role', 'b2b_company_roles.name');
+        $this->addFilter('created_at', 'b2b_company_invitations.created_at');
 
         return $queryBuilder;
     }

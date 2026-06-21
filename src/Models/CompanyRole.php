@@ -10,6 +10,13 @@ use Webkul\Customer\Models\CustomerProxy;
 class CompanyRole extends Model implements CompanyRoleContract
 {
     /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'b2b_company_roles';
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array

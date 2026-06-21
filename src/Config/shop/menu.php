@@ -4,7 +4,7 @@ return [
     [
         'key' => 'account.company_profile',
         'name' => 'b2b::app.shop.acl.company-profile',
-        'route' => 'shop.companies.account.profile.index',
+        'route' => 'shop.customers.account.company_profile.index',
         'icon' => 'icon-checkout-address',
         'sort' => 20,
     ], [

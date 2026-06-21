@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('customer_quotes', function (Blueprint $table) {
+        Schema::create('b2b_customer_quotes', function (Blueprint $table) {
             $table->increments('id');
             $table->string('quotation_number')->nullable();
             $table->string('po_number')->nullable();
@@ -50,6 +50,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('customer_quotes');
+        Schema::dropIfExists('b2b_customer_quotes');
     }
 };

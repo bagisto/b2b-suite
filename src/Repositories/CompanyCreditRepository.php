@@ -8,10 +8,18 @@ use Webkul\Core\Eloquent\Repository;
 class CompanyCreditRepository extends Repository
 {
     /**
-     * Specify Model class name.
+     * Specify model class name.
      */
     public function model()
     {
         return CompanyCredit::class;
+    }
+
+    /**
+     * Find a credit row by id with a pessimistic lock for safe concurrent updates.
+     */
+    public function findForUpdate($id): ?CompanyCredit
+    {
+        return $this->model->where('id', $id)->lockForUpdate()->first();
     }
 }

@@ -4,13 +4,17 @@ namespace Webkul\B2BSuite\Helpers;
 
 use Illuminate\Support\Facades\DB;
 use Webkul\B2BSuite\Models\CompanyCredit;
-use Webkul\B2BSuite\Models\CompanyCreditProxy;
 use Webkul\B2BSuite\Models\CompanyCreditTransaction;
 use Webkul\B2BSuite\Repositories\CompanyCreditRepository;
 use Webkul\B2BSuite\Repositories\CompanyCreditTransactionRepository;
 
 class CreditManager
 {
+    /**
+     * Create a new credit manager instance.
+     *
+     * @return void
+     */
     public function __construct(
         protected CompanyCreditRepository $companyCreditRepository,
         protected CompanyCreditTransactionRepository $companyCreditTransactionRepository,
@@ -74,8 +78,6 @@ class CreditManager
             'credit_limit' => 0,
             'outstanding_balance' => 0,
             'allow_exceed_limit' => false,
-            // New credit accounts start disabled with a zero limit; an admin enables them
-            // and sets a limit from the Company Credit settings.
             'status' => false,
         ]);
     }
@@ -234,9 +236,6 @@ class CreditManager
      */
     protected function lock(CompanyCredit $credit): CompanyCredit
     {
-        return CompanyCreditProxy::modelClass()::query()
-            ->where('id', $credit->id)
-            ->lockForUpdate()
-            ->first();
+        return $this->companyCreditRepository->findForUpdate($credit->id);
     }
 }

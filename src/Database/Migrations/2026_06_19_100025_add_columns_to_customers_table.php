@@ -21,13 +21,13 @@ return new class extends Migration
             if (! Schema::hasColumn('customers', 'company_role_id')) {
                 $table->integer('company_role_id')->unsigned()->nullable()->after('customer_group_id');
 
-                $table->foreign('company_role_id')->references('id')->on('company_roles')->onDelete('set null');
+                $table->foreign('company_role_id')->references('id')->on('b2b_company_roles')->onDelete('set null');
             }
 
             if (! Schema::hasColumn('customers', 'company_catalog_id')) {
                 $table->integer('company_catalog_id')->unsigned()->nullable()->after('company_role_id');
 
-                $table->foreign('company_catalog_id')->references('id')->on('company_catalogs')->onDelete('set null');
+                $table->foreign('company_catalog_id')->references('id')->on('b2b_company_catalogs')->onDelete('set null');
             }
 
             if (! Schema::hasColumn('customers', 'sales_rep_id')) {

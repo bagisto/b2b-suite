@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('customer_requisition_list_products', function (Blueprint $table) {
+        Schema::create('b2b_customer_requisition_list_products', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('requisition_list_id')->unsigned();
             $table->integer('product_id')->unsigned();
@@ -26,9 +26,9 @@ return new class extends Migration
             $table->decimal('base_total', 18, 4)->default(0);
             $table->json('additional')->nullable();
 
-            $table->foreign('requisition_list_id', 'bag_customer_requisition_list_id_foreign')->references('id')->on('customer_requisition_lists')->onDelete('cascade');
-            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
-            $table->foreign('variant_id')->references('id')->on('products')->onDelete('set null');
+            $table->foreign('requisition_list_id', 'b2b_req_list_prod_list_fk')->references('id')->on('b2b_customer_requisition_lists')->onDelete('cascade');
+            $table->foreign('product_id', 'b2b_req_list_prod_product_fk')->references('id')->on('products')->onDelete('cascade');
+            $table->foreign('variant_id', 'b2b_req_list_prod_variant_fk')->references('id')->on('products')->onDelete('set null');
         });
     }
 
@@ -37,6 +37,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('customer_requisition_list_products');
+        Schema::dropIfExists('b2b_customer_requisition_list_products');
     }
 };

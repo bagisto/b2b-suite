@@ -13,7 +13,7 @@
                 {!! $attribute->name . ($attribute->is_required ? '<span class="required"></span>' : '') !!}
             </x-shop::form.control-group.label>
 
-            @include('b2b::shop.companies.account.profile.partials.controls', [
+            @include('b2b::shop.customers.account.company-profile.partials.controls', [
                 'attribute' => $attribute,
                 'customer'  => $customer,
             ])

@@ -9,7 +9,12 @@ use Webkul\Product\Models\ProductProxy;
 
 class CompanyCatalogProduct extends Model implements CompanyCatalogProductContract
 {
-    protected $table = 'company_catalog_products';
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'b2b_company_catalog_products';
 
     /**
      * The attributes that are mass assignable.

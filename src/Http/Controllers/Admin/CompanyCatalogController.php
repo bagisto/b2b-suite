@@ -3,12 +3,13 @@
 namespace Webkul\B2BSuite\Http\Controllers\Admin;
 
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Webkul\Admin\Http\Controllers\Controller;
 use Webkul\B2BSuite\DataGrids\Admin\CompanyCatalogDataGrid;
 use Webkul\B2BSuite\Helpers\CompanyCatalog as CompanyCatalogHelper;
 use Webkul\B2BSuite\Models\Customer;
 use Webkul\B2BSuite\Repositories\CompanyCatalogRepository;
+use Webkul\B2BSuite\Repositories\CompanyFlatRepository;
+use Webkul\Product\Repositories\ProductCustomerGroupPriceRepository;
 use Webkul\Product\Repositories\ProductRepository;
 
 class CompanyCatalogController extends Controller
@@ -18,6 +19,8 @@ class CompanyCatalogController extends Controller
      */
     public function __construct(
         protected CompanyCatalogRepository $companyCatalogRepository,
+        protected CompanyFlatRepository $companyFlatRepository,
+        protected ProductCustomerGroupPriceRepository $productCustomerGroupPriceRepository,
         protected CompanyCatalogHelper $companyCatalogHelper,
     ) {}
 
@@ -38,7 +41,6 @@ class CompanyCatalogController extends Controller
      */
     public function create()
     {
-        // Catalogs are created through a modal on the listing; the page route just returns there.
         return to_route('admin.b2b.company_catalogs.index');
     }
 
@@ -56,12 +58,10 @@ class CompanyCatalogController extends Controller
             'created_by' => auth()->guard('admin')->user()->id,
         ]);
 
-        // Provision the backing customer group so the catalog is ready to price products.
         $this->companyCatalogHelper->provisionGroup($catalog);
 
         session()->flash('success', trans('b2b::app.admin.company-catalogs.create-success'));
 
-        // Continue to the edit screen to assign products and companies (product-style flow).
         return to_route('admin.b2b.company_catalogs.edit', $catalog->id);
     }
 
@@ -78,9 +78,8 @@ class CompanyCatalogController extends Controller
 
         $companyIds = $catalog->companies()->pluck('id')->toArray();
 
-        $flats = DB::table('company_flat')
-            ->whereIn('customer_id', $companyIds)
-            ->get()
+        $flats = $this->companyFlatRepository
+            ->findWhereIn('customer_id', $companyIds)
             ->keyBy('customer_id');
 
         $companies = collect($companyIds)->map(function ($id) use ($flats) {
@@ -93,10 +92,79 @@ class CompanyCatalogController extends Controller
             ];
         })->values();
 
-        // Viewers who are not the creator (and not super-admin) get a read-only form.
+        /**
+         * Viewers who are not the creator (and not super-admin) get a read-only form.
+         */
         $canEdit = Customer::repCanEditCatalog((int) $id);
 
         return view('b2b::admin.company-catalogs.edit', compact('catalog', 'products', 'companies', 'canEdit'));
+    }
+
+    /**
+     * Update the specified company catalog.
+     */
+    public function update($id)
+    {
+        abort_unless(Customer::repCanEditCatalog((int) $id), 403, trans('b2b::app.admin.company-catalogs.not-owner'));
+
+        $this->validateRelations();
+
+        $catalog = $this->companyCatalogRepository->findOrFail($id);
+
+        /**
+         * The edit screen owns products, prices and companies; the general settings
+         * (name/description/status) are managed separately via the settings modal.
+         */
+        $this->persistRelations($catalog);
+
+        session()->flash('success', trans('b2b::app.admin.company-catalogs.update-success'));
+
+        return to_route('admin.b2b.company_catalogs.index');
+    }
+
+    /**
+     * Update only the catalog's general settings (name, description, status) — posted from
+     * the settings modal on the listing.
+     */
+    public function updateSettings($id)
+    {
+        abort_unless(Customer::repCanEditCatalog((int) $id), 403, trans('b2b::app.admin.company-catalogs.not-owner'));
+
+        $this->validateSettings();
+
+        $this->companyCatalogRepository->update([
+            'name' => request('name'),
+            'description' => request('description'),
+            'status' => request('status') !== null ? (int) (bool) request('status') : 1,
+        ], $id);
+
+        session()->flash('success', trans('b2b::app.admin.company-catalogs.update-success'));
+
+        return to_route('admin.b2b.company_catalogs.index');
+    }
+
+    /**
+     * Remove the specified company catalog.
+     */
+    public function destroy($id)
+    {
+        abort_unless(Customer::repCanEditCatalog((int) $id), 403, trans('b2b::app.admin.company-catalogs.not-owner'));
+
+        $catalog = $this->companyCatalogRepository->findOrFail($id);
+
+        try {
+            $this->companyCatalogHelper->cleanup($catalog);
+
+            $this->companyCatalogRepository->delete($id);
+
+            return response()->json([
+                'message' => trans('b2b::app.admin.company-catalogs.delete-success'),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => trans('b2b::app.admin.company-catalogs.delete-failed'),
+            ], 500);
+        }
     }
 
     /**
@@ -106,32 +174,13 @@ class CompanyCatalogController extends Controller
     {
         $query = trim((string) request('query'));
 
-        $sort = request('sort') === 'email' ? 'company_flat.email' : 'company_flat.business_name';
+        $sort = request('sort') === 'email' ? 'b2b_company_flat.email' : 'b2b_company_flat.business_name';
 
         $order = request('order') === 'desc' ? 'desc' : 'asc';
 
         $repId = Customer::salesRepScopeId();
 
-        $companies = DB::table('company_flat')
-            ->leftJoin('customers', 'company_flat.customer_id', '=', 'customers.id')
-            ->leftJoin('company_catalogs', 'customers.company_catalog_id', '=', 'company_catalogs.id')
-            ->where('customers.type', 'company')
-            ->where('company_flat.locale', app()->getLocale())
-            ->when($repId, fn ($builder) => $builder->where('customers.sales_rep_id', $repId))
-            ->when($query !== '', function ($builder) use ($query) {
-                $builder->where(function ($sub) use ($query) {
-                    $sub->where('company_flat.business_name', 'like', '%'.$query.'%')
-                        ->orWhere('company_flat.email', 'like', '%'.$query.'%');
-                });
-            })
-            ->select(
-                'company_flat.customer_id as id',
-                'company_flat.business_name',
-                'company_flat.email',
-                'company_catalogs.name as current_catalog'
-            )
-            ->orderBy($sort, $order)
-            ->paginate(10);
+        $companies = $this->companyFlatRepository->searchCompaniesForPicker($query, $repId, $sort, $order);
 
         return response()->json([
             'data' => collect($companies->items())->map(fn ($company) => [
@@ -193,68 +242,34 @@ class CompanyCatalogController extends Controller
     }
 
     /**
-     * Update the specified company catalog.
+     * Return a single product shaped as a catalog node (type + priceable leaves with
+     * base prices, no overrides) so the assign-products picker can render its rows.
      */
-    public function update($id)
+    public function productChildren($id)
     {
-        abort_unless(Customer::repCanEditCatalog((int) $id), 403, trans('b2b::app.admin.company-catalogs.not-owner'));
+        $product = app(ProductRepository::class)->find($id);
 
-        $this->validateRelations();
-
-        $catalog = $this->companyCatalogRepository->findOrFail($id);
-
-        // The edit screen owns products, prices and companies; the general settings
-        // (name/description/status) are managed separately via the settings modal.
-        $this->persistRelations($catalog);
-
-        session()->flash('success', trans('b2b::app.admin.company-catalogs.update-success'));
-
-        return to_route('admin.b2b.company_catalogs.index');
-    }
-
-    /**
-     * Update only the catalog's general settings (name, description, status) — posted from
-     * the settings modal on the listing.
-     */
-    public function updateSettings($id)
-    {
-        abort_unless(Customer::repCanEditCatalog((int) $id), 403, trans('b2b::app.admin.company-catalogs.not-owner'));
-
-        $this->validateSettings();
-
-        $this->companyCatalogRepository->update([
-            'name' => request('name'),
-            'description' => request('description'),
-            'status' => request('status') !== null ? (int) (bool) request('status') : 1,
-        ], $id);
-
-        session()->flash('success', trans('b2b::app.admin.company-catalogs.update-success'));
-
-        return to_route('admin.b2b.company_catalogs.index');
-    }
-
-    /**
-     * Remove the specified company catalog.
-     */
-    public function destroy($id)
-    {
-        abort_unless(Customer::repCanEditCatalog((int) $id), 403, trans('b2b::app.admin.company-catalogs.not-owner'));
-
-        $catalog = $this->companyCatalogRepository->findOrFail($id);
-
-        try {
-            $this->companyCatalogHelper->cleanup($catalog);
-
-            $this->companyCatalogRepository->delete($id);
-
-            return response()->json([
-                'message' => trans('b2b::app.admin.company-catalogs.delete-success'),
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => trans('b2b::app.admin.company-catalogs.delete-failed'),
-            ], 500);
+        if (! $product) {
+            return response()->json(['data' => null], 404);
         }
+
+        return response()->json(['data' => $this->buildProductNode($product, collect())]);
+    }
+
+    /**
+     * Category tree (with rolled-up product counts) for the save-confirmation dialog,
+     * computed from the products currently assigned in the form.
+     */
+    public function categoryPreview()
+    {
+        $this->validate(request(), [
+            'products' => 'array',
+            'products.*' => 'integer',
+        ]);
+
+        return response()->json([
+            'tree' => $this->companyCatalogHelper->categoryTreeForProducts(request('products', [])),
+        ]);
     }
 
     /**
@@ -313,22 +328,6 @@ class CompanyCatalogController extends Controller
     }
 
     /**
-     * Category tree (with rolled-up product counts) for the save-confirmation dialog,
-     * computed from the products currently assigned in the form.
-     */
-    public function categoryPreview()
-    {
-        $this->validate(request(), [
-            'products' => 'array',
-            'products.*' => 'integer',
-        ]);
-
-        return response()->json([
-            'tree' => $this->companyCatalogHelper->categoryTreeForProducts(request('products', [])),
-        ]);
-    }
-
-    /**
      * Build the product tree (each assigned product + its priceable leaves and their
      * catalog prices) for the edit screen.
      */
@@ -337,10 +336,9 @@ class CompanyCatalogController extends Controller
         $priceRows = collect();
 
         if ($catalog->customer_group_id) {
-            $priceRows = DB::table('product_customer_group_prices')
-                ->where('customer_group_id', $catalog->customer_group_id)
-                ->orderBy('qty')
-                ->get()
+            $priceRows = $this->productCustomerGroupPriceRepository
+                ->findWhere(['customer_group_id' => $catalog->customer_group_id])
+                ->sortBy('qty')
                 ->groupBy('product_id');
         }
 
@@ -408,20 +406,5 @@ class CompanyCatalogController extends Controller
             'is_composite' => in_array($product->type, ['configurable', 'grouped', 'bundle']),
             'leaves' => $leaves,
         ];
-    }
-
-    /**
-     * Return a single product shaped as a catalog node (type + priceable leaves with
-     * base prices, no overrides) so the assign-products picker can render its rows.
-     */
-    public function productChildren($id)
-    {
-        $product = app(ProductRepository::class)->find($id);
-
-        if (! $product) {
-            return response()->json(['data' => null], 404);
-        }
-
-        return response()->json(['data' => $this->buildProductNode($product, collect())]);
     }
 }

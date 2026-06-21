@@ -26,11 +26,11 @@ class QuoteController extends Controller
      * @return void
      */
     public function __construct(
-        protected CustomerRepository $customerRepository,
-        protected AdminRepository $adminRepository,
         protected CustomerQuoteRepository $customerQuoteRepository,
         protected CustomerQuoteMessageRepository $customerQuoteMessageRepository,
         protected CustomerQuoteAttachmentRepository $customerQuoteAttachmentRepository,
+        protected CustomerRepository $customerRepository,
+        protected AdminRepository $adminRepository,
     ) {}
 
     /**
@@ -82,7 +82,9 @@ class QuoteController extends Controller
 
         Event::dispatch('b2b.quote.create.after', $quote);
 
-        // Notify the sales rep of a new quote request (drafts notify on submit instead).
+        /**
+         * Notify the sales rep of a new quote request (drafts notify on submit instead).
+         */
         if ($quote->status !== CustomerQuote::STATUS_DRAFT) {
             Notifier::quote($quote, 'requested', 'admin');
         }
@@ -162,33 +164,6 @@ class QuoteController extends Controller
     }
 
     /**
-     * AJAX endpoint for loading messages with pagination and filters
-     *
-     * @param  int  $id  Quote ID
-     * @return JsonResponse
-     */
-    public function getMessages($id, Request $request)
-    {
-        $quote = $this->customerQuoteRepository->findOrFail($id);
-
-        $query = $quote->messages()
-            ->with('quotations', 'quotations.item');
-
-        if ($request->get('has_quotations') === 'true') {
-            $query->has('quotations');
-        }
-
-        if ($request->get('user_type')) {
-            $query->where('user_type', $request->get('user_type'));
-        }
-
-        $messages = $query->orderBy('created_at', 'asc')
-            ->paginate(10);
-
-        return response()->json($messages);
-    }
-
-    /**
      * UpdateCart quote details.
      */
     public function updateCart($id)
@@ -240,7 +215,9 @@ class QuoteController extends Controller
             if ($canAccept) {
                 $quote->update(['status' => CustomerQuote::STATUS_ACCEPTED]);
 
-                // Notify the sales rep that the buyer accepted the offer.
+                /**
+                 * Notify the sales rep that the buyer accepted the offer.
+                 */
                 Notifier::quote($quote, 'accepted', 'admin');
             }
 
@@ -254,6 +231,77 @@ class QuoteController extends Controller
 
             return redirect()->back();
         }
+    }
+
+    /**
+     * Delete a quote (soft_delete).
+     */
+    public function deleteQuote(Request $request, $id)
+    {
+        $customerId = auth()->guard('customer')->user()->id;
+
+        try {
+            $request->validate([
+                'message' => 'required|string|max:1000',
+            ]);
+
+            $quote = $this->customerQuoteRepository->findOneWhere([
+                'id' => $id,
+                'customer_id' => $customerId,
+            ]);
+
+            if (! $quote) {
+                session()->flash('error', trans('b2b::app.shop.customers.account.quotes.view.un-authorized-quote'));
+
+                return redirect()->back();
+            }
+
+            $quote->soft_deleted = 1;
+
+            $quote->save();
+
+            $quote->messages()->create([
+                'message' => $request->message,
+                'user_type' => 'customer',
+                'user_id' => $customerId,
+                'created_at' => now(),
+            ]);
+
+            return redirect()->route('shop.customers.account.quotes.index')
+                ->with('success', trans('b2b::app.shop.customers.account.quotes.view.quote-deleted'));
+
+        } catch (\Exception $e) {
+            session()->flash('error', $e->getMessage());
+
+            return redirect()->back();
+        }
+    }
+
+    /**
+     * AJAX endpoint for loading messages with pagination and filters.
+     *
+     * @param  int  $id  Quote ID
+     * @return JsonResponse
+     */
+    public function getMessages($id, Request $request)
+    {
+        $quote = $this->customerQuoteRepository->findOrFail($id);
+
+        $query = $quote->messages()
+            ->with('quotations', 'quotations.item');
+
+        if ($request->get('has_quotations') === 'true') {
+            $query->has('quotations');
+        }
+
+        if ($request->get('user_type')) {
+            $query->where('user_type', $request->get('user_type'));
+        }
+
+        $messages = $query->orderBy('created_at', 'asc')
+            ->paginate(10);
+
+        return response()->json($messages);
     }
 
     /**
@@ -348,7 +396,9 @@ class QuoteController extends Controller
                     $quote->update(['status' => CustomerQuote::STATUS_OPEN]);
                 }
 
-                // Notify the sales rep that the buyer submitted their draft request.
+                /**
+                 * Notify the sales rep that the buyer submitted their draft request.
+                 */
                 Notifier::quote($quote->refresh(), 'requested', 'admin');
 
                 return redirect()
@@ -382,56 +432,14 @@ class QuoteController extends Controller
                 $quote->update(['status' => CustomerQuote::STATUS_NEGOTIATION]);
             }
 
-            // Notify the sales rep that the buyer sent a counter-offer.
+            /**
+             * Notify the sales rep that the buyer sent a counter-offer.
+             */
             Notifier::quote($quote->refresh(), 'countered', 'admin');
 
             return redirect()
                 ->route('shop.customers.account.quotes.view', $id)
                 ->with('success', trans('b2b::app.shop.customers.account.quotes.view.quote-submitted'));
-
-        } catch (\Exception $e) {
-            session()->flash('error', $e->getMessage());
-
-            return redirect()->back();
-        }
-    }
-
-    /**
-     * Delete a quote (soft_delete).
-     */
-    public function deleteQuote(Request $request, $id)
-    {
-        $customerId = auth()->guard('customer')->user()->id;
-
-        try {
-            $request->validate([
-                'message' => 'required|string|max:1000',
-            ]);
-
-            $quote = $this->customerQuoteRepository->findOneWhere([
-                'id' => $id,
-                'customer_id' => $customerId,
-            ]);
-
-            if (! $quote) {
-                session()->flash('error', trans('b2b::app.shop.customers.account.quotes.view.un-authorized-quote'));
-
-                return redirect()->back();
-            }
-
-            $quote->soft_deleted = 1;
-
-            $quote->save();
-
-            $quote->messages()->create([
-                'message' => $request->message,
-                'user_type' => 'customer',
-                'user_id' => $customerId,
-                'created_at' => now(),
-            ]);
-
-            return redirect()->route('shop.customers.account.quotes.index')
-                ->with('success', trans('b2b::app.shop.customers.account.quotes.view.quote-deleted'));
 
         } catch (\Exception $e) {
             session()->flash('error', $e->getMessage());
@@ -489,7 +497,9 @@ class QuoteController extends Controller
                 'created_at' => now(),
             ]);
 
-            // Notify the sales rep that the buyer posted a new message.
+            /**
+             * Notify the sales rep that the buyer posted a new message.
+             */
             Notifier::quote($quote, 'message', 'admin');
 
             if ($request->expectsJson()) {
@@ -557,7 +567,9 @@ class QuoteController extends Controller
                 'created_at' => now(),
             ]);
 
-            // Notify the sales rep that the buyer rejected the quote.
+            /**
+             * Notify the sales rep that the buyer rejected the quote.
+             */
             Notifier::quote($quote, 'rejected', 'admin');
 
             return redirect()

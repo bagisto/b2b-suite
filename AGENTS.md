@@ -176,11 +176,11 @@ Bagisto's existing customer-group price index instead of touching the core index
 
 **Core idea — each catalog is backed by a hidden customer group.**
 
-- `CompanyCatalog` (`company_catalogs`) holds `name`, `description`, `status`, and a
+- `CompanyCatalog` (`b2b_company_catalogs`) holds `name`, `description`, `status`, and a
   `customer_group_id` pointing at a dedicated group (`code = company_catalog_<id>`,
   `is_user_defined = 0`) created on first save by `Helpers/CompanyCatalog::provisionGroup()`.
-- `company_catalog_products` is the visibility **allowlist** (catalog ↔ product).
-- `company_catalog_categories` is a **derived** category allowlist (catalog ↔ category),
+- `b2b_company_catalog_products` is the visibility **allowlist** (catalog ↔ product).
+- `b2b_company_catalog_categories` is a **derived** category allowlist (catalog ↔ category),
   recomputed on every save (`deriveCategories()`) from the assigned products' categories plus
   their NestedSet ancestors — it drives storefront category visibility.
 - `customers.company_catalog_id` assigns a **company** (a `customers` row with
@@ -249,7 +249,7 @@ products, with a type filter); a composite's priceable children/tiers come from
 `admin.b2b.company_catalogs.product_children`, and the save dialog previews the derived
 category tree via `admin.b2b.company_catalogs.category_preview`. The company picker uses
 `admin.b2b.company_catalogs.companies`, which searches/returns the **company name**
-(`company_flat.business_name`), not the contact person's name. ACL keys live under
+(`b2b_company_flat.business_name`), not the contact person's name. ACL keys live under
 `b2b.company-catalogs.*`; the menu entry is in `Config/admin/menu.php`.
 
 **Not implemented (v1):** a "public/default" catalog that restricts *all* customers
@@ -280,8 +280,80 @@ theme bundles, refresh `publishables/public/` with `npm run publishables` and re
 
 ## Conventions
 
-- **Repositories** for all DB access (interfaces in `Contracts/`, never query models directly).
-- **Proxies** when type-hinting models across packages.
+### Data access
+
+- **Repositories for ALL database access** — no `DB` facade and no direct
+  model / `Proxy::modelClass()::query()` calls in controllers, helpers, listeners or
+  datagrids. Inject the repository and use `find` / `findWhere` / `findWhereIn` /
+  `findOneByField` / `create` / `update` / `deleteWhere`. For queries Prettus can't express
+  (joins, `lockForUpdate`, search+paginate), add a method to the repository — use
+  `$this->model->…` *inside the repository* rather than reaching for the facade in the caller.
+  Mass updates the repo can't do in one statement are looped via `$repo->update($attrs, $id)`.
+- **Allowed facades** (not data access, no repository equivalent): `DB::transaction()` for
+  atomicity, `Schema::` for table/column metadata.
+- **Proxies** are only for cross-package model type-hints — relationship definitions in models
+  (`belongsTo(CustomerProxy::modelClass())`). Never use a proxy to run a query.
+
+### Tables
+
+- Every package-owned table is prefixed **`b2b_`** (e.g. `b2b_company_catalogs`). Core tables
+  (`customers`, `cart`, …) keep their names — the package only adds columns to them.
+- Prefix the table **everywhere** it appears: model `$table`, FK `->on()`, `DB::raw` SQL, and
+  validation rules (`exists:b2b_…`, `unique:b2b_…`). Quote-anchored find/replace misses
+  table names that sit mid-string in raw SQL / rules — grep for bare names after a rename.
+- Every concrete model declares an explicit `protected $table = 'b2b_…'`. A model that maps a
+  core table (e.g. `Customer` extends the core customer) declares none and inherits it.
+
+### Class member ordering
+
+- **Constructors** — repository dependencies first (primary-entity repo first, then
+  supporting repos), then helpers / managers / services.
+- **Controllers** — RESTful lifecycle (`index, create, store, show/view, edit, update,
+  <update-variants>, destroy`) → mass actions (`mass*`) → other public / AJAX endpoints →
+  `protected`/`private` helpers last.
+- **Models** (Laravel-standard) — **constants** (each with its own docblock) → **Laravel
+  properties** (`$table, $fillable/$guarded, $casts, $timestamps`) → **extra / trait
+  properties** (`$translatedAttributes, $statusLabel, …`) → **methods** (relationships →
+  accessors/mutators → Eloquent overrides → instance helpers → `static` helpers). All
+  properties and constants come before any method.
+- **Listeners / helpers** — public event-handlers / API first, `protected` helpers last.
+
+### Docblocks & comments
+
+- Every method, property and constant has a docblock with a one-line description ending in
+  proper punctuation (a period). `{@inheritdoc}` is fine as-is.
+- Use `/** … */` block comments — not `//` line comments — for inline explanations.
+
+### Events
+
+- CRUD mutations dispatch symmetric `*.before` / `*.after` events; keep `destroy` /
+  `massDestroy` (and shop/admin siblings) consistent with one another.
+
+### Migrations
+
+- One `create_*` migration per table (no separate `add_*_column` migrations for package
+  tables — fold new columns into the create). Column additions to **core** tables stay as
+  `add_columns_to_<core table>` and run last. Keep a logical, dependency-safe, domain-grouped
+  order with `b2b_`-prefixed filenames and table names.
+- Give FKs explicit short index names when the auto name
+  (`<db-prefix><table>_<col>_foreign`) would exceed MySQL's 64-char limit, and pass the
+  explicit `table:` to `foreignId()->constrained()` (it infers the wrong table after the
+  `b2b_` rename).
+
+### Seeders
+
+- Clean with `delete()` (which respects `ON DELETE CASCADE`), **not** `truncate()`, so no
+  `FOREIGN_KEY_CHECKS` toggling is needed. Order seeders parent-first; each seeder cleans then
+  inserts and is idempotent. The suite is enabled by default on install
+  (`CoreConfigTableSeeder` sets `b2b.general.settings.active`).
+
+### Dead code
+
+- No redundant overrides that only call `parent::…`, and no unused methods / relationships —
+  remove them (verify with a repo-wide grep first).
+
+### General
+
 - **Translations:** add new keys for **all** locales (currently only `en/app.php` exists)
   and verify with `php artisan bagisto:translations:check`. Keep the lang array nesting
   correct — e.g. shop sign-in keys live at `app.shop.sign-in.*` (a direct child of `shop`).

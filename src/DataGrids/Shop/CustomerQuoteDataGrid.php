@@ -23,37 +23,37 @@ class CustomerQuoteDataGrid extends DataGrid
         $tablePrefix = DB::getTablePrefix();
         $customer = auth()->guard('customer')->user();
 
-        $companyId = DB::table('customer_companies')
+        $companyId = DB::table('b2b_customer_companies')
             ->where('customer_id', $customer->id)
             ->value('company_id') ?? $customer->id;
 
-        $queryBuilder = DB::table('customer_quotes')
+        $queryBuilder = DB::table('b2b_customer_quotes')
             ->distinct()
-            ->leftJoin('customers as company', 'customer_quotes.company_id', '=', 'company.id')
-            ->leftJoin('customers as customer', 'customer_quotes.customer_id', '=', 'customer.id')
+            ->leftJoin('customers as company', 'b2b_customer_quotes.company_id', '=', 'company.id')
+            ->leftJoin('customers as customer', 'b2b_customer_quotes.customer_id', '=', 'customer.id')
             ->addSelect(
-                'customer_quotes.id as quote_id',
-                'customer_quotes.quotation_number',
-                'customer_quotes.name',
+                'b2b_customer_quotes.id as quote_id',
+                'b2b_customer_quotes.quotation_number',
+                'b2b_customer_quotes.name',
                 'company.email as company_email',
-                'customer_quotes.base_total',
-                'customer_quotes.negotiated_total',
-                'customer_quotes.state',
-                'customer_quotes.status',
-                'customer_quotes.order_id',
-                'customer_quotes.order_date',
-                'customer_quotes.expected_arrival_date',
-                'customer_quotes.expiration_date',
-                'customer_quotes.created_at',
-                'customer_quotes.updated_at'
+                'b2b_customer_quotes.base_total',
+                'b2b_customer_quotes.negotiated_total',
+                'b2b_customer_quotes.state',
+                'b2b_customer_quotes.status',
+                'b2b_customer_quotes.order_id',
+                'b2b_customer_quotes.order_date',
+                'b2b_customer_quotes.expected_arrival_date',
+                'b2b_customer_quotes.expiration_date',
+                'b2b_customer_quotes.created_at',
+                'b2b_customer_quotes.updated_at'
             )
-            ->addSelect(DB::raw('COALESCE(NULLIF(TRIM(CONCAT('.$tablePrefix.'customer.first_name, " ", '.$tablePrefix.'customer.last_name)), ""), '.$tablePrefix.'customer_quotes.customer_name) as customer_name'))
-            ->where('customer_quotes.soft_deleted', 0)
-            ->whereIn('customer_quotes.state', [
+            ->addSelect(DB::raw('COALESCE(NULLIF(TRIM(CONCAT('.$tablePrefix.'customer.first_name, " ", '.$tablePrefix.'customer.last_name)), ""), '.$tablePrefix.'b2b_customer_quotes.customer_name) as customer_name'))
+            ->where('b2b_customer_quotes.soft_deleted', 0)
+            ->whereIn('b2b_customer_quotes.state', [
                 CustomerQuote::STATE_QUOTATION,
                 CustomerQuote::STATE_PURCHASE_ORDER,
             ])
-            ->whereIn('customer_quotes.status', [
+            ->whereIn('b2b_customer_quotes.status', [
                 CustomerQuote::STATUS_DRAFT,
                 CustomerQuote::STATUS_OPEN,
                 CustomerQuote::STATUS_NEGOTIATION,
@@ -62,16 +62,16 @@ class CustomerQuoteDataGrid extends DataGrid
                 CustomerQuote::STATUS_ORDERED,
                 CustomerQuote::STATUS_COMPLETED,
             ])
-            ->where('customer_quotes.company_id', $companyId);
+            ->where('b2b_customer_quotes.company_id', $companyId);
 
-        $this->addFilter('quotation_number', 'customer_quotes.quotation_number');
-        $this->addFilter('name', 'customer_quotes.name');
-        $this->addFilter('state', 'customer_quotes.state');
-        $this->addFilter('status', 'customer_quotes.status');
-        $this->addFilter('base_total', 'customer_quotes.base_total');
-        $this->addFilter('negotiated_total', 'customer_quotes.negotiated_total');
-        $this->addFilter('customer_name', DB::raw('COALESCE(NULLIF(TRIM(CONCAT('.$tablePrefix.'customer.first_name, " ", '.$tablePrefix.'customer.last_name)), ""), '.$tablePrefix.'customer_quotes.customer_name)'));
-        $this->addFilter('created_at', 'customer_quotes.created_at');
+        $this->addFilter('quotation_number', 'b2b_customer_quotes.quotation_number');
+        $this->addFilter('name', 'b2b_customer_quotes.name');
+        $this->addFilter('state', 'b2b_customer_quotes.state');
+        $this->addFilter('status', 'b2b_customer_quotes.status');
+        $this->addFilter('base_total', 'b2b_customer_quotes.base_total');
+        $this->addFilter('negotiated_total', 'b2b_customer_quotes.negotiated_total');
+        $this->addFilter('customer_name', DB::raw('COALESCE(NULLIF(TRIM(CONCAT('.$tablePrefix.'customer.first_name, " ", '.$tablePrefix.'customer.last_name)), ""), '.$tablePrefix.'b2b_customer_quotes.customer_name)'));
+        $this->addFilter('created_at', 'b2b_customer_quotes.created_at');
 
         return $queryBuilder;
     }

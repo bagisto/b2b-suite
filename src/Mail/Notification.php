@@ -13,12 +13,12 @@ class Notification extends Mailable
      * Generic, queued B2B notification. Recipient, subject, template and the (optional)
      * related model are resolved by the Notifier so every B2B email shares one mailable.
      *
-     * @param  string  $toEmail     Recipient address.
-     * @param  string  $toName      Recipient display name.
-     * @param  string  $subjectLine Already-translated subject line.
-     * @param  string  $template    Blade view, e.g. "b2b::emails.quote".
-     * @param  array   $payload     View data; may include a "type" discriminator and scalars.
-     * @param  ?Model  $model       Related record (quote, company, user) — serialized by id.
+     * @param  string  $toEmail  Recipient address.
+     * @param  string  $toName  Recipient display name.
+     * @param  string  $subjectLine  Already-translated subject line.
+     * @param  string  $template  Blade view, e.g. "b2b::emails.quote".
+     * @param  array  $payload  View data; may include a "type" discriminator and scalars.
+     * @param  ?Model  $model  Related record (quote, company, user) — serialized by id.
      */
     public function __construct(
         public string $toEmail,

@@ -15,14 +15,13 @@ class B2BSuite
     public function __construct(protected ProductRepository $productRepository) {}
 
     /**
-     * Process and add products to cart
+     * Process and add products to cart.
      *
      * @return bool
      */
     public function addProductsToCart($data)
     {
         foreach ($data as $item) {
-
             $product = $this->productRepository->with([
                 'parent',
                 'variants',
@@ -48,6 +47,11 @@ class B2BSuite
         }
     }
 
+    /**
+     * Prepare the buy-request cart data for the given product.
+     *
+     * @return array
+     */
     public function prepareCartData($product, $item)
     {
         switch ($product->type) {
@@ -109,7 +113,7 @@ class B2BSuite
     }
 
     /**
-     * Get IDs of all downloadable links for the product
+     * Get IDs of all downloadable links for the product.
      */
     public function getDownloadableLinks($product)
     {
@@ -125,7 +129,7 @@ class B2BSuite
     }
 
     /**
-     * Get the first available variant of a configurable product
+     * Get the first available variant of a configurable product.
      */
     public function getVariant($product)
     {
@@ -145,7 +149,7 @@ class B2BSuite
     }
 
     /**
-     * Get super attributes for a specific variant
+     * Get super attributes for a specific variant.
      */
     public function getSuperAttributesForVariant($product, $variant)
     {
@@ -167,7 +171,7 @@ class B2BSuite
     }
 
     /**
-     * Get bundle options with default selections
+     * Get bundle options with default selections.
      */
     public function getBundleOptions($product)
     {
@@ -195,27 +199,7 @@ class B2BSuite
     }
 
     /**
-     * Get super attributes with
-     */
-    public function getSuperAttributes($product)
-    {
-        $superAttributes = [];
-
-        if (! $product->super_attributes || $product->super_attributes->isEmpty()) {
-            return $superAttributes;
-        }
-
-        foreach ($product->super_attributes as $attribute) {
-            if ($attribute->options && $attribute->options->isNotEmpty()) {
-                $superAttributes[$attribute->id] = $attribute->options->first()->id;
-            }
-        }
-
-        return $superAttributes;
-    }
-
-    /**
-     * Get quantities for grouped product's associated products
+     * Get quantities for grouped product's associated products.
      */
     public function getGroupedProductQuantities($product, $item)
     {

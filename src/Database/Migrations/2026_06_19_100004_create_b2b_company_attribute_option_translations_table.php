@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('company_attribute_option_translations', function (Blueprint $table) {
+        Schema::create('b2b_company_attribute_option_translations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_attribute_option_id')
-                ->constrained(indexName: 'company_attribute_option_id_foreign')
+                ->constrained(table: 'b2b_company_attribute_options', indexName: 'company_attribute_option_id_foreign')
                 ->cascadeOnDelete();
             $table->string('locale');
             $table->text('label')->nullable();
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('company_attribute_option_translations');
+        Schema::dropIfExists('b2b_company_attribute_option_translations');
     }
 };

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('company_flat', function (Blueprint $table) {
+        Schema::create('b2b_company_flat', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('customer_id')->unsigned();
             $table->string('locale')->nullable();
@@ -54,6 +54,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('company_flat');
+        Schema::dropIfExists('b2b_company_flat');
     }
 };

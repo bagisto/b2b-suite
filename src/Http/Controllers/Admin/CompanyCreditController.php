@@ -2,13 +2,13 @@
 
 namespace Webkul\B2BSuite\Http\Controllers\Admin;
 
-use Illuminate\Support\Facades\DB;
 use Webkul\Admin\Http\Controllers\Controller;
 use Webkul\B2BSuite\DataGrids\Admin\CompanyCreditDataGrid;
 use Webkul\B2BSuite\DataGrids\Admin\CompanyCreditTransactionDataGrid;
 use Webkul\B2BSuite\Helpers\CreditManager;
 use Webkul\B2BSuite\Models\Customer;
 use Webkul\B2BSuite\Notifications\Notifier;
+use Webkul\B2BSuite\Repositories\CompanyFlatRepository;
 use Webkul\Customer\Repositories\CustomerRepository;
 
 class CompanyCreditController extends Controller
@@ -17,8 +17,9 @@ class CompanyCreditController extends Controller
      * Create a new controller instance.
      */
     public function __construct(
-        protected CreditManager $creditManager,
         protected CustomerRepository $customerRepository,
+        protected CompanyFlatRepository $companyFlatRepository,
+        protected CreditManager $creditManager,
     ) {}
 
     /**
@@ -53,10 +54,7 @@ class CompanyCreditController extends Controller
             return $datagrid->process();
         }
 
-        $companyFlat = DB::table('company_flat')
-            ->where('customer_id', $company->id)
-            ->where('locale', app()->getLocale())
-            ->first();
+        $companyFlat = $this->companyFlatRepository->findByCustomerAndLocale($company->id, app()->getLocale());
 
         return view('b2b::admin.companies.credit.index', compact('company', 'credit', 'companyFlat'));
     }
@@ -86,7 +84,9 @@ class CompanyCreditController extends Controller
             'comment' => $data['comment'] ?? null,
         ], $this->actor());
 
-        // Notify the buyer that their credit limit changed.
+        /**
+         * Notify the buyer that their credit limit changed.
+         */
         Notifier::credit($company, 'updated', ['amount' => (float) $data['credit_limit']]);
 
         session()->flash('success', trans('b2b::app.admin.companies.credit.limit-updated'));
@@ -120,7 +120,9 @@ class CompanyCreditController extends Controller
             'comment' => $data['comment'] ?? null,
         ], $this->actor());
 
-        // Notify the buyer that a payment was recorded against their balance.
+        /**
+         * Notify the buyer that a payment was recorded against their balance.
+         */
         Notifier::credit($company, 'reimbursed', ['amount' => (float) $data['amount']]);
 
         session()->flash('success', trans('b2b::app.admin.companies.credit.reimbursed'));

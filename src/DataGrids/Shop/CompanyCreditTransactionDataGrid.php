@@ -21,35 +21,35 @@ class CompanyCreditTransactionDataGrid extends DataGrid
     {
         $customer = auth()->guard('customer')->user();
 
-        $companyId = DB::table('customer_companies')
+        $companyId = DB::table('b2b_customer_companies')
             ->where('customer_id', $customer->id)
             ->value('company_id') ?? $customer->id;
 
-        $creditId = DB::table('company_credits')
+        $creditId = DB::table('b2b_company_credits')
             ->where('company_id', $companyId)
             ->value('id');
 
-        $queryBuilder = DB::table('company_credit_transactions')
-            ->leftJoin('orders', 'company_credit_transactions.order_id', '=', 'orders.id')
-            ->where('company_credit_transactions.company_credit_id', $creditId)
+        $queryBuilder = DB::table('b2b_company_credit_transactions')
+            ->leftJoin('orders', 'b2b_company_credit_transactions.order_id', '=', 'orders.id')
+            ->where('b2b_company_credit_transactions.company_credit_id', $creditId)
             ->select(
-                'company_credit_transactions.id',
-                'company_credit_transactions.operation',
+                'b2b_company_credit_transactions.id',
+                'b2b_company_credit_transactions.operation',
                 // Raw copy: the operation column's closure overwrites `operation` with badge
                 // HTML, so later closures read this untouched value.
-                'company_credit_transactions.operation as operation_raw',
-                'company_credit_transactions.amount',
-                'company_credit_transactions.available_credit_after',
-                'company_credit_transactions.order_id',
-                'company_credit_transactions.reference',
-                'company_credit_transactions.comment',
-                'company_credit_transactions.created_at',
+                'b2b_company_credit_transactions.operation as operation_raw',
+                'b2b_company_credit_transactions.amount',
+                'b2b_company_credit_transactions.available_credit_after',
+                'b2b_company_credit_transactions.order_id',
+                'b2b_company_credit_transactions.reference',
+                'b2b_company_credit_transactions.comment',
+                'b2b_company_credit_transactions.created_at',
                 'orders.increment_id as order_increment_id'
             );
 
-        $this->addFilter('operation', 'company_credit_transactions.operation');
-        $this->addFilter('amount', 'company_credit_transactions.amount');
-        $this->addFilter('created_at', 'company_credit_transactions.created_at');
+        $this->addFilter('operation', 'b2b_company_credit_transactions.operation');
+        $this->addFilter('amount', 'b2b_company_credit_transactions.amount');
+        $this->addFilter('created_at', 'b2b_company_credit_transactions.created_at');
 
         return $queryBuilder;
     }
@@ -61,7 +61,7 @@ class CompanyCreditTransactionDataGrid extends DataGrid
     {
         $this->addColumn([
             'index' => 'created_at',
-            'label' => trans('b2b::app.shop.companies.account.credit.date'),
+            'label' => trans('b2b::app.shop.customers.account.company-credit.date'),
             'type' => 'datetime',
             'searchable' => false,
             'filterable' => true,
@@ -72,7 +72,7 @@ class CompanyCreditTransactionDataGrid extends DataGrid
 
         $this->addColumn([
             'index' => 'operation',
-            'label' => trans('b2b::app.shop.companies.account.credit.operation'),
+            'label' => trans('b2b::app.shop.customers.account.company-credit.operation'),
             'type' => 'string',
             'searchable' => false,
             'filterable' => true,
@@ -80,12 +80,12 @@ class CompanyCreditTransactionDataGrid extends DataGrid
             'filterable_options' => collect([
                 'allocated', 'purchased', 'reimbursed', 'refunded', 'reverted',
             ])->map(fn ($operation) => [
-                'label' => trans('b2b::app.shop.companies.account.credit.operations.'.$operation),
+                'label' => trans('b2b::app.shop.customers.account.company-credit.operations.'.$operation),
                 'value' => $operation,
             ])->toArray(),
             'sortable' => true,
             'closure' => function ($row) {
-                $label = trans('b2b::app.shop.companies.account.credit.operations.'.$row->operation);
+                $label = trans('b2b::app.shop.customers.account.company-credit.operations.'.$row->operation);
 
                 $class = match ($row->operation) {
                     'purchased' => 'label-pending',
@@ -99,7 +99,7 @@ class CompanyCreditTransactionDataGrid extends DataGrid
 
         $this->addColumn([
             'index' => 'amount',
-            'label' => trans('b2b::app.shop.companies.account.credit.amount'),
+            'label' => trans('b2b::app.shop.customers.account.company-credit.amount'),
             'type' => 'decimal',
             'searchable' => false,
             'filterable' => true,
@@ -121,7 +121,7 @@ class CompanyCreditTransactionDataGrid extends DataGrid
 
         $this->addColumn([
             'index' => 'available_credit_after',
-            'label' => trans('b2b::app.shop.companies.account.credit.balance'),
+            'label' => trans('b2b::app.shop.customers.account.company-credit.balance'),
             'type' => 'decimal',
             'searchable' => false,
             'filterable' => false,
@@ -131,7 +131,7 @@ class CompanyCreditTransactionDataGrid extends DataGrid
 
         $this->addColumn([
             'index' => 'details',
-            'label' => trans('b2b::app.shop.companies.account.credit.details'),
+            'label' => trans('b2b::app.shop.customers.account.company-credit.details'),
             'type' => 'string',
             'searchable' => false,
             'filterable' => false,
@@ -141,7 +141,7 @@ class CompanyCreditTransactionDataGrid extends DataGrid
 
                 if ($row->order_id) {
                     $parts[] = '<a href="'.route('shop.customers.account.orders.view', $row->order_id).'" class="text-blue-600 hover:underline">'
-                        .trans('b2b::app.shop.companies.account.credit.order').' #'.($row->order_increment_id ?? $row->order_id).'</a>';
+                        .trans('b2b::app.shop.customers.account.company-credit.order').' #'.($row->order_increment_id ?? $row->order_id).'</a>';
                 }
 
                 if ($row->reference) {
@@ -155,13 +155,5 @@ class CompanyCreditTransactionDataGrid extends DataGrid
                 return $parts ? implode('<br>', $parts) : '<span class="text-zinc-400">—</span>';
             },
         ]);
-    }
-
-    /**
-     * Prepare actions — read-only ledger, no row actions.
-     */
-    public function prepareActions()
-    {
-        //
     }
 }

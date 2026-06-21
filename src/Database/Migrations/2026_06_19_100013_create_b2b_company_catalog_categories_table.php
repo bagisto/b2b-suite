@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('company_catalog_categories', function (Blueprint $table) {
+        Schema::create('b2b_company_catalog_categories', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('company_catalog_id')->unsigned();
             $table->integer('category_id')->unsigned();
             $table->timestamps();
 
             $table->unique(['company_catalog_id', 'category_id'], 'company_catalog_categories_unique');
-            $table->foreign('company_catalog_id')->references('id')->on('company_catalogs')->onDelete('cascade');
+            $table->foreign('company_catalog_id')->references('id')->on('b2b_company_catalogs')->onDelete('cascade');
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
         });
     }
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('company_catalog_categories');
+        Schema::dropIfExists('b2b_company_catalog_categories');
     }
 };

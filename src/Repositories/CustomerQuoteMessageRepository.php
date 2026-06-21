@@ -8,7 +8,7 @@ use Webkul\Core\Eloquent\Repository;
 class CustomerQuoteMessageRepository extends Repository
 {
     /**
-     * Specify Model class name.
+     * Specify model class name.
      */
     public function model()
     {

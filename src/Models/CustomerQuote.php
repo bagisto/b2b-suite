@@ -12,8 +12,6 @@ use Webkul\User\Models\Admin;
 
 class CustomerQuote extends Model implements CustomerQuoteContract
 {
-    protected $table = 'customer_quotes';
-
     /**
      * Quotation state.
      */
@@ -64,6 +62,50 @@ class CustomerQuote extends Model implements CustomerQuoteContract
      */
     public const STATUS_COMPLETED = 'completed';
 
+    /**
+     * Admin badge palette: status => admin theme `label-*` class. Single source of truth
+     * for the admin datagrids (quote + purchase order) and the admin view pages, so the
+     * listing badge and the view-page badge always share a colour for a given status.
+     */
+    public const STATUS_LABEL_CLASSES = [
+        self::STATUS_DRAFT => 'label-info',
+        self::STATUS_OPEN => 'label-pending',
+        self::STATUS_NEGOTIATION => 'label-closed',
+        self::STATUS_ACCEPTED => 'label-processing',
+        self::STATUS_ORDERED => 'label-completed',
+        self::STATUS_COMPLETED => 'label-active',
+        self::STATUS_EXPIRED => 'label-canceled',
+        self::STATUS_REJECTED => 'label-canceled',
+    ];
+
+    /**
+     * Storefront badge palette: status => [text colour, background colour]. Inline-styled
+     * (purge-proof) single source of truth for the shop datagrids and the
+     * x-b2b::quote-status-badge component used on the shop view pages.
+     */
+    public const STATUS_COLORS = [
+        self::STATUS_DRAFT => ['#3f3f46', '#f4f4f5'],
+        self::STATUS_OPEN => ['#0044F2', '#e6edff'],
+        self::STATUS_NEGOTIATION => ['#9a6700', '#fff3da'],
+        self::STATUS_ACCEPTED => ['#1f7a33', '#e7f6ea'],
+        self::STATUS_ORDERED => ['#060c3b', '#e8eaf2'],
+        self::STATUS_COMPLETED => ['#1f7a33', '#e7f6ea'],
+        self::STATUS_EXPIRED => ['#52525b', '#f4f4f5'],
+        self::STATUS_REJECTED => ['#b42318', '#fde8e6'],
+    ];
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'b2b_customer_quotes';
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
     protected $fillable = [
         'quotation_number',
         'po_number',
@@ -107,36 +149,76 @@ class CustomerQuote extends Model implements CustomerQuoteContract
     ];
 
     /**
-     * Admin badge palette: status => admin theme `label-*` class. Single source of truth
-     * for the admin datagrids (quote + purchase order) and the admin view pages, so the
-     * listing badge and the view-page badge always share a colour for a given status.
+     * The company that owns the quote.
      */
-    public const STATUS_LABEL_CLASSES = [
-        self::STATUS_DRAFT => 'label-info',
-        self::STATUS_OPEN => 'label-pending',
-        self::STATUS_NEGOTIATION => 'label-closed',
-        self::STATUS_ACCEPTED => 'label-processing',
-        self::STATUS_ORDERED => 'label-completed',
-        self::STATUS_COMPLETED => 'label-active',
-        self::STATUS_EXPIRED => 'label-canceled',
-        self::STATUS_REJECTED => 'label-canceled',
-    ];
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Customer::class, 'company_id');
+    }
 
     /**
-     * Storefront badge palette: status => [text colour, background colour]. Inline-styled
-     * (purge-proof) single source of truth for the shop datagrids and the
-     * x-b2b::quote-status-badge component used on the shop view pages.
+     * The customer that created the quote.
      */
-    public const STATUS_COLORS = [
-        self::STATUS_DRAFT => ['#3f3f46', '#f4f4f5'],
-        self::STATUS_OPEN => ['#0044F2', '#e6edff'],
-        self::STATUS_NEGOTIATION => ['#9a6700', '#fff3da'],
-        self::STATUS_ACCEPTED => ['#1f7a33', '#e7f6ea'],
-        self::STATUS_ORDERED => ['#060c3b', '#e8eaf2'],
-        self::STATUS_COMPLETED => ['#1f7a33', '#e7f6ea'],
-        self::STATUS_EXPIRED => ['#52525b', '#f4f4f5'],
-        self::STATUS_REJECTED => ['#b42318', '#fde8e6'],
-    ];
+    public function customer(): BelongsTo
+    {
+        return $this->belongsTo(Customer::class, 'customer_id');
+    }
+
+    /**
+     * The admin agent handling the quote.
+     */
+    public function agent(): BelongsTo
+    {
+        return $this->belongsTo(Admin::class, 'agent_id');
+    }
+
+    /**
+     * The cart associated with the quote.
+     */
+    public function cart(): BelongsTo
+    {
+        return $this->belongsTo(Cart::class, 'cart_id');
+    }
+
+    /**
+     * The line items belonging to the quote.
+     */
+    public function items(): HasMany
+    {
+        return $this->hasMany(CustomerQuoteItem::class, 'customer_quote_id');
+    }
+
+    /**
+     * The negotiation quotations belonging to the quote.
+     */
+    public function quotations(): HasMany
+    {
+        return $this->hasMany(CustomerQuoteQuotation::class, 'quote_id');
+    }
+
+    /**
+     * The messages belonging to the quote.
+     */
+    public function messages(): HasMany
+    {
+        return $this->hasMany(CustomerQuoteMessage::class, 'quote_id');
+    }
+
+    /**
+     * The attachments belonging to the quote.
+     */
+    public function attachments(): HasMany
+    {
+        return $this->hasMany(CustomerQuoteAttachment::class, 'customer_quote_id');
+    }
+
+    /**
+     * Returns the status label from status code (for Eloquent attribute access).
+     */
+    public function getStatusLabelAttribute()
+    {
+        return self::$statusLabel;
+    }
 
     /**
      * Returns the status label array.
@@ -174,53 +256,5 @@ class CustomerQuote extends Model implements CustomerQuoteContract
 
         return '<span class="inline-flex items-center whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold"'
             .' style="color: '.$text.'; background-color: '.$bg.';">'.e($label).'</span>';
-    }
-
-    /**
-     * Returns the status label from status code (for Eloquent attribute access).
-     */
-    public function getStatusLabelAttribute()
-    {
-        return self::$statusLabel;
-    }
-
-    public function company(): BelongsTo
-    {
-        return $this->belongsTo(Customer::class, 'company_id');
-    }
-
-    public function customer(): BelongsTo
-    {
-        return $this->belongsTo(Customer::class, 'customer_id');
-    }
-
-    public function agent(): BelongsTo
-    {
-        return $this->belongsTo(Admin::class, 'agent_id');
-    }
-
-    public function cart(): BelongsTo
-    {
-        return $this->belongsTo(Cart::class, 'cart_id');
-    }
-
-    public function items(): HasMany
-    {
-        return $this->hasMany(CustomerQuoteItem::class, 'customer_quote_id');
-    }
-
-    public function quotations(): HasMany
-    {
-        return $this->hasMany(CustomerQuoteQuotation::class, 'quote_id');
-    }
-
-    public function messages(): HasMany
-    {
-        return $this->hasMany(CustomerQuoteMessage::class, 'quote_id');
-    }
-
-    public function attachments(): HasMany
-    {
-        return $this->hasMany(CustomerQuoteAttachment::class, 'customer_quote_id');
     }
 }

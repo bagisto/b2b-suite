@@ -5,7 +5,6 @@ namespace Webkul\B2BSuite\Http\Controllers\Shop;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
@@ -18,6 +17,8 @@ use Webkul\B2BSuite\Models\CompanyInvitation;
 use Webkul\B2BSuite\Notifications\Notifier;
 use Webkul\B2BSuite\Repositories\CompanyInvitationRepository;
 use Webkul\B2BSuite\Repositories\CompanyRoleRepository;
+use Webkul\B2BSuite\Repositories\CustomerQuoteRepository;
+use Webkul\B2BSuite\Repositories\CustomerRequisitionRepository;
 use Webkul\Core\Rules\PhoneNumber;
 use Webkul\Customer\Repositories\CustomerGroupRepository;
 use Webkul\Customer\Repositories\CustomerRepository;
@@ -35,6 +36,8 @@ class UserController extends Controller
         protected CustomerGroupRepository $customerGroupRepository,
         protected CompanyRoleRepository $companyRoleRepository,
         protected CompanyInvitationRepository $companyInvitationRepository,
+        protected CustomerQuoteRepository $customerQuoteRepository,
+        protected CustomerRequisitionRepository $customerRequisitionRepository,
     ) {}
 
     /**
@@ -130,8 +133,10 @@ class UserController extends Controller
 
         $customer = $this->customerRepository->create($data);
 
-        // Resolve via the repository to get the B2B customer model (the auth guard returns
-        // the core Customer, which lacks the companies() relation).
+        /**
+         * Resolve via the repository to get the B2B customer model (the auth guard returns
+         * the core Customer, which lacks the companies() relation).
+         */
         $currentAdmin = $this->customerRepository->find(auth()->guard('customer')->user()->id);
 
         if ($currentAdmin->type === 'company') {
@@ -147,7 +152,9 @@ class UserController extends Controller
 
         Event::dispatch('customer.registration.after', $customer);
 
-        // Welcome the newly created company sub-user.
+        /**
+         * Welcome the newly created company sub-user.
+         */
         Notifier::user($customer);
 
         if (request()->hasFile('image')) {
@@ -172,150 +179,6 @@ class UserController extends Controller
     }
 
     /**
-     * Show the "invite an existing platform customer" form.
-     *
-     * @return View
-     */
-    public function addExisting()
-    {
-        if (request()->ajax()) {
-            return datagrid(CompanyInvitationDataGrid::class)->process();
-        }
-
-        $customer = auth()->guard('customer')->user();
-
-        $currentRole = $this->companyRoleRepository->find($customer->company_role_id);
-
-        $roles = $this->companyRoleRepository->findWhere([
-            'customer_id' => $currentRole->customer_id,
-        ]);
-
-        return view('b2b::shop.customers.account.users.add-existing', compact('roles'));
-    }
-
-    /**
-     * Invite an existing platform customer to join the company. Instead of adding them
-     * directly we create a pending invitation and email them a link to accept — they only
-     * become a company user once they accept.
-     *
-     * @return Response
-     */
-    public function invite(Request $request)
-    {
-        $this->validate($request, [
-            'user_email' => ['required', 'email'],
-            'company_role_id' => ['required'],
-        ]);
-
-        // Resolve via the repository to get the B2B customer model (the auth guard returns
-        // the core Customer, which lacks the companies() relation).
-        $currentAdmin = $this->customerRepository->find(auth()->guard('customer')->user()->id);
-
-        $companyId = $currentAdmin->type === 'company'
-            ? $currentAdmin->id
-            : ($currentAdmin->companies()->first()?->id ?? $currentAdmin->id);
-
-        $email = $request->input('user_email');
-
-        $customer = $this->customerRepository->findOneWhere(['email' => $email]);
-
-        if (! $customer) {
-            return redirect()->back()->withInput()
-                ->with('error', trans('b2b::app.shop.customers.account.users.existing.not-found'));
-        }
-
-        // A company account, or the viewer's own company, cannot be invited as a sub-user.
-        if ($customer->type === 'company' || (int) $customer->id === (int) $companyId) {
-            return redirect()->back()->withInput()
-                ->with('error', trans('b2b::app.shop.customers.account.users.existing.invalid'));
-        }
-
-        // Already belongs to a company (members carry a company role / company link). Note a
-        // plain customer is also type "user" here, so membership must not be inferred from type.
-        if ($customer->company_role_id || $customer->companies()->exists()) {
-            return redirect()->back()->withInput()
-                ->with('error', trans('b2b::app.shop.customers.account.users.existing.already-member'));
-        }
-
-        // The chosen role must belong to this company.
-        $role = $this->companyRoleRepository->findOneWhere([
-            'id' => $request->input('company_role_id'),
-            'customer_id' => $companyId,
-        ]);
-
-        if (! $role) {
-            return redirect()->back()->withInput()
-                ->with('error', trans('b2b::app.shop.customers.account.users.existing.invalid-role'));
-        }
-
-        // Reuse an existing pending invitation for this email (re-send) so duplicates can't pile up.
-        $existing = $this->companyInvitationRepository->findOneWhere([
-            'company_id' => $companyId,
-            'email' => $email,
-            'status' => CompanyInvitation::STATUS_PENDING,
-        ]);
-
-        $data = [
-            'company_id' => $companyId,
-            'email' => $email,
-            'company_role_id' => $request->input('company_role_id'),
-            'invited_by' => $currentAdmin->id,
-            'token' => Str::random(48),
-            'status' => CompanyInvitation::STATUS_PENDING,
-            'expires_at' => now()->addDays(7),
-        ];
-
-        $invitation = $existing
-            ? $this->companyInvitationRepository->update($data, $existing->id)
-            : $this->companyInvitationRepository->create($data);
-
-        $company = $this->customerRepository->find($companyId);
-
-        Notifier::invitation(
-            $invitation,
-            $company->businessName() ?: $company->name,
-            $role->name,
-            route('shop.customers.account.invitations.show', $invitation->token),
-        );
-
-        session()->flash('success', trans('b2b::app.shop.customers.account.users.existing.invite-success', ['email' => $email]));
-
-        return redirect()->route('shop.customers.account.users.index');
-    }
-
-    /**
-     * Revoke a pending invitation sent by this company (datagrid action — returns JSON).
-     */
-    public function revokeInvitation(int $id): JsonResponse
-    {
-        // Resolve via the repository to get the B2B customer model (the auth guard returns
-        // the core Customer, which lacks the companies() relation).
-        $currentAdmin = $this->customerRepository->find(auth()->guard('customer')->user()->id);
-
-        $companyId = $currentAdmin->type === 'company'
-            ? $currentAdmin->id
-            : ($currentAdmin->companies()->first()?->id ?? $currentAdmin->id);
-
-        $invitation = $this->companyInvitationRepository->findOneWhere([
-            'id' => $id,
-            'company_id' => $companyId,
-            'status' => CompanyInvitation::STATUS_PENDING,
-        ]);
-
-        if (! $invitation) {
-            return new JsonResponse([
-                'message' => trans('b2b::app.shop.customers.account.users.un-auth-access'),
-            ], 401);
-        }
-
-        $this->companyInvitationRepository->update(['status' => CompanyInvitation::STATUS_REVOKED], $invitation->id);
-
-        return new JsonResponse([
-            'message' => trans('b2b::app.shop.customers.account.users.existing.revoke-success'),
-        ]);
-    }
-
-    /**
      * For loading the edit form page.
      *
      * @return View
@@ -324,7 +187,9 @@ class UserController extends Controller
     {
         $user = $this->customerRepository->find($id);
 
-        // The company owner is listed for context but is not editable through the sub-user form.
+        /**
+         * The company owner is listed for context but is not editable through the sub-user form.
+         */
         if (! $user || $user->type === 'company') {
             session()->flash('error', trans('b2b::app.shop.customers.account.users.un-auth-access'));
 
@@ -353,7 +218,9 @@ class UserController extends Controller
     {
         $user = $this->customerRepository->find($id);
 
-        // The company owner is listed for context but is not editable through the sub-user form.
+        /**
+         * The company owner is listed for context but is not editable through the sub-user form.
+         */
         if (! $user || $user->type === 'company') {
             session()->flash('error', trans('b2b::app.shop.customers.account.users.un-auth-access'));
 
@@ -436,11 +303,15 @@ class UserController extends Controller
      */
     public function destroy(int $id): JsonResponse
     {
-        // Resolve via the repository to get the B2B customer model (the auth guard returns
-        // the core Customer, which lacks the companies() relation).
+        /**
+         * Resolve via the repository to get the B2B customer model (the auth guard returns
+         * the core Customer, which lacks the companies() relation).
+         */
         $currentAdmin = $this->customerRepository->find(auth()->guard('customer')->user()->id);
 
-        // A member cannot remove themselves from the company.
+        /**
+         * A member cannot remove themselves from the company.
+         */
         if ((int) $id === (int) $currentAdmin->id) {
             return new JsonResponse([
                 'message' => trans('b2b::app.shop.customers.account.users.cannot-remove-self'),
@@ -479,35 +350,24 @@ class UserController extends Controller
              * creator's name + email for display and null the customer link so they no longer
              * belong to (or reach) the now-removed customer.
              */
-            DB::table('customer_quotes')
-                ->where('customer_id', $user->id)
-                ->where('company_id', $companyId)
-                ->update([
+            $this->customerQuoteRepository
+                ->findWhere(['customer_id' => $user->id, 'company_id' => $companyId])
+                ->each(fn ($quote) => $this->customerQuoteRepository->update([
                     'customer_name' => $user->name,
                     'customer_email' => $user->email,
                     'customer_id' => null,
-                ]);
+                ], $quote->id));
 
             /**
              * Requisition lists are personal B2B lists the member can no longer reach once
              * detached, and they are not shared with the company — so they would only linger
-             * as orphaned rows. Delete the member's lists for this company (their items are
-             * removed explicitly and also cascade via the requisition_list_id foreign key).
+             * as orphaned rows. Delete the member's lists for this company; their items are
+             * removed automatically via the requisition_list_id foreign key cascade.
              */
-            $requisitionListIds = DB::table('customer_requisition_lists')
-                ->where('customer_id', $user->id)
-                ->where('company_id', $companyId)
-                ->pluck('id');
-
-            if ($requisitionListIds->isNotEmpty()) {
-                DB::table('customer_requisition_list_products')
-                    ->whereIn('requisition_list_id', $requisitionListIds)
-                    ->delete();
-
-                DB::table('customer_requisition_lists')
-                    ->whereIn('id', $requisitionListIds)
-                    ->delete();
-            }
+            $this->customerRequisitionRepository->deleteWhere([
+                'customer_id' => $user->id,
+                'company_id' => $companyId,
+            ]);
 
             $data = ['company_role_id' => null];
 
@@ -517,7 +377,9 @@ class UserController extends Controller
 
             $this->customerRepository->update($data, $id);
 
-            // Let the customer know they have been detached and are now a standard customer.
+            /**
+             * Let the customer know they have been detached and are now a standard customer.
+             */
             Notifier::userRemoved($user);
 
             return new JsonResponse([
@@ -528,6 +390,162 @@ class UserController extends Controller
                 'message' => trans('b2b::app.shop.customers.account.users.delete-failed'),
             ], 500);
         }
+    }
+
+    /**
+     * Show the "invite an existing platform customer" form.
+     *
+     * @return View
+     */
+    public function addExisting()
+    {
+        if (request()->ajax()) {
+            return datagrid(CompanyInvitationDataGrid::class)->process();
+        }
+
+        $customer = auth()->guard('customer')->user();
+
+        $currentRole = $this->companyRoleRepository->find($customer->company_role_id);
+
+        $roles = $this->companyRoleRepository->findWhere([
+            'customer_id' => $currentRole->customer_id,
+        ]);
+
+        return view('b2b::shop.customers.account.users.add-existing', compact('roles'));
+    }
+
+    /**
+     * Invite an existing platform customer to join the company. Instead of adding them
+     * directly we create a pending invitation and email them a link to accept — they only
+     * become a company user once they accept.
+     *
+     * @return Response
+     */
+    public function invite(Request $request)
+    {
+        $this->validate($request, [
+            'user_email' => ['required', 'email'],
+            'company_role_id' => ['required'],
+        ]);
+
+        /**
+         * Resolve via the repository to get the B2B customer model (the auth guard returns
+         * the core Customer, which lacks the companies() relation).
+         */
+        $currentAdmin = $this->customerRepository->find(auth()->guard('customer')->user()->id);
+
+        $companyId = $currentAdmin->type === 'company'
+            ? $currentAdmin->id
+            : ($currentAdmin->companies()->first()?->id ?? $currentAdmin->id);
+
+        $email = $request->input('user_email');
+
+        $customer = $this->customerRepository->findOneWhere(['email' => $email]);
+
+        if (! $customer) {
+            return redirect()->back()->withInput()
+                ->with('error', trans('b2b::app.shop.customers.account.users.existing.not-found'));
+        }
+
+        /**
+         * A company account, or the viewer's own company, cannot be invited as a sub-user.
+         */
+        if ($customer->type === 'company' || (int) $customer->id === (int) $companyId) {
+            return redirect()->back()->withInput()
+                ->with('error', trans('b2b::app.shop.customers.account.users.existing.invalid'));
+        }
+
+        /**
+         * Already belongs to a company (members carry a company role / company link). Note a
+         * plain customer is also type "user" here, so membership must not be inferred from type.
+         */
+        if ($customer->company_role_id || $customer->companies()->exists()) {
+            return redirect()->back()->withInput()
+                ->with('error', trans('b2b::app.shop.customers.account.users.existing.already-member'));
+        }
+
+        /**
+         * The chosen role must belong to this company.
+         */
+        $role = $this->companyRoleRepository->findOneWhere([
+            'id' => $request->input('company_role_id'),
+            'customer_id' => $companyId,
+        ]);
+
+        if (! $role) {
+            return redirect()->back()->withInput()
+                ->with('error', trans('b2b::app.shop.customers.account.users.existing.invalid-role'));
+        }
+
+        /**
+         * Reuse an existing pending invitation for this email (re-send) so duplicates can't pile up.
+         */
+        $existing = $this->companyInvitationRepository->findOneWhere([
+            'company_id' => $companyId,
+            'email' => $email,
+            'status' => CompanyInvitation::STATUS_PENDING,
+        ]);
+
+        $data = [
+            'company_id' => $companyId,
+            'email' => $email,
+            'company_role_id' => $request->input('company_role_id'),
+            'invited_by' => $currentAdmin->id,
+            'token' => Str::random(48),
+            'status' => CompanyInvitation::STATUS_PENDING,
+            'expires_at' => now()->addDays(7),
+        ];
+
+        $invitation = $existing
+            ? $this->companyInvitationRepository->update($data, $existing->id)
+            : $this->companyInvitationRepository->create($data);
+
+        $company = $this->customerRepository->find($companyId);
+
+        Notifier::invitation(
+            $invitation,
+            $company->businessName() ?: $company->name,
+            $role->name,
+            route('shop.customers.account.invitations.show', $invitation->token),
+        );
+
+        session()->flash('success', trans('b2b::app.shop.customers.account.users.existing.invite-success', ['email' => $email]));
+
+        return redirect()->route('shop.customers.account.users.index');
+    }
+
+    /**
+     * Revoke a pending invitation sent by this company (datagrid action — returns JSON).
+     */
+    public function revokeInvitation(int $id): JsonResponse
+    {
+        /**
+         * Resolve via the repository to get the B2B customer model (the auth guard returns
+         * the core Customer, which lacks the companies() relation).
+         */
+        $currentAdmin = $this->customerRepository->find(auth()->guard('customer')->user()->id);
+
+        $companyId = $currentAdmin->type === 'company'
+            ? $currentAdmin->id
+            : ($currentAdmin->companies()->first()?->id ?? $currentAdmin->id);
+
+        $invitation = $this->companyInvitationRepository->findOneWhere([
+            'id' => $id,
+            'company_id' => $companyId,
+            'status' => CompanyInvitation::STATUS_PENDING,
+        ]);
+
+        if (! $invitation) {
+            return new JsonResponse([
+                'message' => trans('b2b::app.shop.customers.account.users.un-auth-access'),
+            ], 401);
+        }
+
+        $this->companyInvitationRepository->update(['status' => CompanyInvitation::STATUS_REVOKED], $invitation->id);
+
+        return new JsonResponse([
+            'message' => trans('b2b::app.shop.customers.account.users.existing.revoke-success'),
+        ]);
     }
 
     /**

@@ -14,8 +14,6 @@ use Webkul\Product\Models\ProductProxy;
 
 class CompanyCatalog extends Model implements CompanyCatalogContract
 {
-    protected $table = 'company_catalogs';
-
     /**
      * Active status.
      */
@@ -25,6 +23,13 @@ class CompanyCatalog extends Model implements CompanyCatalogContract
      * Inactive status.
      */
     public const STATUS_INACTIVE = 0;
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'b2b_company_catalogs';
 
     /**
      * The attributes that are mass assignable.
@@ -63,7 +68,7 @@ class CompanyCatalog extends Model implements CompanyCatalogContract
     {
         return $this->belongsToMany(
             ProductProxy::modelClass(),
-            'company_catalog_products',
+            'b2b_company_catalog_products',
             'company_catalog_id',
             'product_id'
         );
@@ -94,7 +99,7 @@ class CompanyCatalog extends Model implements CompanyCatalogContract
     {
         return $this->belongsToMany(
             CategoryProxy::modelClass(),
-            'company_catalog_categories',
+            'b2b_company_catalog_categories',
             'company_catalog_id',
             'category_id'
         );

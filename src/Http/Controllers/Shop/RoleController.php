@@ -20,8 +20,8 @@ class RoleController extends Controller
      * @return void
      */
     public function __construct(
-        protected CustomerRepository $customerRepository,
         protected CompanyRoleRepository $companyRoleRepository,
+        protected CustomerRepository $customerRepository,
     ) {}
 
     /**

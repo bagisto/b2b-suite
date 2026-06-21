@@ -3,14 +3,14 @@
 namespace Webkul\B2BSuite\Helpers;
 
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Webkul\B2BSuite\Repositories\CompanyCatalogRepository;
-use Webkul\Category\Models\CategoryProxy;
-use Webkul\Customer\Models\CustomerProxy;
+use Webkul\Category\Repositories\CategoryRepository;
 use Webkul\Customer\Repositories\CustomerGroupRepository;
+use Webkul\Customer\Repositories\CustomerRepository;
 use Webkul\Product\Contracts\Product;
 use Webkul\Product\Jobs\UpdateCreatePriceIndex as UpdateCreatePriceIndexJob;
-use Webkul\Product\Models\ProductCustomerGroupPriceProxy;
+use Webkul\Product\Repositories\ProductCustomerGroupPriceRepository;
+use Webkul\Product\Repositories\ProductRepository;
 
 class CompanyCatalog
 {
@@ -25,8 +25,12 @@ class CompanyCatalog
      * @return void
      */
     public function __construct(
-        protected CompanyCatalogRepository $companyCatalogRepository,
         protected CustomerGroupRepository $customerGroupRepository,
+        protected CustomerRepository $customerRepository,
+        protected CategoryRepository $categoryRepository,
+        protected ProductRepository $productRepository,
+        protected ProductCustomerGroupPriceRepository $productCustomerGroupPriceRepository,
+        protected CompanyCatalogRepository $companyCatalogRepository,
     ) {}
 
     /**
@@ -99,8 +103,8 @@ class CompanyCatalog
 
         $companyIds = array_map('intval', $companyIds);
 
-        $current = CustomerProxy::modelClass()::query()
-            ->where('company_catalog_id', $catalog->id)
+        $current = $this->customerRepository
+            ->findWhere(['company_catalog_id' => $catalog->id])
             ->pluck('id')
             ->toArray();
 
@@ -118,7 +122,7 @@ class CompanyCatalog
      */
     public function attachCompany($companyId, $catalogId, $groupId): void
     {
-        $company = CustomerProxy::modelClass()::find($companyId);
+        $company = $this->customerRepository->find($companyId);
 
         if (! $company) {
             return;
@@ -136,7 +140,7 @@ class CompanyCatalog
      */
     public function detachCompany($companyId): void
     {
-        $company = CustomerProxy::modelClass()::find($companyId);
+        $company = $this->customerRepository->find($companyId);
 
         if (! $company) {
             return;
@@ -156,18 +160,15 @@ class CompanyCatalog
      */
     public function updateMembersGroup($companyId, $groupId): void
     {
-        $memberIds = DB::table('customer_companies')
-            ->where('company_id', $companyId)
-            ->pluck('customer_id')
-            ->toArray();
+        $company = $this->customerRepository->find($companyId);
 
-        if (empty($memberIds)) {
+        if (! $company) {
             return;
         }
 
-        CustomerProxy::modelClass()::query()
-            ->whereIn('id', $memberIds)
-            ->update(['customer_group_id' => $groupId]);
+        $company->members->each(
+            fn ($member) => $this->customerRepository->update(['customer_group_id' => $groupId], $member->id)
+        );
     }
 
     /**
@@ -205,93 +206,6 @@ class CompanyCatalog
     public function allowedCategoryIds($catalog): array
     {
         return $catalog->categories()->pluck('categories.id')->toArray();
-    }
-
-    /**
-     * Resolve, from a set of products, the visible category set (products' categories +
-     * ancestors) and a display tree where each node carries a rolled-up product count
-     * (products in that category OR any of its descendants). Root categories are kept in
-     * the id set (the tree needs them) but excluded from the displayed nodes.
-     *
-     * @return array{categoryIds: array<int>, tree: array<int, array>}
-     */
-    protected function buildCategoryData(array $productIds): array
-    {
-        $productIds = array_values(array_unique(array_filter(array_map('intval', $productIds))));
-
-        if (empty($productIds)) {
-            return ['categoryIds' => [], 'tree' => []];
-        }
-
-        /**
-         * Direct category -> the assigned products that sit in it. Category links live on
-         * the (parent) product, which is exactly what the allowlist holds.
-         */
-        $directProducts = [];
-
-        foreach (DB::table('product_categories')->whereIn('product_id', $productIds)->get() as $row) {
-            $directProducts[$row->category_id][$row->product_id] = true;
-        }
-
-        if (empty($directProducts)) {
-            return ['categoryIds' => [], 'tree' => []];
-        }
-
-        $rolled = [];
-
-        $allIds = [];
-
-        $directCategories = CategoryProxy::modelClass()::query()
-            ->whereIn('id', array_keys($directProducts))
-            ->get();
-
-        foreach ($directCategories as $category) {
-            $chain = $category->ancestors->pluck('id')->push($category->id)->all();
-
-            foreach ($chain as $categoryId) {
-                $allIds[$categoryId] = true;
-
-                foreach ($directProducts[$category->id] as $productId => $unused) {
-                    $rolled[$categoryId][$productId] = true;
-                }
-            }
-        }
-
-        $allIds = array_map('intval', array_keys($allIds));
-
-        $tree = CategoryProxy::modelClass()::query()
-            ->whereIn('id', $allIds)
-            ->whereNotNull('parent_id')
-            ->orderBy('_lft')
-            ->get()
-            ->map(fn ($category) => [
-                'id' => $category->id,
-                'name' => $category->name ?: '#'.$category->id,
-                'parent_id' => (int) $category->parent_id,
-                'count' => count($rolled[$category->id] ?? []),
-            ])
-            ->values()
-            ->all();
-
-        /**
-         * Nesting depth relative to the displayed tree (roots are excluded), so the
-         * dialog can indent rows without a recursive component.
-         */
-        $byId = collect($tree)->keyBy('id');
-
-        foreach ($tree as &$node) {
-            $depth = 0;
-            $parentId = $node['parent_id'];
-
-            while ($parentId && $byId->has($parentId)) {
-                $depth++;
-                $parentId = $byId[$parentId]['parent_id'];
-            }
-
-            $node['depth'] = $depth;
-        }
-
-        return ['categoryIds' => $allIds, 'tree' => $tree];
     }
 
     /**
@@ -351,18 +265,16 @@ class CompanyCatalog
             return;
         }
 
-        $model = ProductCustomerGroupPriceProxy::modelClass();
-
         /**
          * Products that currently carry a catalog-group price — they must be
          * reindexed after we wipe/rewrite so stale overrides don't linger.
          */
-        $affected = $model::query()
-            ->where('customer_group_id', $groupId)
+        $affected = $this->productCustomerGroupPriceRepository
+            ->findWhere(['customer_group_id' => $groupId])
             ->pluck('product_id')
             ->toArray();
 
-        $model::query()->where('customer_group_id', $groupId)->delete();
+        $this->productCustomerGroupPriceRepository->deleteWhere(['customer_group_id' => $groupId]);
 
         foreach ($prices as $productId => $row) {
             $productId = (int) $productId;
@@ -401,7 +313,7 @@ class CompanyCatalog
             }
 
             foreach ($tiers as $tier) {
-                $model::create([
+                $this->productCustomerGroupPriceRepository->create([
                     'qty' => $tier['qty'],
                     'value_type' => $tier['type'],
                     'value' => $tier['value'],
@@ -421,6 +333,130 @@ class CompanyCatalog
         $parentIds = $catalog->products()->pluck('products.id')->toArray();
 
         $this->reindex(array_merge($affected, $parentIds));
+    }
+
+    /**
+     * Dispatch a price reindex for the given products.
+     */
+    public function reindex(array $productIds): void
+    {
+        $productIds = array_values(array_unique(array_filter($productIds)));
+
+        if (empty($productIds)) {
+            return;
+        }
+
+        UpdateCreatePriceIndexJob::dispatch($productIds);
+    }
+
+    /**
+     * Tear down a catalog: revert assigned companies/members and drop the backing group.
+     */
+    public function cleanup($catalog): void
+    {
+        $companyIds = $this->customerRepository
+            ->findWhere(['company_catalog_id' => $catalog->id])
+            ->pluck('id')
+            ->toArray();
+
+        foreach ($companyIds as $companyId) {
+            $this->detachCompany($companyId);
+        }
+
+        if ($catalog->customer_group_id) {
+            $defaultGroupId = $this->defaultGroupId();
+
+            $this->customerRepository
+                ->findWhere(['customer_group_id' => $catalog->customer_group_id])
+                ->each(fn ($customer) => $this->customerRepository->update(['customer_group_id' => $defaultGroupId], $customer->id));
+
+            $this->customerGroupRepository->delete($catalog->customer_group_id);
+        }
+    }
+
+    /**
+     * Resolve, from a set of products, the visible category set (products' categories +
+     * ancestors) and a display tree where each node carries a rolled-up product count
+     * (products in that category OR any of its descendants). Root categories are kept in
+     * the id set (the tree needs them) but excluded from the displayed nodes.
+     *
+     * @return array{categoryIds: array<int>, tree: array<int, array>}
+     */
+    protected function buildCategoryData(array $productIds): array
+    {
+        $productIds = array_values(array_unique(array_filter(array_map('intval', $productIds))));
+
+        if (empty($productIds)) {
+            return ['categoryIds' => [], 'tree' => []];
+        }
+
+        /**
+         * Direct category -> the assigned products that sit in it. Category links live on
+         * the (parent) product, which is exactly what the allowlist holds.
+         */
+        $directProducts = [];
+
+        foreach ($this->productRepository->with('categories')->findWhereIn('id', $productIds) as $product) {
+            foreach ($product->categories as $category) {
+                $directProducts[$category->id][$product->id] = true;
+            }
+        }
+
+        if (empty($directProducts)) {
+            return ['categoryIds' => [], 'tree' => []];
+        }
+
+        $rolled = [];
+
+        $allIds = [];
+
+        $directCategories = $this->categoryRepository->findWhereIn('id', array_keys($directProducts));
+
+        foreach ($directCategories as $category) {
+            $chain = $category->ancestors->pluck('id')->push($category->id)->all();
+
+            foreach ($chain as $categoryId) {
+                $allIds[$categoryId] = true;
+
+                foreach ($directProducts[$category->id] as $productId => $unused) {
+                    $rolled[$categoryId][$productId] = true;
+                }
+            }
+        }
+
+        $allIds = array_map('intval', array_keys($allIds));
+
+        $tree = $this->categoryRepository->findWhereIn('id', $allIds)
+            ->filter(fn ($category) => $category->parent_id !== null)
+            ->sortBy('_lft')
+            ->map(fn ($category) => [
+                'id' => $category->id,
+                'name' => $category->name ?: '#'.$category->id,
+                'parent_id' => (int) $category->parent_id,
+                'count' => count($rolled[$category->id] ?? []),
+            ])
+            ->values()
+            ->all();
+
+        /**
+         * Nesting depth relative to the displayed tree (roots are excluded), so the
+         * dialog can indent rows without a recursive component.
+         */
+        $byId = collect($tree)->keyBy('id');
+
+        foreach ($tree as &$node) {
+            $depth = 0;
+            $parentId = $node['parent_id'];
+
+            while ($parentId && $byId->has($parentId)) {
+                $depth++;
+                $parentId = $byId[$parentId]['parent_id'];
+            }
+
+            $node['depth'] = $depth;
+        }
+
+        return ['categoryIds' => $allIds, 'tree' => $tree];
     }
 
     /**
@@ -452,44 +488,5 @@ class CompanyCatalog
             'type' => $type,
             'value' => (float) $value,
         ];
-    }
-
-    /**
-     * Dispatch a price reindex for the given products.
-     */
-    public function reindex(array $productIds): void
-    {
-        $productIds = array_values(array_unique(array_filter($productIds)));
-
-        if (empty($productIds)) {
-            return;
-        }
-
-        UpdateCreatePriceIndexJob::dispatch($productIds);
-    }
-
-    /**
-     * Tear down a catalog: revert assigned companies/members and drop the backing group.
-     */
-    public function cleanup($catalog): void
-    {
-        $companyIds = CustomerProxy::modelClass()::query()
-            ->where('company_catalog_id', $catalog->id)
-            ->pluck('id')
-            ->toArray();
-
-        foreach ($companyIds as $companyId) {
-            $this->detachCompany($companyId);
-        }
-
-        if ($catalog->customer_group_id) {
-            $defaultGroupId = $this->defaultGroupId();
-
-            CustomerProxy::modelClass()::query()
-                ->where('customer_group_id', $catalog->customer_group_id)
-                ->update(['customer_group_id' => $defaultGroupId]);
-
-            $this->customerGroupRepository->delete($catalog->customer_group_id);
-        }
     }
 }

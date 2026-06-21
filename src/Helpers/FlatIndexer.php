@@ -10,12 +10,14 @@ use Webkul\Customer\Repositories\CustomerRepository;
 class FlatIndexer
 {
     /**
+     * The column names of the b2b_company_flat table.
+     *
      * @var array
      */
     protected $flatColumns = [];
 
     /**
-     * Create a new listener instance.
+     * Create a new company flat indexer instance.
      *
      * @return void
      */
@@ -23,11 +25,11 @@ class FlatIndexer
         protected CustomerRepository $customerRepository,
         protected CompanyFlatRepository $companyFlatRepository
     ) {
-        $this->flatColumns = Schema::getColumnListing('company_flat');
+        $this->flatColumns = Schema::getColumnListing('b2b_company_flat');
     }
 
     /**
-     * Refresh customer flat indices
+     * Refresh the company flat index for the given customer.
      *
      * @param  Customer  $customer
      * @return void
@@ -39,7 +41,7 @@ class FlatIndexer
         /**
          * Only the company owner carries company attribute data. Sub-users (and plain
          * customers) share their company's details, so they must not get their own
-         * company_flat row — drop any stale one if the record is not a company.
+         * b2b_company_flat row — drop any stale one if the record is not a company.
          */
         if (($customer->type ?? null) !== 'company') {
             $this->companyFlatRepository->deleteWhere(['customer_id' => $customer->id]);
@@ -51,12 +53,12 @@ class FlatIndexer
     }
 
     /**
-     * Creates customer flat
+     * Create or update the company flat index rows for the company.
      *
      * @param  Customer  $customer
      * @return void
      */
-    public function updateOrCreate($customer)
+    protected function updateOrCreate($customer)
     {
         $channelIds[] = $customer->channel->id;
 

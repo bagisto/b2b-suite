@@ -857,54 +857,6 @@ return [
                 'company-title' => 'Create a Company Account',
                 'company-text' => 'Register your business to unlock B2B features like quotations, requisition lists and bulk ordering.',
             ],
-
-            'account' => [
-                'profile' => [
-                    'index' => [
-                        'title' => 'Company Profile',
-                        'info' => 'Manage your company information.',
-                        'save-btn' => 'Save',
-                        'edit-btn' => 'Edit Profile',
-                        'yes' => 'Yes',
-                        'no' => 'No',
-                        'no-attributes' => 'No company attributes have been configured yet.',
-                    ],
-
-                    'edit' => [
-                        'btn-back' => 'Back',
-                        'settings' => 'Settings',
-                        'profile-image' => 'Profile Image',
-                    ],
-                ],
-
-                'credit' => [
-                    'title' => 'Company Credit',
-                    'info' => 'Buy now and pay later against your company credit limit.',
-                    'credit-limit' => 'Credit Limit',
-                    'outstanding-balance' => 'Outstanding Balance',
-                    'available-credit' => 'Available Credit',
-                    'history' => 'Credit History',
-                    'date' => 'Date',
-                    'operation' => 'Operation',
-                    'amount' => 'Amount',
-                    'balance' => 'Balance',
-                    'details' => 'Details',
-                    'order' => 'Order',
-                    'status' => 'Status',
-                    'enabled' => 'Active',
-                    'disabled' => 'Inactive',
-                    'no-transactions' => 'No credit transactions yet.',
-
-                    'operations' => [
-                        'allocated' => 'Credit Allocated',
-                        'updated' => 'Limit Updated',
-                        'purchased' => 'Order Purchase',
-                        'reimbursed' => 'Payment Received',
-                        'refunded' => 'Order Refunded',
-                        'reverted' => 'Order Reverted',
-                    ],
-                ],
-            ],
         ],
 
         'sign-in' => [
@@ -987,6 +939,52 @@ return [
 
         'customers' => [
             'account' => [
+                'company-profile' => [
+                    'index' => [
+                        'title' => 'Company Profile',
+                        'info' => 'Manage your company information.',
+                        'save-btn' => 'Save',
+                        'edit-btn' => 'Edit Profile',
+                        'yes' => 'Yes',
+                        'no' => 'No',
+                        'no-attributes' => 'No company attributes have been configured yet.',
+                    ],
+
+                    'edit' => [
+                        'btn-back' => 'Back',
+                        'settings' => 'Settings',
+                        'profile-image' => 'Profile Image',
+                    ],
+                ],
+
+                'company-credit' => [
+                    'title' => 'Company Credit',
+                    'info' => 'Buy now and pay later against your company credit limit.',
+                    'credit-limit' => 'Credit Limit',
+                    'outstanding-balance' => 'Outstanding Balance',
+                    'available-credit' => 'Available Credit',
+                    'history' => 'Credit History',
+                    'date' => 'Date',
+                    'operation' => 'Operation',
+                    'amount' => 'Amount',
+                    'balance' => 'Balance',
+                    'details' => 'Details',
+                    'order' => 'Order',
+                    'status' => 'Status',
+                    'enabled' => 'Active',
+                    'disabled' => 'Inactive',
+                    'no-transactions' => 'No credit transactions yet.',
+
+                    'operations' => [
+                        'allocated' => 'Credit Allocated',
+                        'updated' => 'Limit Updated',
+                        'purchased' => 'Order Purchase',
+                        'reimbursed' => 'Payment Received',
+                        'refunded' => 'Order Refunded',
+                        'reverted' => 'Order Reverted',
+                    ],
+                ],
+
                 'profile' => [
                     'profile-information' => 'Profile Information',
                     'company-information' => 'Company Information',

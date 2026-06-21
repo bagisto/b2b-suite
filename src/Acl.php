@@ -9,7 +9,7 @@ use Webkul\Core\Acl\AclItem;
 class Acl
 {
     /**
-     * acl items.
+     * The registered ACL items.
      */
     protected array $items = [];
 
@@ -35,22 +35,6 @@ class Acl
     }
 
     /**
-     * Acl Config.
-     */
-    private function getAclConfig(): array
-    {
-        static $aclConfig;
-
-        if ($aclConfig) {
-            return $aclConfig;
-        }
-
-        $aclConfig = config('b2b_acl');
-
-        return $aclConfig;
-    }
-
-    /**
      * Get all roles.
      */
     public function getRoles(): Collection
@@ -65,6 +49,22 @@ class Acl
             ->mapWithKeys(fn ($routeName) => [$routeName => $role['key']]));
 
         return $roles;
+    }
+
+    /**
+     * Acl Config.
+     */
+    private function getAclConfig(): array
+    {
+        static $aclConfig;
+
+        if ($aclConfig) {
+            return $aclConfig;
+        }
+
+        $aclConfig = config('b2b_acl');
+
+        return $aclConfig;
     }
 
     /**

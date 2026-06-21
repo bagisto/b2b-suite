@@ -11,7 +11,7 @@
                 </span>
 
                 <span class="break-words text-sm font-medium text-gray-800">
-                    @include('b2b::shop.companies.account.profile.partials.value', [
+                    @include('b2b::shop.customers.account.company-profile.partials.value', [
                         'attribute' => $attribute,
                         'customer'  => $customer,
                     ])

@@ -33,30 +33,6 @@ class CustomerController extends BaseCustomerController
     ) {}
 
     /**
-     * Taking the customer to profile details page.
-     *
-     * @return View
-     */
-    public function index()
-    {
-        return parent::index();
-    }
-
-    /**
-     * For loading the edit form page.
-     *
-     * The personal account edit form is the core form for every customer
-     * (company basic info included). Company-specific mapped attributes are
-     * edited on the dedicated Company Profile page (see companyProfile()).
-     *
-     * @return View
-     */
-    public function edit()
-    {
-        return parent::edit();
-    }
-
-    /**
      * Dedicated Company Profile page — renders the mapped company attributes
      * exactly as configured in the admin (grouped by column/position).
      *
@@ -88,7 +64,7 @@ class CustomerController extends BaseCustomerController
             },
         ])->orderBy('column', 'asc')->orderBy('position', 'asc')->get();
 
-        return view('b2b::shop.companies.account.profile.index')
+        return view('b2b::shop.customers.account.company-profile.index')
             ->with([
                 'customer' => $customer,
                 'attributeGroups' => $attributeGroups,
@@ -124,78 +100,12 @@ class CustomerController extends BaseCustomerController
             },
         ])->orderBy('column', 'asc')->orderBy('position', 'asc')->get();
 
-        return view('b2b::shop.companies.account.profile.edit')
+        return view('b2b::shop.customers.account.company-profile.edit')
             ->with([
                 'customer' => $customer,
                 'attributeGroups' => $attributeGroups,
                 'canEdit' => true,
             ]);
-    }
-
-    /**
-     * Company credit dashboard for the buyer: balance, available credit and ledger.
-     *
-     * @return View
-     */
-    public function companyCredit()
-    {
-        $creditManager = app(CreditManager::class);
-
-        if (
-            ! (bool) core()->getConfigData('b2b.general.settings.active')
-            || ! $creditManager->isActive()
-            || ! customer_bouncer()->hasPermission('account.company_credit')
-        ) {
-            abort(404);
-        }
-
-        if (! $company = $this->resolveCompany()) {
-            abort(404);
-        }
-
-        $credit = $creditManager->find($company->id);
-
-        if (! $credit) {
-            abort(404);
-        }
-
-        if (request()->ajax()) {
-            return app(CompanyCreditTransactionDataGrid::class)->process();
-        }
-
-        return view('b2b::shop.companies.account.credit.index')
-            ->with(compact('company', 'credit'));
-    }
-
-    /**
-     * Resolve the company customer whose profile is shown/edited: the account itself for
-     * a company login, or the company a member belongs to.
-     */
-    protected function resolveCompany()
-    {
-        $authId = auth()->guard('customer')->user()?->id;
-
-        if (! $authId) {
-            return null;
-        }
-
-        /**
-         * Resolve through the repository so we get the B2B customer model (with the
-         * `companies()` relation), regardless of the model the auth guard returns.
-         */
-        $customer = $this->customerRepository->find($authId);
-
-        if (! $customer) {
-            return null;
-        }
-
-        if ($customer->type === 'company') {
-            return $customer;
-        }
-
-        $company = $customer->companies()->first();
-
-        return $company ? $this->customerRepository->find($company->id) : null;
     }
 
     /**
@@ -254,7 +164,73 @@ class CustomerController extends BaseCustomerController
 
         Event::dispatch('customer.update.after', $customer);
 
-        return to_route('shop.companies.account.profile.index')
+        return to_route('shop.customers.account.company_profile.index')
             ->withSuccess(trans('shop::app.customers.account.profile.index.edit-success'));
+    }
+
+    /**
+     * Company credit dashboard for the buyer: balance, available credit and ledger.
+     *
+     * @return View
+     */
+    public function companyCredit()
+    {
+        $creditManager = app(CreditManager::class);
+
+        if (
+            ! (bool) core()->getConfigData('b2b.general.settings.active')
+            || ! $creditManager->isActive()
+            || ! customer_bouncer()->hasPermission('account.company_credit')
+        ) {
+            abort(404);
+        }
+
+        if (! $company = $this->resolveCompany()) {
+            abort(404);
+        }
+
+        $credit = $creditManager->find($company->id);
+
+        if (! $credit) {
+            abort(404);
+        }
+
+        if (request()->ajax()) {
+            return app(CompanyCreditTransactionDataGrid::class)->process();
+        }
+
+        return view('b2b::shop.customers.account.company-credit.index')
+            ->with(compact('company', 'credit'));
+    }
+
+    /**
+     * Resolve the company customer whose profile is shown/edited: the account itself for
+     * a company login, or the company a member belongs to.
+     */
+    protected function resolveCompany()
+    {
+        $authId = auth()->guard('customer')->user()?->id;
+
+        if (! $authId) {
+            return null;
+        }
+
+        /**
+         * Resolve through the repository so we get the B2B customer model (with the
+         * `companies()` relation), regardless of the model the auth guard returns.
+         */
+        $customer = $this->customerRepository->find($authId);
+
+        if (! $customer) {
+            return null;
+        }
+
+        if ($customer->type === 'company') {
+            return $customer;
+        }
+
+        $company = $customer->companies()->first();
+
+        return $company ? $this->customerRepository->find($company->id) : null;
     }
 }

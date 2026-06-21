@@ -9,23 +9,42 @@ use Webkul\Sales\Models\OrderProxy;
 
 class CompanyCreditTransaction extends Model implements CompanyCreditTransactionContract
 {
-    protected $table = 'company_credit_transactions';
-
     /**
-     * Ledger operations. The first four constants increase what the company owes
-     * (purchases); reimbursed/refunded/reverted decrease it.
+     * Initial credit limit allocated to the company.
      */
     public const OPERATION_ALLOCATED = 'allocated';
 
+    /**
+     * Credit limit or settings were updated.
+     */
     public const OPERATION_UPDATED = 'updated';
 
+    /**
+     * An order was charged to the credit (increases the outstanding balance).
+     */
     public const OPERATION_PURCHASED = 'purchased';
 
+    /**
+     * An offline payment was recorded (decreases the outstanding balance).
+     */
     public const OPERATION_REIMBURSED = 'reimbursed';
 
+    /**
+     * A completed order was refunded (decreases the outstanding balance).
+     */
     public const OPERATION_REFUNDED = 'refunded';
 
+    /**
+     * A purchase was reversed because its order was cancelled.
+     */
     public const OPERATION_REVERTED = 'reverted';
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'b2b_company_credit_transactions';
 
     /**
      * The attributes that are mass assignable.
