@@ -40,6 +40,16 @@ tree + 404 on disallowed slugs) — both bound in `B2BSuiteManager`. Visible cat
 save. Helper logic lives in `Helpers/CompanyCatalog.php`. See AGENTS.md → *Company Catalog*
 for the full design.
 
+## Installation
+
+Main install — the [README](./README.md) is canonical: `composer require bagisto/b2b-suite`
+→ register `B2BSuiteServiceProvider` in `bootstrap/providers.php` **after Shop** (auto-discovery
+is disabled) → `php artisan b2b-suite:install`. Installs into `vendor/bagisto/b2b-suite`.
+
+**This repo is a development checkout** — the package lives at `packages/bagisto/b2b-suite`,
+wired via the root `packages/*/*` path repo (`"bagisto/b2b-suite": "@dev"`) and symlinked into
+`vendor/bagisto/b2b-suite`. That's the dev layout, not the install layout.
+
 ## Publishing
 
 ```bash
@@ -67,8 +77,16 @@ php artisan optimize:clear
   per table (`b2b_`-prefixed), core-table `add_*` last, explicit short FK names,
   `constrained(table: …)`. **Seeders:** `delete()` not `truncate()` (no FK-check toggling).
   **No dead code** (drop `parent::`-only overrides and unused members).
-- Add new translation keys for **all** locales (currently `en` only) and run
-  `php artisan bagisto:translations:check`. Mind the lang array nesting.
+- **Blade:** tags with 2+ attributes are multiline (0–1 inline), preserving Vue/`:`/`@`/`x-slot`
+  bindings exactly; label comments Title Case, sentence comments punctuated; shop views use
+  `x-shop::*`, admin `x-admin::*` — never mix.
+- **Routes:** each route file is self-contained (owns its `Route::group` middleware + prefix);
+  `web.php` only `require`s them; order route groups to match the menu.
+- **Translations:** all **22 locales** exist; `en` is the canonical structure and every locale
+  shares its exact keys/order (values translated, `:placeholders` preserved). Lang file order:
+  top-level `admin, shop, emails, seeders, commands`; within admin/shop `acl, layouts → menu
+  features → configuration`; leaf keys alphabetical; no dead keys. Run
+  `php artisan bagisto:translations:check` after changes.
 - `vendor/bin/pint` for style; `php artisan optimize:clear` after provider/config/route changes.
 - **Comments in Blade-embedded Vue/CSS** use multi-line JSDoc blocks (`/** … */`,
   capitalised and punctuated) — one consistent style per view.

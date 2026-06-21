@@ -12,18 +12,28 @@ company catalogs (per-company product **and category** visibility, custom pricin
 quantity-tier/volume pricing).
 
 - **Namespace:** `Webkul\B2BSuite` → `src/`
-- **Package path:** `packages/bagisto/b2b-suite` (symlinked into `vendor/bagisto/b2b-suite`)
-- **PHP:** 8.1+ · **Bagisto:** 2.x · Blade views styled via the core Shop/Admin themes,
-  which the package rebuilds into its own bundles (see *Styling* below)
+- **Installed path:** `vendor/bagisto/b2b-suite` (via `composer require` — see *Installation
+  & registration*). This repo is a **development checkout** at `packages/bagisto/b2b-suite`,
+  symlinked into `vendor/` by the root `packages/*/*` path repository.
+- **PHP:** 8.1+ (per `composer.json`); developed against **Bagisto 2.4 / Laravel 12**. Blade
+  views are styled via the core Shop/Admin themes, which the package rebuilds into its own
+  bundles (see *Styling* below).
 
-## How the package is registered
+## Installation & registration
 
-Composer auto-discovery is intentionally **disabled** for this package. It is wired up
-manually in the application:
+**Installing the package — the [README](./README.md) is canonical:**
 
-1. `composer.json` (root) requires `bagisto/b2b-suite` via the `packages/*/*` path repo.
-2. `bootstrap/providers.php` registers `Webkul\B2BSuite\Providers\B2BSuiteServiceProvider`
-   **last** (it must load after the Shop package).
+1. `composer require bagisto/b2b-suite` (installs into `vendor/bagisto/b2b-suite`).
+2. Register `Webkul\B2BSuite\Providers\B2BSuiteServiceProvider` in `bootstrap/providers.php`,
+   **after the Shop package** (or last in the array). Composer auto-discovery is intentionally
+   **disabled** — discovery would load the provider too early, before Shop.
+3. `php artisan b2b-suite:install` (migrate, seed, publish assets/overrides, clear caches).
+
+**Development checkout (this repo):** instead of a registry install, the package lives at
+`packages/bagisto/b2b-suite` and is wired via the root `composer.json` path repository
+(`"type": "path", "url": "packages/*/*"` + `"bagisto/b2b-suite": "@dev"`), which symlinks it
+into `vendor/bagisto/b2b-suite`. Provider registration in `bootstrap/providers.php` is the same.
+Do not confuse this dev layout with the install steps above.
 
 `B2BSuiteServiceProvider` itself registers `ModuleServiceProvider` (Concord models) and
 `EventServiceProvider`, so there is **no** `config/concord.php` entry.
@@ -347,6 +357,46 @@ theme bundles, refresh `publishables/public/` with `npm run publishables` and re
   inserts and is idempotent. The suite is enabled by default on install
   (`CoreConfigTableSeeder` sets `b2b.general.settings.active`).
 
+### Routes
+
+- Each route file is **self-contained** — it declares its own `Route::group([...])` with the
+  middleware + prefix it owns. `admin-routes.php` wraps its groups in
+  `['admin', NoCacheMiddleware]` + prefix `config('app.admin_url').'/b2b'`; `shop-routes.php`
+  wraps the account groups in `['theme','locale','currency','customer','customer_bouncer',
+  NoCacheMiddleware]` + prefix `customer/account`. `web.php` only `require`s the two files
+  (no wrapping group of its own).
+- Order the route groups to match the **admin / account menu order**, so routes, menu and ACL
+  read in the same sequence.
+- `/** … */` block comments, one per group.
+
+### Blade & views
+
+- **Tags with 2+ attributes are multiline** (match core): `<tag` alone on the first line, each
+  attribute on its own line indented +4, the closing `>` / `/>` on its own line. 0–1 attribute
+  stays inline. Preserve Vue / `@` / `:` / `x-slot` bindings exactly — change only whitespace.
+- **Comments:** short label/heading comments are Title Case (`<!-- Action Buttons -->`);
+  full-sentence comments are capitalised and end with a period. Applies to `<!-- -->`,
+  `{{-- --}}`, and the `/** … */` JS/CSS blocks.
+- **Folder layout mirrors routes/features** (`admin/<feature>/…`,
+  `shop/customers/account/<feature>/…`); a feature's partials live under `partials/`.
+- A **shop** view uses `x-shop::*` components, an **admin** view `x-admin::*` — never mix them.
+- Verify a view compiles by **linting the compiled output** (see *Gotchas*), not just `view:cache`.
+
+### Translations & lang files
+
+- **All 22 Bagisto locales** exist (`ar, bn, ca, de, en, es, fa, fr, he, hi_IN, id, it, ja,
+  nl, pl, pt_BR, ro, ru, sin, tr, uk, zh_CN`). `en/app.php` is the canonical structure; every
+  other locale must have the **identical key set and order** — only values translated.
+  Preserve `:placeholder` tokens and brand terms (B2B Suite, Bagisto, SKU, Google Analytics ID,
+  social networks) across all locales.
+- **File structure (systematic, like core):** top-level `admin → shop → emails → seeders →
+  commands`. Within `admin` / `shop`: `acl → layouts → <menu-order features> → configuration`
+  (configuration last; shop has none). Within a feature: RESTful groups (`index → create →
+  edit → view`) then flash/validation messages. **Leaf keys sorted alphabetically.**
+- **No dead keys.** A key is live only if `b2b::app.<path>` — or any parent prefix, for dynamic
+  `'b2b::app.….'.$var` access — appears in `src/` or `publishables/`; audit before removing.
+- After any change run `php artisan bagisto:translations:check` (must report all synced).
+
 ### Dead code
 
 - No redundant overrides that only call `parent::…`, and no unused methods / relationships —
@@ -354,8 +404,8 @@ theme bundles, refresh `publishables/public/` with `npm run publishables` and re
 
 ### General
 
-- **Translations:** add new keys for **all** locales (currently only `en/app.php` exists)
-  and verify with `php artisan bagisto:translations:check`. Keep the lang array nesting
-  correct — e.g. shop sign-in keys live at `app.shop.sign-in.*` (a direct child of `shop`).
+- **Translations:** see *Translations & lang files* above — every change must keep all 22
+  locales in sync and pass `php artisan bagisto:translations:check`. Mind the array nesting
+  (e.g. shop sign-in keys live at `app.shop.sign-in.*`, a direct child of `shop`).
 - **Code style:** `vendor/bin/pint` (run from the application root).
 - After changing providers/config/routes: `php artisan optimize:clear`.

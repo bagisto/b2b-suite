@@ -1,9 +1,7 @@
-# CHANGELOG for v1.0.0
+# CHANGELOG for v2.0.0
 
 This changelog consists of the bug & security updates.
 
-## **v1.0.0 (11th of June 2026)** - *Release*
+## **v2.0.0 (22nd of June 2026)** - *Release*
 
-* Bug fixes.
-
-* Security updates.
+- Soon.
