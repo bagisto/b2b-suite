@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use Webkul\B2BSuite\Console\Commands\InstallB2BSuite;
+use Webkul\B2BSuite\Console\Commands\SeedDemoData;
 use Webkul\B2BSuite\Contracts\CompanyFlat;
 use Webkul\B2BSuite\Http\Middleware\CustomerBouncerMiddleware;
 use Webkul\B2BSuite\Http\Middleware\EnsurePayByCreditWithinLimit;
@@ -109,6 +110,7 @@ class B2BSuiteServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 InstallB2BSuite::class,
+                SeedDemoData::class,
             ]);
         }
     }

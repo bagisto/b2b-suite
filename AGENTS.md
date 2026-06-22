@@ -287,6 +287,16 @@ theme bundles, refresh `publishables/public/` with `npm run publishables` and re
 ## Commands
 
 - `php artisan b2b-suite:install` — migrate, seed, publish (storage + view overrides), clear caches.
+- `php artisan b2b-suite:seed-demo` — seed realistic **demo** companies (with profiles, members,
+  roles), company credit lines (+ ledger), quotations, purchase orders (each placing a real
+  pending Pay-By-Credit order that draws down the credit) and a few company catalogs (product +
+  derived-category visibility and tiered trade pricing, assigned to a subset of companies).
+  Tunable and built to
+  scale (chunked bulk inserts), e.g. `--companies=10000 --members=3 --quotations=4
+  --purchase-orders=3`; `--clean` wipes it. All demo accounts use the `@bagisto-b2b-demo.test`
+  email domain so the set is isolated and idempotently re-seeded (a run wipes the previous demo
+  data first). Seeders live in `Database/Seeders/DemoSeeders/` (orchestrated by `DemoDataSeeder`,
+  which is also runnable via `db:seed`). **Demo-only — never run against production data.**
 
 ## Conventions
 
