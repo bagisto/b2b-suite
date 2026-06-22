@@ -51,10 +51,11 @@ class DemoPurchaseOrderSeeder extends AbstractQuoteSeeder
                 return;
             }
 
-            $orderIdByNumber = $this->createOrders($plans, $flats, $now);
+            $orderIdByNumber = $this->createOrders($plans, $now);
             $quoteIdByNumber = $this->createQuotes($plans, $orderIdByNumber, $agentId, $now);
+            $quoteItemMap = $this->createQuoteChildren($plans, $quoteIdByNumber, $agentId, $now);
 
-            $this->createQuoteChildren($plans, $quoteIdByNumber, $agentId, $now);
+            $this->createOrderChildren($plans, $orderIdByNumber, $quoteIdByNumber, $quoteItemMap, $flats, $now);
             $this->chargeCredits($plans, $orderIdByNumber, $credits, $now);
         });
     }
@@ -88,9 +89,9 @@ class DemoPurchaseOrderSeeder extends AbstractQuoteSeeder
     }
 
     /**
-     * Create the sales orders (one per PO) and return order id keyed by quotation number.
+     * Create the sales order rows (one per PO) and return order id keyed by quotation number.
      */
-    protected function createOrders(array $plans, $flats, string $now): array
+    protected function createOrders(array $plans, string $now): array
     {
         $orderRows = [];
 
@@ -142,20 +143,40 @@ class DemoPurchaseOrderSeeder extends AbstractQuoteSeeder
             ->pluck('id', 'increment_id');
 
         $orderIdByNumber = [];
+
+        foreach ($plans as $number => $plan) {
+            if ($orderId = $orderIdByIncrement[$plan['increment_id']] ?? null) {
+                $orderIdByNumber[$number] = $orderId;
+            }
+        }
+
+        return $orderIdByNumber;
+    }
+
+    /**
+     * Create each order's items, billing/shipping address and payment. Order items carry the
+     * `additional` quote linkage (`quote_id` + `quote_item_id`) exactly like a real cart-placed
+     * order, so when the order is later invoiced + shipped to completion the B2B listener can
+     * follow it back and mark the purchase order completed.
+     */
+    protected function createOrderChildren(array $plans, array $orderIdByNumber, array $quoteIdByNumber, array $quoteItemMap, $flats, string $now): void
+    {
         $itemRows = [];
         $addressRows = [];
         $paymentRows = [];
 
         foreach ($plans as $number => $plan) {
-            $orderId = $orderIdByIncrement[$plan['increment_id']] ?? null;
+            $orderId = $orderIdByNumber[$number] ?? null;
 
             if (! $orderId) {
                 continue;
             }
 
-            $orderIdByNumber[$number] = $orderId;
+            $quoteId = $quoteIdByNumber[$number] ?? null;
 
             foreach ($plan['items'] as $item) {
+                $quoteItemId = $quoteItemMap[$number][$item['sku']] ?? null;
+
                 $itemRows[] = [
                     'sku' => $item['sku'],
                     'type' => $item['type'],
@@ -170,6 +191,9 @@ class DemoPurchaseOrderSeeder extends AbstractQuoteSeeder
                     'product_id' => $item['product_id'],
                     'product_type' => Product::class,
                     'order_id' => $orderId,
+                    'additional' => $quoteId && $quoteItemId
+                        ? json_encode(['quote_id' => $quoteId, 'quote_item_id' => $quoteItemId])
+                        : null,
                     'created_at' => $plan['order_date'],
                     'updated_at' => $now,
                 ];
@@ -191,8 +215,6 @@ class DemoPurchaseOrderSeeder extends AbstractQuoteSeeder
         $this->bulkInsert('order_items', $itemRows);
         $this->bulkInsert('addresses', $addressRows);
         $this->bulkInsert('order_payment', $paymentRows);
-
-        return $orderIdByNumber;
     }
 
     /**
@@ -272,9 +294,10 @@ class DemoPurchaseOrderSeeder extends AbstractQuoteSeeder
     }
 
     /**
-     * Insert the quote line items and message thread for each purchase order.
+     * Insert the quote line items and message thread for each purchase order, then return a
+     * map of quotation number → sku → quote item id so the order items can be linked back.
      */
-    protected function createQuoteChildren(array $plans, array $quoteIdByNumber, ?int $agentId, string $now): void
+    protected function createQuoteChildren(array $plans, array $quoteIdByNumber, ?int $agentId, string $now): array
     {
         $itemRows = [];
         $messageRows = [];
@@ -311,6 +334,35 @@ class DemoPurchaseOrderSeeder extends AbstractQuoteSeeder
         $this->bulkInsert('b2b_customer_quote_messages', $messageRows);
 
         $this->attachQuotations($plans, $quoteIdByNumber);
+
+        return $this->mapQuoteItemIds($quoteIdByNumber);
+    }
+
+    /**
+     * Read the just-inserted quote items back and map quotation number → sku → quote item id
+     * (SKUs are unique within a quote, so this uniquely identifies each line).
+     */
+    protected function mapQuoteItemIds(array $quoteIdByNumber): array
+    {
+        if (empty($quoteIdByNumber)) {
+            return [];
+        }
+
+        $numberByQuoteId = array_flip($quoteIdByNumber);
+
+        $map = [];
+
+        $items = DB::table('b2b_customer_quote_items')
+            ->whereIn('customer_quote_id', array_values($quoteIdByNumber))
+            ->get(['id', 'customer_quote_id', 'sku']);
+
+        foreach ($items as $item) {
+            if ($number = $numberByQuoteId[$item->customer_quote_id] ?? null) {
+                $map[$number][$item->sku] = $item->id;
+            }
+        }
+
+        return $map;
     }
 
     /**

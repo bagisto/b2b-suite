@@ -54,8 +54,10 @@
         <!-- Quote Attachments -->
         @include('b2b::shop.customers.account.quotes.view.attachments', ['quote' => $quote])
         
-        <!-- Quote Messages -->
-        @include('b2b::shop.customers.account.quotes.view.messages', ['quote' => $quote, 'isAdminLastQuotation' => $isAdminLastQuotation])
+        <!-- Quote Messages (Only when the member may use the quote chat.) -->
+        @if (customer_bouncer()->hasPermission('account.quotes.messages'))
+            @include('b2b::shop.customers.account.quotes.view.messages', ['quote' => $quote, 'isAdminLastQuotation' => $isAdminLastQuotation])
+        @endif
 
         {!! view_render_event('bagisto.shop.customers.account.purchase_order.view.after', ['quote' => $quote]) !!}
     </div>

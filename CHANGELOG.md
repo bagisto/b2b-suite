@@ -2,6 +2,14 @@
 
 This changelog consists of the bug & security updates.
 
+## **v2.0.1 (22nd of June 2026)** - *Release*
+
+- The sales order behind a company purchase order can now be opened by any member of that company via the "View Order" link, guarded by the purchase-orders permission; previously only the member who placed it could view it.
+
+- The quote / purchase-order chat block is hidden in full for members who do not have the quote messaging permission, rather than only hiding the message input.
+
+- Demo purchase orders now place sales orders whose line items are linked back to their quote items, so completing the sales order (invoice and shipment) correctly marks the linked purchase order, and its line items, as completed.
+
 ## **v2.0.0 (22nd of June 2026)** - *Release*
 
 - Initial release of the Bagisto B2B Suite for Bagisto v2.4.x (Laravel 12, PHP 8.3+).

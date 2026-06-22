@@ -6,6 +6,7 @@ use Illuminate\Foundation\Application;
 use Webkul\B2BSuite\Http\Controllers\Shop\API\CartController as B2BCartController;
 use Webkul\B2BSuite\Http\Controllers\Shop\Customer\CustomerController as ShopCustomerController;
 use Webkul\B2BSuite\Http\Controllers\Shop\Customer\RegistrationController;
+use Webkul\B2BSuite\Http\Controllers\Shop\OrderController as ShopOrderController;
 use Webkul\B2BSuite\Models\Customer;
 use Webkul\B2BSuite\Repositories\CategoryRepository as B2BCategoryRepository;
 use Webkul\B2BSuite\Repositories\ProductRepository as B2BProductRepository;
@@ -13,6 +14,7 @@ use Webkul\Category\Repositories\CategoryRepository as BaseCategoryRepository;
 use Webkul\Customer\Contracts\Customer as CustomerContract;
 use Webkul\Product\Repositories\ProductRepository as BaseProductRepository;
 use Webkul\Shop\Http\Controllers\API\CartController as BaseCartController;
+use Webkul\Shop\Http\Controllers\Customer\Account\OrderController as BaseOrderController;
 use Webkul\Shop\Http\Controllers\Customer\CustomerController as BaseShopCustomerController;
 use Webkul\Shop\Http\Controllers\Customer\RegistrationController as BaseRegistrationController;
 
@@ -42,6 +44,8 @@ final class B2BSuiteManager
         $this->app->bind(BaseShopCustomerController::class, ShopCustomerController::class);
 
         $this->app->bind(BaseCartController::class, B2BCartController::class);
+
+        $this->app->bind(BaseOrderController::class, ShopOrderController::class);
     }
 
     /**

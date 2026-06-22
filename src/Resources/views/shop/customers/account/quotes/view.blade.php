@@ -16,7 +16,6 @@
     </div>
 
     <div class="min-w-0 flex-auto">
-
         {!! view_render_event('bagisto.shop.customers.account.quote.view.before', ['quote' => $quote]) !!}
 
         @php
@@ -60,41 +59,41 @@
                 @endif
 
                 @if ($isDraft)
-                        <!-- Submit Quote (name + description + per-item discount editor) -->
-                        @include('b2b::shop.customers.account.quotes.view.submission-modal', [
-                            'quote'       => $quote,
-                            'mode'        => 'draft',
-                            'buttonLabel' => trans('b2b::app.shop.customers.account.quotes.view.btn-submit-quote'),
-                            'buttonClass' => 'primary-button',
-                        ])
+                    <!-- Submit Quote (name + description + per-item discount editor) -->
+                    @include('b2b::shop.customers.account.quotes.view.submission-modal', [
+                        'quote'       => $quote,
+                        'mode'        => 'draft',
+                        'buttonLabel' => trans('b2b::app.shop.customers.account.quotes.view.btn-submit-quote'),
+                        'buttonClass' => 'primary-button',
+                    ])
 
-                        <!-- Delete Quote -->
-                        @include('b2b::shop.customers.account.quotes.view.partials.modal', [
-                            'action'           => 'delete',
-                            'buttonText'       => 'btn-delete-quote',
-                            'buttonClass'      => 'secondary-button',
-                            'actionButtonText' => 'btn-delete',
-                        ])
-                    @endif
+                    <!-- Delete Quote -->
+                    @include('b2b::shop.customers.account.quotes.view.partials.modal', [
+                        'action'           => 'delete',
+                        'buttonText'       => 'btn-delete-quote',
+                        'buttonClass'      => 'secondary-button',
+                        'actionButtonText' => 'btn-delete',
+                    ])
+                @endif
 
-                    @if (! $isAdminLastQuotation && $quote->state == 'quotation' && $isOpenOrNegotiation)
-                        <!-- Re-submit / counter-offer (per-item discount editor + message) -->
-                        @include('b2b::shop.customers.account.quotes.view.submission-modal', [
-                            'quote'       => $quote,
-                            'mode'        => 'counter',
-                            'buttonLabel' => trans('b2b::app.shop.customers.account.quotes.view.btn-again-quote'),
-                            'buttonClass' => 'secondary-button',
-                        ])
-                    @endif
+                @if (! $isAdminLastQuotation && $quote->state == 'quotation' && $isOpenOrNegotiation)
+                    <!-- Re-submit / counter-offer (per-item discount editor + message) -->
+                    @include('b2b::shop.customers.account.quotes.view.submission-modal', [
+                        'quote'       => $quote,
+                        'mode'        => 'counter',
+                        'buttonLabel' => trans('b2b::app.shop.customers.account.quotes.view.btn-again-quote'),
+                        'buttonClass' => 'secondary-button',
+                    ])
+                @endif
 
-                    @if (! $isOrderedOrRejected)
-                        <!-- Reject Quote -->
-                        @include('b2b::shop.customers.account.quotes.view.partials.modal', [
-                            'action'      => 'reject',
-                            'buttonText'  => 'btn-reject-quote',
-                            'buttonClass' => 'secondary-button',
-                        ])
-                    @endif
+                @if (! $isOrderedOrRejected)
+                    <!-- Reject Quote -->
+                    @include('b2b::shop.customers.account.quotes.view.partials.modal', [
+                        'action'      => 'reject',
+                        'buttonText'  => 'btn-reject-quote',
+                        'buttonClass' => 'secondary-button',
+                    ])
+                @endif
             </div>
         </div>
 
@@ -107,11 +106,11 @@
         <!-- Quote Attachments -->
         @include('b2b::shop.customers.account.quotes.view.attachments', ['quote' => $quote])
 
-        <!-- Quote Messages -->
-        @include('b2b::shop.customers.account.quotes.view.messages', ['quote' => $quote, 'isAdminLastQuotation' => $isAdminLastQuotation])
+        <!-- Quote Messages (Only when the member may use the quote chat.) -->
+        @if (customer_bouncer()->hasPermission('account.quotes.messages'))
+            @include('b2b::shop.customers.account.quotes.view.messages', ['quote' => $quote, 'isAdminLastQuotation' => $isAdminLastQuotation])
+        @endif
 
         {!! view_render_event('bagisto.shop.customers.account.quote.view.after', ['quote' => $quote]) !!}
-
     </div>
-
 </x-shop::layouts.account>
