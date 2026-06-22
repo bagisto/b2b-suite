@@ -7,12 +7,36 @@ use Webkul\B2BSuite\Repositories\CompanyRoleRepository;
 class CustomerBouncer
 {
     /**
-     * Permission types
+     * Full-access permission type — grants every company feature.
      */
     public const PERMISSION_TYPE_ALL = 'all';
 
+    /**
+     * Custom permission type allows selecting specific permissions from the list of company features.
+     */
     public const PERMISSION_TYPE_CUSTOM = 'custom';
 
+    /**
+     * Company (B2B) feature ACL keys. Everything else — profile, address, orders,
+     * downloadables, reviews, wishlist, GDPR — is a personal account feature that a company
+     * role must never be able to revoke: a member always controls their own account.
+     */
+    public const B2B_KEYS = [
+        'account.company_profile',
+        'account.company_credit',
+        'account.quotes',
+        'account.purchase_orders',
+        'account.requisitions',
+        'account.quick_orders',
+        'account.users',
+        'account.roles',
+    ];
+
+    /**
+     * Create a new bouncer instance.
+     *
+     * @return void
+     */
     public function __construct(protected CompanyRoleRepository $roleRepo) {}
 
     /**
@@ -26,30 +50,24 @@ class CustomerBouncer
             return false;
         }
 
-        $b2bKeys = [
-            'account.requisitions',
-            'account.quotes',
-            'account.purchase_orders',
-            'account.quick_orders',
-            'account.users',
-            'account.roles',
-        ];
-
-        if (! $customer->company_role_id && $customer->type !== 'company') {
-            foreach ($b2bKeys as $b2bKey) {
-                if (str_contains($permission, $b2bKey)) {
-                    return false;
-                }
-            }
-
+        /**
+         * Personal account features are always allowed — only company features are gated by
+         * the company role.
+         */
+        if (! $this->isCompanyPermission($permission)) {
             return true;
         }
 
-        if ($customer->type === 'company') {
-            $role = $this->roleRepo->findWhere(['customer_id' => $customer->id])->first();
-        } else {
-            $role = $this->roleRepo->find($customer->company_role_id);
+        /**
+         * A plain customer (no company role) cannot reach company features.
+         */
+        if (! $customer->company_role_id && $customer->type !== 'company') {
+            return false;
         }
+
+        $role = $customer->type === 'company'
+            ? $this->roleRepo->findWhere(['customer_id' => $customer->id])->first()
+            : $this->roleRepo->find($customer->company_role_id);
 
         if (! $role) {
             return false;
@@ -73,9 +91,7 @@ class CustomerBouncer
             $permissions = array_map(fn ($perm) => 'account.'.$perm, $permissions);
             array_unshift($permissions, 'account');
 
-            $hasPermission = in_array($permission, $permissions);
-
-            return $hasPermission;
+            return in_array($permission, $permissions);
         }
 
         return false;
@@ -91,5 +107,19 @@ class CustomerBouncer
         if (! $instance->hasPermission($permission)) {
             abort(401, 'Unauthorized action.');
         }
+    }
+
+    /**
+     * Whether the given ACL key belongs to a company (B2B) feature.
+     */
+    protected function isCompanyPermission(string $permission): bool
+    {
+        foreach (self::B2B_KEYS as $key) {
+            if (str_contains($permission, $key)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

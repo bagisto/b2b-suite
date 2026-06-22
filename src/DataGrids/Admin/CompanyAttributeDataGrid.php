@@ -13,7 +13,7 @@ class CompanyAttributeDataGrid extends DataGrid
      */
     public function prepareQueryBuilder(): Builder
     {
-        return DB::table('company_attributes')
+        return DB::table('b2b_company_attributes')
             ->select(
                 'id',
                 'code',
@@ -33,78 +33,78 @@ class CompanyAttributeDataGrid extends DataGrid
     public function prepareColumns(): void
     {
         $this->addColumn([
-            'index'      => 'id',
-            'label'      => trans('b2b_suite::app.admin.company-attributes.index.datagrid.id'),
-            'type'       => 'integer',
+            'index' => 'id',
+            'label' => trans('b2b::app.admin.company-attributes.index.datagrid.id'),
+            'type' => 'integer',
             'searchable' => true,
             'filterable' => true,
-            'sortable'   => true,
+            'sortable' => true,
         ]);
 
         $this->addColumn([
-            'index'      => 'code',
-            'label'      => trans('b2b_suite::app.admin.company-attributes.index.datagrid.code'),
-            'type'       => 'string',
+            'index' => 'code',
+            'label' => trans('b2b::app.admin.company-attributes.index.datagrid.code'),
+            'type' => 'string',
             'searchable' => true,
             'filterable' => true,
-            'sortable'   => true,
+            'sortable' => true,
         ]);
 
         $this->addColumn([
-            'index'      => 'admin_name',
-            'label'      => trans('b2b_suite::app.admin.company-attributes.index.datagrid.name'),
-            'type'       => 'string',
+            'index' => 'admin_name',
+            'label' => trans('b2b::app.admin.company-attributes.index.datagrid.name'),
+            'type' => 'string',
             'searchable' => true,
             'filterable' => true,
-            'sortable'   => true,
+            'sortable' => true,
         ]);
 
         $this->addColumn([
-            'index'              => 'type',
-            'label'              => trans('b2b_suite::app.admin.company-attributes.index.datagrid.type'),
-            'type'               => 'string',
-            'searchable'         => true,
-            'filterable'         => true,
-            'filterable_type'    => 'dropdown',
+            'index' => 'type',
+            'label' => trans('b2b::app.admin.company-attributes.index.datagrid.type'),
+            'type' => 'string',
+            'searchable' => true,
+            'filterable' => true,
+            'filterable_type' => 'dropdown',
             'filterable_options' => [
                 [
-                    'label' => trans('b2b_suite::app.admin.company-attributes.index.datagrid.text'),
+                    'label' => trans('b2b::app.admin.company-attributes.index.datagrid.text'),
                     'value' => 'text',
                 ],
                 [
-                    'label' => trans('b2b_suite::app.admin.company-attributes.index.datagrid.textarea'),
+                    'label' => trans('b2b::app.admin.company-attributes.index.datagrid.textarea'),
                     'value' => 'textarea',
                 ],
                 [
-                    'label' => trans('b2b_suite::app.admin.company-attributes.index.datagrid.boolean'),
+                    'label' => trans('b2b::app.admin.company-attributes.index.datagrid.boolean'),
                     'value' => 'boolean',
                 ],
                 [
-                    'label' => trans('b2b_suite::app.admin.company-attributes.index.datagrid.select'),
+                    'label' => trans('b2b::app.admin.company-attributes.index.datagrid.select'),
                     'value' => 'select',
                 ],
                 [
-                    'label' => trans('b2b_suite::app.admin.company-attributes.index.datagrid.multiselect'),
+                    'label' => trans('b2b::app.admin.company-attributes.index.datagrid.multiselect'),
                     'value' => 'multiselect',
                 ],
                 [
-                    'label' => trans('b2b_suite::app.admin.company-attributes.index.datagrid.date-time'),
+                    'label' => trans('b2b::app.admin.company-attributes.index.datagrid.date-time'),
                     'value' => 'datetime',
                 ],
                 [
-                    'label' => trans('b2b_suite::app.admin.company-attributes.index.datagrid.date'),
+                    'label' => trans('b2b::app.admin.company-attributes.index.datagrid.date'),
                     'value' => 'date',
                 ],
                 [
-                    'label' => trans('b2b_suite::app.admin.company-attributes.index.datagrid.image'),
+                    'label' => trans('b2b::app.admin.company-attributes.index.datagrid.image'),
                     'value' => 'image',
                 ],
                 [
-                    'label' => trans('b2b_suite::app.admin.company-attributes.index.datagrid.file'),
+                    'label' => trans('b2b::app.admin.company-attributes.index.datagrid.file'),
                     'value' => 'file',
                 ],
                 [
-                    'label' => trans('b2b_suite::app.admin.company-attributes.index.datagrid.checkbox'),
+                    'label' => trans('b2b::app.admin.company-attributes.index.datagrid.checkbox'),
                     'value' => 'checkbox',
                 ],
             ],
@@ -112,77 +112,77 @@ class CompanyAttributeDataGrid extends DataGrid
         ]);
 
         $this->addColumn([
-            'index'      => 'is_required',
-            'label'      => trans('b2b_suite::app.admin.company-attributes.index.datagrid.required'),
-            'type'       => 'boolean',
+            'index' => 'is_required',
+            'label' => trans('b2b::app.admin.company-attributes.index.datagrid.required'),
+            'type' => 'boolean',
             'searchable' => true,
             'filterable' => true,
-            'sortable'   => true,
-            'closure'    => function ($row) {
+            'sortable' => true,
+            'closure' => function ($row) {
                 if ($row->is_required) {
-                    return trans('b2b_suite::app.admin.company-attributes.index.datagrid.true');
+                    return trans('b2b::app.admin.company-attributes.index.datagrid.true');
                 }
 
-                return trans('b2b_suite::app.admin.company-attributes.index.datagrid.false');
+                return trans('b2b::app.admin.company-attributes.index.datagrid.false');
             },
         ]);
 
         $this->addColumn([
-            'index'      => 'is_unique',
-            'label'      => trans('b2b_suite::app.admin.company-attributes.index.datagrid.unique'),
-            'type'       => 'boolean',
+            'index' => 'is_unique',
+            'label' => trans('b2b::app.admin.company-attributes.index.datagrid.unique'),
+            'type' => 'boolean',
             'searchable' => true,
             'filterable' => true,
-            'sortable'   => true,
-            'closure'    => function ($row) {
+            'sortable' => true,
+            'closure' => function ($row) {
                 if ($row->is_unique) {
-                    return trans('b2b_suite::app.admin.company-attributes.index.datagrid.true');
+                    return trans('b2b::app.admin.company-attributes.index.datagrid.true');
                 }
 
-                return trans('b2b_suite::app.admin.company-attributes.index.datagrid.false');
+                return trans('b2b::app.admin.company-attributes.index.datagrid.false');
             },
         ]);
 
         $this->addColumn([
-            'index'      => 'value_per_locale',
-            'label'      => trans('b2b_suite::app.admin.company-attributes.index.datagrid.locale-based'),
-            'type'       => 'boolean',
+            'index' => 'value_per_locale',
+            'label' => trans('b2b::app.admin.company-attributes.index.datagrid.locale-based'),
+            'type' => 'boolean',
             'searchable' => true,
             'filterable' => true,
-            'sortable'   => true,
-            'closure'    => function ($row) {
+            'sortable' => true,
+            'closure' => function ($row) {
                 if ($row->value_per_locale) {
-                    return trans('b2b_suite::app.admin.company-attributes.index.datagrid.true');
+                    return trans('b2b::app.admin.company-attributes.index.datagrid.true');
                 }
 
-                return trans('b2b_suite::app.admin.company-attributes.index.datagrid.false');
+                return trans('b2b::app.admin.company-attributes.index.datagrid.false');
             },
         ]);
 
         $this->addColumn([
-            'index'      => 'value_per_channel',
-            'label'      => trans('b2b_suite::app.admin.company-attributes.index.datagrid.channel-based'),
-            'type'       => 'boolean',
+            'index' => 'value_per_channel',
+            'label' => trans('b2b::app.admin.company-attributes.index.datagrid.channel-based'),
+            'type' => 'boolean',
             'searchable' => true,
             'filterable' => true,
-            'sortable'   => true,
-            'closure'    => function ($row) {
+            'sortable' => true,
+            'closure' => function ($row) {
                 if ($row->value_per_channel) {
-                    return trans('b2b_suite::app.admin.company-attributes.index.datagrid.true');
+                    return trans('b2b::app.admin.company-attributes.index.datagrid.true');
                 }
 
-                return trans('b2b_suite::app.admin.company-attributes.index.datagrid.false');
+                return trans('b2b::app.admin.company-attributes.index.datagrid.false');
             },
         ]);
 
         $this->addColumn([
-            'index'           => 'created_at',
-            'label'           => trans('b2b_suite::app.admin.company-attributes.index.datagrid.created-at'),
-            'type'            => 'date',
-            'searchable'      => true,
-            'filterable'      => true,
+            'index' => 'created_at',
+            'label' => trans('b2b::app.admin.company-attributes.index.datagrid.created-at'),
+            'type' => 'date',
+            'searchable' => true,
+            'filterable' => true,
             'filterable_type' => 'date_range',
-            'sortable'        => true,
+            'sortable' => true,
         ]);
     }
 
@@ -191,24 +191,24 @@ class CompanyAttributeDataGrid extends DataGrid
      */
     public function prepareActions(): void
     {
-        if (bouncer()->hasPermission('b2b_suite.company_attributes.edit')) {
+        if (bouncer()->hasPermission('b2b.attributes.edit')) {
             $this->addAction([
-                'icon'   => 'icon-edit',
-                'title'  => trans('b2b_suite::app.admin.company-attributes.index.datagrid.edit'),
+                'icon' => 'icon-edit',
+                'title' => trans('b2b::app.admin.company-attributes.index.datagrid.edit'),
                 'method' => 'GET',
-                'url'    => function ($row) {
-                    return route('admin.customers.attributes.edit', $row->id);
+                'url' => function ($row) {
+                    return route('admin.b2b.attributes.edit', $row->id);
                 },
             ]);
         }
 
-        if (bouncer()->hasPermission('b2b_suite.company_attributes.delete')) {
+        if (bouncer()->hasPermission('b2b.attributes.delete')) {
             $this->addAction([
-                'icon'   => 'icon-delete',
-                'title'  => trans('b2b_suite::app.admin.company-attributes.index.datagrid.delete'),
+                'icon' => 'icon-delete',
+                'title' => trans('b2b::app.admin.company-attributes.index.datagrid.delete'),
                 'method' => 'DELETE',
-                'url'    => function ($row) {
-                    return route('admin.customers.attributes.delete', $row->id);
+                'url' => function ($row) {
+                    return route('admin.b2b.attributes.delete', $row->id);
                 },
             ]);
         }
@@ -219,12 +219,12 @@ class CompanyAttributeDataGrid extends DataGrid
      */
     public function prepareMassActions(): void
     {
-        if (bouncer()->hasPermission('b2b_suite.company_attributes.delete')) {
+        if (bouncer()->hasPermission('b2b.attributes.delete')) {
             $this->addMassAction([
-                'icon'   => 'icon-delete',
-                'title'  => trans('b2b_suite::app.admin.company-attributes.index.datagrid.delete'),
+                'icon' => 'icon-delete',
+                'title' => trans('b2b::app.admin.company-attributes.index.datagrid.delete'),
                 'method' => 'POST',
-                'url'    => route('admin.customers.attributes.mass_delete'),
+                'url' => route('admin.b2b.attributes.mass_delete'),
             ]);
         }
     }

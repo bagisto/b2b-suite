@@ -9,6 +9,13 @@ use Webkul\Core\Eloquent\TranslatableModel;
 class CompanyAttributeOption extends TranslatableModel implements AttributeOptionContract
 {
     /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'b2b_company_attribute_options';
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array

@@ -2,8 +2,11 @@
 
 namespace Webkul\B2BSuite\Http\Controllers\Shop;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\View\View;
 use Webkul\Admin\Http\Resources\ProductResource;
 use Webkul\B2BSuite\Repositories\CompanyRoleRepository;
 use Webkul\Customer\Repositories\CustomerGroupRepository;
@@ -19,37 +22,37 @@ class QuickOrderController extends Controller
      * @return void
      */
     public function __construct(
+        protected ProductRepository $productRepository,
         protected CustomerRepository $customerRepository,
         protected CustomerGroupRepository $customerGroupRepository,
         protected CompanyRoleRepository $companyRoleRepository,
-        protected ProductRepository $productRepository,
     ) {}
 
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function index()
     {
-        return view('b2b_suite::shop.customers.account.quick-orders.index');
+        return view('b2b::shop.customers.account.quick-orders.index');
     }
 
     /**
      * Method to store user's sign up form data to DB.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store()
     {
         try {
-            $maxFileSizeMB = core()->getConfigData('b2b.catalog.quick_order.upload_file.max_size') ?? 2;
+            $maxFileSizeMB = (int) (core()->getConfigData('b2b.quotes.settings.maximum_file_size') ?: 2);
 
             $this->validate(request(), [
-                'products'            => 'required_without:upload_file|array',
-                'products.*.sku'      => 'sometimes|string|distinct|exists:products,sku',
+                'products' => 'required_without:upload_file|array',
+                'products.*.sku' => 'sometimes|string|distinct|exists:products,sku',
                 'products.*.quantity' => 'sometimes|numeric|min:1',
-                'upload_file'         => 'required_without:products|file|mimes:csv|max:'.($maxFileSizeMB * 1024),
+                'upload_file' => 'required_without:products|file|mimes:csv|max:'.($maxFileSizeMB * 1024),
             ]);
 
             $data = request()->only('products', 'upload_file');
@@ -67,7 +70,7 @@ class QuickOrderController extends Controller
 
                     if (! empty($sku)) {
                         $products[] = [
-                            'sku'      => $sku,
+                            'sku' => $sku,
                             'quantity' => $quantity,
                         ];
                     }
@@ -78,27 +81,27 @@ class QuickOrderController extends Controller
 
             if (empty($data['products'])) {
                 return response()->json([
-                    'message' => trans('b2b_suite::app.shop.customers.account.quick-orders.no-products-found'),
+                    'message' => trans('b2b::app.shop.customers.account.quick-orders.no-products-found'),
                 ]);
             }
 
             try {
-                b2b_suite()->addProductsToCart($data['products']);
+                b2b()->addProductsToCart($data['products']);
 
                 return response()->json([
-                    'status'       => 'success',
-                    'message'      => trans('b2b_suite::app.shop.customers.account.quick-orders.create-success'),
+                    'status' => 'success',
+                    'message' => trans('b2b::app.shop.customers.account.quick-orders.create-success'),
                     'redirect_url' => route('shop.customers.account.quick_orders.index'),
                 ]);
             } catch (\Exception $e) {
                 return response()->json([
-                    'message' => trans('b2b_suite::app.shop.customers.account.quick-orders.something-went-wrong'),
+                    'message' => trans('b2b::app.shop.customers.account.quick-orders.something-went-wrong'),
                 ]);
             }
 
         } catch (\Exception $e) {
             return response()->json([
-                'message' => trans('b2b_suite::app.shop.customers.account.quick-orders.no-products-found'),
+                'message' => trans('b2b::app.shop.customers.account.quick-orders.no-products-found'),
             ]);
         }
     }
@@ -106,7 +109,7 @@ class QuickOrderController extends Controller
     /**
      * Result of search product.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function search()
     {
@@ -134,10 +137,10 @@ class QuickOrderController extends Controller
         $channelId = $this->customerRepository->find(auth()->guard('customer')->user()->id)->channel_id ?? null;
 
         $params = [
-            'index'      => $indexNames ?? null,
-            'name'       => request('query'),
-            'sort'       => 'created_at',
-            'order'      => 'desc',
+            'index' => $indexNames ?? null,
+            'name' => request('query'),
+            'sort' => 'created_at',
+            'order' => 'desc',
             'channel_id' => $channelId,
         ];
 
@@ -147,10 +150,10 @@ class QuickOrderController extends Controller
 
         if ($products->isEmpty()) {
             $params = [
-                'index'      => $indexNames ?? null,
-                'sku'        => request('query'),
-                'sort'       => 'created_at',
-                'order'      => 'desc',
+                'index' => $indexNames ?? null,
+                'sku' => request('query'),
+                'sort' => 'created_at',
+                'order' => 'desc',
                 'channel_id' => $channelId,
             ];
 
@@ -165,15 +168,21 @@ class QuickOrderController extends Controller
     /**
      * Fetch products by skus.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function fetchBySkus(Request $request)
     {
-        $skus = $request->get('skus', []);
+        $skus = $request->input('skus', []);
 
         $products = $this->productRepository->scopeQuery(function ($q) use ($skus) {
             return $q->whereIn('sku', $skus);
         })->get();
+
+        /**
+         * Keep only products inside the customer's company catalog (search already does this;
+         * this direct SKU lookup must too). isVisible() is a no-op when no catalog applies.
+         */
+        $products = $products->filter(fn ($product) => $this->productRepository->isVisible($product))->values();
 
         return ProductResource::collection($products);
     }
@@ -183,8 +192,6 @@ class QuickOrderController extends Controller
      */
     public function downloadSample()
     {
-        $samplePath = 'b2b-data/sample/sample_file.csv';
-
-        return Storage::download($samplePath);
+        return Storage::disk('public')->download('b2b-quick-order/samples/sample-file.csv');
     }
 }

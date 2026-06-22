@@ -8,8 +8,18 @@ use Webkul\B2BSuite\Contracts\CustomerQuoteAttachment as CustomerQuoteAttachment
 
 class CustomerQuoteAttachment extends Model implements CustomerQuoteAttachmentContract
 {
-    protected $table = 'customer_quote_attachments';
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'b2b_customer_quote_attachments';
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
     protected $fillable = [
         'customer_quote_id',
         'name',
@@ -18,6 +28,9 @@ class CustomerQuoteAttachment extends Model implements CustomerQuoteAttachmentCo
         'size',
     ];
 
+    /**
+     * The quote this attachment belongs to.
+     */
     public function quote(): BelongsTo
     {
         return $this->belongsTo(CustomerQuote::class, 'customer_quote_id');

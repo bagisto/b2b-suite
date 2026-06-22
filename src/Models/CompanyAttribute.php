@@ -11,6 +11,13 @@ use Webkul\Core\Eloquent\TranslatableModel;
 class CompanyAttribute extends TranslatableModel implements AttributeContract
 {
     /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'b2b_company_attributes';
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array
@@ -45,17 +52,17 @@ class CompanyAttribute extends TranslatableModel implements AttributeContract
      * @var array
      */
     public $attributeTypeFields = [
-        'text'        => 'text_value',
-        'textarea'    => 'text_value',
-        'price'       => 'float_value',
-        'boolean'     => 'boolean_value',
-        'select'      => 'integer_value',
+        'text' => 'text_value',
+        'textarea' => 'text_value',
+        'price' => 'float_value',
+        'boolean' => 'boolean_value',
+        'select' => 'integer_value',
         'multiselect' => 'text_value',
-        'datetime'    => 'datetime_value',
-        'date'        => 'date_value',
-        'file'        => 'text_value',
-        'image'       => 'text_value',
-        'checkbox'    => 'text_value',
+        'datetime' => 'datetime_value',
+        'date' => 'date_value',
+        'file' => 'text_value',
+        'image' => 'text_value',
+        'checkbox' => 'text_value',
     ];
 
     /**
@@ -67,7 +74,17 @@ class CompanyAttribute extends TranslatableModel implements AttributeContract
     }
 
     /**
-     * Returns attribute value table column based attribute type
+     * Get the attributes that owns the attribute group.
+     */
+    public function attribute_group(): BelongsToMany
+    {
+        return $this->belongsToMany(CompanyAttributeGroupProxy::modelClass(), 'b2b_company_attribute_group_mappings')
+            ->withPivot('position')
+            ->orderBy('pivot_position', 'asc');
+    }
+
+    /**
+     * Returns attribute value table column based attribute type.
      */
     protected function columnName(): Attribute
     {
@@ -77,7 +94,7 @@ class CompanyAttribute extends TranslatableModel implements AttributeContract
     }
 
     /**
-     * Get the validation attribute
+     * Get the validation attribute.
      */
     protected function validations(): Attribute
     {
@@ -116,15 +133,5 @@ class CompanyAttribute extends TranslatableModel implements AttributeContract
         return Attribute::make(
             get: fn () => '{ '.implode(', ', array_filter($validations)).' }',
         );
-    }
-
-    /**
-     * Get the attributes that owns the attribute group.
-     */
-    public function attribute_group(): BelongsToMany
-    {
-        return $this->belongsToMany(CompanyAttributeGroupProxy::modelClass(), 'company_attribute_group_mappings')
-            ->withPivot('position')
-            ->orderBy('pivot_position', 'asc');
     }
 }

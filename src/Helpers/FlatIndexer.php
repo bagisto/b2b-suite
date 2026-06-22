@@ -3,87 +3,62 @@
 namespace Webkul\B2BSuite\Helpers;
 
 use Illuminate\Support\Facades\Schema;
-use Webkul\B2BSuite\Repositories\CustomerFlatRepository;
+use Webkul\B2BSuite\Repositories\CompanyFlatRepository;
+use Webkul\Customer\Contracts\Customer;
 use Webkul\Customer\Repositories\CustomerRepository;
 
 class FlatIndexer
 {
     /**
-     * Default batch size
-     */
-    protected const BATCH_SIZE = 100;
-
-    /**
-     * @var int
-     */
-    private $batchSize;
-
-    /**
-     * Attribute codes that can be fill during flat creation.
+     * The column names of the b2b_company_flat table.
      *
-     * @var string[]
-     */
-    protected $fillableAttributeCodes = [
-        'sku',
-        'name',
-        'price',
-        'weight',
-        'status',
-    ];
-
-    /**
      * @var array
      */
     protected $flatColumns = [];
 
     /**
-     * Channels
-     *
-     * @var array
-     */
-    protected $channels = [];
-
-    /**
-     * Family Attributes
-     *
-     * @var array
-     */
-    protected $familyAttributes = [];
-
-    /**
-     * Create a new listener instance.
+     * Create a new company flat indexer instance.
      *
      * @return void
      */
     public function __construct(
         protected CustomerRepository $customerRepository,
-        protected CustomerFlatRepository $customerFlatRepository
+        protected CompanyFlatRepository $companyFlatRepository
     ) {
-        $this->batchSize = self::BATCH_SIZE;
-
-        $this->flatColumns = Schema::getColumnListing('customer_flat');
+        $this->flatColumns = Schema::getColumnListing('b2b_company_flat');
     }
 
     /**
-     * Refresh customer flat indices
+     * Refresh the company flat index for the given customer.
      *
-     * @param  \Webkul\Customer\Contracts\Customer  $customer
+     * @param  Customer  $customer
      * @return void
      */
     public function refresh($customer)
     {
         $customer = $this->customerRepository->find($customer->id);
 
+        /**
+         * Only the company owner carries company attribute data. Sub-users (and plain
+         * customers) share their company's details, so they must not get their own
+         * b2b_company_flat row — drop any stale one if the record is not a company.
+         */
+        if (($customer->type ?? null) !== 'company') {
+            $this->companyFlatRepository->deleteWhere(['customer_id' => $customer->id]);
+
+            return;
+        }
+
         $this->updateOrCreate($customer);
     }
 
     /**
-     * Creates customer flat
+     * Create or update the company flat index rows for the company.
      *
-     * @param  \Webkul\Customer\Contracts\Customer  $customer
+     * @param  Customer  $customer
      * @return void
      */
-    public function updateOrCreate($customer)
+    protected function updateOrCreate($customer)
     {
         $channelIds[] = $customer->channel->id;
 
@@ -98,21 +73,17 @@ class FlatIndexer
         foreach (core()->getAllChannels() as $channel) {
             if (in_array($channel->id, $channelIds)) {
                 foreach ($channel->locales as $locale) {
-                    $customerFlat = $this->customerFlatRepository->updateOrCreate([
+                    $customerFlat = $this->companyFlatRepository->updateOrCreate([
                         'customer_id' => $customer->id,
-                        'channel'     => $channel->code,
-                        'locale'      => $locale->code,
+                        'channel' => $channel->code,
+                        'locale' => $locale->code,
                     ], [
-                        'slug'  => $customer->slug,
                         'email' => $customer->email,
                         'phone' => $customer->phone,
                     ]);
 
                     foreach ($customerAttributes as $attribute) {
-                        if (
-                            ! in_array($attribute->code, $this->flatColumns)
-                            || $attribute->code == 'slug'
-                        ) {
+                        if (! in_array($attribute->code, $this->flatColumns)) {
                             continue;
                         }
 
@@ -141,9 +112,9 @@ class FlatIndexer
                 }
             } else {
                 if (request()->route()?->getName() == 'admin.customer.customers.update') {
-                    $this->customerFlatRepository->deleteWhere([
+                    $this->companyFlatRepository->deleteWhere([
                         'customer_id' => $customer->id,
-                        'channel'     => $channel->code,
+                        'channel' => $channel->code,
                     ]);
                 }
             }

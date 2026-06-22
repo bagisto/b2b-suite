@@ -2,6 +2,7 @@
 
 namespace Webkul\B2BSuite\Http\Resources;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
@@ -12,7 +13,7 @@ class RequisitionItemResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request
+     * @param  Request
      * @return array
      */
     public function toArray($request)
@@ -24,21 +25,21 @@ class RequisitionItemResource extends JsonResource
         }
 
         return [
-            'id'                  => $this->id,
+            'id' => $this->id,
             'requisition_list_id' => $this->requisition_list_id,
-            'product_id'          => $this->product_id,
-            'variant_id'          => $this->variant_id,
-            'type'                => $this->type,
-            'sku'                 => $this->sku,
-            'name'                => $this->name,
-            'quantity'            => $this->qty,
-            'price'               => $this->price,
-            'formatted_price'     => core()->formatPrice($this->price),
-            'total'               => $this->total,
-            'formatted_total'     => core()->formatPrice($this->total),
-            'base_image'          => ProductImage::getProductBaseImage($product),
-            'product_url_key'     => $this->product->url_key,
-            'options'             => $this->formatAdditionalAttributes(),
+            'product_id' => $this->product_id,
+            'variant_id' => $this->variant_id,
+            'type' => $this->type,
+            'sku' => $this->sku,
+            'name' => $this->name,
+            'quantity' => $this->qty,
+            'price' => $this->price,
+            'formatted_price' => core()->formatPrice($this->price),
+            'total' => $this->total,
+            'formatted_total' => core()->formatPrice($this->total),
+            'base_image' => ProductImage::getProductBaseImage($product),
+            'product_url_key' => $this->product->url_key,
+            'options' => $this->formatAdditionalAttributes(),
         ];
     }
 

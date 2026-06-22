@@ -1,1 +1,0 @@
-@bagistoVite(['src/Resources/assets/js/app.js'], 'b2b-suite')

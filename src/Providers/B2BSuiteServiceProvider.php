@@ -6,8 +6,12 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
+use Webkul\B2BSuite\Console\Commands\InstallB2BSuite;
+use Webkul\B2BSuite\Contracts\CompanyFlat;
 use Webkul\B2BSuite\Http\Middleware\CustomerBouncerMiddleware;
+use Webkul\B2BSuite\Http\Middleware\EnsurePayByCreditWithinLimit;
 use Webkul\B2BSuite\Menu as B2BMenu;
+use Webkul\B2BSuite\Repositories\CompanyFlatRepository;
 use Webkul\Core\Menu as CoreMenu;
 
 class B2BSuiteServiceProvider extends ServiceProvider
@@ -28,34 +32,17 @@ class B2BSuiteServiceProvider extends ServiceProvider
 
         $this->mergeConfigFrom(
             dirname(__DIR__).'/Config/shop/acl.php',
-            'b2b_suite_acl'
+            'b2b_acl'
         );
 
         $this->mergeConfigFrom(
-            dirname(__DIR__).'/Config/bagisto-vite.php',
-            'bagisto-vite.viters'
+            dirname(__DIR__).'/Config/payment-methods.php',
+            'payment_methods'
         );
-
-        $this->mergeAuthConfigs();
 
         $this->registerServices();
 
-        $this->registerFacades();
-
         $this->app->bind(CoreMenu::class, B2BMenu::class);
-    }
-
-    /**
-     * Merge Auth Configs.
-     */
-    public function mergeAuthConfigs(): void
-    {
-        foreach (['guards', 'providers', 'passwords'] as $key) {
-            $this->mergeConfigFrom(
-                dirname(__DIR__).'/Config/company/auth/'.$key.'.php',
-                'auth.'.$key
-            );
-        }
     }
 
     /**
@@ -65,19 +52,27 @@ class B2BSuiteServiceProvider extends ServiceProvider
     {
         include __DIR__.'/../Http/helpers.php';
 
-        if (core()->getConfigData('b2b_suite.general.settings.active')) {
+        if (core()->getConfigData('b2b.general.settings.active')) {
             Route::middleware('web')->group(__DIR__.'/../Routes/web.php');
+
+            require __DIR__.'/../Routes/breadcrumbs.php';
         }
 
         Route::aliasMiddleware('customer_bouncer', CustomerBouncerMiddleware::class);
 
+        /**
+         * Guard checkout so a "Pay By Credit" order can never exceed the company's available
+         * credit (the method is shown but the order is rejected when over the limit).
+         */
+        Route::pushMiddlewareToGroup('shop', EnsurePayByCreditWithinLimit::class);
+
         $this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
 
-        $this->loadTranslationsFrom(__DIR__.'/../Resources/lang', 'b2b_suite');
+        $this->loadTranslationsFrom(__DIR__.'/../Resources/lang', 'b2b');
 
-        $this->loadViewsFrom(__DIR__.'/../Resources/views', 'b2b_suite');
+        $this->loadViewsFrom(__DIR__.'/../Resources/views', 'b2b');
 
-        Blade::anonymousComponentPath(__DIR__.'/../Resources/views/components', 'b2b_suite');
+        Blade::anonymousComponentPath(__DIR__.'/../Resources/views/components', 'b2b');
 
         $this->registerCommands();
 
@@ -87,7 +82,7 @@ class B2BSuiteServiceProvider extends ServiceProvider
 
         if (
             Schema::hasTable('core_config')
-            && (bool) core()->getConfigData('b2b_suite.general.settings.active')
+            && (bool) core()->getConfigData('b2b.general.settings.active')
         ) {
             $this->mergeConfigFrom(
                 dirname(__DIR__).'/Config/admin/menu.php',
@@ -113,7 +108,7 @@ class B2BSuiteServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->commands([
-                \Webkul\B2BSuite\Console\Commands\InstallB2BSuite::class,
+                InstallB2BSuite::class,
             ]);
         }
     }
@@ -134,15 +129,12 @@ class B2BSuiteServiceProvider extends ServiceProvider
     protected function publishAssets(): void
     {
         $this->publishes([
-            __DIR__.'/../../publishable/build' => public_path('themes/b2b-suite/build'),
-        ], 'public');
+            __DIR__.'/../../publishables/public/themes/admin/default/build' => public_path('themes/admin/default/build'),
+            __DIR__.'/../../publishables/public/themes/shop/default/build' => public_path('themes/shop/default/build'),
 
-        $this->publishes([
-            __DIR__.'/../../publishable/storage' => storage_path('app/public'),
-        ]);
+            __DIR__.'/../../publishables/resources/vendor' => resource_path('views/vendor'),
 
-        $this->publishes([
-            __DIR__.'/../Resources/views/admin/customers/customers' => resource_path('admin-themes/default/views/customers/customers'),
+            __DIR__.'/../../publishables/storage' => storage_path('app/public'),
         ]);
     }
 
@@ -152,23 +144,8 @@ class B2BSuiteServiceProvider extends ServiceProvider
     protected function registerServices(): void
     {
         $this->app->bind(
-            \Webkul\B2BSuite\Contracts\Company::class,
-            \Webkul\B2BSuite\Repositories\CompanyRepository::class
+            CompanyFlat::class,
+            CompanyFlatRepository::class
         );
-
-        $this->app->bind(
-            \Webkul\B2BSuite\Contracts\CompanyFlat::class,
-            \Webkul\B2BSuite\Repositories\CompanyFlatRepository::class
-        );
-    }
-
-    /**
-     * Register facades.
-     */
-    protected function registerFacades(): void
-    {
-        // $this->app->singleton('b2b', function () {
-        //     return new \Webkul\B2BSuite\Helpers\B2BHelper;
-        // });
     }
 }

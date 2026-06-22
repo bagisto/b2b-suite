@@ -24,11 +24,11 @@ class QuoteRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'          => ['required', 'string', 'max:255'],
-            'description'   => ['required', 'string', 'max:1000'],
-            'status'        => ['sometimes', 'required', 'in:draft,open,submitted,negotiation,ordered,cancelled,rejected,closed'],
-            'cart_id'       => ['required'],
-            'attachments'   => ['sometimes', 'array'],
+            'name' => ['required', 'string', 'max:255'],
+            'description' => ['required', 'string', 'max:1000'],
+            'status' => ['sometimes', 'required', 'in:draft,open,submitted,negotiation,ordered,cancelled,rejected,closed'],
+            'cart_id' => ['required'],
+            'attachments' => ['sometimes', 'array'],
             'attachments.*' => ['mimes:doc,docx,xls,xlsx,pdf,txt,jpg,png,jpeg'],
         ];
     }

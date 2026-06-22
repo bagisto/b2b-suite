@@ -3,120 +3,154 @@
 use Illuminate\Support\Facades\Route;
 use Webkul\B2BSuite\Http\Controllers\Admin\CartController;
 use Webkul\B2BSuite\Http\Controllers\Admin\CompanyAttributeController;
+use Webkul\B2BSuite\Http\Controllers\Admin\CompanyCatalogController;
 use Webkul\B2BSuite\Http\Controllers\Admin\CompanyController;
+use Webkul\B2BSuite\Http\Controllers\Admin\CompanyCreditController;
 use Webkul\B2BSuite\Http\Controllers\Admin\PurchaseOrderController;
 use Webkul\B2BSuite\Http\Controllers\Admin\QuoteController;
+use Webkul\Core\Http\Middleware\NoCacheMiddleware;
 
-/**
- * ----------------------------------------------------
- * All the company attributes routes will be defined here
- * ----------------------------------------------------
- */
-Route::controller(CompanyAttributeController::class)->prefix('attributes')->group(function () {
-    Route::get('', 'index')->name('admin.customers.attributes.index');
+Route::group(['middleware' => ['admin', NoCacheMiddleware::class], 'prefix' => config('app.admin_url').'/b2b'], function () {
+    /**
+     * All the companies routes will be defined here.
+     */
+    Route::controller(CompanyController::class)->prefix('companies')->group(function () {
+        Route::get('', 'index')->name('admin.b2b.companies.index');
 
-    Route::get('create', 'create')->name('admin.customers.attributes.create');
+        Route::get('fetch', 'get')->name('admin.b2b.companies.get');
 
-    Route::post('', 'store')->name('admin.customers.attributes.store');
+        Route::get('search', 'search')->name('admin.b2b.companies.search');
 
-    Route::get('edit/{id}', 'edit')->name('admin.customers.attributes.edit');
+        Route::get('create', 'create')->name('admin.b2b.companies.create');
 
-    Route::put('edit/{id}', 'update')->name('admin.customers.attributes.update');
+        Route::post('create', 'store')->name('admin.b2b.companies.store');
 
-    Route::delete('delete/{id}', 'destroy')->name('admin.customers.attributes.delete');
+        Route::get('edit/{id}', 'edit')->name('admin.b2b.companies.edit');
 
-    Route::post('mass-delete', 'massDestroy')->name('admin.customers.attributes.mass_delete');
+        Route::put('edit/{id}', 'update')->name('admin.b2b.companies.update');
 
-    Route::get('mapping', 'editMapping')->name('admin.customers.attributes.edit_mapping');
+        Route::post('{id}/status', 'updateStatus')->name('admin.b2b.companies.update_status');
 
-    Route::post('mapping', 'updateMapping')->name('admin.customers.attributes.update_mapping');
-});
+        Route::delete('edit/{id}', 'destroy')->name('admin.b2b.companies.delete');
 
-/**
- * ----------------------------------------------------
- * All the companies routes will be defined here
- * ----------------------------------------------------
- */
-Route::controller(CompanyController::class)->prefix('companies')->group(function () {
-    Route::get('', 'index')->name('admin.customers.companies.index');
+        Route::post('mass-delete', 'massDestroy')->name('admin.b2b.companies.mass_delete');
 
-    Route::get('companies', 'get')->name('admin.customers.companies.get');
+        Route::post('mass-update-status', 'massUpdateStatus')->name('admin.b2b.companies.mass_update_status');
 
-    Route::get('search', 'search')->name('admin.customers.companies.search');
+        Route::post('mass-assign-sales-rep', 'massAssignSalesRep')->name('admin.b2b.companies.mass_assign_sales_rep');
+    });
 
-    Route::get('create', 'create')->name('admin.customers.companies.create');
+    /**
+     * All the company attributes routes will be defined here.
+     */
+    Route::controller(CompanyAttributeController::class)->prefix('attributes')->group(function () {
+        Route::get('', 'index')->name('admin.b2b.attributes.index');
 
-    Route::post('create', 'store')->name('admin.customers.companies.store');
+        Route::get('create', 'create')->name('admin.b2b.attributes.create');
 
-    Route::get('edit/{id}', 'edit')->name('admin.customers.companies.edit');
+        Route::post('', 'store')->name('admin.b2b.attributes.store');
 
-    Route::put('edit/{id}', 'update')->name('admin.customers.companies.update');
+        Route::get('edit/{id}', 'edit')->name('admin.b2b.attributes.edit');
 
-    Route::delete('edit/{id}', 'destroy')->name('admin.customers.companies.delete');
+        Route::put('edit/{id}', 'update')->name('admin.b2b.attributes.update');
 
-    Route::post('mass-delete', 'massDestroy')->name('admin.customers.companies.mass_delete');
-});
+        Route::delete('delete/{id}', 'destroy')->name('admin.b2b.attributes.delete');
 
-/**
- * ----------------------------------------------------
- * All the company quotes routes will be defined here
- * ----------------------------------------------------
- */
-Route::controller(QuoteController::class)->prefix('quotes')->group(function () {
-    Route::get('', 'index')->name('admin.customers.quotes.index');
+        Route::post('mass-delete', 'massDestroy')->name('admin.b2b.attributes.mass_delete');
 
-    Route::get('create/{cartId}', 'create')->name('admin.customers.quotes.create');
+        Route::get('mapping', 'editMapping')->name('admin.b2b.attributes.edit_mapping');
 
-    Route::post('create/{cartId}', 'store')->name('admin.customers.quotes.store');
+        Route::post('mapping', 'updateMapping')->name('admin.b2b.attributes.update_mapping');
+    });
 
-    Route::get('{id}', 'view')->name('admin.customers.quotes.view');
+    /**
+     * All the company catalog routes will be defined here.
+     */
+    Route::controller(CompanyCatalogController::class)->prefix('company-catalogs')->group(function () {
+        Route::get('', 'index')->name('admin.b2b.company_catalogs.index');
 
-    Route::get('/quotes/{id}/messages', 'getMessages')->name('admin.customers.quotes.messages');
+        Route::get('companies', 'companies')->name('admin.b2b.company_catalogs.companies');
 
-    Route::post('{id}/send-message', 'sendMessage')->name('admin.customers.quotes.send_message');
+        Route::get('products', 'products')->name('admin.b2b.company_catalogs.products');
 
-    Route::post('{id}/reject-quote', 'rejectQuote')->name('admin.customers.quotes.reject_quote');
+        Route::get('product-children/{id}', 'productChildren')->name('admin.b2b.company_catalogs.product_children');
 
-    Route::post('{id}/submit', 'submitQuote')->name('admin.customers.quotes.submit_quote');
+        Route::post('category-preview', 'categoryPreview')->name('admin.b2b.company_catalogs.category_preview');
 
-    Route::post('{id}/accept-quote', 'acceptQuote')->name('admin.customers.quotes.accept_quote');
+        Route::get('create', 'create')->name('admin.b2b.company_catalogs.create');
 
-    // Route::get('send-by-mail/{id}', 'sendByMail')->name('admin.customers.quotes.send_by_mail');
+        Route::post('create', 'store')->name('admin.b2b.company_catalogs.store');
 
-    // Route::get('print-order/{id}', 'printOrder')->name('admin.customers.quotes.print_order');
+        Route::get('edit/{id}', 'edit')->name('admin.b2b.company_catalogs.edit');
 
-    // Route::post('{id}/delete', 'deleteQuote')->name('admin.customers.quotes.delete_quote');
+        Route::put('edit/{id}', 'update')->name('admin.b2b.company_catalogs.update');
 
-    // Route::get('edit/{id}', 'edit')->name('admin.customers.quotes.edit');
+        Route::put('settings/{id}', 'updateSettings')->name('admin.b2b.company_catalogs.settings');
 
-    // Route::put('edit/{id}', 'update')->name('admin.customers.quotes.update');
+        Route::delete('delete/{id}', 'destroy')->name('admin.b2b.company_catalogs.delete');
+    });
 
-    // Route::delete('delete/{id}', 'destroy')->name('admin.customers.quotes.delete');
+    /**
+     * Company credit (Pay By Credit) management.
+     */
+    Route::controller(CompanyCreditController::class)->prefix('company-credits')->group(function () {
+        Route::get('', 'index')->name('admin.b2b.company_credits.index');
 
-    Route::post('mass-delete', 'massDestroy')->name('admin.customers.quotes.mass_delete');
+        Route::get('{id}', 'show')->name('admin.b2b.company_credits.view');
 
-    Route::post('mass-update', 'massUpdate')->name('admin.customers.quotes.mass_update');
-});
+        Route::post('{id}/limit', 'updateLimit')->name('admin.b2b.company_credits.update_limit');
 
-/**
- * ----------------------------------------------------
- * All the company purchase orders routes will be defined here
- * ----------------------------------------------------
- */
-Route::controller(PurchaseOrderController::class)->prefix('purchase-orders')->group(function () {
-    Route::get('', 'index')->name('admin.customers.purchase_orders.index');
+        Route::post('{id}/reimburse', 'reimburse')->name('admin.b2b.company_credits.reimburse');
+    });
 
-    Route::get('{id}', 'view')->name('admin.customers.purchase_orders.view');
-});
+    /**
+     * All the company quotes routes will be defined here.
+     */
+    Route::controller(QuoteController::class)->prefix('quotes')->group(function () {
+        Route::get('', 'index')->name('admin.b2b.quotes.index');
 
-Route::controller(CartController::class)->prefix('cart')->group(function () {
-    Route::get('{id}', 'index')->name('admin.customers.cart.index');
+        Route::get('create/{cartId}', 'create')->name('admin.b2b.quotes.create');
 
-    Route::post('create', 'store')->name('admin.customers.cart.store');
+        Route::post('create/{cartId}', 'store')->name('admin.b2b.quotes.store');
 
-    Route::post('{id}/items', 'storeItem')->name('admin.customers.cart.items.store');
+        Route::get('{id}', 'view')->name('admin.b2b.quotes.view');
 
-    Route::put('{id}/items', 'updateItem')->name('admin.customers.cart.items.update');
+        Route::get('{id}/messages', 'getMessages')->name('admin.b2b.quotes.messages');
 
-    Route::delete('{id}/items', 'destroyItem')->name('admin.customers.cart.items.destroy');
+        Route::post('{id}/send-message', 'sendMessage')->name('admin.b2b.quotes.send_message');
+
+        Route::post('{id}/reject-quote', 'rejectQuote')->name('admin.b2b.quotes.reject_quote');
+
+        Route::post('{id}/accept-quote', 'acceptQuote')->name('admin.b2b.quotes.accept_quote');
+
+        Route::post('{id}/submit', 'submitQuote')->name('admin.b2b.quotes.submit_quote');
+
+        Route::post('mass-delete', 'massDestroy')->name('admin.b2b.quotes.mass_delete');
+
+        Route::post('mass-update', 'massUpdate')->name('admin.b2b.quotes.mass_update');
+    });
+
+    /**
+     * All the company purchase orders routes will be defined here.
+     */
+    Route::controller(PurchaseOrderController::class)->prefix('purchase-orders')->group(function () {
+        Route::get('', 'index')->name('admin.b2b.purchase_orders.index');
+
+        Route::get('{id}', 'view')->name('admin.b2b.purchase_orders.view');
+    });
+
+    /**
+     * All the company cart routes will be defined here.
+     */
+    Route::controller(CartController::class)->prefix('cart')->group(function () {
+        Route::get('{id}', 'index')->name('admin.b2b.cart.index');
+
+        Route::post('create', 'store')->name('admin.b2b.cart.store');
+
+        Route::post('{id}/items', 'storeItem')->name('admin.b2b.cart.items.store');
+
+        Route::put('{id}/items', 'updateItem')->name('admin.b2b.cart.items.update');
+
+        Route::delete('{id}/items', 'destroyItem')->name('admin.b2b.cart.items.destroy');
+    });
 });

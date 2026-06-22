@@ -8,8 +8,18 @@ use Webkul\B2BSuite\Contracts\CustomerQuoteQuotation as CustomerQuoteQuotationCo
 
 class CustomerQuoteQuotation extends Model implements CustomerQuoteQuotationContract
 {
-    protected $table = 'customer_quote_quotations';
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'b2b_customer_quote_quotations';
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
     protected $fillable = [
         'message_id',
         'quote_id',
@@ -17,6 +27,8 @@ class CustomerQuoteQuotation extends Model implements CustomerQuoteQuotationCont
         'sku',
         'name',
         'qty',
+        'discount_type',
+        'discount_value',
         'price',
         'base_price',
         'total',
@@ -25,16 +37,25 @@ class CustomerQuoteQuotation extends Model implements CustomerQuoteQuotationCont
         'accepted_by',
     ];
 
+    /**
+     * The message this quotation was sent in.
+     */
     public function message(): BelongsTo
     {
         return $this->belongsTo(CustomerQuoteMessage::class, 'message_id');
     }
 
+    /**
+     * The quote this quotation belongs to.
+     */
     public function quote(): BelongsTo
     {
         return $this->belongsTo(CustomerQuote::class, 'quote_id');
     }
 
+    /**
+     * The quote item this quotation negotiates.
+     */
     public function item(): BelongsTo
     {
         return $this->belongsTo(CustomerQuoteItem::class, 'quote_item_id');

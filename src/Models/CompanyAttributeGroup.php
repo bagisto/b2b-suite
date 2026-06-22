@@ -9,6 +9,13 @@ use Webkul\Core\Eloquent\TranslatableModel;
 class CompanyAttributeGroup extends TranslatableModel implements CompanyAttributeGroupContract
 {
     /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'b2b_company_attribute_groups';
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array
@@ -22,13 +29,6 @@ class CompanyAttributeGroup extends TranslatableModel implements CompanyAttribut
     ];
 
     /**
-     * The attributes that should be translated.
-     *
-     * @var array
-     */
-    public $translatedAttributes = ['name'];
-
-    /**
      * Indicates if the model should be timestamped.
      *
      * @var bool
@@ -36,11 +36,18 @@ class CompanyAttributeGroup extends TranslatableModel implements CompanyAttribut
     public $timestamps = false;
 
     /**
+     * The attributes that should be translated.
+     *
+     * @var array
+     */
+    public $translatedAttributes = ['name'];
+
+    /**
      * Get the attributes that owns the attribute group.
      */
     public function custom_attributes(): BelongsToMany
     {
-        return $this->belongsToMany(CompanyAttributeProxy::modelClass(), 'company_attribute_group_mappings')
+        return $this->belongsToMany(CompanyAttributeProxy::modelClass(), 'b2b_company_attribute_group_mappings')
             ->withPivot('position')
             ->orderBy('pivot_position', 'asc');
     }

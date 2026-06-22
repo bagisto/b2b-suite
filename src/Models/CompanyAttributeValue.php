@@ -14,7 +14,7 @@ class CompanyAttributeValue extends Model implements CompanyAttributeValueContra
      *
      * @var string
      */
-    protected $table = 'customer_attribute_values';
+    protected $table = 'b2b_company_attribute_values';
 
     /**
      * The attributes that are mass assignable.
@@ -37,6 +37,13 @@ class CompanyAttributeValue extends Model implements CompanyAttributeValueContra
     ];
 
     /**
+     * Indicates if the model should be timestamped.
+     *
+     * @var bool
+     */
+    public $timestamps = false;
+
+    /**
      * Get the attribute that owns the attribute value.
      */
     public function attribute(): BelongsTo
@@ -51,11 +58,4 @@ class CompanyAttributeValue extends Model implements CompanyAttributeValueContra
     {
         return $this->belongsTo(CustomerProxy::modelClass());
     }
-
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
 }

@@ -8,13 +8,16 @@ use Webkul\Core\Eloquent\Repository;
 class CustomerQuoteQuotationRepository extends Repository
 {
     /**
-     * Specify Model class name.
+     * Specify model class name.
      */
     public function model()
     {
         return CustomerQuoteQuotation::class;
     }
 
+    /**
+     * Create a new quote quotation record.
+     */
     public function create(array $data): CustomerQuoteQuotation
     {
         return $this->model->create($data);

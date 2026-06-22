@@ -8,7 +8,6 @@ use Webkul\B2BSuite\Repositories\CompanyAttributeRepository;
 use Webkul\B2BSuite\Repositories\CompanyAttributeValueRepository;
 use Webkul\Core\Rules\Decimal;
 use Webkul\Core\Rules\PhoneNumber;
-use Webkul\Core\Rules\Slug;
 use Webkul\Customer\Repositories\CustomerRepository;
 
 class CompanyRequest extends FormRequest
@@ -56,21 +55,17 @@ class CompanyRequest extends FormRequest
                 'email',
                 Rule::unique('customers', 'email')->ignore($customerId),
             ],
-            'slug'  => [
-                'required',
-                new Slug,
-                Rule::unique('customers', 'slug')->ignore($customerId),
-            ],
-            'phone'  => [
+            'phone' => [
                 'required',
                 new PhoneNumber,
                 Rule::unique('customers', 'phone')->ignore($customerId),
             ],
+            'sales_rep_id' => ['nullable', 'exists:admins,id'],
         ];
 
         if (
             is_null($customerId)
-            && request()->route()?->getName() !== 'admin.customers.companies.store'
+            && request()->route()?->getName() !== 'admin.b2b.companies.store'
         ) {
             $this->rules['password'] = 'required|min:6|confirmed';
         }
@@ -81,7 +76,7 @@ class CompanyRequest extends FormRequest
 
         foreach ($attributes as $attribute) {
             if (
-                in_array($attribute->code, ['email', 'slug', 'phone'])
+                in_array($attribute->code, ['email', 'phone'])
                 || $attribute->type == 'boolean'
             ) {
                 continue;
@@ -122,7 +117,7 @@ class CompanyRequest extends FormRequest
                             request($attribute->code)
                         )
                     ) {
-                        $fail(trans('b2b_suite::app.admin.companies.edit.already-taken', [
+                        $fail(trans('b2b::app.admin.companies.edit.already-taken', [
                             'name' => ':attribute',
                         ]));
                     }

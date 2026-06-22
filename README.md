@@ -59,7 +59,8 @@ The **Bagisto B2B Ecommerce** enhances your Bagisto store with advanced Business
 
 ### 2. Requirements:
 
-* **Bagisto**: v2.3.x
+* **Bagisto**: v2.4.x
+* **PHP**: 8.3 or higher
 
 ---
 
@@ -71,16 +72,17 @@ The **Bagisto B2B Ecommerce** enhances your Bagisto store with advanced Business
 composer require bagisto/b2b-suite
 ```
 
-### 2. Register the Service Provider
+#### Step 2: Register the Service Provider
 
-In `bootstrap/providers.php`:
+Add the provider to the array returned by `bootstrap/providers.php` (Bagisto v2.4.x runs on Laravel 12, which registers providers here rather than in `config/app.php`):
 
-> **Note:** Autoloading via Composer’s package auto-discovery is **not possible** for this provider. The registry order matters—`B2BSuiteServiceProvider` must be listed **after** the Shop package or at the end of the providers array. Auto-discovery would load it too early, which can cause issues.
+> **Note:** Composer package auto-discovery is **not possible** for this provider. Order matters—`B2BSuiteServiceProvider` must be listed **after** the Shop package (or last in the array). Auto-discovery would load it too early, which can cause issues.
 
 ```php
-'providers' => [
+return [
+    // ...other service providers
     Webkul\B2BSuite\Providers\B2BSuiteServiceProvider::class,
-],
+];
 ```
 
 #### Step 3: Run the installation command
@@ -90,6 +92,37 @@ php artisan b2b-suite:install
 ```
 
 > That’s it! The package is now installed and ready to use in your Bagisto project.
+
+#### Frontend assets
+
+The package **ships prebuilt admin & shop theme bundles** (each core theme with the B2B
+views folded in). They are published automatically by `b2b-suite:install`, so a normal
+install **does not need Node, npm, or a Tailwind build**.
+
+If you upgrade or customize the core **Shop/Admin** theme and notice any B2B styling
+breakage, just rebuild the bundles. `npm run build` writes the regenerated bundles
+straight into `public/themes/.../build`, so there's nothing else to publish. The build
+resolves the core themes relative to the app, so it works from `vendor/`.
+
+> **Prerequisite:** the B2B build reuses the **Shop** and **Admin** theme dependencies
+> (Vue plugin, theme JS), so make sure `npm install` has been run in **both** core theme
+> packages first:
+>
+> ```bash
+> ( cd packages/Webkul/Shop  && npm install )
+> ( cd packages/Webkul/Admin && npm install )
+> ```
+
+```bash
+cd vendor/bagisto/b2b-suite
+npm install
+npm run build   # rebuilds admin + shop directly into public/themes/.../build
+
+php artisan optimize:clear
+```
+
+> Individual themes can be rebuilt with `npm run build:admin` or `npm run build:shop`
+> (and `npm run dev:admin` / `npm run dev:shop` for hot-reload while developing).
 
 ---
 

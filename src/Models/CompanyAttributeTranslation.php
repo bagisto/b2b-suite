@@ -8,6 +8,13 @@ use Webkul\B2BSuite\Contracts\CompanyAttributeTranslation as AttributeTranslatio
 class CompanyAttributeTranslation extends Model implements AttributeTranslationContract
 {
     /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'b2b_company_attribute_translations';
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array

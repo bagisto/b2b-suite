@@ -17,7 +17,7 @@
                 @change="inputChanged()"
             >
 
-            <span class="icon-radio-normal peer-checked:icon-radio-selected mr-1 cursor-pointer rounded-md text-2xl peer-checked:text-blue-600"></span>
+            <span class="icon-radio-normal peer-checked:icon-radio-selected ltr:mr-1 rtl:ml-1 cursor-pointer rounded-md text-2xl peer-checked:text-blue-600"></span>
 
             <div class="cursor-pointer text-sm text-gray-600 hover:text-gray-800">
                 @{{ label }}

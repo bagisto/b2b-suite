@@ -20,17 +20,7 @@ class InstallB2BSuite extends Command
      *
      * @var string
      */
-    protected $description = '';
-
-    /**
-     * Create a new command instance.
-     */
-    public function __construct()
-    {
-        $this->description = trans('marketplace::app.commands.install.description');
-
-        parent::__construct();
-    }
+    protected $description = 'Install and configure B2B Suite for Bagisto.';
 
     /**
      * Install and configure B2B Suite.
@@ -43,7 +33,7 @@ class InstallB2BSuite extends Command
 
         $this->callSilently('vendor:publish', [
             '--provider' => B2BSuiteServiceProvider::class,
-            '--force'    => true,
+            '--force' => true,
         ]);
 
         $this->call('optimize:clear');
@@ -57,6 +47,6 @@ class InstallB2BSuite extends Command
                          |___/                                                          
         </>');
 
-        $this->components->info(trans('b2b_suite::app.commands.install.finish'));
+        $this->components->info(trans('b2b::app.commands.install.finish'));
     }
 }

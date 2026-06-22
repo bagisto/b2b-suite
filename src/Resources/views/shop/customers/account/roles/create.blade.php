@@ -1,13 +1,13 @@
 <x-shop::layouts.account>
     <!-- Page Title -->
     <x-slot:title>
-        @lang('b2b_suite::app.shop.customers.account.roles.create.title')
+        @lang('b2b::app.shop.customers.account.roles.create.title')
     </x-slot>
 
     <!-- Breadcrumbs -->
     @if ((core()->getConfigData('general.general.breadcrumbs.shop')))
         @section('breadcrumbs')
-            <x-shop::breadcrumbs name="profile.edit" />
+            <x-shop::breadcrumbs name="roles.create" />
         @endSection
     @endif
 
@@ -28,7 +28,7 @@
             </a>
 
             <h2 class="text-2xl font-medium max-md:text-xl max-sm:text-base ltr:ml-2.5 md:ltr:ml-0 rtl:mr-2.5 md:rtl:mr-0">
-                @lang('b2b_suite::app.shop.customers.account.roles.create.title')
+                @lang('b2b::app.shop.customers.account.roles.create.title')
             </h2>
         </div>
 
@@ -39,7 +39,7 @@
             <!-- Name -->
             <x-shop::form.control-group>
                 <x-shop::form.control-group.label class="required">
-                    @lang('b2b_suite::app.shop.customers.account.roles.create.name')
+                    @lang('b2b::app.shop.customers.account.roles.create.name')
                 </x-shop::form.control-group.label>
 
                 <x-shop::form.control-group.control
@@ -48,8 +48,8 @@
                     name="name"
                     rules="required"
                     value="{{ old('name') }}"
-                    :label="trans('b2b_suite::app.shop.customers.account.roles.create.name')"
-                    :placeholder="trans('b2b_suite::app.shop.customers.account.roles.create.name')"
+                    :label="trans('b2b::app.shop.customers.account.roles.create.name')"
+                    :placeholder="trans('b2b::app.shop.customers.account.roles.create.name')"
                 />
 
                 <x-shop::form.control-group.error control-name="name" />
@@ -60,7 +60,7 @@
             <!-- Description -->
             <x-shop::form.control-group class="!mb-0">
                 <x-shop::form.control-group.label class="required">
-                    @lang('b2b_suite::app.shop.customers.account.roles.create.description')
+                    @lang('b2b::app.shop.customers.account.roles.create.description')
                 </x-shop::form.control-group.label>
 
                 <x-shop::form.control-group.control
@@ -69,8 +69,8 @@
                     name="description"
                     rules="required"
                     value="{{ old('description') }}"
-                    :label="trans('b2b_suite::app.shop.customers.account.roles.create.description')"
-                    :placeholder="trans('b2b_suite::app.shop.customers.account.roles.create.description')"
+                    :label="trans('b2b::app.shop.customers.account.roles.create.description')"
+                    :placeholder="trans('b2b::app.shop.customers.account.roles.create.description')"
                 />
 
                 <x-shop::form.control-group.error control-name="description" />
@@ -80,8 +80,8 @@
 
             <!-- Access Control Input Fields -->
             <div class="box-shadow rounded bg-white py-4">
-                <p class="mb-4 text-base font-semibold text-gray-800 dark:text-white">
-                    @lang('b2b_suite::app.shop.customers.account.roles.create.access-control')
+                <p class="mb-4 text-base font-semibold text-gray-800">
+                    @lang('b2b::app.shop.customers.account.roles.create.access-control')
                 </p>
 
                 <!-- Create Role for -->
@@ -102,7 +102,7 @@
                 type="submit"
                 class="primary-button m-0 block rounded-2xl px-11 py-3 text-center text-base max-md:w-full max-md:max-w-full max-md:rounded-lg max-md:py-1.5"
             >
-                @lang('b2b_suite::app.shop.customers.account.roles.create.btn-save')
+                @lang('b2b::app.shop.customers.account.roles.create.btn-save')
             </button>
 
         </x-shop::form>
@@ -122,7 +122,7 @@
                 <!-- Permission Type -->
                 <x-shop::form.control-group>
                     <x-shop::form.control-group.label class="required">
-                        @lang('b2b_suite::app.shop.customers.account.roles.create.permissions')
+                        @lang('b2b::app.shop.customers.account.roles.create.permissions')
                     </x-shop::form.control-group.label>
 
                     <x-shop::form.control-group.control
@@ -130,16 +130,16 @@
                         name="permission_type"
                         id="permission_type"
                         rules="required"
-                        :label="trans('b2b_suite::app.shop.customers.account.roles.create.permissions')"
-                        :placeholder="trans('b2b_suite::app.shop.customers.account.roles.create.permissions')"
+                        :label="trans('b2b::app.shop.customers.account.roles.create.permissions')"
+                        :placeholder="trans('b2b::app.shop.customers.account.roles.create.permissions')"
                         v-model="permission_type"
                     >
                         <option value="custom">
-                            @lang('b2b_suite::app.shop.customers.account.roles.create.custom-permissions')
+                            @lang('b2b::app.shop.customers.account.roles.create.custom-permissions')
                         </option>
 
                         <option value="all">
-                            @lang('b2b_suite::app.shop.customers.account.roles.create.all-permissions')
+                            @lang('b2b::app.shop.customers.account.roles.create.all-permissions')
                         </option>
                     </x-shop::form.control-group.control>
 
@@ -149,11 +149,11 @@
                 <div v-if="permission_type == 'custom'">
                     <x-shop::form.control-group.error control-name="permissions" />
 
-                    <x-b2b_suite::tree.view
+                    <x-b2b::tree.view
                         input-type="checkbox"
                         value-field="key"
                         id-field="key"
-                        :items="json_encode(b2b_suite_acl()->getItems())"
+                        :items="json_encode(b2b_acl()->getItems())"
                         :fallback-locale="config('app.fallback_locale')"
                     />
                 </div>

@@ -7,6 +7,7 @@ use Illuminate\Support\Arr;
 use Webkul\B2BSuite\Contracts\CustomerRequisitionList;
 use Webkul\Checkout\Repositories\CartRepository;
 use Webkul\Core\Eloquent\Repository;
+use Webkul\Product\Models\Product;
 use Webkul\Product\Repositories\ProductRepository;
 
 class CustomerRequisitionRepository extends Repository
@@ -23,7 +24,7 @@ class CustomerRequisitionRepository extends Repository
     }
 
     /**
-     * Specify Model class name.
+     * Specify model class name.
      */
     public function model()
     {
@@ -68,7 +69,7 @@ class CustomerRequisitionRepository extends Repository
     public function prepareRequisitionItemsByCart(array $data): array
     {
         $cart = $this->cartRepository->findOneWhere([
-            'id'          => $data['cart_id'],
+            'id' => $data['cart_id'],
             'customer_id' => auth()->guard('customer')->id(),
         ]);
 
@@ -83,13 +84,13 @@ class CustomerRequisitionRepository extends Repository
             $items[] = [
                 'product_id' => $cartItem->product_id,
                 'variant_id' => $additional['selected_configurable_option'] ?? null,
-                'type'       => $cartItem->type,
-                'sku'        => $cartItem->sku,
-                'name'       => $cartItem->name,
-                'qty'        => $cartItem->quantity,
-                'price'      => core()->convertPrice($cartItem->base_price),
+                'type' => $cartItem->type,
+                'sku' => $cartItem->sku,
+                'name' => $cartItem->name,
+                'qty' => $cartItem->quantity,
+                'price' => core()->convertPrice($cartItem->base_price),
                 'base_price' => $cartItem->base_price,
-                'total'      => core()->convertPrice($cartItem->base_total),
+                'total' => core()->convertPrice($cartItem->base_total),
                 'base_total' => $cartItem->base_total,
                 'additional' => $additional ? json_encode($additional) : null,
             ];
@@ -114,7 +115,7 @@ class CustomerRequisitionRepository extends Repository
                 $items[] = $this->buildRequisitionItem($child, [
                     'product_id' => $product->id,
                     'variant_id' => $child->id,
-                    'quantity'   => $data['quantity'],
+                    'quantity' => $data['quantity'],
                     'additional' => $additional,
                 ]);
 
@@ -124,7 +125,7 @@ class CustomerRequisitionRepository extends Repository
                     $items[] = $this->buildRequisitionItem($grouped->associated_product, [
                         'product_id' => $grouped->associated_product->id,
                         'variant_id' => null,
-                        'quantity'   => $grouped->qty,
+                        'quantity' => $grouped->qty,
                         'additional' => null,
                     ]);
                 }
@@ -133,7 +134,7 @@ class CustomerRequisitionRepository extends Repository
                 $items[] = $this->buildRequisitionItem($product, [
                     'product_id' => $product->id,
                     'variant_id' => null,
-                    'quantity'   => $data['quantity'],
+                    'quantity' => $data['quantity'],
                     'additional' => null,
                 ]);
                 break;
@@ -145,7 +146,7 @@ class CustomerRequisitionRepository extends Repository
     /**
      * Build requisition item array.
      *
-     * @param  \Webkul\Product\Models\Product  $product
+     * @param  Product  $product
      */
     public function buildRequisitionItem($product, array $data): array
     {
@@ -157,13 +158,13 @@ class CustomerRequisitionRepository extends Repository
         }
 
         return array_merge([
-            'type'       => $product->type,
-            'sku'        => $product->sku,
-            'name'       => $product->name,
-            'qty'        => $data['quantity'],
-            'price'      => $convertedPrice,
+            'type' => $product->type,
+            'sku' => $product->sku,
+            'name' => $product->name,
+            'qty' => $data['quantity'],
+            'price' => $convertedPrice,
             'base_price' => $price,
-            'total'      => $convertedPrice * $data['quantity'],
+            'total' => $convertedPrice * $data['quantity'],
             'base_total' => $price * $data['quantity'],
         ], $data);
     }

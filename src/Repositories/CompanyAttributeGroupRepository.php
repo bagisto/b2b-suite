@@ -20,7 +20,7 @@ class CompanyAttributeGroupRepository extends Repository
     }
 
     /**
-     * Specify Model class name
+     * Specify model class name.
      */
     public function model(): string
     {
@@ -50,10 +50,10 @@ class CompanyAttributeGroupRepository extends Repository
         foreach ($data['attribute_groups'] ?? [] as $attributeGroupId => $attributeGroupInputs) {
             if (Str::contains($attributeGroupId, 'group_')) {
                 $attributeGroup = $this->model->create([
-                    'code'        => $attributeGroupInputs['code'],
-                    'admin_name'  => $attributeGroupInputs['admin_name'],
-                    'position'    => $attributeGroupInputs['position'] ?? 0,
-                    'column'      => $attributeGroupInputs['column'],
+                    'code' => $attributeGroupInputs['code'],
+                    'admin_name' => $attributeGroupInputs['admin_name'],
+                    'position' => $attributeGroupInputs['position'] ?? 0,
+                    'column' => $attributeGroupInputs['column'],
                 ]);
 
                 if (empty($attributeGroupInputs['custom_attributes'])) {
@@ -114,10 +114,10 @@ class CompanyAttributeGroupRepository extends Repository
     {
         return array_map(function ($item) {
             return [
-                'code'        => $item['code'],
-                'admin_name'  => $item['admin_name'],
-                'position'    => $item['position'] ?? 0,
-                'column'      => $item['column'],
+                'code' => $item['code'],
+                'admin_name' => $item['admin_name'],
+                'position' => $item['position'] ?? 0,
+                'column' => $item['column'],
             ];
         }, $data);
     }

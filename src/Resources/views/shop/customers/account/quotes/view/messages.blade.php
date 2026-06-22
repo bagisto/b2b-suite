@@ -1,442 +1,486 @@
-<quote-messages 
-    :initial-quote="{{ json_encode($quote) }}" 
+@php
+    $canSendMessage = ! in_array($quote->status, ['draft', 'purchase_order', 'expired', 'completed', 'accepted', 'rejected', 'ordered']);
+@endphp
+
+<quote-messages
+    :initial-quote="{{ json_encode($quote) }}"
+    :can-send-message="{{ $canSendMessage ? 'true' : 'false' }}"
 ></quote-messages>
 
-<!-- Action Buttons -->
-<div class="mt-6 flex gap-4 max-lg:flex-wrap max-md:grid max-md:max-w-full max-sm:w-full max-sm:p-2">
-    @php
-        $isDraft = $quote->state === 'quotation' && $quote->status === 'draft';
-        $isDraftOrCompletedStatus = in_array($quote->status, ['draft', 'purchase_order', 'expired','completed', 'accepted', 'rejected', 'ordered']);
-        $isOpenOrNegotiation = in_array($quote->status, ['open', 'negotiation']);
-        $canCustomerApprove = (bool) core()->getConfigData('b2b_suite.quotes.settings.can_customer_approve_quote');
-        $isNegotiation = $quote->state === 'quotation' && $quote->status === 'negotiation';
-        $isOrderedOrRejected = in_array($quote->status, ['draft', 'ordered', 'completed', 'rejected']);
-    @endphp
-    
-    @if ($isDraft)
-        <!-- Submit Quote modal -->
-        @include('b2b_suite::shop.customers.account.quotes.view.partials.modal', [
-            'action'     => 'submit',
-            'buttonText' => 'btn-submit-quote',
-        ])
-        
-        <!-- Delete Quote modal -->
-        @include('b2b_suite::shop.customers.account.quotes.view.partials.modal', [
-            'action'           => 'delete',
-            'buttonText'       => 'btn-delete-quote',
-            'buttonClass'      => 'secondary-button',
-            'actionButtonText' => 'btn-delete',
-        ])
-    @endif
-
-    @if (! $isDraftOrCompletedStatus)
-        <!-- Send Message modal -->
-        @include('b2b_suite::shop.customers.account.quotes.view.partials.modal', [
-            'buttonText'       => 'btn-message',
-            'actionButtonText' => 'btn-send'
-        ])
-    @endif
-
-    @if (! $isAdminLastQuotation && $quote->state == 'quotation' && $isOpenOrNegotiation)
-        <!-- Submit Quote modal -->
-        @include('b2b_suite::shop.customers.account.quotes.view.partials.modal', [
-            'action'      => 'submit',
-            'buttonText'  => 'btn-again-quote',
-            'buttonClass' => 'secondary-button',
-        ])
-    @endif
-    
-    <!-- Accept Quote Modal - only if customer is allowed to approve and last quotation is from admin and status is negotiation -->
-    @if ($canCustomerApprove && $isAdminLastQuotation && $isNegotiation)
-        <!-- Accept Quote Modal -->
-        @include('b2b_suite::shop.customers.account.quotes.view.partials.modal', [
-            'action'      => 'accept',
-            'buttonText'  => 'btn-accept-quote',
-            'buttonClass' => 'secondary-button'
-        ])
-    @endif
-    
-    @if (! $isOrderedOrRejected)
-        <!-- Reject Quote Modal -->
-        @include('b2b_suite::shop.customers.account.quotes.view.partials.modal', [
-            'action'      => 'reject',
-            'buttonText'  => 'btn-reject-quote',
-            'buttonClass' => 'secondary-button'
-        ])
-    @endif
-</div>
+@push('styles')
+    <style>
+        .b2b-chat-thread { display: flex; flex-direction: column; gap: 1.25rem; max-height: 440px; overflow-y: auto; padding: 0.5rem 0.25rem; }
+        .b2b-chat-row { display: flex; align-items: flex-end; gap: 0.625rem; }
+        .b2b-chat-row.is-mine { flex-direction: row-reverse; }
+        .b2b-chat-avatar { height: 2.25rem; width: 2.25rem; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; background: #F6F2EB; color: #060C3B; }
+        .b2b-chat-row.is-mine .b2b-chat-avatar { background: #060C3B; color: #fff; }
+        .b2b-chat-col { max-width: 76%; display: flex; flex-direction: column; }
+        .b2b-chat-row.is-mine .b2b-chat-col { align-items: flex-end; }
+        .b2b-chat-meta { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem; font-size: 0.6875rem; color: #a1a1aa; }
+        .b2b-chat-meta b { color: #060C3B; font-weight: 600; }
+        .b2b-chat-bubble { border-radius: 1rem; padding: 0.625rem 0.875rem; font-size: 0.875rem; line-height: 1.45; word-break: break-word; }
+        .b2b-chat-bubble.is-mine { background: #060C3B; color: #fff; border-bottom-right-radius: 0.25rem; }
+        .b2b-chat-bubble.is-theirs { background: #f4f4f5; color: #27272a; border-bottom-left-radius: 0.25rem; }
+        .b2b-chat-text { white-space: pre-line; }
+        .b2b-chat-quotations { margin-top: 0.5rem; border-radius: 0.625rem; background: #fff; color: #27272a; overflow: hidden; border: 1px solid #e4e4e7; }
+        .b2b-chat-quotations table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+        .b2b-chat-quotations th { background: #fafafa; text-align: left; padding: 0.5rem 0.625rem; font-weight: 600; }
+        .b2b-chat-quotations td { padding: 0.5rem 0.625rem; border-top: 1px solid #f1f1f4; }
+        .b2b-chat-status { display: inline-block; margin-top: 0.5rem; border-radius: 9999px; padding: 0.125rem 0.625rem; font-size: 0.6875rem; font-weight: 600; }
+        .b2b-chat-status.is-rejected { background: #fde8e6; color: #b42318; }
+        .b2b-chat-status.is-ok { background: #e7f6ea; color: #1f7a33; }
+        .b2b-chat-composer { display: flex; align-items: flex-end; gap: 0.5rem; margin-top: 1rem; border-top: 1px solid #f1f1f4; padding-top: 1rem; }
+        .b2b-chat-input { flex: 1; resize: none; border: 1px solid #d4d4d8; border-radius: 1rem; padding: 0.75rem 1rem; font-size: 0.875rem; outline: none; transition: border-color .2s; max-height: 140px; }
+        .b2b-chat-input:focus { border-color: #060C3B; }
+        .b2b-chat-send { height: 2.75rem; width: 2.75rem; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 9999px; background: #060C3B; color: #fff; cursor: pointer; transition: opacity .2s; }
+        .b2b-chat-send:disabled { opacity: .45; cursor: not-allowed; }
+    </style>
+@endpush
 
 @pushOnce('scripts')
     <script
         type="text/x-template"
         id="quote-messages-template"
     >
-        <div class="mt-4 flex flex-col rounded-xl border bg-white p-5 max-xl:flex-auto max-sm:p-2">
-            <div class="mb-4 flex items-center justify-between">
-                <p class="text-base font-semibold text-gray-800">
+        <div class="mt-4 flex flex-col rounded-xl border bg-white p-5 max-xl:flex-auto max-sm:p-3">
+            <!-- Header -->
+            <div class="mb-4 flex items-center justify-between gap-3 max-sm:flex-col max-sm:items-start">
+                <p class="text-base font-semibold text-navyBlue">
                     @if ($quote->state == 'quotation')
-                        @lang('b2b_suite::app.shop.customers.account.quotes.view.quote-messages')
+                        @lang('b2b::app.shop.customers.account.quotes.view.quote-messages')
                     @else
-                        @lang('b2b_suite::app.shop.customers.account.purchase-orders.view.po-messages')
+                        @lang('b2b::app.shop.customers.account.purchase-orders.view.po-messages')
                     @endif
                 </p>
-                
-                <!-- Filter Controls -->
-                <div class="flex justify-end gap-3 max-sm:flex-wrap">
-                    <div class="flex items-center gap-2 max-sm:flex-wrap">
-                        <label class="text-base font-semibold text-gray-800 max-md:hidden">Filter:</label>
-                        <select 
-                            v-model="filters.has_quotations" 
-                            @change="applyFilters"
-                            class="rounded border border-gray-300 px-5 py-3 text-sm"
-                        >
-                            <option value="">All Messages</option>
-                            <option value="true">With Quotations</option>
-                        </select>
-                    </div>
-                    
-                    <div class="flex items-center gap-2 max-sm:flex-wrap">
-                        <label class="text-base font-semibold text-gray-800 max-md:hidden">User:</label>
-                        <select 
-                            v-model="filters.user_type" 
-                            @change="applyFilters"
-                            class="rounded border border-gray-300 px-5 py-3 text-sm"
-                        >
-                            <option value="">All Users</option>
-                            <option value="customer">You</option>
-                            <option value="admin">System</option>
-                        </select>
-                    </div>
-                    
-                    <button 
+
+                <!-- Filters -->
+                <div class="flex items-center gap-2 max-sm:w-full max-sm:flex-wrap">
+                    <select
+                        v-model="filters.has_quotations"
+                        @change="applyFilters"
+                        class="rounded-lg border border-zinc-300 px-3 py-2 text-xs"
+                    >
+                        <option value="">All messages</option>
+                        <option value="true">With quotations</option>
+                    </select>
+
+                    <select
+                        v-model="filters.user_type"
+                        @change="applyFilters"
+                        class="rounded-lg border border-zinc-300 px-3 py-2 text-xs"
+                    >
+                        <option value="">Everyone</option>
+                        <option value="customer">You</option>
+                        <option value="admin">Seller</option>
+                    </select>
+
+                    <button
                         @click="clearFilters"
                         v-if="hasActiveFilters"
-                        class="text-xs text-blue-600 underline hover:text-blue-800"
+                        type="button"
+                        class="text-xs font-medium text-navyBlue underline"
                     >
-                        Clear Filters
+                        Clear
                     </button>
                 </div>
             </div>
 
-            <!-- Loading state -->
-            <div v-if="loading" class="flex justify-center py-4">
-                <div class="text-gray-500">Loading messages...</div>
+            <!-- Loading -->
+            <div v-if="loading" class="flex justify-center py-6 text-sm text-zinc-500">
+                @lang('b2b::app.shop.customers.account.quotes.view.loading-messages')
             </div>
 
-            <!-- Messages List -->
-            <div 
-                v-else
-                id="messages-panel"
-                class="flex max-h-[350px] flex-col gap-4 overflow-y-auto"
-            >
-                <div 
-                    v-for="msg in (messages.data ? messages.data : messages)" 
+            <!-- Thread -->
+            <div v-else id="messages-panel" class="b2b-chat-thread">
+                <div
+                    v-for="msg in (messages.data ? messages.data : messages)"
                     :key="msg.id"
-                    :class="['flex', msg.user_type == 'customer' ? 'justify-end' : 'justify-start']"
+                    class="b2b-chat-row"
+                    :class="{ 'is-mine': msg.user_type == 'customer' }"
                 >
-                    <div 
-                        :class="['rounded-lg px-4 py-2 max-w-[70%]', msg.user_type == 'customer' ? 'bg-zinc-200 text-right' : 'bg-gray-100 text-left']"
-                    >
-                        <!-- User info -->
-                        <div class="mb-1 flex items-center gap-2">
-                            <span :class="[
-                                'text-xs font-medium',
-                                msg.user_type === 'customer' ? 'text-blue-600' : 'text-red-600'
-                            ]">
-                                @{{ getUserTypeLabel(msg.user_type) }}
-                            </span>
+                    <!-- Avatar -->
+                    <div class="b2b-chat-avatar">@{{ getInitials(msg.user_type) }}</div>
+
+                    <div class="b2b-chat-col">
+                        <!-- Meta -->
+                        <div class="b2b-chat-meta">
+                            <b>@{{ getUserTypeLabel(msg.user_type) }}</b>
+                            <span>@{{ formatDate(msg.created_at) }}</span>
                         </div>
 
-                        <!-- Message quotations if any -->
-                        <div v-if="msg.quotations && msg.quotations.length > 0" class="mt-2">
-                            <div class="text-md mb-1 text-left font-bold text-gray-600">Quotations:</div>
-                            
-                            <table :class="['w-full border text-left text-sm', msg.user_type == 'customer' ? 'border-gray-300' : 'border-zinc-200']">
-                                <thead :class="[msg.user_type == 'customer' ? 'bg-gray-100' : 'bg-gray-200']">
-                                    <tr>
-                                        <th class="px-4 py-2">
-                                            @lang('b2b_suite::app.shop.customers.account.quotes.view.name')
-                                        </th>
-                                        <th class="px-4 py-2">
-                                            @lang('b2b_suite::app.shop.customers.account.quotes.view.price')
-                                        </th>
-                                        <th class="px-4 py-2">
-                                            @lang('b2b_suite::app.shop.customers.account.quotes.view.quantity')
-                                        </th>
-                                    </tr>
-                                </thead>
+                        <!-- Bubble -->
+                        <div
+                            class="b2b-chat-bubble"
+                            :class="msg.user_type == 'customer' ? 'is-mine' : 'is-theirs'"
+                        >
+                            <p class="b2b-chat-text" v-if="msg.message">@{{ msg.message }}</p>
 
-                                <tbody>
-                                    <tr 
-                                        v-for="quotation in msg.quotations" 
-                                        :key="quotation.id"
-                                        :class="['border-b', msg.user_type == 'customer' ? 'border-gray-300' : 'border-zinc-200']"
-                                    >   
-                                        <td class="px-4 py-2">
-                                            @{{ quotation.name }}
+                            <!-- Quotations -->
+                            <div v-if="msg.quotations && msg.quotations.length > 0" class="b2b-chat-quotations">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>@lang('b2b::app.shop.customers.account.quotes.view.name')</th>
+                                            <th>@lang('b2b::app.shop.customers.account.quotes.view.price')</th>
+                                            <th>@lang('b2b::app.shop.customers.account.quotes.view.discount')</th>
+                                            <th>@lang('b2b::app.shop.customers.account.quotes.view.negotiated-price')</th>
+                                            <th>@lang('b2b::app.shop.customers.account.quotes.view.quantity')</th>
+                                            <th style="text-align: right;">@lang('b2b::app.shop.customers.account.quotes.view.sub-total')</th>
+                                        </tr>
+                                    </thead>
 
-                                            <div class="text-xs italic text-zinc-500" v-if="quotation.sku">
-                                                @{{ quotation.sku }}
-                                            </div>
-                                            
-                                            <div v-if="getAttributes(quotation.item.additional)" class="mt-1">
-                                                <div 
-                                                    v-for="(attribute, key) in getAttributes(quotation.item.additional)" 
-                                                    :key="key"
-                                                    class="text-sm text-zinc-500"
-                                                >
-                                                    <b>@{{ attribute.attribute_name }}:</b> @{{ attribute.option_label }}
+                                    <tbody>
+                                        <tr v-for="quotation in msg.quotations" :key="quotation.id">
+                                            <td>
+                                                @{{ quotation.name }}
+
+                                                <div class="text-[11px] italic text-zinc-500" v-if="quotation.sku">@{{ quotation.sku }}</div>
+
+                                                <div v-if="getAttributes(quotation.item.additional)" class="mt-0.5">
+                                                    <div
+                                                        v-for="(attribute, key) in getAttributes(quotation.item.additional)"
+                                                        :key="key"
+                                                        class="text-[11px] text-zinc-500"
+                                                    >
+                                                        <b>@{{ attribute.attribute_name }}:</b> @{{ attribute.option_label }}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </td>
-                                        <td class="px-4 py-2">@{{ formatCurrency(quotation.price) }}</td>
-                                        <td class="px-4 py-2">@{{ quotation.qty }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        
-                        <!-- Message content -->
-                        <div class="mb-2 mt-2 grid gap-2 text-sm text-gray-800">
-                            @{{ msg.message }}
-                            
-                            <div v-if="msg.status">
-                                <span 
-                                    :class="['px-2 py-1 text-normal text-white', msg.status === 'Rejected' ? 'label-canceled' : 'label-completed']" 
-                                    v-text="msg.status"
-                                ></span>
+                                            </td>
+                                            <td>@{{ quotation.item ? formatCurrency(quotation.item.price) : '—' }}</td>
+                                            <td>
+                                                <span v-if="discountLabel(quotation)" class="font-medium text-green-700">@{{ discountLabel(quotation) }}</span>
+                                                <span v-else class="text-zinc-400">—</span>
+                                            </td>
+                                            <td class="font-semibold">@{{ formatCurrency(lineNegotiatedPrice(quotation)) }}</td>
+                                            <td>@{{ quotation.qty }}</td>
+                                            <td style="text-align: right;" class="font-semibold">@{{ formatCurrency(lineSubTotal(quotation)) }}</td>
+                                        </tr>
+                                    </tbody>
+
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="5" style="text-align: right;" class="font-semibold">@lang('b2b::app.shop.customers.account.quotes.view.sub-total')</td>
+                                            <td style="text-align: right;" class="font-semibold">@{{ formatCurrency(offerSubTotal(msg)) }}</td>
+                                        </tr>
+
+                                        <tr v-if="offerDiscountOnTotal(msg) > 0.0001">
+                                            <td colspan="5" style="text-align: right;" class="font-semibold">@lang('b2b::app.shop.customers.account.quotes.view.discount-on-total')</td>
+                                            <td style="text-align: right;" class="font-semibold text-green-700">− @{{ formatCurrency(offerDiscountOnTotal(msg)) }}</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td colspan="5" style="text-align: right;" class="font-bold">@lang('b2b::app.shop.customers.account.quotes.view.negotiated-total')</td>
+                                            <td style="text-align: right;" class="font-bold">@{{ formatCurrency(offerNegotiatedTotal(msg)) }}</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
                             </div>
-                        </div>
-                        
-                        <!-- Message timestamp -->
-                        <div class="mt-1 text-xs text-gray-500">
-                            @{{ formatDate(msg.created_at) }}
+
+                            <!-- Status -->
+                            <span
+                                v-if="msg.status"
+                                class="b2b-chat-status"
+                                :class="msg.status === 'Rejected' ? 'is-rejected' : 'is-ok'"
+                                v-text="msg.status"
+                            ></span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Empty state -->
-                <div v-if="(!messages.data || messages.data.length === 0) && (!messages.length || messages.length === 0)" class="py-8 text-center text-gray-500">
-                    <div v-if="hasActiveFilters">
-                        <p class="mb-2">No messages found matching the current filters.</p>
-                        <button 
+                <!-- Empty -->
+                <div
+                    v-if="(!messages.data || messages.data.length === 0) && (!messages.length || messages.length === 0)"
+                    class="py-10 text-center text-sm text-zinc-500"
+                >
+                    <template v-if="hasActiveFilters">
+                        <p class="mb-2">@lang('b2b::app.shop.customers.account.quotes.view.no-messages-filtered')</p>
+                        <button
                             @click="clearFilters"
-                            class="text-sm text-blue-600 underline hover:text-blue-800"
+                            type="button"
+                            class="text-navyBlue underline"
                         >
-                            Clear filters to see all messages
+                            @lang('b2b::app.shop.customers.account.quotes.view.clear-filters')
                         </button>
-                    </div>
-                    <div v-else>
-                        No messages found for this quote.
-                    </div>
+                    </template>
+
+                    <template v-else>
+                        @lang('b2b::app.shop.customers.account.quotes.view.no-messages')
+                    </template>
                 </div>
             </div>
 
             <!-- Pagination -->
-            <div v-if="messages.prev_page_url || messages.next_page_url" class="mt-4 flex items-center justify-center gap-2">
-                <button 
-                    v-if="messages.prev_page_url" 
-                    @click="loadPage(messages.prev_page_url)" 
+            <div v-if="messages.prev_page_url || messages.next_page_url" class="mt-4 flex items-center justify-center gap-2 text-sm">
+                <button
+                    v-if="messages.prev_page_url"
+                    @click="loadPage(messages.prev_page_url)"
                     :disabled="loading"
-                    class="rounded-l border bg-white px-4 py-2 hover:bg-gray-50 disabled:opacity-50"
+                    type="button"
+                    class="rounded-lg border px-4 py-2 hover:bg-zinc-50 disabled:opacity-50"
                 >
-                    Previous
+                    @lang('b2b::app.shop.customers.account.quotes.view.previous')
                 </button>
-                
-                <span class="border-b border-t bg-gray-50 px-4 py-2" v-if="messages.current_page">
-                    Page @{{ messages.current_page }} of @{{ messages.last_page }}
+
+                <span class="text-zinc-500" v-if="messages.current_page">
+                    @{{ messages.current_page }} / @{{ messages.last_page }}
                 </span>
-                
-                <button 
-                    v-if="messages.next_page_url" 
-                    @click="loadPage(messages.next_page_url)" 
+
+                <button
+                    v-if="messages.next_page_url"
+                    @click="loadPage(messages.next_page_url)"
                     :disabled="loading"
-                    class="rounded-r border bg-white px-4 py-2 hover:bg-gray-50 disabled:opacity-50"
+                    type="button"
+                    class="rounded-lg border px-4 py-2 hover:bg-zinc-50 disabled:opacity-50"
                 >
-                    Next
+                    @lang('b2b::app.shop.customers.account.quotes.view.next')
                 </button>
             </div>
 
-            <!-- Page info with filter status -->
-            <div v-if="messages.total || hasActiveFilters" class="mt-2 text-center text-xs text-gray-500">
-                <span v-if="messages.total">
-                    Showing @{{ messages.from || 0 }} to @{{ messages.to || 0 }} of @{{ messages.total }} messages
-                </span>
-                <span v-if="hasActiveFilters" class="ml-2 text-blue-600">
-                    (Filtered
-                    <span v-if="filters.has_quotations === 'true'">- With Quotations</span>
-                    <span v-if="filters.user_type">- @{{ getUserTypeLabel(filters.user_type) }} Only</span>
-                    )
-                </span>
+            <!-- Composer -->
+            <div v-if="canSendMessage" class="b2b-chat-composer">
+                <textarea
+                    v-model="newMessage"
+                    rows="1"
+                    @keydown.enter.exact.prevent="sendMessage"
+                    :placeholder="'@lang('b2b::app.shop.customers.account.quotes.view.message-placeholder')'"
+                    class="b2b-chat-input"
+                ></textarea>
+
+                <button
+                    type="button"
+                    class="b2b-chat-send"
+                    :disabled="sending || ! newMessage.trim()"
+                    @click="sendMessage"
+                    aria-label="@lang('b2b::app.shop.customers.account.quotes.view.btn-send')"
+                >
+                    <span class="icon-arrow-right text-xl rtl:icon-arrow-left"></span>
+                </button>
             </div>
         </div>
     </script>
-    
+
     <script type="module">
         app.component('quote-messages', {
             template: '#quote-messages-template',
-            
+
             props: {
                 initialQuote: {
                     type: Object,
-                    required: true
-                }
+                    required: true,
+                },
+
+                canSendMessage: {
+                    type: Boolean,
+                    default: false,
+                },
             },
-            
+
             data() {
                 return {
                     quote: this.initialQuote,
                     messages: [],
                     messageUrl: '{{ route('shop.customers.account.quotes.messages', $quote->id) }}',
+                    sendUrl: '{{ route('shop.customers.account.quotes.send_message', $quote->id) }}',
                     loading: false,
+                    sending: false,
+                    newMessage: '',
                     filters: {
                         has_quotations: '',
-                        user_type: ''
-                    }
+                        user_type: '',
+                    },
                 };
             },
-            
+
             created() {
                 this.quote = this.initialQuote;
                 this.loadPage(this.messageUrl);
             },
-            
+
             computed: {
                 hasActiveFilters() {
                     return this.filters.has_quotations !== '' || this.filters.user_type !== '';
-                }
+                },
             },
-            
+
             methods: {
                 formatDate(date) {
-                    if (!date) return '';
-                    const d = new Date(date);
-                    return d.toLocaleString();
+                    if (! date) return '';
+
+                    return new Date(date).toLocaleString();
                 },
-                
+
                 formatCurrency(amount) {
-                    if (!amount) return '';
-                    return new Intl.NumberFormat('en-US', {
-                        style: 'currency',
-                        currency: 'USD' // Change this to your currency
-                    }).format(amount);
+                    if (! amount) return '';
+
+                    return (this.$shop && this.$shop.formatPrice)
+                        ? this.$shop.formatPrice(amount)
+                        : amount;
                 },
-                
+
+                /**
+                 * The item-level discount stored on the offer snapshot ("10%" or a fixed
+                 * amount). Null when the line has no item discount.
+                 */
+                discountLabel(quotation) {
+                    const value = parseFloat(quotation.discount_value);
+
+                    if (! quotation.discount_type || ! (value > 0)) {
+                        return null;
+                    }
+
+                    return quotation.discount_type === 'percent'
+                        ? parseFloat(value.toFixed(2)) + '%'
+                        : this.formatCurrency(value);
+                },
+
+                /**
+                 * Per-unit price after the ITEM discount only (before any whole-quote discount),
+                 * mirroring the quote items table's "Negotiated Price" column.
+                 */
+                lineNegotiatedPrice(quotation) {
+                    const original = quotation.item ? parseFloat(quotation.item.price) : parseFloat(quotation.price);
+                    const value = parseFloat(quotation.discount_value);
+
+                    if (! quotation.discount_type || ! (value > 0)) {
+                        return original;
+                    }
+
+                    if (quotation.discount_type === 'percent') {
+                        return Math.max(0, original - (original * Math.min(value, 100) / 100));
+                    }
+
+                    return Math.max(0, original - value);
+                },
+
+                lineSubTotal(quotation) {
+                    return this.lineNegotiatedPrice(quotation) * (parseInt(quotation.qty) || 0);
+                },
+
+                offerSubTotal(msg) {
+                    return (msg.quotations || []).reduce((sum, q) => sum + this.lineSubTotal(q), 0);
+                },
+
+                // Whole-quote ("Discount on Total"): the snapshot price already folds it in.
+                offerNegotiatedTotal(msg) {
+                    return (msg.quotations || []).reduce((sum, q) => sum + (parseFloat(q.price) * (parseInt(q.qty) || 0)), 0);
+                },
+
+                offerDiscountOnTotal(msg) {
+                    return this.offerSubTotal(msg) - this.offerNegotiatedTotal(msg);
+                },
+
                 getUserTypeLabel(userType) {
                     const labels = {
-                        'customer': 'You',
-                        'agent': 'Agent',
-                        'admin': 'System'
+                        customer: '@lang('b2b::app.shop.customers.account.quotes.view.you')',
+                        agent: '@lang('b2b::app.shop.customers.account.quotes.view.seller')',
+                        admin: '@lang('b2b::app.shop.customers.account.quotes.view.seller')',
                     };
-                    return labels[userType] || 'You';
-                },
-                
-                getAttributes(additional) {
-                    const additionalData = JSON.parse(additional);
 
-                    if (additionalData && additionalData.attributes) {
-                        return additionalData.attributes;
-                    }
-                    
-                    return null;
+                    return labels[userType] || labels.customer;
                 },
-                
-                async loadPage(url) {
-                    console.log(url);
-                    this.loading = true;
+
+                getInitials(userType) {
+                    return (this.getUserTypeLabel(userType) || '?').charAt(0).toUpperCase();
+                },
+
+                getAttributes(additional) {
                     try {
-                        // Add filters to the URL
+                        const data = JSON.parse(additional);
+
+                        return data && data.attributes ? data.attributes : null;
+                    } catch (e) {
+                        return null;
+                    }
+                },
+
+                async sendMessage() {
+                    const message = this.newMessage.trim();
+
+                    if (! message || this.sending) return;
+
+                    this.sending = true;
+
+                    try {
+                        const response = await fetch(this.sendUrl, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                            },
+                            body: JSON.stringify({ message }),
+                        });
+
+                        if (response.ok) {
+                            this.newMessage = '';
+                            await this.loadPage(this.messageUrl);
+                        } else {
+                            const data = await response.json().catch(() => ({}));
+
+                            this.$emitter.emit('add-flash', {
+                                type: 'error',
+                                message: data.message || '@lang('b2b::app.shop.customers.account.quotes.view.error-message')',
+                            });
+                        }
+                    } catch (error) {
+                        this.$emitter.emit('add-flash', {
+                            type: 'error',
+                            message: '@lang('b2b::app.shop.customers.account.quotes.view.error-message')',
+                        });
+                    } finally {
+                        this.sending = false;
+                    }
+                },
+
+                async loadPage(url) {
+                    this.loading = true;
+
+                    try {
                         const urlObj = new URL(url, window.location.origin);
-                        
+
                         if (this.filters.has_quotations) {
                             urlObj.searchParams.set('has_quotations', this.filters.has_quotations);
                         }
-                        
+
                         if (this.filters.user_type) {
                             urlObj.searchParams.set('user_type', this.filters.user_type);
                         }
-                        
+
                         const response = await fetch(urlObj.toString(), {
                             headers: {
                                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
                                 'Accept': 'application/json',
-                                'X-Requested-With': 'XMLHttpRequest'
-                            }
+                                'X-Requested-With': 'XMLHttpRequest',
+                            },
                         });
-                        
+
                         if (response.ok) {
-                            const data = await response.json();
-                            this.messages = data;
-                            
-                            // Scroll to top of messages panel
+                            this.messages = await response.json();
+
                             this.$nextTick(() => {
-                                const messagesPanel = document.getElementById('messages-panel');
-                                if (messagesPanel) {
-                                    messagesPanel.scrollTop = 0;
-                                }
+                                const panel = document.getElementById('messages-panel');
+
+                                if (panel) panel.scrollTop = panel.scrollHeight;
                             });
-                        } else {
-                            console.error('Failed to load messages page');
-                            // You could add user notification here
                         }
                     } catch (error) {
-                        console.error('Error loading messages page:', error);
-                        // You could add user notification here
+                        //
                     } finally {
                         this.loading = false;
                     }
                 },
-                
-                async applyFilters() {
-                    this.loading = true;
-                    try {
-                        const url = this.messageUrl;
-                        const params = new URLSearchParams();
-                        
-                        if (this.filters.has_quotations) {
-                            params.append('has_quotations', this.filters.has_quotations);
-                        }
-                        if (this.filters.user_type) {
-                            params.append('user_type', this.filters.user_type);
-                        }
-                        
-                        const fullUrl = params.toString() ? `${url}?${params.toString()}` : url;
-                        
-                        const response = await fetch(fullUrl, {
-                            headers: {
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                'Accept': 'application/json',
-                                'X-Requested-With': 'XMLHttpRequest'
-                            }
-                        });
-                        
-                        if (response.ok) {
-                            const data = await response.json();
-                            this.messages = data;
-                            
-                            // Scroll to top of messages panel
-                            this.$nextTick(() => {
-                                const messagesPanel = document.getElementById('messages-panel');
-                                if (messagesPanel) {
-                                    messagesPanel.scrollTop = 0;
-                                }
-                            });
-                        } else {
-                            console.error('Failed to apply filters');
-                        }
-                    } catch (error) {
-                        console.error('Error applying filters:', error);
-                    } finally {
-                        this.loading = false;
-                    }
+
+                applyFilters() {
+                    this.loadPage(this.messageUrl);
                 },
-                
+
                 clearFilters() {
                     this.filters.has_quotations = '';
                     this.filters.user_type = '';
                     this.applyFilters();
-                }
-            }
+                },
+            },
         });
     </script>
 @endPushOnce

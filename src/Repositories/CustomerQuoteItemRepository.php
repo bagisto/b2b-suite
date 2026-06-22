@@ -8,13 +8,16 @@ use Webkul\Core\Eloquent\Repository;
 class CustomerQuoteItemRepository extends Repository
 {
     /**
-     * Specify Model class name.
+     * Specify model class name.
      */
     public function model()
     {
         return CustomerQuoteItem::class;
     }
 
+    /**
+     * Create a new quote item record.
+     */
     public function create(array $data): CustomerQuoteItem
     {
         return $this->model->create($data);
@@ -25,15 +28,14 @@ class CustomerQuoteItemRepository extends Repository
      *
      * @param  int  $productId
      * @param  int  $customerId
-     * @return bool
      */
     public function hasAcceptedNegotiation($productId, $customerId): bool
     {
         return $this->model
-            ->join('customer_quotes', 'customer_quote_items.customer_quote_id', '=', 'customer_quotes.id')
-            ->where('customer_quote_items.product_id', $productId)
-            ->where('customer_quotes.customer_id', $customerId)
-            ->where('customer_quotes.status', 'accepted')
+            ->join('b2b_customer_quotes', 'b2b_customer_quote_items.customer_quote_id', '=', 'b2b_customer_quotes.id')
+            ->where('b2b_customer_quote_items.product_id', $productId)
+            ->where('b2b_customer_quotes.customer_id', $customerId)
+            ->where('b2b_customer_quotes.status', 'accepted')
             ->exists();
     }
 }

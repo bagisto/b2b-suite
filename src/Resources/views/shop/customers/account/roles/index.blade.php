@@ -1,13 +1,13 @@
 <x-shop::layouts.account>
     <!-- Page Title -->
     <x-slot:title>
-        @lang('b2b_suite::app.shop.customers.account.roles.index.title')
+        @lang('b2b::app.shop.customers.account.roles.index.title')
     </x-slot>
 
     <!-- Breadcrumbs -->
     @if ((core()->getConfigData('general.general.breadcrumbs.shop')))
         @section('breadcrumbs')
-            <x-shop::breadcrumbs name="orders" />
+            <x-shop::breadcrumbs name="roles" />
         @endSection
     @endif
 
@@ -27,7 +27,7 @@
                 </a>
 
                 <h2 class="text-2xl font-medium max-sm:text-base ltr:ml-2.5 md:ltr:ml-0 rtl:mr-2.5 md:rtl:mr-0">
-                    @lang('b2b_suite::app.shop.customers.account.roles.index.title')
+                    @lang('b2b::app.shop.customers.account.roles.index.title')
                 </h2>
             </div>
 
@@ -35,7 +35,7 @@
                 href="{{ route('shop.customers.account.roles.create') }}"
                 class="secondary-button border-zinc-200 px-5 py-3 font-normal max-md:rounded-lg max-md:py-2 max-sm:py-1.5 max-sm:text-sm"
             >
-                @lang('b2b_suite::app.shop.customers.account.roles.index.add-btn') 
+                @lang('b2b::app.shop.customers.account.roles.index.add-btn') 
             </a>
         </div>
 
@@ -70,7 +70,7 @@
                     performAction
                 }">
                     <template v-if="isLoading">
-                        <x-shop::shimmer.datagrid.table.body />
+                        <x-b2b::shimmer.datagrid.card.body />
                     </template>
     
                     <template v-else>
@@ -79,7 +79,7 @@
                                 <a :href="record.actions[0].url">
                                     <div class="flex justify-between">
                                         <div class="text-sm font-semibold">
-                                            @lang('b2b_suite::app.shop.customers.account.roles.index.datagrid.id'): #@{{ record.role_id }}
+                                            @lang('b2b::app.shop.customers.account.roles.index.datagrid.id'): #@{{ record.role_id }}
                                         </div>
     
                                         <p v-html="record.permission_type"></p>
@@ -93,7 +93,7 @@
                                         </p>
 
                                         <p>
-                                            <span class="text-neutral-500">@lang('b2b_suite::app.shop.customers.account.roles.index.datagrid.created-at'): </span>
+                                            <span class="text-neutral-500">@lang('b2b::app.shop.customers.account.roles.index.datagrid.created-at'): </span>
                                             <span class="font-medium">@{{ record.created_at }}</span>
                                         </p>
                                     </div>

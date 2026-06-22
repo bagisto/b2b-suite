@@ -42,7 +42,7 @@ class CartController extends Controller
     }
 
     /**
-     * Create cart
+     * Create cart.
      */
     public function store(): JsonResource
     {
@@ -54,8 +54,8 @@ class CartController extends Controller
             $cart->save();
 
             return new JsonResource([
-                'data'         => new CartResource($cart),
-                'redirect_url' => route('admin.customers.quotes.create', $cart->id),
+                'data' => new CartResource($cart),
+                'redirect_url' => route('admin.b2b.quotes.create', $cart->id),
             ]);
         }
 
@@ -63,13 +63,13 @@ class CartController extends Controller
 
         try {
             $cart = Cart::createCart([
-                'customer'  => $customer,
+                'customer' => $customer,
                 'is_active' => false,
             ]);
 
             return new JsonResource([
-                'data'         => new CartResource($cart),
-                'redirect_url' => route('admin.customers.quotes.create', $cart->id),
+                'data' => new CartResource($cart),
+                'redirect_url' => route('admin.b2b.quotes.create', $cart->id),
             ]);
         } catch (\Exception $exception) {
             return new JsonResource([
@@ -99,8 +99,31 @@ class CartController extends Controller
             Cart::addProduct($product, $params);
 
             return new JsonResource([
-                'data'    => new CartResource(Cart::getCart()),
+                'data' => new CartResource(Cart::getCart()),
                 'message' => trans('admin::app.sales.orders.create.cart.success-add-to-cart'),
+            ]);
+        } catch (\Exception $exception) {
+            return new JsonResource([
+                'message' => $exception->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Updates the quantity of the items present in the cart.
+     */
+    public function updateItem(int $cartId): JsonResource
+    {
+        $cart = $this->cartRepository->findOrFail($cartId);
+
+        Cart::setCart($cart);
+
+        try {
+            Cart::updateItems(request()->input());
+
+            return new JsonResource([
+                'data' => new CartResource(Cart::getCart()),
+                'message' => trans('admin::app.sales.orders.create.cart.success-update'),
             ]);
         } catch (\Exception $exception) {
             return new JsonResource([
@@ -127,31 +150,8 @@ class CartController extends Controller
         Cart::collectTotals();
 
         return new JsonResource([
-            'data'    => new CartResource(Cart::getCart()),
+            'data' => new CartResource(Cart::getCart()),
             'message' => trans('admin::app.sales.orders.create.cart.success-remove'),
         ]);
-    }
-
-    /**
-     * Updates the quantity of the items present in the cart.
-     */
-    public function updateItem(int $cartId): JsonResource
-    {
-        $cart = $this->cartRepository->findOrFail($cartId);
-
-        Cart::setCart($cart);
-
-        try {
-            Cart::updateItems(request()->input());
-
-            return new JsonResource([
-                'data'    => new CartResource(Cart::getCart()),
-                'message' => trans('admin::app.sales.orders.create.cart.success-update'),
-            ]);
-        } catch (\Exception $exception) {
-            return new JsonResource([
-                'message' => $exception->getMessage(),
-            ]);
-        }
     }
 }

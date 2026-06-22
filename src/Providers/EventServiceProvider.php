@@ -6,6 +6,7 @@ use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvi
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use Webkul\B2BSuite\Listeners\Company;
+use Webkul\B2BSuite\Listeners\CompanyNotification;
 use Webkul\B2BSuite\Listeners\Order;
 
 class EventServiceProvider extends ServiceProvider
@@ -21,9 +22,23 @@ class EventServiceProvider extends ServiceProvider
          */
         'customer.registration.after' => [
             [Company::class, 'afterUpdate'],
+            [Company::class, 'provisionCompanyCredit'],
         ],
         'customer.update.after' => [
             [Company::class, 'afterUpdate'],
+        ],
+
+        /**
+         * Company lifecycle email notifications.
+         */
+        'b2b.company.registered' => [
+            [CompanyNotification::class, 'registered'],
+        ],
+        'b2b.company.approved' => [
+            [CompanyNotification::class, 'approved'],
+        ],
+        'b2b.company.disabled' => [
+            [CompanyNotification::class, 'disabled'],
         ],
 
         /**
@@ -31,6 +46,9 @@ class EventServiceProvider extends ServiceProvider
          */
         'checkout.order.save.after' => [
             [Order::class, 'afterCreated'],
+        ],
+        'sales.order.cancel.after' => [
+            [Order::class, 'afterCancelled'],
         ],
 
         /**
@@ -53,24 +71,12 @@ class EventServiceProvider extends ServiceProvider
     {
         $templates = [
             [
-                'event'    => 'bagisto.shop.layout.head.after',
-                'template' => 'b2b_suite::components.layouts.scripts',
+                'event' => 'bagisto.shop.products.view.additional_actions.before',
+                'template' => 'b2b::shop.customers.account.requisitions.list-modal',
             ],
             [
-                'event'    => 'bagisto.shop.checkout.cart.summary.proceed_to_checkout.before',
-                'template' => 'b2b_suite::shop.checkout.cart.request-quote-button',
-            ],
-            [
-                'event'    => 'bagisto.shop.products.view.additional_actions.before',
-                'template' => 'b2b_suite::shop.customers.account.requisitions.list-modal',
-            ],
-            [
-                'event'    => 'bagisto.shop.checkout.cart.continue_shopping.before',
-                'template' => 'b2b_suite::shop.customers.account.requisitions.list-modal',
-            ],
-            [
-                // 'event'    => 'bagisto.shop.components.products.card.compare_option.after',
-                // 'template' => 'b2b_suite::shop.customers.account.requisitions.list-modal',
+                'event' => 'bagisto.shop.checkout.cart.continue_shopping.before',
+                'template' => 'b2b::shop.customers.account.requisitions.list-modal',
             ],
         ];
 
@@ -81,7 +87,7 @@ class EventServiceProvider extends ServiceProvider
          */
         if (
             Schema::hasTable('core_config')
-            && core()->getConfigData('b2b_suite.general.settings.active')
+            && core()->getConfigData('b2b.general.settings.active')
         ) {
             foreach ($templates as $template) {
                 Event::listen(current($template), fn ($e) => $e->addTemplate(end($template)));

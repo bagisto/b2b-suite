@@ -3,11 +3,19 @@
 namespace Webkul\B2BSuite\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Webkul\B2BSuite\Contracts\CompanyRole as CompanyRoleContract;
 use Webkul\Customer\Models\CustomerProxy;
 
 class CompanyRole extends Model implements CompanyRoleContract
 {
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'b2b_company_roles';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -33,7 +41,7 @@ class CompanyRole extends Model implements CompanyRoleContract
     /**
      * Get the customers.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function customers()
     {

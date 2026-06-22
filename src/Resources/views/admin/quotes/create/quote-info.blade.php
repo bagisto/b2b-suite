@@ -1,13 +1,13 @@
 <!-- Quote Create Form -->
 <x-admin::form
-    :action="route('admin.customers.quotes.store', $cart->id)"
+    :action="route('admin.b2b.quotes.store', $cart->id)"
     enctype="multipart/form-data"
 >
     <div class="box-shadow rounded bg-white dark:bg-gray-900">
         <div class="grid p-4 pt-2">
             <div class="flex justify-between p-4">
                 <p class="text-base font-semibold text-gray-800 dark:text-white">
-                    @lang('b2b_suite::app.admin.quotes.create.quote-title')
+                    @lang('b2b::app.admin.quotes.create.quote-title')
                 </p>
 
                 <!-- Save Button -->
@@ -15,7 +15,7 @@
                     type="submit"
                     class="primary-button"
                 >
-                    @lang('b2b_suite::app.admin.quotes.create.save-btn')
+                    @lang('b2b::app.admin.quotes.create.save-btn')
                 </button>
             </div>
             
@@ -31,7 +31,7 @@
                     <!-- Quote Name -->
                     <x-admin::form.control-group>
                         <x-admin::form.control-group.label class="required !text-gray-800 dark:!text-white">
-                            @lang('b2b_suite::app.admin.quotes.create.name')
+                            @lang('b2b::app.admin.quotes.create.name')
                         </x-admin::form.control-group.label>
 
                         <x-admin::form.control-group.control
@@ -40,8 +40,8 @@
                             name="name"
                             value="{{ old('name') ?? '' }}"
                             rules="required|min:3|max:255"
-                            :label="trans('b2b_suite::app.admin.quotes.create.name')"
-                            :placeholder="trans('b2b_suite::app.admin.quotes.create.name')"
+                            :label="trans('b2b::app.admin.quotes.create.name')"
+                            :placeholder="trans('b2b::app.admin.quotes.create.name')"
                         />
 
                         <x-admin::form.control-group.error control-name="name" />
@@ -50,7 +50,7 @@
                     <!-- Quote Description -->
                     <x-admin::form.control-group>
                         <x-admin::form.control-group.label class="required !text-gray-800 dark:!text-white">
-                            @lang('b2b_suite::app.admin.quotes.create.description')
+                            @lang('b2b::app.admin.quotes.create.description')
                         </x-admin::form.control-group.label>
 
                         <x-admin::form.control-group.control
@@ -60,8 +60,8 @@
                             value="{{ old('description') ?? '' }}"
                             rows="4"
                             rules="required|min:10|max:1000"
-                            :label="trans('b2b_suite::app.admin.quotes.create.description')"
-                            :placeholder="trans('b2b_suite::app.admin.quotes.create.description')"
+                            :label="trans('b2b::app.admin.quotes.create.description')"
+                            :placeholder="trans('b2b::app.admin.quotes.create.description')"
                         />
 
                         <x-admin::form.control-group.error control-name="description" />
@@ -70,7 +70,7 @@
                     <!-- Status -->
                     <x-admin::form.control-group class="mt-4">
                         <x-admin::form.control-group.label class="required !text-gray-800 dark:!text-white">
-                            @lang('b2b_suite::app.admin.quotes.create.status')
+                            @lang('b2b::app.admin.quotes.create.status')
                         </x-admin::form.control-group.label>
 
                         <x-admin::form.control-group.control
@@ -79,7 +79,7 @@
                             id="status"
                             value="{{ old('status') ?? '' }}"
                             rules="required"
-                            :label="trans('b2b_suite::app.admin.quotes.create.status')"
+                            :label="trans('b2b::app.admin.quotes.create.status')"
                         >
                             @foreach($statusLabels as $index => $label)
                                 <option value="{{ $index }}"> 
@@ -94,7 +94,7 @@
                     <!-- Order Date -->
                     <x-admin::form.control-group class="mt-4">
                         <x-admin::form.control-group.label>
-                            @lang('b2b_suite::app.admin.quotes.create.order-date')
+                            @lang('b2b::app.admin.quotes.create.order-date')
                         </x-admin::form.control-group.label>
                     
                         <x-admin::form.control-group.control
@@ -103,7 +103,7 @@
                             name="order_date"
                             value="{{ old('order_date') ?? '' }}"
                             data-min-date="today"
-                            :label="trans('b2b_suite::app.admin.quotes.create.order-date')"
+                            :label="trans('b2b::app.admin.quotes.create.order-date')"
                         />
 
                         <x-admin::form.control-group.error control-name="order_date" />
@@ -112,7 +112,7 @@
                     <!-- Expected Arrival Date -->
                     <x-admin::form.control-group class="mt-4">
                         <x-admin::form.control-group.label>
-                            @lang('b2b_suite::app.admin.quotes.create.expected-arrival')
+                            @lang('b2b::app.admin.quotes.create.expected-arrival')
                         </x-admin::form.control-group.label>
                     
                         <x-admin::form.control-group.control
@@ -121,7 +121,7 @@
                             name="expected_arrival_date"
                             value="{{ old('expected_arrival_date') ?? '' }}"
                             data-min-date="today"
-                            :label="trans('b2b_suite::app.admin.quotes.create.expected-arrival')"
+                            :label="trans('b2b::app.admin.quotes.create.expected-arrival')"
                         />
 
                         <x-admin::form.control-group.error control-name="expected_arrival_date" />
@@ -130,7 +130,7 @@
                     <!-- Created At -->
                     <x-admin::form.control-group class="mt-4">
                         <x-admin::form.control-group.label>
-                            @lang('b2b_suite::app.admin.quotes.create.created-at')
+                            @lang('b2b::app.admin.quotes.create.created-at')
                         </x-admin::form.control-group.label>
                     
                         <x-admin::form.control-group.control
@@ -138,7 +138,7 @@
                             id="created_at"
                             name="created_at"
                             value="{{ old('created_at') ?? '' }}"
-                            :label="trans('b2b_suite::app.admin.quotes.create.created-at')"
+                            :label="trans('b2b::app.admin.quotes.create.created-at')"
                         />
 
                         <x-admin::form.control-group.error control-name="created_at" />
@@ -147,7 +147,7 @@
                     <!-- Expiration Date -->
                     <x-admin::form.control-group class="mt-4">
                         <x-admin::form.control-group.label class="required !text-gray-800 dark:!text-white">
-                            @lang('b2b_suite::app.admin.quotes.create.expiration-date')
+                            @lang('b2b::app.admin.quotes.create.expiration-date')
                         </x-admin::form.control-group.label>
                     
                         <x-admin::form.control-group.control
@@ -157,7 +157,7 @@
                             value="{{ old('expiration_date') ?? '' }}"
                             rules="required"
                             data-min-date="today"
-                            :label="trans('b2b_suite::app.admin.quotes.create.expiration-date')"
+                            :label="trans('b2b::app.admin.quotes.create.expiration-date')"
                         />
 
                         <x-admin::form.control-group.error control-name="expiration_date" />
@@ -171,11 +171,11 @@
                         <div class="mb-4 flex justify-between gap-5">
                             <div class="flex flex-col gap-2">
                                 <p class="text-base font-semibold text-gray-800 dark:text-white">
-                                    @lang('b2b_suite::app.admin.quotes.create.attachments')
+                                    @lang('b2b::app.admin.quotes.create.attachments')
                                 </p>
 
                                 <p class="text-xs font-medium text-gray-500 dark:text-gray-300">
-                                    @lang('b2b_suite::app.admin.quotes.create.attachment-info')
+                                    @lang('b2b::app.admin.quotes.create.attachment-info')
                                 </p>
                             </div>
                         </div>

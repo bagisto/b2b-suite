@@ -1,35 +1,35 @@
 <x-admin::layouts>
     <!-- Page Title -->
     <x-slot:title>
-        @lang('b2b_suite::app.admin.quotes.index.title')
+        @lang('b2b::app.admin.quotes.index.title')
     </x-slot>
 
     <div class="flex items-center justify-between gap-4 max-sm:flex-wrap">
         <p class="py-3 text-xl font-bold text-gray-800 dark:text-white">
-            @lang('b2b_suite::app.admin.quotes.index.title')
+            @lang('b2b::app.admin.quotes.index.title')
         </p>
 
         <div class="flex items-center gap-x-2.5">
-            <x-admin::datagrid.export src="{{ route('admin.customers.quotes.index') }}" />
+            <x-admin::datagrid.export src="{{ route('admin.b2b.quotes.index') }}" />
             
-            {!! view_render_event('bagisto.admin.customers.quotes.create.before') !!}
+            {!! view_render_event('bagisto.admin.b2b.quotes.create.before') !!}
 
-            @if (bouncer()->hasPermission('customers.quotes.create'))
+            @if (bouncer()->hasPermission('b2b.quotes.create'))
                 <button
                     class="primary-button"
                     @click="$refs.selectCustomerComponent.openDrawer()"
                 >
-                    @lang('b2b_suite::app.admin.quotes.index.create-btn')
+                    @lang('b2b::app.admin.quotes.index.create-btn')
                 </button>
             @endif
 
-            {!! view_render_event('bagisto.admin.customers.quotes.create.after') !!}
+            {!! view_render_event('bagisto.admin.b2b.quotes.create.after') !!}
         </div>
     </div>
 
     <v-customer-search ref="selectCustomerComponent"></v-customer-search>
 
-    <x-admin::datagrid :src="route('admin.customers.quotes.index')" :isMultiRow="true">
+    <x-admin::datagrid :src="route('admin.b2b.quotes.index')" :isMultiRow="true">
         <template #header="{
             isLoading,
             available,
@@ -39,14 +39,15 @@
             performAction
         }">
             <template v-if="isLoading">
-                <x-admin::shimmer.datagrid.table.head :isMultiRow="true" />
+                <x-b2b::shimmer.datagrid.dg.head />
             </template>
 
             <template v-else>
-                <div class="row grid grid-cols-4 grid-rows-1 items-center border-b px-4 py-2.5 dark:border-gray-800">
+                <div class="b2b-dg-head border-b px-4 py-2.5 dark:border-gray-800">
                     <div
                         class="flex select-none items-center gap-2.5"
-                        v-for="(columnGroup, index) in [['quotation_number', 'name', 'status'], ['company_name', 'customer_name', 'created_at'], ['base_total', 'negotiated_total', 'expiration_date'], ['items']]"
+                        :class="{ 'b2b-dg-divider': index > 0 }"
+                        v-for="(columnGroup, index) in [['quotation_number', 'name', 'status'], ['company_name', 'agent_name', 'customer_name', 'created_at'], ['base_total', 'negotiated_total', 'expiration_date'], ['items']]"
                     >
                         <p class="text-gray-600 dark:text-gray-300">
                             <span class="[&>*]:after:content-['_/_']">
@@ -87,78 +88,123 @@
             performAction
         }">
             <template v-if="isLoading">
-                <x-admin::shimmer.datagrid.table.body :isMultiRow="true" />
+                <x-b2b::shimmer.datagrid.dg.body />
             </template>
 
             <template v-else>
                 <div
-                    class="row grid grid-cols-4 border-b px-4 py-2.5 transition-all hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-950"
+                    class="b2b-dg-grid border-b px-4 py-4 transition-all hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-950"
                     v-for="record in available.records"
                 >
-                    <!-- Quote Id, Name, Status Section -->
-                    <div class="">
-                        <div class="flex gap-2.5">
-                            <div class="flex flex-col gap-1.5">
-                                <p class="text-base font-semibold text-gray-800 dark:text-white">
-                                    @{{ "@lang('b2b_suite::app.admin.quotes.index.datagrid.id')".replace(':id', record.quotation_number) }}
-                                </p>
+                    <!-- Quote Id, Name, Status -->
+                    <div class="flex flex-col gap-2">
+                        <a
+                            class="w-fit text-base font-semibold text-gray-800 transition-all hover:text-blue-600 dark:text-white"
+                            :href=`{{ route('admin.b2b.quotes.index') }}/${record.quote_id}`
+                        >
+                            @{{ "@lang('b2b::app.admin.quotes.index.datagrid.id')".replace(':id', record.quotation_number) }}
+                        </a>
 
-                                <p class="text-base text-gray-800 dark:text-white">
-                                    @{{ record.name }}
-                                </p>
+                        <p
+                            class="text-sm text-gray-600 dark:text-gray-300"
+                            v-if="record.name"
+                        >
+                            @{{ record.name }}
+                        </p>
 
-                                <p
-                                    v-html="record.status"
-                                >
-                                </p>
-                            </div>
-                        </div>
+                        <div v-html="record.status"></div>
                     </div>
 
                     <!-- Company, Customer, Created At -->
-                    <div class="">
-                        <div class="flex flex-col gap-1.5">
-                            <p class="text-base text-gray-800 dark:text-white">
+                    <div class="b2b-dg-divider flex flex-col gap-3">
+                        <div class="flex flex-col gap-0.5">
+                            <span class="text-xs uppercase tracking-wide text-gray-400 dark:text-gray-500">
+                                @lang('b2b::app.admin.quotes.index.datagrid.company')
+                            </span>
+
+                            <p class="break-words text-sm font-medium text-gray-800 dark:text-white">
                                 @{{ record.company_name }}
                             </p>
+                        </div>
 
-                            <p class="text-base text-gray-800 dark:text-white">
+                        <div class="flex flex-col gap-0.5">
+                            <span class="text-xs uppercase tracking-wide text-gray-400 dark:text-gray-500">
+                                @lang('b2b::app.admin.quotes.index.datagrid.sales-representative')
+                            </span>
+
+                            <p class="break-words text-sm text-gray-700 dark:text-gray-300">
+                                @{{ record.agent_name || '—' }}
+                            </p>
+                        </div>
+
+                        <div class="flex flex-col gap-0.5">
+                            <span class="text-xs uppercase tracking-wide text-gray-400 dark:text-gray-500">
+                                @lang('b2b::app.admin.quotes.index.datagrid.customer')
+                            </span>
+
+                            <p class="break-words text-sm text-gray-700 dark:text-gray-300">
                                 @{{ record.customer_name }}
                             </p>
+                        </div>
 
-                            <p class="text-gray-600 dark:text-gray-300">
+                        <div class="flex flex-col gap-0.5">
+                            <span class="text-xs uppercase tracking-wide text-gray-400 dark:text-gray-500">
+                                @lang('b2b::app.admin.quotes.index.datagrid.created-at')
+                            </span>
+
+                            <p class="text-sm text-gray-600 dark:text-gray-300">
                                 @{{ record.created_at }}
                             </p>
                         </div>
                     </div>
 
-                    <!-- Base Total, Negotiated Amount, Updated At -->
-                    <div class="">
-                        <div class="flex flex-col gap-1.5">
-                            <p class="text-base font-semibold text-gray-800 dark:text-white">
+                    <!-- Base Total, Negotiated Total, Expiration -->
+                    <div class="b2b-dg-divider flex flex-col gap-3">
+                        <div class="flex flex-col gap-0.5">
+                            <span class="text-xs uppercase tracking-wide text-gray-400 dark:text-gray-500">
+                                @lang('b2b::app.admin.quotes.index.datagrid.base_total')
+                            </span>
+
+                            <p class="text-sm font-medium text-gray-700 dark:text-gray-300">
                                 @{{ $admin.formatPrice(record.base_total) }}
                             </p>
-                            
-                            <p class="text-base font-semibold text-gray-800 dark:text-white">
+                        </div>
+
+                        <div class="flex flex-col gap-0.5">
+                            <span class="text-xs uppercase tracking-wide text-gray-400 dark:text-gray-500">
+                                @lang('b2b::app.admin.quotes.index.datagrid.negotiated_total')
+                            </span>
+
+                            <p class="text-base font-bold text-gray-800 dark:text-white">
                                 @{{ $admin.formatPrice(record.negotiated_total) }}
                             </p>
+                        </div>
 
-                            <p class="text-gray-600 dark:text-gray-300">
+                        <div class="flex flex-col gap-0.5">
+                            <span class="text-xs uppercase tracking-wide text-gray-400 dark:text-gray-500">
+                                @lang('b2b::app.admin.quotes.index.datagrid.expiration-date')
+                            </span>
+
+                            <p class="text-sm text-gray-600 dark:text-gray-300">
                                 @{{ record.expiration_date }}
                             </p>
                         </div>
                     </div>
 
-                    <!-- Images Section -->
-                    <div class="flex items-center justify-between gap-x-2">
+                    <!-- Items + View action -->
+                    <div class="b2b-dg-divider flex items-start justify-between gap-2">
                         <div
-                            class="flex flex-col gap-1.5"
+                            class="min-w-0"
                             v-html="record.items"
                         >
                         </div>
 
-                        <a :href=`{{ route('admin.customers.quotes.view', '') }}/${record.quote_id}`>
-                            <span class="icon-view rtl:icon-sort-left cursor-pointer p-1.5 text-2xl hover:rounded-md hover:bg-gray-200 ltr:ml-1 rtl:mr-1 dark:hover:bg-gray-800"></span>
+                        <a
+                            class="grid h-9 w-9 shrink-0 place-items-center rounded-md border border-gray-200 text-gray-600 transition-all hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+                            :href=`{{ route('admin.b2b.quotes.index') }}/${record.quote_id}`
+                            title="@lang('b2b::app.admin.quotes.index.datagrid.view')"
+                        >
+                            <span class="icon-view text-2xl"></span>
                         </a>
                     </div>
                 </div>
@@ -167,6 +213,56 @@
     </x-admin::datagrid>
     
     @include('admin::customers.customers.index.create')
+
+    @pushOnce('styles')
+        <style>
+            /**
+             * Responsive layout for the B2B multi-row datagrid. The grid variants /
+             * dividers used here are purged out of the B2B admin bundle, so they live in
+             * this scoped block: one column on mobile, four aligned columns on desktop.
+             */
+            .b2b-dg-grid,
+            .b2b-dg-head {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+            .b2b-dg-grid {
+                gap: 1.25rem;
+            }
+
+            .b2b-dg-head {
+                display: none;
+            }
+
+            @media (min-width: 1024px) {
+                .b2b-dg-grid,
+                .b2b-dg-head {
+                    grid-template-columns: 1.5fr 1.1fr 1.1fr 1.3fr;
+                    column-gap: 1.5rem;
+                }
+
+                .b2b-dg-grid {
+                    row-gap: 0;
+                    align-items: start;
+                }
+
+                .b2b-dg-head {
+                    display: grid;
+                    align-items: center;
+                }
+
+                .b2b-dg-divider {
+                    border-inline-start: 1px solid rgb(243 244 246);
+                    padding-inline-start: 1.5rem;
+                }
+
+                .dark .b2b-dg-divider {
+                    border-inline-start-color: rgb(31 41 55);
+                }
+            }
+        </style>
+    @endPushOnce
 
     @pushOnce('scripts')
         <script
@@ -305,7 +401,7 @@
 
                         let self = this;
 
-                        this.$axios.get("{{ route('admin.customers.companies.search') }}", {
+                        this.$axios.get("{{ route('admin.b2b.companies.search') }}", {
                                 params: {
                                     query: this.searchTerm,
                                     type: 'user'
@@ -321,7 +417,7 @@
                     },
 
                     createCart(customer) {
-                        this.$axios.post("{{ route('admin.customers.cart.store') }}", {customer_id: customer.id})
+                        this.$axios.post("{{ route('admin.b2b.cart.store') }}", {customer_id: customer.id})
                             .then(function(response) {
                                 window.location.href = response.data.redirect_url;
                             })

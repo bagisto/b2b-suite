@@ -8,6 +8,13 @@ use Webkul\B2BSuite\Contracts\CompanyAttributeOptionTranslation as AttributeOpti
 class CompanyAttributeOptionTranslation extends Model implements AttributeOptionTranslationContract
 {
     /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'b2b_company_attribute_option_translations';
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array

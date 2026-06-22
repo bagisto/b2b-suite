@@ -1,13 +1,13 @@
 <x-shop::layouts.account>
     <!-- Page Title -->
     <x-slot:title>
-        @lang('b2b_suite::app.shop.customers.account.requisitions.title')
+        @lang('b2b::app.shop.customers.account.requisitions.title')
     </x-slot>
 
     <!-- Breadcrumbs -->
     @if ((core()->getConfigData('general.general.breadcrumbs.shop')))
         @section('breadcrumbs')
-            <x-shop::breadcrumbs name="orders" />
+            <x-shop::breadcrumbs name="requisitions" />
         @endSection
     @endif
 
@@ -28,17 +28,17 @@
                     </a>
         
                     <h2 class="text-2xl font-medium max-md:text-xl max-sm:text-base ltr:ml-2.5 md:ltr:ml-0 rtl:mr-2.5 md:rtl:mr-0">
-                        @lang('b2b_suite::app.shop.customers.account.requisitions.title')
+                        @lang('b2b::app.shop.customers.account.requisitions.title')
                     </h2>
                 </div>
 
-                @if ((int) core()->getConfigData('b2b_suite.general.settings.no_requisition_list') > $totalRequisition)
+                @if ((int) core()->getConfigData('b2b.general.settings.no_requisition_list') > $totalRequisition)
                     <div class="flex items-center">
                         <a
                             href="{{ route('shop.customers.account.requisitions.create') }}"
                             class="secondary-button border-zinc-200 px-5 py-3 font-normal max-md:rounded-lg max-md:py-2 max-sm:py-1.5 max-sm:text-sm"
                         >
-                            @lang('b2b_suite::app.shop.customers.account.requisitions.btn-create') 
+                            @lang('b2b::app.shop.customers.account.requisitions.btn-create') 
                         </a>
                     </div>
                 @endif
@@ -63,18 +63,18 @@
                         </a>
             
                         <h2 class="text-2xl font-medium max-md:text-xl max-sm:text-base ltr:ml-2.5 md:ltr:ml-0 rtl:mr-2.5 md:rtl:mr-0">
-                            @lang('b2b_suite::app.shop.customers.account.requisitions.title')
+                            @lang('b2b::app.shop.customers.account.requisitions.title')
                         </h2>
                     </div>
                     
                     <!-- Requisition Create Button -->
-                    @if ((int) core()->getConfigData('b2b_suite.general.settings.no_requisition_list') > $totalRequisition)
+                    @if ((int) core()->getConfigData('b2b.general.settings.no_requisition_list') > $totalRequisition)
                         <button
                             type="button"
                             class="secondary-button border-zinc-200 px-5 py-3 font-normal max-md:rounded-lg max-md:py-2 max-sm:py-1.5 max-sm:text-sm"
                             @click="selectedRequisitions=0;resetForm();$refs.requisitionCreateModal.toggle()"
                         >
-                            @lang('b2b_suite::app.shop.customers.account.requisitions.btn-create') 
+                            @lang('b2b::app.shop.customers.account.requisitions.btn-create') 
                         </button>
                     @endif
                 </div>
@@ -110,7 +110,7 @@
                             performAction
                         }">
                             <template v-if="isLoading">
-                                <x-shop::shimmer.datagrid.table.body />
+                                <x-b2b::shimmer.datagrid.card.body />
                             </template>
             
                             <template v-else>
@@ -119,7 +119,7 @@
                                         <a :href="record.actions[0].url">
                                             <div class="flex justify-between">
                                                 <div class="text-sm font-semibold">
-                                                    @lang('b2b_suite::app.shop.customers.account.requisitions.index.datagrid.order-id'): #@{{ record.id }}
+                                                    @lang('b2b::app.shop.customers.account.requisitions.index.datagrid.order-id'): #@{{ record.id }}
             
                                                     <p class="text-xs font-normal text-neutral-500">
                                                         @{{ record.created_at }}
@@ -130,7 +130,7 @@
                                             </div>
                 
                                             <div class="mt-2.5 text-xs font-normal text-neutral-500">
-                                                @lang('b2b_suite::app.shop.customers.account.quotes.subtotal')
+                                                @lang('b2b::app.shop.customers.account.quotes.subtotal')
             
                                                 <p class="text-xl font-semibold text-black">
                                                     @{{ record.name }}
@@ -161,13 +161,13 @@
                         <x-shop::modal ref="requisitionCreateModal">
                             <!-- Modal Header -->
                             <x-slot:header>
-                                <p class="text-lg font-bold text-gray-800 dark:text-white">
+                                <p class="text-lg font-bold text-gray-800">
                                     <span v-if="selectedRequisitions">
-                                        @lang('b2b_suite::app.shop.customers.account.requisitions.edit-title')
+                                        @lang('b2b::app.shop.customers.account.requisitions.edit-title')
                                     </span>
 
                                     <span v-else>
-                                        @lang('b2b_suite::app.shop.customers.account.requisitions.add-title')
+                                        @lang('b2b::app.shop.customers.account.requisitions.add-title')
                                     </span>
                                 </p>
                             </x-slot>
@@ -184,7 +184,7 @@
 
                                 <x-shop::form.control-group>
                                     <x-shop::form.control-group.label class="required">
-                                        @lang('b2b_suite::app.shop.customers.account.requisitions.index.create.name')
+                                        @lang('b2b::app.shop.customers.account.requisitions.index.create.name')
                                     </x-shop::form.control-group.label>
 
                                     <x-shop::form.control-group.control
@@ -192,8 +192,8 @@
                                         name="name"
                                         rules="required"
                                         v-model="requisition.name"
-                                        :label="trans('b2b_suite::app.shop.customers.account.requisitions.index.create.name')"
-                                        :placeholder="trans('b2b_suite::app.shop.customers.account.requisitions.index.create.name')"
+                                        :label="trans('b2b::app.shop.customers.account.requisitions.index.create.name')"
+                                        :placeholder="trans('b2b::app.shop.customers.account.requisitions.index.create.name')"
                                     />
 
                                     <x-shop::form.control-group.error control-name="name" />
@@ -201,7 +201,7 @@
 
                                 <x-shop::form.control-group>
                                     <x-shop::form.control-group.label class="required">
-                                        @lang('b2b_suite::app.shop.customers.account.requisitions.index.create.description')
+                                        @lang('b2b::app.shop.customers.account.requisitions.index.create.description')
                                     </x-shop::form.control-group.label>
 
                                     <x-shop::form.control-group.control
@@ -210,8 +210,8 @@
                                         rows="4"
                                         rules="required"
                                         v-model="requisition.description"
-                                        :label="trans('b2b_suite::app.shop.customers.account.requisitions.index.create.description')"
-                                        :placeholder="trans('b2b_suite::app.shop.customers.account.requisitions.index.create.description')"
+                                        :label="trans('b2b::app.shop.customers.account.requisitions.index.create.description')"
+                                        :placeholder="trans('b2b::app.shop.customers.account.requisitions.index.create.description')"
                                     />
 
                                     <x-shop::form.control-group.error control-name="description" />
@@ -220,14 +220,14 @@
                                 <!-- Is Default -->
                                 <x-shop::form.control-group>
                                     <x-shop::form.control-group.label>
-                                        @lang('b2b_suite::app.shop.customers.account.requisitions.index.create.is-default')
+                                        @lang('b2b::app.shop.customers.account.requisitions.index.create.is-default')
                                     </x-shop::form.control-group.label>
 
                                     <x-shop::form.control-group.control
                                         type="switch"
                                         name="is_default"
                                         value="1"
-                                        :label="trans('b2b_suite::app.shop.customers.account.requisitions.index.create.is-default')"
+                                        :label="trans('b2b::app.shop.customers.account.requisitions.index.create.is-default')"
                                     />
                                 </x-shop::form.control-group>
 
@@ -237,20 +237,20 @@
                             <!-- Modal Footer -->
                             <x-slot:footer>
                                 <!-- Save Button -->
-                                <x-admin::button
+                                <x-shop::button
                                     button-type="button"
                                     class="primary-button"
-                                    :title="trans('b2b_suite::app.shop.customers.account.requisitions.index.create.btn-save')"
+                                    :title="trans('b2b::app.shop.customers.account.requisitions.index.create.btn-save')"
                                     ::loading="isLoading"
                                     ::disabled="isLoading"
                                 />
                             </x-slot>
-                        </x-admin::modal>
+                        </x-shop::modal>
 
                         {!! view_render_event('bagisto.shop.customers.account.requisitions.create_form_controls.after') !!}
 
                     </form>
-                </x-admin::form>
+                </x-shop::form>
             </div>
         </script>
 

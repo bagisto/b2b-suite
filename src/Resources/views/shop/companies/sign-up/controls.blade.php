@@ -10,6 +10,7 @@
             value="{{ old($attribute->code) }}"
             aria-required="true"
         />
+
         @break
 
     @case('price')
@@ -28,7 +29,8 @@
                 </x-slot>
             </x-shop::form.control-group.control>
         </div>
-    @break
+
+        @break
 
     @case('textarea')
         <x-shop::form.control-group.control
@@ -188,5 +190,4 @@
         </div>
 
         @break
-
 @endswitch

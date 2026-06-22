@@ -1,30 +1,30 @@
 <x-admin::layouts>
     <x-slot:title>
-        @lang('b2b_suite::app.admin.companies.create.title')
+        @lang('b2b::app.admin.companies.create.title')
     </x-slot>
 
-    {!! view_render_event('bagisto.admin.customers.companies.create.before') !!}
+    {!! view_render_event('bagisto.admin.b2b.companies.create.before') !!}
 
     <!-- Input Form -->
     <x-admin::form
-        :action="route('admin.customers.companies.store')"
+        :action="route('admin.b2b.companies.store')"
         enctype="multipart/form-data"
     >
-        {!! view_render_event('bagisto.admin.customers.companies.create.create_form_controls.before') !!}
+        {!! view_render_event('bagisto.admin.b2b.companies.create.create_form_controls.before') !!}
 
         <!-- Actions Buttons -->
         <div class="flex items-center justify-between gap-4 max-sm:flex-wrap">
             <p class="text-xl font-bold text-gray-800 dark:text-white">
-                @lang('b2b_suite::app.admin.companies.create.title')
+                @lang('b2b::app.admin.companies.create.title')
             </p>
 
             <div class="flex items-center gap-x-2.5">
                 <!-- Back Button -->
                 <a
-                    href="{{ route('admin.customers.companies.index') }}"
+                    href="{{ route('admin.b2b.companies.index') }}"
                     class="transparent-button hover:bg-gray-200 dark:text-white dark:hover:bg-gray-800"
                 >
-                    @lang('b2b_suite::app.admin.layouts.back-btn')
+                    @lang('b2b::app.admin.layouts.back-btn')
                 </a>
 
                 <!-- Save Button -->
@@ -32,7 +32,7 @@
                     type="submit"
                     class="primary-button"
                 >
-                    @lang('b2b_suite::app.admin.companies.create.save-btn')
+                    @lang('b2b::app.admin.companies.create.save-btn')
                 </button>
             </div>
         </div>
@@ -51,7 +51,7 @@
 
                         <x-slot:content>
                             @foreach($group->custom_attributes as $attribute)
-                                @include('b2b_suite::admin.companies.field-types', ['attribute' => $attribute])
+                                @include('b2b::admin.companies.field-types', ['attribute' => $attribute])
                             @endforeach
                         </x-slot>
                     </x-admin::accordion>
@@ -60,6 +60,39 @@
 
             <!-- Right Column -->
             <div class="flex w-[360px] max-w-full flex-col gap-2">
+                <!-- Sales Rep & Approval -->
+                <x-admin::accordion>
+                    <x-slot:header>
+                        <p class="p-2.5 text-base font-semibold text-gray-800 dark:text-white">
+                            @lang('b2b::app.admin.companies.edit.sales-rep-approval')
+                        </p>
+                    </x-slot>
+
+                    <x-slot:content>
+                        @include('b2b::admin.companies.sales-rep', ['admins' => $admins])
+
+                        <x-admin::form.control-group>
+                            <x-admin::form.control-group.label>
+                                @lang('b2b::app.admin.companies.edit.status')
+                            </x-admin::form.control-group.label>
+
+                            <x-admin::form.control-group.control
+                                type="select"
+                                name="status"
+                                :value="old('status', '1')"
+                                rules="required"
+                                :label="trans('b2b::app.admin.companies.edit.status')"
+                            >
+                                <option value="1">@lang('b2b::app.admin.companies.edit.active')</option>
+
+                                <option value="0">@lang('b2b::app.admin.companies.edit.pending')</option>
+                            </x-admin::form.control-group.control>
+
+                            <x-admin::form.control-group.error control-name="status" />
+                        </x-admin::form.control-group>
+                    </x-slot>
+                </x-admin::accordion>
+
                 @foreach($attributeGroups->where('column', 2) as $group)
                     <x-admin::accordion>
                         <x-slot:header>
@@ -70,7 +103,7 @@
 
                         <x-slot:content>
                             @foreach($group->custom_attributes as $attribute)
-                                @include('b2b_suite::admin.companies.field-types', ['attribute' => $attribute])
+                                @include('b2b::admin.companies.field-types', ['attribute' => $attribute])
                             @endforeach
                         </x-slot>
                     </x-admin::accordion>
@@ -78,8 +111,8 @@
             </div>
         </div>
 
-        {!! view_render_event('bagisto.admin.customers.companies.create.create_form_controls.after') !!}
+        {!! view_render_event('bagisto.admin.b2b.companies.create.create_form_controls.after') !!}
     </x-admin::form>
 
-    {!! view_render_event('bagisto.admin.customers.companies.create.after') !!}
+    {!! view_render_event('bagisto.admin.b2b.companies.create.after') !!}
 </x-admin::layouts>

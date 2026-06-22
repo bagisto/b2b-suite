@@ -4,16 +4,19 @@ namespace Webkul\B2BSuite\Http\Controllers\Admin;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Event;
+use Illuminate\View\View;
 use Webkul\Admin\Http\Controllers\Controller;
 use Webkul\Admin\Http\Requests\MassDestroyRequest;
 use Webkul\Admin\Http\Requests\MassUpdateRequest;
 use Webkul\Admin\Http\Resources\CartResource;
 use Webkul\B2BSuite\DataGrids\Admin\CustomerQuoteDataGrid;
 use Webkul\B2BSuite\Http\Requests\QuoteRequest;
+use Webkul\B2BSuite\Models\Customer;
 use Webkul\B2BSuite\Models\CustomerQuote;
+use Webkul\B2BSuite\Notifications\Notifier;
 use Webkul\B2BSuite\Repositories\CustomerQuoteMessageRepository;
-use Webkul\B2BSuite\Repositories\CustomerQuoteQuotationRepository;
 use Webkul\B2BSuite\Repositories\CustomerQuoteRepository;
 use Webkul\Checkout\Repositories\CartRepository;
 use Webkul\Customer\Repositories\CustomerGroupRepository;
@@ -25,18 +28,17 @@ class QuoteController extends Controller
      * Create a new controller instance.
      */
     public function __construct(
-        protected CartRepository $cartRepository,
-        protected CustomerRepository $customerRepository,
         protected CustomerQuoteRepository $customerQuoteRepository,
         protected CustomerQuoteMessageRepository $customerQuoteMessageRepository,
-        protected CustomerQuoteQuotationRepository $customerQuoteQuotationRepository,
+        protected CartRepository $cartRepository,
+        protected CustomerRepository $customerRepository,
         protected CustomerGroupRepository $customerGroupRepository
     ) {}
 
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function index()
     {
@@ -46,20 +48,20 @@ class QuoteController extends Controller
 
         $groups = $this->customerGroupRepository->findWhere([['code', '<>', 'guest']]);
 
-        return view('b2b_suite::admin.quotes.index', compact('groups'));
+        return view('b2b::admin.quotes.index', compact('groups'));
     }
 
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function create(int $cartId)
     {
         $cart = $this->cartRepository->find($cartId);
 
         if (! $cart) {
-            return redirect()->route('admin.customers.quotes.index');
+            return redirect()->route('admin.b2b.quotes.index');
         }
 
         $cart = new CartResource($cart);
@@ -74,20 +76,20 @@ class QuoteController extends Controller
 
         if ($cart?->company_id) {
             $company = $this->customerRepository->findOneWhere([
-                'id'   => $cart->company_id,
+                'id' => $cart->company_id,
                 'type' => 'company',
             ]);
         }
 
         $user = auth()->guard('admin')->user();
 
-        return view('b2b_suite::admin.quotes.create', compact('cart', 'statusLabels', 'company', 'user'));
+        return view('b2b::admin.quotes.create', compact('cart', 'statusLabels', 'company', 'user'));
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(QuoteRequest $quoteRequest)
     {
@@ -96,24 +98,25 @@ class QuoteController extends Controller
         $cart = $this->cartRepository->find((int) $quoteRequest->cart_id);
 
         $company = $this->customerRepository->findOneWhere([
-            'id'   => $cart->company_id,
+            'id' => $cart->company_id,
             'type' => 'company',
         ]);
 
         $customer = $cart->customer;
 
-        $company = $company ? $company->id : $customer->companies->first()->id;
+        $company = $company ?: $customer->companies->first();
 
         $quoteNumber = $this->customerQuoteRepository->generateQuotationNumber(null);
 
         $data = array_merge([
             'quotation_number' => $quoteNumber['quotation_number'],
-            'po_number'        => $quoteNumber['po_number'],
-            'customer_id'      => $customer->id,
-            'company_id'       => $company,
-            'agent_id'         => auth()->guard('admin')->user()->id,
-            'customer_name'    => $customer->name,
-            'cart'             => $cart,
+            'po_number' => $quoteNumber['po_number'],
+            'customer_id' => $customer->id,
+            'company_id' => $company?->id,
+            'agent_id' => $company?->sales_rep_id ?? auth()->guard('admin')->user()->id,
+            'customer_name' => $customer->name,
+            'customer_email' => $customer->email,
+            'cart' => $cart,
         ], $quoteRequest->only([
             'name',
             'description',
@@ -129,218 +132,43 @@ class QuoteController extends Controller
 
         Event::dispatch('b2b.quote.create.after', $quote);
 
-        session()->flash('success', __('b2b_suite::app.admin.quotes.index.create-success'));
+        session()->flash('success', __('b2b::app.admin.quotes.index.create-success'));
 
-        return redirect()->route('admin.customers.quotes.index');
+        return redirect()->route('admin.b2b.quotes.index');
     }
 
     /**
      * Show the form for viewing the specified resource.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function view(int $id)
     {
-        $quote = $this->customerQuoteRepository->findOrFail($id);
+        $quote = $this->customerQuoteRepository
+            ->with(['company', 'company.salesRep', 'company.company_flats'])
+            ->findOrFail($id);
 
-        return view('b2b_suite::admin.quotes.view', compact('quote'));
-    }
+        $this->authorizeQuoteAccess($quote);
 
-    /**
-     * AJAX endpoint for loading messages with pagination and filters
-     *
-     * @param  int  $id  Quote ID
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function getMessages($id, Request $request)
-    {
-        $quote = $this->customerQuoteRepository->findOrFail($id);
+        /**
+         * The admin may accept the buyer's offer only when the buyer made the latest quotation.
+         */
+        $lastQuotation = $quote->messages()->whereHas('quotations')->orderByDesc('id')->first();
 
-        $query = $quote->messages()
-            ->with('quotations', 'quotations.item');
+        $adminIsLastQuotation = $lastQuotation && $lastQuotation->user_type === 'admin';
 
-        if ($request->get('has_quotations') === 'true') {
-            $query->has('quotations');
-        }
-
-        if ($request->get('user_type')) {
-            $query->where('user_type', $request->get('user_type'));
-        }
-
-        $messages = $query->orderBy('created_at', 'desc')
-            ->paginate(10);
-
-        return response()->json($messages);
-    }
-
-    /**
-     * Send a message for this quote.
-     */
-    public function sendMessage(Request $request, $id)
-    {
-        try {
-            $request->validate([
-                'message' => 'required|string|max:1000',
-            ]);
-
-            $quote = $this->customerQuoteRepository->findOrFail($id);
-
-            if ($quote->status === CustomerQuote::STATUS_OPEN) {
-                $quote->status = CustomerQuote::STATUS_NEGOTIATION;
-
-                $quote->save();
-            }
-
-            $quote->messages()->create([
-                'message'    => $request->message,
-                'user_type'  => 'admin',
-                'user_id'    => auth()->guard('admin')->user()->id,
-                'created_at' => now(),
-            ]);
-
-            return redirect()->route('admin.customers.quotes.view', $id)
-                ->with('success', trans('b2b_suite::app.admin.quotes.view.success-message'));
-        } catch (\Exception $e) {
-            return redirect()->back()
-                ->withErrors(['error' => trans('b2b_suite::app.admin.quotes.view.error-message')]);
-        }
-    }
-
-    /**
-     * Submit a quote (Draft to Open).
-     */
-    public function submitQuote(Request $request, $id)
-    {
-        try {
-            $request->validate([
-                'items'   => ['required', 'array', 'min:1'],
-                'message' => 'required|string|max:1000',
-            ]);
-
-            $quote = $this->customerQuoteRepository->findOrFail($id);
-
-            $message = $quote->messages()->create([
-                'message'    => $request->message,
-                'user_type'  => 'admin',
-                'user_id'    => auth()->guard('admin')->user()->id,
-                'created_at' => now(),
-            ]);
-
-            $data = array_merge([
-                'status'     => CustomerQuote::STATUS_NEGOTIATION,
-                'message_id' => $message->id,
-            ], $request->only([
-                'items',
-                'message',
-            ]));
-
-            $this->customerQuoteRepository->createOrUpdateMessageQuotation($data, $id);
-
-            return redirect()->route('admin.customers.quotes.view', $id)
-                ->with('success', trans('b2b_suite::app.admin.quotes.view.quote-submitted'));
-
-        } catch (\Exception $e) {
-            session()->flash('error', $e->getMessage());
-
-            return redirect()->back();
-        }
-    }
-
-    /**
-     * Accept this quote.
-     */
-    public function acceptQuote(Request $request, $id)
-    {
-        $adminId = auth()->guard('admin')->user()->id;
-
-        try {
-            $request->validate([
-                'message' => 'required|string|max:1000',
-            ]);
-
-            $quote = $this->customerQuoteRepository->findOrFail($id);
-
-            $quote->update(['status' => 'accepted']);
-
-            $message = $quote->messages()->create([
-                'message'    => $request->message,
-                'status'     => trans('b2b_suite::app.shop.customers.account.quotes.view.'.$quote->status),
-                'user_type'  => 'admin',
-                'user_id'    => $adminId,
-                'created_at' => now(),
-            ]);
-
-            $isAdminLastQuotation = $this->customerQuoteMessageRepository->getLastQuotationMessage($quote->id, 'admin');
-
-            $targetMessageId = $isAdminLastQuotation?->id ?? $message->id;
-
-            if ($targetMessageId) {
-                $this->customerQuoteQuotationRepository->updateOrCreate([
-                    'message_id' => $targetMessageId,
-                    'quote_id'   => $quote->id,
-                ], [
-                    'is_accepted' => 1,
-                    'accepted_by' => 'admin',
-                ]);
-            }
-
-            return redirect()->route('admin.customers.quotes.view', $id)
-                ->with('success', trans('b2b_suite::app.admin.quotes.view.quote-accepted'));
-
-        } catch (\Exception $e) {
-            return redirect()->back()->withErrors([
-                'error' => trans('b2b_suite::app.admin.quotes.view.error-message'),
-            ]);
-        }
-    }
-
-    /**
-     * Reject a quote (Open to Rejected) by admin.
-     */
-    public function rejectQuote(Request $request, $id)
-    {
-        try {
-            $request->validate([
-                'message' => 'required|string|max:1000',
-            ]);
-
-            $quote = $this->customerQuoteRepository->findOrFail($id);
-
-            if (in_array($quote->status, [CustomerQuote::STATUS_COMPLETED, CustomerQuote::STATUS_REJECTED])) {
-                session()->flash('error', trans('b2b_suite::app.admin.quotes.view.un-authorized-quote'));
-
-                return redirect()->back();
-            }
-
-            $quote->status = CustomerQuote::STATUS_REJECTED;
-
-            $quote->save();
-
-            $quote->messages()->create([
-                'message'    => $request->message,
-                'status'     => trans('b2b_suite::app.admin.quotes.view.'.$quote->status),
-                'user_type'  => 'admin',
-                'user_id'    => auth()->guard('admin')->user()->id,
-                'created_at' => now(),
-            ]);
-
-            return redirect()->route('admin.customers.quotes.view', $id)
-                ->with('success', trans('b2b_suite::app.admin.quotes.view.quote-rejected'));
-
-        } catch (\Exception $e) {
-            session()->flash('error', $e->getMessage());
-
-            return redirect()->back();
-        }
+        return view('b2b::admin.quotes.view', compact('quote', 'adminIsLastQuotation'));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(QuoteRequest $request, int $id)
     {
+        $this->authorizeQuoteAccess($this->customerQuoteRepository->findOrFail($id));
+
         Event::dispatch('b2b.quote.update.before', $id);
 
         $data = $request->only([
@@ -361,9 +189,9 @@ class QuoteController extends Controller
 
         Event::dispatch('b2b.quote.update.after', $quote);
 
-        session()->flash('success', __('b2b_suite::app.admin.quotes.index.update-success'));
+        session()->flash('success', __('b2b::app.admin.quotes.index.update-success'));
 
-        return redirect()->route('admin.customers.quotes.index');
+        return redirect()->route('admin.b2b.quotes.index');
     }
 
     /**
@@ -373,6 +201,8 @@ class QuoteController extends Controller
     {
         $quote = $this->customerQuoteRepository->findOrFail($id);
 
+        $this->authorizeQuoteAccess($quote);
+
         try {
             Event::dispatch('b2b.quote.delete.before', $id);
 
@@ -381,46 +211,20 @@ class QuoteController extends Controller
             Event::dispatch('b2b.quote.delete.after', $id);
 
             return new JsonResponse([
-                'message' => trans('b2b_suite::app.admin.quotes.index.delete-success'),
+                'message' => trans('b2b::app.admin.quotes.index.delete-success'),
             ]);
         } catch (\Exception $e) {
         }
 
         return new JsonResponse([
-            'message' => trans('b2b_suite::app.admin.quotes.index.delete-failed'),
+            'message' => trans('b2b::app.admin.quotes.index.delete-failed'),
         ], 500);
-    }
-
-    /**
-     * Remove the specified resources from database.
-     */
-    public function massDestroy(MassDestroyRequest $massDestroyRequest): JsonResponse
-    {
-        $indices = $massDestroyRequest->input('indices');
-
-        try {
-            foreach ($indices as $index) {
-                Event::dispatch('b2b.quote.delete.before', $index);
-
-                $this->customerQuoteRepository->delete($index);
-
-                Event::dispatch('b2b.quote.delete.after', $index);
-            }
-
-            return new JsonResponse([
-                'message' => trans('b2b_suite::app.admin.quotes.index.index.mass-delete-success'),
-            ]);
-        } catch (\Exception $exception) {
-            return new JsonResponse([
-                'message' => trans('b2b_suite::app.admin.quotes.index.delete-failed'),
-            ], 500);
-        }
     }
 
     /**
      * Mass update quote.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function massUpdate(MassUpdateRequest $massUpdateRequest)
     {
@@ -432,6 +236,8 @@ class QuoteController extends Controller
 
                 $quote = $this->customerQuoteRepository->find($quoteId);
 
+                $this->authorizeQuoteAccess($quote);
+
                 $quote->status = $massUpdateRequest->input('value');
 
                 $quote->save();
@@ -440,12 +246,292 @@ class QuoteController extends Controller
             }
 
             return new JsonResponse([
-                'message' => trans('b2b_suite::app.admin.quotes.index.update-success'),
+                'message' => trans('b2b::app.admin.quotes.index.update-success'),
             ]);
         } catch (\Exception $e) {
             return new JsonResponse([
                 'message' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    /**
+     * Remove the specified resources from database.
+     */
+    public function massDestroy(MassDestroyRequest $massDestroyRequest): JsonResponse
+    {
+        $indices = $massDestroyRequest->input('indices');
+
+        try {
+            foreach ($indices as $index) {
+                $this->authorizeQuoteAccess($this->customerQuoteRepository->findOrFail($index));
+
+                Event::dispatch('b2b.quote.delete.before', $index);
+
+                $this->customerQuoteRepository->delete($index);
+
+                Event::dispatch('b2b.quote.delete.after', $index);
+            }
+
+            return new JsonResponse([
+                'message' => trans('b2b::app.admin.quotes.index.index.mass-delete-success'),
+            ]);
+        } catch (\Exception $exception) {
+            return new JsonResponse([
+                'message' => trans('b2b::app.admin.quotes.index.delete-failed'),
+            ], 500);
+        }
+    }
+
+    /**
+     * AJAX endpoint for loading messages with pagination and filters.
+     *
+     * @param  int  $id  Quote ID
+     * @return JsonResponse
+     */
+    public function getMessages($id, Request $request)
+    {
+        $quote = $this->customerQuoteRepository->findOrFail($id);
+
+        $this->authorizeQuoteAccess($quote);
+
+        $query = $quote->messages()
+            ->with('quotations', 'quotations.item');
+
+        if ($request->get('has_quotations') === 'true') {
+            $query->has('quotations');
+        }
+
+        if ($request->get('user_type')) {
+            $query->where('user_type', $request->get('user_type'));
+        }
+
+        $messages = $query->orderBy('created_at', 'asc')
+            ->paginate(10);
+
+        return response()->json($messages);
+    }
+
+    /**
+     * Send a message for this quote.
+     */
+    public function sendMessage(Request $request, $id)
+    {
+        try {
+            $request->validate([
+                'message' => 'required|string|max:1000',
+            ]);
+
+            $quote = $this->customerQuoteRepository->findOrFail($id);
+
+            $this->authorizeQuoteAccess($quote);
+
+            if ($quote->status === CustomerQuote::STATUS_OPEN) {
+                $quote->status = CustomerQuote::STATUS_NEGOTIATION;
+
+                $quote->save();
+            }
+
+            $message = $quote->messages()->create([
+                'message' => $request->message,
+                'user_type' => 'admin',
+                'user_id' => auth()->guard('admin')->user()->id,
+                'created_at' => now(),
+            ]);
+
+            /**
+             * Notify the buyer that the seller sent a message in the quote thread.
+             */
+            Notifier::quote($quote, 'message', 'buyer');
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => trans('b2b::app.admin.quotes.view.success-message'),
+                    'data' => $message,
+                ]);
+            }
+
+            return redirect()->route('admin.b2b.quotes.view', $id)
+                ->with('success', trans('b2b::app.admin.quotes.view.success-message'));
+        } catch (\Exception $e) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => trans('b2b::app.admin.quotes.view.error-message'),
+                ], 500);
+            }
+
+            return redirect()->back()
+                ->withErrors(['error' => trans('b2b::app.admin.quotes.view.error-message')]);
+        }
+    }
+
+    /**
+     * Submit a quote (Draft to Open).
+     */
+    public function submitQuote(Request $request, $id)
+    {
+        try {
+            $request->validate([
+                'items' => ['required', 'array', 'min:1'],
+                'items.*.discount_type' => ['nullable', 'in:percent,fixed'],
+                'items.*.discount_value' => ['nullable', 'numeric', 'min:0'],
+                'items.*.negotiated_qty' => ['required', 'integer', 'min:1'],
+                'total_discount_type' => ['nullable', 'in:percent,fixed'],
+                'total_discount_value' => ['nullable', 'numeric', 'min:0'],
+                'removed_items' => ['nullable', 'array'],
+                'removed_items.*' => ['integer'],
+                'message' => 'required|string|max:1000',
+            ]);
+
+            $quote = $this->customerQuoteRepository->findOrFail($id);
+
+            $this->authorizeQuoteAccess($quote);
+
+            $message = $quote->messages()->create([
+                'message' => $request->message,
+                'user_type' => 'admin',
+                'user_id' => auth()->guard('admin')->user()->id,
+                'created_at' => now(),
+            ]);
+
+            /**
+             * Sending a quotation is a counter-offer, not a final sale: the quote moves to
+             * "negotiation" and the thread stays open. The buyer reviews the offer and either
+             * keeps negotiating, rejects it, or accepts it — accepting adds the negotiated
+             * items straight to their cart.
+             */
+            $data = array_merge([
+                'status' => CustomerQuote::STATUS_NEGOTIATION,
+                'message_id' => $message->id,
+            ], $request->only([
+                'items',
+                'message',
+                'total_discount_type',
+                'total_discount_value',
+                'removed_items',
+            ]));
+
+            $this->customerQuoteRepository->createOrUpdateMessageQuotation($data, $id);
+
+            /**
+             * Notify the buyer that the seller sent/revised a quotation.
+             */
+            Notifier::quote($quote->refresh(), 'sent', 'buyer');
+
+            return redirect()->route('admin.b2b.quotes.view', $id)
+                ->with('success', trans('b2b::app.admin.quotes.view.quote-submitted'));
+
+        } catch (\Exception $e) {
+            session()->flash('error', $e->getMessage());
+
+            return redirect()->back();
+        }
+    }
+
+    /**
+     * Reject a quote (Open to Rejected) by admin.
+     */
+    public function rejectQuote(Request $request, $id)
+    {
+        try {
+            $request->validate([
+                'message' => 'required|string|max:1000',
+            ]);
+
+            $quote = $this->customerQuoteRepository->findOrFail($id);
+
+            $this->authorizeQuoteAccess($quote);
+
+            if (in_array($quote->status, [CustomerQuote::STATUS_COMPLETED, CustomerQuote::STATUS_REJECTED])) {
+                session()->flash('error', trans('b2b::app.admin.quotes.view.un-authorized-quote'));
+
+                return redirect()->back();
+            }
+
+            $quote->status = CustomerQuote::STATUS_REJECTED;
+
+            $quote->save();
+
+            $quote->messages()->create([
+                'message' => $request->message,
+                'status' => trans('b2b::app.admin.quotes.view.'.$quote->status),
+                'user_type' => 'admin',
+                'user_id' => auth()->guard('admin')->user()->id,
+                'created_at' => now(),
+            ]);
+
+            /**
+             * Notify the buyer that the seller rejected the quote.
+             */
+            Notifier::quote($quote, 'rejected', 'buyer');
+
+            return redirect()->route('admin.b2b.quotes.view', $id)
+                ->with('success', trans('b2b::app.admin.quotes.view.quote-rejected'));
+
+        } catch (\Exception $e) {
+            session()->flash('error', $e->getMessage());
+
+            return redirect()->back();
+        }
+    }
+
+    /**
+     * Accept the buyer's quotation (the buyer's last offer becomes the agreed quote).
+     */
+    public function acceptQuote(Request $request, $id)
+    {
+        try {
+            $request->validate([
+                'message' => 'required|string|max:1000',
+            ]);
+
+            $quote = $this->customerQuoteRepository->findOrFail($id);
+
+            $this->authorizeQuoteAccess($quote);
+
+            if (in_array($quote->status, [
+                CustomerQuote::STATUS_COMPLETED,
+                CustomerQuote::STATUS_ORDERED,
+                CustomerQuote::STATUS_REJECTED,
+            ])) {
+                session()->flash('error', trans('b2b::app.admin.quotes.view.un-authorized-quote'));
+
+                return redirect()->back();
+            }
+
+            $quote->status = CustomerQuote::STATUS_ACCEPTED;
+
+            $quote->save();
+
+            $quote->messages()->create([
+                'message' => $request->message,
+                'status' => trans('b2b::app.admin.quotes.view.'.$quote->status),
+                'user_type' => 'admin',
+                'user_id' => auth()->guard('admin')->user()->id,
+                'created_at' => now(),
+            ]);
+
+            /**
+             * Notify the buyer that the seller accepted the quote.
+             */
+            Notifier::quote($quote, 'accepted', 'buyer');
+
+            return redirect()->route('admin.b2b.quotes.view', $id)
+                ->with('success', trans('b2b::app.admin.quotes.view.quote-accepted'));
+
+        } catch (\Exception $e) {
+            session()->flash('error', $e->getMessage());
+
+            return redirect()->back();
+        }
+    }
+
+    /**
+     * Abort with 403 when the current admin (a sales rep) may not access this quote's
+     * company. Guards direct-URL access that datagrid scoping does not cover.
+     */
+    protected function authorizeQuoteAccess($quote): void
+    {
+        abort_unless(Customer::repCanAccessCompany($quote?->company_id), 403);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Webkul\B2BSuite\Http\Controllers\Shop;
 
+use Illuminate\View\View;
 use Webkul\B2BSuite\DataGrids\Shop\CustomerPurchaseOrderDataGrid;
 use Webkul\B2BSuite\Models\CustomerQuote;
 use Webkul\B2BSuite\Repositories\CustomerQuoteMessageRepository;
@@ -17,15 +18,15 @@ class PurchaseOrderController extends Controller
      * @return void
      */
     public function __construct(
-        protected CustomerRepository $customerRepository,
         protected CustomerQuoteRepository $customerQuoteRepository,
         protected CustomerQuoteMessageRepository $customerQuoteMessageRepository,
+        protected CustomerRepository $customerRepository,
     ) {}
 
     /**
      * Populate the request for quote page.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function index()
     {
@@ -33,20 +34,20 @@ class PurchaseOrderController extends Controller
             return datagrid(CustomerPurchaseOrderDataGrid::class)->process();
         }
 
-        return view('b2b_suite::shop.customers.account.purchase-orders.index');
+        return view('b2b::shop.customers.account.purchase-orders.index');
     }
 
     /**
      * For loading the edit form page.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function view($id)
     {
         $customer = $this->customerRepository->find(auth()->guard('customer')->user()->id);
 
         $quoteConditions = [
-            'id'    => $id,
+            'id' => $id,
             'state' => CustomerQuote::STATE_PURCHASE_ORDER,
         ];
 
@@ -63,17 +64,17 @@ class PurchaseOrderController extends Controller
         }
 
         $quote = $this->customerQuoteRepository
-            ->with(['company', 'agent', 'attachments'])
+            ->with(['company', 'company.salesRep', 'company.company_flats', 'agent', 'attachments'])
             ->findOneWhere($quoteConditions);
 
         if (! $quote) {
-            session()->flash('error', trans('b2b_suite::app.shop.customers.account.quotes.view.un-authorized-quote'));
+            session()->flash('error', trans('b2b::app.shop.customers.account.quotes.view.un-authorized-quote'));
 
             return redirect()->route('shop.customers.account.purchase_orders.index');
         }
 
         $isAdminLastQuotation = $this->customerQuoteMessageRepository->getLastQuotationMessage($quote->id, 'admin');
 
-        return view('b2b_suite::shop.customers.account.purchase-orders.view', compact('customer', 'quote', 'isAdminLastQuotation'));
+        return view('b2b::shop.customers.account.purchase-orders.view', compact('customer', 'quote', 'isAdminLastQuotation'));
     }
 }

@@ -15,20 +15,28 @@ class B2BSuite
     public function __construct(protected ProductRepository $productRepository) {}
 
     /**
-     * Process and add products to cart
+     * Process and add products to cart.
      *
      * @return bool
      */
     public function addProductsToCart($data)
     {
         foreach ($data as $item) {
-
             $product = $this->productRepository->with([
                 'parent',
                 'variants',
                 'bundle_options.bundle_option_products',
                 'grouped_products.associated_product',
             ])->findOneByField('sku', $item['sku']);
+
+            /**
+             * Enforce the company-catalog allowlist on SKU/file based adds too (search already
+             * filters; these flows resolve the product directly, so guard them here). isVisible
+             * returns true when no catalog applies, so non-B2B carts are unaffected.
+             */
+            if (! $product || ! $this->productRepository->isVisible($product)) {
+                continue;
+            }
 
             $cartData = $this->prepareCartData($product, $item);
 
@@ -39,6 +47,11 @@ class B2BSuite
         }
     }
 
+    /**
+     * Prepare the buy-request cart data for the given product.
+     *
+     * @return array
+     */
     public function prepareCartData($product, $item)
     {
         switch ($product->type) {
@@ -46,7 +59,7 @@ class B2BSuite
                 $buyRequest = [
                     'product_id' => $product->id,
                     'is_buy_now' => 0,
-                    'quantity'   => $item['quantity'] ?? 1,
+                    'quantity' => $item['quantity'] ?? 1,
                 ];
                 break;
 
@@ -56,9 +69,9 @@ class B2BSuite
                 $superAttributes = $this->getSuperAttributesForVariant($product, $variant);
 
                 $buyRequest = [
-                    'product_id'                   => $variant->id,
-                    'quantity'                     => $item['quantity'] ?? 1,
-                    'super_attribute'              => $superAttributes,
+                    'product_id' => $variant->id,
+                    'quantity' => $item['quantity'] ?? 1,
+                    'super_attribute' => $superAttributes,
                     'selected_configurable_option' => $variant->id,
                 ];
 
@@ -66,7 +79,7 @@ class B2BSuite
 
             case 'bundle':
                 $buyRequest = [
-                    'quantity'       => $item['quantity'],
+                    'quantity' => $item['quantity'],
                     'bundle_options' => $this->getBundleOptions($product),
                 ];
                 break;
@@ -74,8 +87,8 @@ class B2BSuite
             case 'grouped':
                 $buyRequest = [
                     'product_id' => $product->id,
-                    'quantity'   => $item['quantity'] ?? 1,
-                    'qty'        => $this->getGroupedProductQuantities($product, $item),
+                    'quantity' => $item['quantity'] ?? 1,
+                    'qty' => $this->getGroupedProductQuantities($product, $item),
                 ];
 
                 break;
@@ -83,15 +96,15 @@ class B2BSuite
             case 'downloadable':
                 $buyRequest = [
                     'product_id' => $product->id,
-                    'quantity'   => $item['quantity'],
-                    'links'      => $this->getDownloadableLinks($product),
+                    'quantity' => $item['quantity'],
+                    'links' => $this->getDownloadableLinks($product),
                 ];
                 break;
 
             default:
                 $buyRequest = [
                     'product_id' => $product->id,
-                    'quantity'   => $item['quantity'],
+                    'quantity' => $item['quantity'],
                 ];
                 break;
         }
@@ -100,7 +113,7 @@ class B2BSuite
     }
 
     /**
-     * Get IDs of all downloadable links for the product
+     * Get IDs of all downloadable links for the product.
      */
     public function getDownloadableLinks($product)
     {
@@ -116,7 +129,7 @@ class B2BSuite
     }
 
     /**
-     * Get the first available variant of a configurable product
+     * Get the first available variant of a configurable product.
      */
     public function getVariant($product)
     {
@@ -136,7 +149,7 @@ class B2BSuite
     }
 
     /**
-     * Get super attributes for a specific variant
+     * Get super attributes for a specific variant.
      */
     public function getSuperAttributesForVariant($product, $variant)
     {
@@ -158,7 +171,7 @@ class B2BSuite
     }
 
     /**
-     * Get bundle options with default selections
+     * Get bundle options with default selections.
      */
     public function getBundleOptions($product)
     {
@@ -186,27 +199,7 @@ class B2BSuite
     }
 
     /**
-     * Get super attributes with
-     */
-    public function getSuperAttributes($product)
-    {
-        $superAttributes = [];
-
-        if (! $product->super_attributes || $product->super_attributes->isEmpty()) {
-            return $superAttributes;
-        }
-
-        foreach ($product->super_attributes as $attribute) {
-            if ($attribute->options && $attribute->options->isNotEmpty()) {
-                $superAttributes[$attribute->id] = $attribute->options->first()->id;
-            }
-        }
-
-        return $superAttributes;
-    }
-
-    /**
-     * Get quantities for grouped product's associated products
+     * Get quantities for grouped product's associated products.
      */
     public function getGroupedProductQuantities($product, $item)
     {

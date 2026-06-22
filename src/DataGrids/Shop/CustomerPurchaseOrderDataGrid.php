@@ -23,47 +23,47 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
         $tablePrefix = DB::getTablePrefix();
         $currentAdmin = auth()->guard('customer')->user();
 
-        $companyId = DB::table('customer_companies')
+        $companyId = DB::table('b2b_customer_companies')
             ->where('customer_id', $currentAdmin->id)
             ->value('company_id') ?? $currentAdmin->id;
 
-        $queryBuilder = DB::table('customer_quotes')
+        $queryBuilder = DB::table('b2b_customer_quotes')
             ->distinct()
-            ->leftJoin('customers as company', 'customer_quotes.company_id', '=', 'company.id')
-            ->leftJoin('customers as customer', 'customer_quotes.customer_id', '=', 'customer.id')
+            ->leftJoin('customers as company', 'b2b_customer_quotes.company_id', '=', 'company.id')
+            ->leftJoin('customers as customer', 'b2b_customer_quotes.customer_id', '=', 'customer.id')
             ->addSelect(
-                'customer_quotes.id as quote_id',
-                'customer_quotes.po_number',
-                'customer_quotes.name',
+                'b2b_customer_quotes.id as quote_id',
+                'b2b_customer_quotes.po_number',
+                'b2b_customer_quotes.name',
                 'company.email as company_email',
-                'customer_quotes.base_total',
-                'customer_quotes.negotiated_total',
-                'customer_quotes.state',
-                'customer_quotes.status',
-                'customer_quotes.order_date',
-                'customer_quotes.expected_arrival_date',
-                'customer_quotes.expiration_date',
-                'customer_quotes.order_id',
-                'customer_quotes.created_at',
-                'customer_quotes.updated_at'
+                'b2b_customer_quotes.base_total',
+                'b2b_customer_quotes.negotiated_total',
+                'b2b_customer_quotes.state',
+                'b2b_customer_quotes.status',
+                'b2b_customer_quotes.order_date',
+                'b2b_customer_quotes.expected_arrival_date',
+                'b2b_customer_quotes.expiration_date',
+                'b2b_customer_quotes.order_id',
+                'b2b_customer_quotes.created_at',
+                'b2b_customer_quotes.updated_at'
             )
-            ->addSelect(DB::raw('CONCAT('.$tablePrefix.'company.first_name, " ", '.$tablePrefix.'company.last_name) as company_name'))
-            ->where('customer_quotes.soft_deleted', 0)
-            ->where('customer_quotes.state', CustomerQuote::STATE_PURCHASE_ORDER)
-            ->whereIn('customer_quotes.status', [
+            ->addSelect(DB::raw('COALESCE(NULLIF(TRIM(CONCAT('.$tablePrefix.'customer.first_name, " ", '.$tablePrefix.'customer.last_name)), ""), '.$tablePrefix.'b2b_customer_quotes.customer_name) as customer_name'))
+            ->where('b2b_customer_quotes.soft_deleted', 0)
+            ->where('b2b_customer_quotes.state', CustomerQuote::STATE_PURCHASE_ORDER)
+            ->whereIn('b2b_customer_quotes.status', [
                 CustomerQuote::STATUS_ORDERED,
                 CustomerQuote::STATUS_COMPLETED,
             ])
-            ->where('customer_quotes.company_id', $companyId);
+            ->where('b2b_customer_quotes.company_id', $companyId);
 
-        $this->addFilter('po_number', 'customer_quotes.po_number');
-        $this->addFilter('name', 'customer_quotes.name');
-        $this->addFilter('state', 'customer_quotes.state');
-        $this->addFilter('status', 'customer_quotes.status');
-        $this->addFilter('base_total', 'customer_quotes.base_total');
-        $this->addFilter('negotiated_total', 'customer_quotes.negotiated_total');
-        $this->addFilter('company_name', DB::raw('CONCAT('.$tablePrefix.'company.first_name, " ", '.$tablePrefix.'company.last_name)'));
-        $this->addFilter('created_at', 'customer_quotes.created_at');
+        $this->addFilter('po_number', 'b2b_customer_quotes.po_number');
+        $this->addFilter('name', 'b2b_customer_quotes.name');
+        $this->addFilter('state', 'b2b_customer_quotes.state');
+        $this->addFilter('status', 'b2b_customer_quotes.status');
+        $this->addFilter('base_total', 'b2b_customer_quotes.base_total');
+        $this->addFilter('negotiated_total', 'b2b_customer_quotes.negotiated_total');
+        $this->addFilter('customer_name', DB::raw('COALESCE(NULLIF(TRIM(CONCAT('.$tablePrefix.'customer.first_name, " ", '.$tablePrefix.'customer.last_name)), ""), '.$tablePrefix.'b2b_customer_quotes.customer_name)'));
+        $this->addFilter('created_at', 'b2b_customer_quotes.created_at');
 
         return $queryBuilder;
     }
@@ -74,90 +74,87 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
     public function prepareColumns()
     {
         $this->addColumn([
-            'index'      => 'po_number',
-            'label'      => trans('b2b_suite::app.shop.customers.account.purchase-orders.index.datagrid.id'),
-            'type'       => 'string',
+            'index' => 'po_number',
+            'label' => trans('b2b::app.shop.customers.account.purchase-orders.index.datagrid.id'),
+            'type' => 'string',
             'searchable' => false,
             'filterable' => true,
-            'sortable'   => true,
+            'sortable' => true,
         ]);
 
         $this->addColumn([
-            'index'      => 'name',
-            'label'      => trans('b2b_suite::app.shop.customers.account.quotes.index.datagrid.name'),
-            'type'       => 'string',
+            'index' => 'name',
+            'label' => trans('b2b::app.shop.customers.account.quotes.index.datagrid.name'),
+            'type' => 'string',
             'searchable' => true,
             'filterable' => true,
-            'sortable'   => true,
+            'sortable' => true,
         ]);
 
         $this->addColumn([
-            'index'      => 'company_name',
-            'label'      => trans('b2b_suite::app.shop.customers.account.quotes.index.datagrid.company'),
-            'type'       => 'string',
+            'index' => 'customer_name',
+            'label' => trans('b2b::app.shop.customers.account.quotes.index.datagrid.customer'),
+            'type' => 'string',
             'searchable' => true,
             'filterable' => true,
-            'sortable'   => true,
+            'sortable' => true,
         ]);
 
         $this->addColumn([
-            'index'      => 'base_total',
-            'label'      => trans('b2b_suite::app.shop.customers.account.quotes.index.datagrid.base_total'),
-            'type'       => 'decimal',
+            'index' => 'base_total',
+            'label' => trans('b2b::app.shop.customers.account.quotes.index.datagrid.base_total'),
+            'type' => 'decimal',
             'filterable' => true,
-            'sortable'   => true,
-            'closure'    => function ($row) {
+            'sortable' => true,
+            'closure' => function ($row) {
                 return core()->formatPrice($row->base_total, core()->getCurrentCurrencyCode());
             },
         ]);
 
         $this->addColumn([
-            'index'      => 'negotiated_total',
-            'label'      => trans('b2b_suite::app.shop.customers.account.quotes.index.datagrid.negotiated_total'),
-            'type'       => 'decimal',
+            'index' => 'negotiated_total',
+            'label' => trans('b2b::app.shop.customers.account.quotes.index.datagrid.negotiated_total'),
+            'type' => 'decimal',
             'filterable' => true,
-            'sortable'   => true,
-            'closure'    => function ($row) {
+            'sortable' => true,
+            'closure' => function ($row) {
                 return core()->formatPrice($row->negotiated_total, core()->getCurrentCurrencyCode());
             },
         ]);
 
         $this->addColumn([
-            'index'              => 'status',
-            'label'              => trans('b2b_suite::app.shop.customers.account.quotes.index.datagrid.status'),
-            'type'               => 'string',
-            'searchable'         => true,
-            'filterable'         => true,
-            'filterable_type'    => 'dropdown',
+            'index' => 'status',
+            'label' => trans('b2b::app.shop.customers.account.quotes.index.datagrid.status'),
+            'type' => 'string',
+            'searchable' => true,
+            'filterable' => true,
+            'filterable_type' => 'dropdown',
             'filterable_options' => [
                 [
-                    'label' => trans('b2b_suite::app.shop.customers.account.quotes.index.datagrid.ordered'),
+                    'label' => trans('b2b::app.shop.customers.account.quotes.index.datagrid.ordered'),
                     'value' => CustomerQuote::STATUS_ORDERED,
                 ],
                 [
-                    'label' => trans('b2b_suite::app.shop.customers.account.quotes.index.datagrid.completed'),
+                    'label' => trans('b2b::app.shop.customers.account.quotes.index.datagrid.completed'),
                     'value' => CustomerQuote::STATUS_COMPLETED,
                 ],
             ],
-            'sortable'   => true,
-            'closure'    => function ($row) {
-                switch ($row->status) {
-                    case CustomerQuote::STATUS_ORDERED:
-                        return '<p class="label-active">'.trans('b2b_suite::app.shop.customers.account.quotes.index.datagrid.ordered').'</p>';
-
-                    case CustomerQuote::STATUS_COMPLETED:
-                        return '<p class="label-canceled">'.trans('b2b_suite::app.shop.customers.account.quotes.index.datagrid.completed').'</p>';
-                }
+            'sortable' => true,
+            'closure' => function ($row) {
+                return CustomerQuote::statusBadge(
+                    $row->status,
+                    trans('b2b::app.shop.customers.account.quotes.index.datagrid.'.$row->status)
+                );
             },
         ]);
 
         $this->addColumn([
-            'index'           => 'created_at',
-            'label'           => trans('b2b_suite::app.shop.customers.account.quotes.index.datagrid.created-at'),
-            'type'            => 'datetime',
-            'filterable'      => true,
+            'index' => 'created_at',
+            'label' => trans('b2b::app.shop.customers.account.quotes.index.datagrid.created-at'),
+            'type' => 'datetime',
+            'filterable' => true,
             'filterable_type' => 'datetime_range',
-            'sortable'        => true,
+            'sortable' => true,
         ]);
     }
 
@@ -169,11 +166,11 @@ class CustomerPurchaseOrderDataGrid extends DataGrid
     public function prepareActions()
     {
         $this->addAction([
-            'index'  => 'edit',
-            'icon'   => 'icon-eye',
-            'title'  => trans('b2b_suite::app.admin.quotes.index.datagrid.view'),
+            'index' => 'edit',
+            'icon' => 'icon-eye',
+            'title' => trans('b2b::app.admin.quotes.index.datagrid.view'),
             'method' => 'GET',
-            'url'    => function ($row) {
+            'url' => function ($row) {
                 return route('shop.customers.account.purchase_orders.view', $row->quote_id);
             },
         ]);
