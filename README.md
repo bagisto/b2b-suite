@@ -13,40 +13,61 @@
 
 ### 1. Introduction:
 
-The **Bagisto B2B Ecommerce** is a comprehensive package designed to extend the Bagisto eCommerce platform with advanced Business-to-Business (B2B) capabilities. It introduces powerful **company management features, role-based permissions**, and seamless **company-customer relationships**, enabling businesses to operate in a more structured and professional B2B environment.
+The **Bagisto B2B Ecommerce** is an open-source package designed to extend the Bagisto eCommerce platform with advanced Business-to-Business (B2B) capabilities. It enables companies to register their organization, manage multiple users, and handle the entire purchasing process from a single, unified dashboard.
 
-# Bagisto B2B Ecommerce
+Powerful tools such as **Quick Order**, **Requisition Lists**, and **Request for Quote (RFQ)** make buying faster, simpler, and better organized for business customers, even across large or repeat orders. With **role-based permissions**, companies can assign roles and control exactly what each user can access, ensuring a secure, transparent, and well-managed workflow across the entire team.
 
-The **Bagisto B2B Ecommerce** enhances your Bagisto store with advanced Business-to-Business (B2B) features. It enables company-based purchasing, multi-user access, quote negotiation, and procurement management — empowering businesses to handle B2B workflows efficiently within a single platform.
+The platform also gives administrators fine-grained control over each company's experience through **Company Catalogs** (per-company product and category visibility with custom and quantity-tier pricing), **Company Credit** (a buy-now-pay-later account with an audited ledger and a *Pay By Credit* checkout method), **Sales Representatives** (assign admin users to manage specific companies and their negotiations), and **Company Attributes** (extend the company profile with custom fields).
+
+This makes the Bagisto B2B Ecommerce an ideal fit for wholesalers, manufacturers, and distributors looking to run a scalable, flexible, and efficient online store tailored to business buyers.
 
 ![Bagisto B2B Ecommerce Image](https://github.com/bagisto/temp-media/blob/master/intro-banner.webp)
 
 
 ## Key Features
 
-* **Company Registration** – Companies can easily register from the storefront and manage their organization profile.
-* **Company User Management** – Companies can create users under their account and manage access control.
-* **Role-Based Permissions** – Assign roles and define permissions for users within the company to restrict access as needed.
-* **Purchase Orders (Company End)** – Companies can create and manage purchase orders directly from their dashboard.
-* **Requisition Lists** – Companies can add products to requisition lists for bulk purchase and quick ordering.
-* **Quick Order** – Add multiple products to the cart quickly using SKUs or CSV upload.
-* **Request for Quote (RFQ)** – Companies can submit quote requests directly from the storefront.
-* **Frontend Quotation Handling** – Companies can create quotations, negotiate terms, and approve or decline quotes from their dashboard.
-* **Quotation Management** – Admin and company users can negotiate, approve, or reject quotes seamlessly.
-* **Companies Management (Admin End)** – Admin can create companies and manage from backend.
-* **Purchase Orders (Admin End)** – Admins can view and manage all company purchase orders centrally.
+* **Company Registration & Approval** – Companies can register from the storefront and manage their organization profile, with optional admin approval before activation.
+* **Company User Management** – Companies can add new users directly or invite existing store customers to join their account.
+* **Role-Based Permissions** – Create custom company roles and grant granular access control to users within the company.
+* **Requisition Lists** – Save products to reusable lists for faster bulk and repeat ordering.
+* **Quick Order** – Add multiple products to the cart instantly using SKUs or CSV upload.
+* **Request for Quote (RFQ)** – Companies can submit quote requests directly from the cart on the storefront.
+* **Quotation Handling** – End-to-end buyer–seller negotiation, with messaging, on both the storefront and admin.
+* **Purchase Orders** – Track and manage procurement across the company, from both the storefront and admin.
+* **Company Catalogs** – Per-company product and category visibility with custom flat, percentage, and quantity-tier pricing.
+* **Company Credit (Pay By Credit)** – Per-company credit limits with an audited ledger, reimbursements, and a *Pay By Credit* checkout method.
+* **Sales Representatives** – Assign admin users to manage specific companies and handle their negotiations.
+* **Company Attributes** – Extend the company profile with custom fields, optionally shown on the registration form.
+* **Companies Management (Admin End)** – Admins can create, approve, disable, and manage companies from the backend.
+* **Localization & RTL** – Full right-to-left support and translations for all 22 supported locales.
 
 ![Bagisto B2B Ecommerce Features Image](https://github.com/bagisto/temp-media/blob/master/b2b-ecommerce-feature-list.webp)
 
 ## Admin Configuration Options
 
-* **Enable B2B Ecommerce** – Toggle the B2B Ecommerce module on or off globally.
-* **Allow Customer to Approve Quote** – Enable or restrict customers from finalizing quote approvals.
-* **Procurement Method** – Choose the preferred procurement workflow (e.g., PO-based or direct).
-* **Quotation Default Expiration Period** – Define how long a quotation remains valid by default.
-* **Quotation Email Template Options** – Manage email templates for quotation communication.
-* **Purchase Order Prefix** – Customize the prefix for purchase order numbers.
-* **Manage Number of Requisition Lists** – Limit how many requisition lists a company can maintain.
+All B2B settings are grouped together under **Admin Panel → Configure → B2B Suite**, so you can control company onboarding, quotations, company credit, and email notifications from a single place.
+
+**General**
+
+* **Enable B2B Suite** – Master switch for the entire suite. When disabled, all B2B routes, menus, the company registration option, and every company-specific feature are hidden.
+* **Require Company Approval** – When enabled, newly registered companies stay in a **Pending** state and cannot sign in until an administrator approves them.
+* **Number Of Requisition Lists** – The maximum number of requisition lists each company is allowed to create.
+
+**Quotations & Purchase Orders**
+
+* **Quotation Prefix / Purchase Order Prefix** – Prefixes used when generating quotation (`QO`) and purchase order (`PO`) numbers.
+* **Default Padding** – Zero-padding applied to the auto-incrementing quotation / purchase order number.
+* **Default Expiration Period & Unit** – How long a quotation stays valid, in Days, Weeks, or Months.
+* **Minimum Cart Amount & Message** – The minimum cart total required before a customer can request a quote, and the message shown when it is not met.
+* **Supported File Formats & Maximum File Size** – Allowed attachment extensions and size limit for quotation uploads.
+
+**Company Credit**
+
+* **Enable Company Credit** – Lets companies with an assigned credit limit pay using the **Pay By Credit** method at checkout.
+
+**B2B Email Notifications**
+
+* Per-notification toggles for the entire B2B lifecycle — company registration/approval, sub-user management, credit updates, quotation negotiation, and purchase orders. Buyer emails go to the company; seller emails go to the assigned sales representative (or the store email).
 
 ![Bagisto B2B Ecommerce Features Image](https://github.com/bagisto/temp-media/blob/master/b2b-ecommerce-admin-feature-list.webp)
 
@@ -56,6 +77,23 @@ The **Bagisto B2B Ecommerce** enhances your Bagisto store with advanced Business
 
 - **User Guide:** [User Guide](https://docs.bagisto.com/b2b-ecommerce-platform/introduction.html)
 - **Live Demo:** [Live Demo](https://demo.bagisto.com/b2b-suite)
+
+### Feature Guides
+
+| Guide | Description |
+| --- | --- |
+| [Configuration](https://docs.bagisto.com/b2b-ecommerce-platform/configuration.html) | Enable and configure the suite, quotations, company credit, and email notifications. |
+| [Company Registration](https://docs.bagisto.com/b2b-ecommerce-platform/company-registration.html) | Storefront company sign-up, sign in, and admin-side company management. |
+| [Role Based Permissions](https://docs.bagisto.com/b2b-ecommerce-platform/role-based-permissions.html) | Custom company roles, company user management, and inviting existing customers. |
+| [Company Attributes](https://docs.bagisto.com/b2b-ecommerce-platform/company-attributes.html) | Extend the company profile with custom fields and attribute mapping. |
+| [Company Catalog](https://docs.bagisto.com/b2b-ecommerce-platform/company-catalog.html) | Per-company product/category visibility with custom and tier pricing. |
+| [Company Credit](https://docs.bagisto.com/b2b-ecommerce-platform/company-credit.html) | Credit limits, audited ledger, reimbursements, and Pay By Credit checkout. |
+| [Sales Representative](https://docs.bagisto.com/b2b-ecommerce-platform/sales-representative.html) | Assign admin users to manage specific companies and their negotiations. |
+| [Quick Order](https://docs.bagisto.com/b2b-ecommerce-platform/quick-order.html) | Add products to the cart in bulk via SKU or CSV upload. |
+| [Requisition Lists](https://docs.bagisto.com/b2b-ecommerce-platform/requisition-lists.html) | Save products to reusable lists for faster repeat ordering. |
+| [Request for Quote](https://docs.bagisto.com/b2b-ecommerce-platform/request-for-quote.html) | Request custom pricing and negotiate from the cart. |
+| [Quotation Handling](https://docs.bagisto.com/b2b-ecommerce-platform/quotation-handling.html) | End-to-end buyer–seller quotation negotiation and messaging. |
+| [Purchase Orders](https://docs.bagisto.com/b2b-ecommerce-platform/purchase-orders.html) | Track and manage procurement from the storefront and admin. |
 
 ### 2. Requirements:
 
