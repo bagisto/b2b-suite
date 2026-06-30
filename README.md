@@ -41,7 +41,7 @@ This makes the Bagisto B2B Ecommerce an ideal fit for wholesalers, manufacturers
 * **Companies Management (Admin End)** – Admins can create, approve, disable, and manage companies from the backend.
 * **Localization & RTL** – Full right-to-left support and translations for all 22 supported locales.
 
-![Bagisto B2B Ecommerce Features Image](https://github.com/bagisto/temp-media/blob/master/b2b-ecommerce-feature-list.webp)
+![Bagisto B2B Ecommerce Features Image](https://github.com/bagisto/temp-media/blob/master/b2b-ecommerce-platform-banner.webp)
 
 ## Admin Configuration Options
 
@@ -69,7 +69,7 @@ All B2B settings are grouped together under **Admin Panel → Configure → B2B 
 
 * Per-notification toggles for the entire B2B lifecycle — company registration/approval, sub-user management, credit updates, quotation negotiation, and purchase orders. Buyer emails go to the company; seller emails go to the assigned sales representative (or the store email).
 
-![Bagisto B2B Ecommerce Features Image](https://github.com/bagisto/temp-media/blob/master/b2b-ecommerce-admin-feature-list.webp)
+![Bagisto B2B Ecommerce Features Image](https://github.com/bagisto/temp-media/blob/master/b2b-suit-admin-feaures.webp)
 
 ---
 
