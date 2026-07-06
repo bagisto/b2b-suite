@@ -1399,6 +1399,8 @@ return [
 
         'user' => [
             'created' => [
+                'credentials' => 'Usa questi dati per accedere — Email: :email, Password: :password. Per la tua sicurezza, cambia la password dopo l\'accesso.',
+                'credentials-title' => 'I tuoi dati di accesso',
                 'cta' => 'Accedi',
                 'greeting' => 'È stato creato un account per te con l\'email :email. Puoi accedere per iniziare.',
                 'subject' => 'Il tuo account è stato creato',

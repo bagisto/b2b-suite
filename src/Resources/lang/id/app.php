@@ -1399,6 +1399,8 @@ return [
 
         'user' => [
             'created' => [
+                'credentials' => 'Gunakan detail ini untuk masuk — Email: :email, Kata Sandi: :password. Demi keamanan Anda, harap ubah kata sandi Anda setelah masuk.',
+                'credentials-title' => 'Detail Login Anda',
                 'cta' => 'Masuk',
                 'greeting' => 'Sebuah akun telah dibuat untuk Anda dengan email :email. Anda dapat masuk untuk memulai.',
                 'subject' => 'Akun Anda Telah Dibuat',

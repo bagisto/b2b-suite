@@ -1399,6 +1399,8 @@ return [
 
         'user' => [
             'created' => [
+                'credentials' => '使用以下信息登录 — 邮箱：:email，密码：:password。为了您的安全，请在登录后更改密码。',
+                'credentials-title' => '您的登录信息',
                 'cta' => '登录',
                 'greeting' => '已为您创建一个使用电子邮箱 :email 的账户。您可以登录以开始使用。',
                 'subject' => '您的账户已创建',

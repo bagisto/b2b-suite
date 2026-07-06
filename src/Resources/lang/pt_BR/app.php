@@ -1399,6 +1399,8 @@ return [
 
         'user' => [
             'created' => [
+                'credentials' => 'Use estes dados para entrar — E-mail: :email, Senha: :password. Para sua segurança, altere sua senha após entrar.',
+                'credentials-title' => 'Seus dados de acesso',
                 'cta' => 'Entrar',
                 'greeting' => 'Uma conta foi criada para você com o e-mail :email. Você pode entrar para começar.',
                 'subject' => 'Sua Conta Foi Criada',

@@ -1399,6 +1399,8 @@ return [
 
         'user' => [
             'created' => [
+                'credentials' => 'Użyj tych danych, aby się zalogować — E-mail: :email, Hasło: :password. Dla własnego bezpieczeństwa zmień hasło po zalogowaniu.',
+                'credentials-title' => 'Twoje dane logowania',
                 'cta' => 'Zaloguj się',
                 'greeting' => 'Utworzono dla Ciebie konto z adresem e-mail :email. Możesz się zalogować, aby rozpocząć.',
                 'subject' => 'Twoje konto zostało utworzone',
