@@ -3,6 +3,7 @@
 namespace Webkul\B2BSuite\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Event;
 use Webkul\B2BSuite\Database\Seeders\DatabaseSeeder;
 use Webkul\B2BSuite\Providers\B2BSuiteServiceProvider;
 
@@ -37,6 +38,8 @@ class InstallB2BSuite extends Command
         ]);
 
         $this->call('optimize:clear');
+
+        Event::dispatch('bagisto.module.installed', ['bagisto/b2b-suite']);
 
         $this->line('<fg=white>
              ____              _     _          ____  ____  ____    ____        _ _       
