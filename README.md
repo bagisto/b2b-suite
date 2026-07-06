@@ -13,13 +13,21 @@
 
 ### 1. Introduction:
 
-The **Bagisto B2B Ecommerce** is an open-source package designed to extend the Bagisto eCommerce platform with advanced Business-to-Business (B2B) capabilities. It enables companies to register their organization, manage multiple users, and handle the entire purchasing process from a single, unified dashboard.
+**Bagisto B2B Ecommerce** is an open-source package that extends the Bagisto eCommerce
+platform with powerful B2B features.
 
-Powerful tools such as **Quick Order**, **Requisition Lists**, and **Request for Quote (RFQ)** make buying faster, simpler, and better organized for business customers, even across large or repeat orders. With **role-based permissions**, companies can assign roles and control exactly what each user can access, ensuring a secure, transparent, and well-managed workflow across the entire team.
+It allows companies to register their organization, submit their registration for **Admin Approval**, manage multiple users, and complete their purchasing process from a single dashboard.
 
-The platform also gives administrators fine-grained control over each company's experience through **Company Catalogs** (per-company product and category visibility with custom and quantity-tier pricing), **Company Credit** (a buy-now-pay-later account with an audited ledger and a *Pay By Credit* checkout method), **Sales Representatives** (assign admin users to manage specific companies and their negotiations), and **Company Attributes** (extend the company profile with custom fields).
+The package includes features such as **Quick Order, Requisition Lists**, and **Request for Quote (RFQ)** to make ordering faster and easier.
 
-This makes the Bagisto B2B Ecommerce an ideal fit for wholesalers, manufacturers, and distributors looking to run a scalable, flexible, and efficient online store tailored to business buyers.
+**Role-based permissions** let companies assign roles and control what each user can access.
+
+Administrators can manage each company's buying experience with **Company Catalogs, Company Credit, Sales Representatives**, and **Company Attributes**.
+
+These features help customize product visibility, pricing, credit limits, company information, and customer management.
+
+Bagisto B2B Ecommerce is built for wholesalers, manufacturers, distributors, and other
+businesses that need a flexible and scalable B2B eCommerce solution.
 
 ![Bagisto B2B Ecommerce Image](https://github.com/bagisto/temp-media/blob/master/intro-banner.webp)
 
