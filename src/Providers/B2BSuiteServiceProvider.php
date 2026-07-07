@@ -57,6 +57,13 @@ class B2BSuiteServiceProvider extends ServiceProvider
             Route::middleware('web')->group(__DIR__.'/../Routes/web.php');
 
             require __DIR__.'/../Routes/breadcrumbs.php';
+            
+            config([
+                'bagisto.tracked_modules' => array_values(array_unique(array_merge(
+                    config('bagisto.tracked_modules', []),
+                    ['bagisto/b2b-suite']
+                ))),
+            ]);
         }
 
         Route::aliasMiddleware('customer_bouncer', CustomerBouncerMiddleware::class);
