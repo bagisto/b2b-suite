@@ -2,6 +2,14 @@
 
 This changelog consists of the bug & security updates.
 
+## **v2.0.2 (8th of July 2026)** - *Release*
+
+- Compatibility with Bagisto v2.4.8.
+
+- Added the prebuilt admin and shop theme bundles.
+
+- Company onboarding e-mails are consolidated so a new member receives a single onboarding mail alongside the registration mail, instead of multiple overlapping messages.
+
 ## **v2.0.1 (22nd of June 2026)** - *Release*
 
 - The sales order behind a company purchase order can now be opened by any member of that company via the "View Order" link, guarded by the purchase-orders permission; previously only the member who placed it could view it.
