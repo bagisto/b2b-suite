@@ -1399,6 +1399,8 @@ return [
 
         'user' => [
             'created' => [
+                'credentials' => 'Folosește aceste date pentru a te conecta — E-mail: :email, Parolă: :password. Pentru siguranța ta, te rugăm să îți schimbi parola după conectare.',
+                'credentials-title' => 'Datele tale de conectare',
                 'cta' => 'Autentificare',
                 'greeting' => 'A fost creat un cont pentru dvs. cu e-mailul :email. Vă puteți autentifica pentru a începe.',
                 'subject' => 'Contul dvs. a fost creat',

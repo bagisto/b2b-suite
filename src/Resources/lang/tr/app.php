@@ -1399,6 +1399,8 @@ return [
 
         'user' => [
             'created' => [
+                'credentials' => 'Giriş yapmak için bu bilgileri kullanın — E-posta: :email, Parola: :password. Güvenliğiniz için lütfen giriş yaptıktan sonra parolanızı değiştirin.',
+                'credentials-title' => 'Giriş Bilgileriniz',
                 'cta' => 'Oturum Aç',
                 'greeting' => 'Sizin için :email e-postasıyla bir hesap oluşturuldu. Başlamak için oturum açabilirsiniz.',
                 'subject' => 'Hesabınız Oluşturuldu',

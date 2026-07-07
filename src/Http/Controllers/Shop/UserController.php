@@ -6,11 +6,9 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
-use Webkul\Admin\Mail\Customer\NewCustomerNotification;
 use Webkul\B2BSuite\DataGrids\Shop\CompanyInvitationDataGrid;
 use Webkul\B2BSuite\DataGrids\Shop\UserDataGrid;
 use Webkul\B2BSuite\Models\CompanyInvitation;
@@ -153,20 +151,15 @@ class UserController extends Controller
         Event::dispatch('customer.registration.after', $customer);
 
         /**
-         * Welcome the newly created company sub-user.
+         * Welcome the newly created company sub-user. The generated password is passed through
+         * so the welcome email can carry their login credentials (replacing the separate core
+         * NewCustomerNotification credentials mail); it is gated by the "New Sub-User Welcome"
+         * toggle inside Notifier::user().
          */
-        Notifier::user($customer);
+        Notifier::user($customer, $password);
 
         if (request()->hasFile('image')) {
             $this->customerRepository->uploadImages($data, $customer);
-        }
-
-        if (core()->getConfigData('emails.general.notifications.emails.general.notifications.customer_account_credentials')) {
-            try {
-                Mail::queue(new NewCustomerNotification($customer, $password));
-            } catch (\Exception $e) {
-                report($e);
-            }
         }
 
         if (core()->getConfigData('emails.general.notifications.emails.general.notifications.verification')) {

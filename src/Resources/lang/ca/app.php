@@ -1399,6 +1399,8 @@ return [
 
         'user' => [
             'created' => [
+                'credentials' => 'Utilitzeu aquestes dades per iniciar la sessió — Correu electrònic: :email, Contrasenya: :password. Per a la vostra seguretat, canvieu la contrasenya després d\'iniciar la sessió.',
+                'credentials-title' => 'Les vostres dades d\'inici de sessió',
                 'cta' => 'Iniciar sessió',
                 'greeting' => 'S\'ha creat un compte per a vós amb el correu electrònic :email. Podeu iniciar sessió per començar.',
                 'subject' => 'El vostre compte s\'ha creat',

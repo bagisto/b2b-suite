@@ -1399,6 +1399,8 @@ return [
 
         'user' => [
             'created' => [
+                'credentials' => 'Use these details to sign in — Email: :email, Password: :password. For your security, please change your password after signing in.',
+                'credentials-title' => 'Your Login Details',
                 'cta' => 'Sign In',
                 'greeting' => 'An account has been created for you with the email :email. You can sign in to get started.',
                 'subject' => 'Your Account Has Been Created',

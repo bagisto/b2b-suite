@@ -74,9 +74,13 @@ class Notifier
     }
 
     /**
-     * Notify a newly created company sub-user.
+     * Notify a newly created company sub-user, optionally including the generated login
+     * credentials so they can sign in for the first time.
+     *
+     * @param  string|null  $password  Plain-text generated password, or null when the member
+     *                                 already has their own (e.g. accepted-invitation flow).
      */
-    public static function user($user): void
+    public static function user($user, ?string $password = null): void
     {
         if (! self::enabled('user_created') || ! $user?->email) {
             return;
@@ -85,6 +89,7 @@ class Notifier
         self::send($user->email, $user->name, trans('b2b::app.emails.user.created.subject'), 'b2b::emails.user', [
             'type' => 'created',
             'audience' => 'buyer',
+            'password' => $password,
         ], $user);
     }
 

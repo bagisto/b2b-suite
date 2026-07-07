@@ -1399,6 +1399,8 @@ return [
 
         'user' => [
             'created' => [
+                'credentials' => 'Utilisez ces informations pour vous connecter — E-mail : :email, Mot de passe : :password. Pour votre sécurité, veuillez changer votre mot de passe après la connexion.',
+                'credentials-title' => 'Vos identifiants de connexion',
                 'cta' => 'Se connecter',
                 'greeting' => 'Un compte a été créé pour vous avec l\'e-mail :email. Vous pouvez vous connecter pour commencer.',
                 'subject' => 'Votre compte a été créé',

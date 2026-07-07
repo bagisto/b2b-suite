@@ -1399,6 +1399,8 @@ return [
 
         'user' => [
             'created' => [
+                'credentials' => 'Verwenden Sie diese Daten zum Anmelden — E-Mail: :email, Passwort: :password. Ändern Sie zu Ihrer Sicherheit Ihr Passwort nach der Anmeldung.',
+                'credentials-title' => 'Ihre Anmeldedaten',
                 'cta' => 'Anmelden',
                 'greeting' => 'Für Sie wurde ein Konto mit der E-Mail :email erstellt. Sie können sich anmelden, um loszulegen.',
                 'subject' => 'Ihr Konto wurde erstellt',

@@ -1399,6 +1399,8 @@ return [
 
         'user' => [
             'created' => [
+                'credentials' => 'Gebruik deze gegevens om in te loggen — E-mail: :email, Wachtwoord: :password. Wijzig voor uw veiligheid uw wachtwoord na het inloggen.',
+                'credentials-title' => 'Uw inloggegevens',
                 'cta' => 'Inloggen',
                 'greeting' => 'Er is een account voor u aangemaakt met het e-mailadres :email. U kunt inloggen om aan de slag te gaan.',
                 'subject' => 'Uw account is aangemaakt',
