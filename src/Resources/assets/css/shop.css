@@ -1,0 +1,29 @@
+/**
+ * B2B Suite — storefront stylesheet.
+ *
+ * `@tailwind base` is kept for the `--tw-*` custom property defaults that
+ * transform, shadow and ring utilities depend on. The reset itself is not emitted:
+ * `corePlugins.preflight` is disabled in `tailwind.shop.config.js`.
+ */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+ * The look every B2B datagrid header shares, storefront side.
+ *
+ * Both the real header and its loading skeleton carry this, so the two cannot
+ * drift — a header that restates the utilities inline is how the skeleton ends up
+ * a different height and colour from the table it stands in for.
+ *
+ * Only the grid template stays with each grid, in that view's scoped style block,
+ * since that is the part which legitimately differs.
+ *
+ * Defined here rather than reused from the core shop bundle because core shop has
+ * no shared header class — unlike core admin, which owns `.datagrid-head`.
+ */
+@layer components {
+    .b2b-datagrid-head {
+        @apply min-h-[47px] items-center gap-2.5 rounded-t-lg border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-sm font-semibold text-zinc-600;
+    }
+}

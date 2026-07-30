@@ -71,6 +71,14 @@ class EventServiceProvider extends ServiceProvider
     {
         $templates = [
             [
+                'event' => 'bagisto.admin.layout.head.before',
+                'template' => 'b2b::components.admin.layouts.style',
+            ],
+            [
+                'event' => 'bagisto.shop.layout.head.before',
+                'template' => 'b2b::components.shop.layouts.style',
+            ],
+            [
                 'event' => 'bagisto.shop.products.view.additional_actions.before',
                 'template' => 'b2b::shop.customers.account.requisitions.list-modal',
             ],

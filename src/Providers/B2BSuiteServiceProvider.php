@@ -41,6 +41,11 @@ class B2BSuiteServiceProvider extends ServiceProvider
             'payment_methods'
         );
 
+        $this->mergeConfigFrom(
+            dirname(__DIR__).'/Config/bagisto-vite.php',
+            'bagisto-vite.viters'
+        );
+
         $this->registerServices();
 
         $this->app->bind(CoreMenu::class, B2BMenu::class);
@@ -57,7 +62,7 @@ class B2BSuiteServiceProvider extends ServiceProvider
             Route::middleware('web')->group(__DIR__.'/../Routes/web.php');
 
             require __DIR__.'/../Routes/breadcrumbs.php';
-            
+
             config([
                 'bagisto.tracked_modules' => array_values(array_unique(array_merge(
                     config('bagisto.tracked_modules', []),
@@ -138,8 +143,7 @@ class B2BSuiteServiceProvider extends ServiceProvider
     protected function publishAssets(): void
     {
         $this->publishes([
-            __DIR__.'/../../publishables/public/themes/admin/default/build' => public_path('themes/admin/default/build'),
-            __DIR__.'/../../publishables/public/themes/shop/default/build' => public_path('themes/shop/default/build'),
+            __DIR__.'/../../publishables/public/themes/b2b-suite' => public_path('themes/b2b-suite'),
 
             __DIR__.'/../../publishables/resources/vendor' => resource_path('views/vendor'),
 

@@ -1,41 +1,86 @@
+import { defineConfig, loadEnv } from "vite";
+import laravel from "laravel-vite-plugin";
 import path from "path";
-import { fileURLToPath } from "url";
+import { createRequire } from "module";
 import tailwindcss from "tailwindcss";
 import autoprefixer from "autoprefixer";
 
 /**
  * B2B Suite — admin build.
  *
- * Reuses the Admin theme's own Vite config (Vue plugin, inputs, output dir) and
- * its Tailwind theme, and only overrides PostCSS so Tailwind ALSO scans B2B's
- * admin views. The result is the regular admin bundle with B2B classes folded in
- * — a single Tailwind pass (no second stylesheet, correct layer order).
- *
- * Run from this package via `vite --root <admin> --config <this file>` (the
- * package.json `build:admin` script does this) — works whether the package is in
- * `packages/bagisto/b2b-suite` (source) or `vendor/bagisto/b2b-suite` (installed).
- *
- * Nothing in the Admin package is modified — its config is imported, not edited.
+ * Builds this package's own stylesheet into its own build directory. It must not
+ * write to `themes/admin/default`: the core ships its own bundle there and
+ * replaces it on upgrade.
  */
-import adminConfigFactory from "../../../packages/Webkul/Admin/vite.config.js";
 
-const moduleDir = path.dirname(fileURLToPath(import.meta.url));
+/**
+ * Loaded with `createRequire`, not a static `import`. Vite pre-bundles this
+ * config with esbuild in ESM format; esbuild inlines a statically imported
+ * CommonJS file, and `paths.cjs`'s own `require("fs")` then fails with
+ * `Dynamic require of "fs" is not supported`.
+ */
+const paths = createRequire(import.meta.url)("./paths.cjs");
 
-export default (env) => {
-    const config = adminConfigFactory(env);
+export default defineConfig(({ mode }) => {
+    Object.assign(process.env, loadEnv(mode, paths.appRoot));
 
-    /**
-     * Tailwind: admin theme preset + B2B admin views (config loaded via Tailwind's
-     * own resolver, which handles the CommonJS config under this `type: module`).
-     */
-    config.css = {
-        postcss: {
-            plugins: [
-                tailwindcss(path.join(moduleDir, "tailwind.admin.config.js")),
-                autoprefixer(),
-            ],
+    return {
+        build: {
+            emptyOutDir: true,
+        },
+
+        envDir: paths.appRoot,
+
+        server: {
+            host: process.env.VITE_HOST || "localhost",
+            port: process.env.VITE_PORT || 5173,
+            cors: true,
+        },
+
+        css: {
+            postcss: {
+                plugins: [
+                    tailwindcss(path.join(paths.packageDir, "tailwind.admin.config.js")),
+                    autoprefixer(),
+                ],
+            },
+        },
+
+        plugins: [
+            laravel({
+                /**
+                 * Written verbatim, so an absolute path is safe. The filename must
+                 * match `hot_file` in `src/Config/bagisto-vite.php`, which Laravel
+                 * resolves relative to `public/`.
+                 */
+                hotFile: path.join(paths.appPublic, "b2b-suite-admin-vite.hot"),
+
+                /**
+                 * Must stay relative to this package: the plugin strips a leading
+                 * slash and joins this with `buildDirectory` to form
+                 * `build.outDir`, so an absolute path resolves inside the package
+                 * and leaks a stray `public/` into it.
+                 */
+                publicDirectory: path.relative(paths.packageDir, paths.appPublic),
+
+                buildDirectory: paths.adminBuildDirectory,
+
+                input: ["src/Resources/assets/css/admin.css"],
+
+                refresh: true,
+            }),
+        ],
+
+        experimental: {
+            /**
+             * Matches the core themes: assets referenced from CSS are emitted
+             * alongside the stylesheet, so a bare filename resolves.
+             */
+            renderBuiltUrl(filename, { hostType }) {
+                if (hostType === "css") {
+                    return path.basename(filename);
+                }
+            },
         },
     };
-
-    return config;
-};
+});

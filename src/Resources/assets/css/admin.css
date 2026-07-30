@@ -1,0 +1,28 @@
+/**
+ * B2B Suite — admin stylesheet.
+ *
+ * `@tailwind base` is kept for the `--tw-*` custom property defaults that
+ * transform, shadow and ring utilities depend on. The reset itself is not emitted:
+ * `corePlugins.preflight` is disabled in `tailwind.admin.config.js`.
+ */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+ * The look every B2B datagrid header shares, admin side.
+ *
+ * Both the real header and its loading skeleton carry this, so the two cannot
+ * drift. Only the grid template stays with each grid, in that view's scoped style
+ * block, since that is the part which legitimately differs.
+ *
+ * Deliberately a copy of core admin's `.datagrid-head` rather than a use of it:
+ * that class landed on the 2.4 branch after the 2.4.8 tag, so a merchant on a
+ * released 2.4.8 does not have it and the headers would lose their chrome
+ * silently. **Keep these declarations in step with core's.**
+ */
+@layer components {
+    .b2b-datagrid-head {
+        @apply min-h-[47px] items-center gap-2.5 border-b bg-gray-50 px-4 py-2.5 text-sm font-semibold text-gray-600 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300;
+    }
+}

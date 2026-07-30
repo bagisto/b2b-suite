@@ -1,35 +1,29 @@
+@props(['groups' => [1, 1, 1, 1]])
+
 {{--
-    Loading skeleton for the shared B2B multi-row datagrid header (`b2b-dg-head`, a four
-    column grid). The grid template lives in each consuming view's scoped style block; this
-    only fills the columns with shimmer bars. Like the real header it is hidden below 1024px.
-    Bar dimensions use inline styles so they survive the B2B bundle's Tailwind purge.
+    Loading skeleton for the shared B2B multi-row datagrid header.
+
+    `b2b-datagrid-head` carries the chrome, defined per area in this package's own
+    `admin.css` / `shop.css`, so the skeleton and the real header are styled from
+    one place. `b2b-dg-head` adds only the grid template and the breakpoint it is
+    hidden at, from the consuming view's scoped style block — which is why the
+    skeleton lines up with that grid without repeating its columns here.
+
+    `groups` mirrors the real header's `columnGroup` array: one entry per column
+    group, falsy where that group has no labels. Grids whose last column holds only
+    row actions pass `[1, 1, 1, 0]`, so the skeleton leaves that column blank
+    instead of promising a heading the table never renders.
 --}}
-<div class="b2b-dg-head border-b px-4 py-2.5 dark:border-gray-800">
-    <div>
-        <div
-            class="shimmer"
-            style="height: 16px; width: 70%; max-width: 150px;"
-        ></div>
-    </div>
-
-    <div class="b2b-dg-divider">
-        <div
-            class="shimmer"
-            style="height: 16px; width: 72%; max-width: 150px;"
-        ></div>
-    </div>
-
-    <div class="b2b-dg-divider">
-        <div
-            class="shimmer"
-            style="height: 16px; width: 64%; max-width: 130px;"
-        ></div>
-    </div>
-
-    <div class="b2b-dg-divider">
-        <div
-            class="shimmer"
-            style="height: 16px; width: 50%; max-width: 90px;"
-        ></div>
-    </div>
+<div class="b2b-dg-head b2b-datagrid-head">
+    @foreach ($groups as $index => $group)
+        <div @class(['b2b-dg-divider' => $index > 0])>
+            @if ($group)
+                <div @class([
+                    'shimmer h-[17px]',
+                    'w-[70%] max-w-[150px]' => ! $index,
+                    'w-[64%] max-w-[130px]' => (bool) $index,
+                ])></div>
+            @endif
+        </div>
+    @endforeach
 </div>

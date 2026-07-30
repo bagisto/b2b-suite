@@ -93,33 +93,63 @@ To override another view/component: add it under `publishables/resources/vendor/
 (mirror the namespaced path without the namespace prefix — components live under
 `<namespace>/components/<name>`), then re-publish.
 
-## Styling — the package builds its own theme bundles
+## Styling — the package owns its own bundle
 
 B2B Blade views are styled with the core **Shop/Admin Tailwind themes**, but they live
-outside those themes' `src/Resources/**`, so the core builds don't scan them. Rather than
-editing the core theme configs, the package ships **its own build** that regenerates each
-theme's bundle with the B2B views folded in — a single coherent Tailwind pass (correct
-layer order, no second stylesheet) and **no changes to the core Shop/Admin packages**.
+outside those themes' `src/Resources/**`, so the core builds don't scan them. The package
+therefore ships **its own stylesheet in its own build directory**, and does not touch the
+core Shop/Admin packages or their bundles.
 
-How it works (all in the package root):
+> **Never build or publish into `public/themes/{admin,shop}/default/build`.** Bagisto ships
+> its own bundles there and replaces them on upgrade, which silently reverts anything written
+> over them.
 
-- `tailwind.{admin,shop}.config.js` — reuse the core theme's Tailwind config (theme tokens,
-  plugins, safelist, `darkMode`) and add the B2B views to `content` (absolute paths, so the
-  build is cwd-independent).
-- `vite.{admin,shop}.config.js` — `import` the core theme's *own* Vite config and override
-  only PostCSS to use the config above; output goes to the theme's own
-  `public/themes/{admin,shop}/default/build`.
-- Core themes are resolved at `<app-root>/packages/Webkul/<theme>`, so the build works
-  whether this package sits in `packages/bagisto/b2b-suite` (source) or
-  `vendor/bagisto/b2b-suite` (installed).
+How it works (all in the package root unless noted):
 
-Commands (run from the package). The build reuses the core themes' `node_modules`, so make
-sure `npm install` has been run in `packages/Webkul/{Shop,Admin}` first:
+- `paths.cjs` — single source of truth for paths. Walks up to the application root (the
+  first directory holding both `artisan` and `public`), so nothing assumes a fixed depth.
+  `BAGISTO_ROOT` overrides it. Never hardcode `../../../`.
+- `src/Resources/assets/css/{admin,shop}.css` — the two entry stylesheets.
+- `tailwind.{admin,shop}.config.js` — scan **only** this package's views, reuse the core
+  theme's `theme`/`plugins`/`safelist`/`darkMode` so every token resolves identically, and
+  set `corePlugins.preflight: false` (the core bundle already emits the reset).
+- `vite.{admin,shop}.config.js` — build into `themes/b2b-suite/{admin,shop}/build`. They
+  load `paths.cjs` via `createRequire`, **not** a static `import`: Vite pre-bundles its
+  config with esbuild, which inlines a statically imported CommonJS file and then dies on
+  its `require("fs")`. Don't "tidy" that into an import.
+- `src/Config/bagisto-vite.php` — registers the `b2b-suite-admin` / `b2b-suite-shop` viters
+  (merged into `bagisto-vite.viters`) so `@bagistoVite([...], 'b2b-suite-admin')` resolves
+  this package's own manifest.
+- `src/Resources/views/components/{admin,shop}/layouts/style.blade.php` — emit the `<link>`,
+  injected into the core layout heads by `Providers/EventServiceProvider` on
+  `bagisto.{admin,shop}.layout.head.before`.
+
+Two separate builds, not one, because the core Admin and Shop themes have different Tailwind
+presets — their utilities cannot be generated in a single pass.
+
+### Load order — read before changing it
+
+The sheets are injected at **`head.before`, so they load BEFORE the core bundle.** This is
+deliberate and must stay that way.
+
+Loading a second utility sheet *after* core's lets its **plain** utilities override core's
+**responsive variants** on core's own elements — a later rule of equal specificity wins, and
+core's `md:` rule sits in a media query in the earlier sheet. That previously broke the
+responsive flash toasts and the admin sidebar layout. `head.before` is what prevents it.
+
+The mirror of that risk remains, bounded: if a B2B view relies on a responsive variant that
+core's bundle does **not** emit, while core's bundle *does* emit the plain counterpart, core's
+plain rule (loaded second) wins. So verify responsive variants in B2B views against the
+compiled bundle — see *Gotchas*. For one-off rules, a scoped `@push('styles')` block still
+wins over both sheets.
+
+Commands (run from the package; `npm ci` once per clone — the build no longer needs the core
+themes' `node_modules`):
 
 ```bash
-npm install
-npm run build          # admin + shop → straight into public/themes/.../build
-npm run build:admin    # one theme only
+npm ci
+npm run build          # admin + shop → public/themes/b2b-suite/{admin,shop}/build
+npm run build:admin    # one bundle only
 npm run build:shop
 npm run dev:admin      # hot-reload while developing
 npm run dev:shop
@@ -127,13 +157,8 @@ npm run dev:shop
 
 **Prebuilt bundles ship with the package**, so a normal install needs **no Node/Tailwind
 build**: `npm run publishables` (maintainer) rebuilds both and copies them into
-`publishables/public/`, and `b2b-suite:install` publishes them into `public/`. Only rebuild
-if you change a B2B view (new utility class) or the core theme changes and you spot breakage.
-
-Do **not** add a second global stylesheet — loading another Tailwind utility sheet after
-the core one lets its plain utilities override core's responsive variants (this previously
-broke the responsive flash toasts and the admin sidebar layout). For one-off rules, prefer
-a scoped `@push('styles')` block within the view.
+`publishables/public/themes/b2b-suite/`, and `b2b-suite:install` publishes them into
+`public/`. Rebuild only when a B2B view introduces a new utility class.
 
 ### Vue inside Blade
 

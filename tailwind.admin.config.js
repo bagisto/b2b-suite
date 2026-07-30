@@ -1,26 +1,35 @@
 const path = require("path");
+const { adminDir, packageDir } = require("./paths.cjs");
 
 /**
- * Admin theme Tailwind config + B2B admin views.
+ * B2B Suite — admin Tailwind config.
  *
- * Resolves the core Admin package at `<app-root>/packages/Webkul/Admin` — which
- * holds whether this package lives in `packages/bagisto/b2b-suite` (source) or
- * `vendor/bagisto/b2b-suite` (installed), since both are 3 levels under the app
- * root. All `content` paths are ABSOLUTE so the build works from any cwd.
+ * Scans only this package's admin views; the core admin theme generates its own
+ * utilities in its own bundle.
  */
-const adminDir = path.resolve(__dirname, "../../../packages/Webkul/Admin");
+
+/**
+ * The core admin theme's config. `theme`, `plugins`, `safelist` and `darkMode`
+ * are reused verbatim so a token resolves to the same value in a B2B view as in a
+ * core view.
+ */
 const admin = require(path.join(adminDir, "tailwind.config.js"));
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
     content: [
-        path.join(adminDir, "src/Resources/**/*.blade.php"),
-        path.join(adminDir, "src/Resources/**/*.js"),
-
-        path.join(__dirname, "src/Resources/views/admin/**/*.blade.php"),
-        path.join(__dirname, "src/Resources/views/components/**/*.blade.php"),
-        path.join(__dirname, "publishables/resources/vendor/admin/**/*.blade.php"),
+        path.join(packageDir, "src/Resources/views/admin/**/*.blade.php"),
+        path.join(packageDir, "src/Resources/views/components/**/*.blade.php"),
+        path.join(packageDir, "publishables/resources/vendor/admin/**/*.blade.php"),
     ],
+
+    /**
+     * The core bundle already emits the reset; emitting it again would re-apply
+     * base element styles over it.
+     */
+    corePlugins: {
+        preflight: false,
+    },
 
     theme: admin.theme,
     plugins: admin.plugins,

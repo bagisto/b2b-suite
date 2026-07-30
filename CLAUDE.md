@@ -13,14 +13,15 @@ changes. The essentials:
   storage and all view/component overrides (`publishables/resources/vendor` →
   `resources/views/vendor`, covering both regular `shop::`/`admin::` views and anonymous
   `x-shop::` components like the account navigation). Never publish directly from `src/`.
-- **Own theme build (no core edits).** The package has its own Vite/Tailwind build that
-  `import`s each core theme's config and regenerates the theme bundle with B2B views folded
-  in (one coherent Tailwind pass) — `tailwind.{admin,shop}.config.js`, `vite.{admin,shop}.config.js`.
-  Prebuilt bundles ship via `publishables/public` and are published on install (no Node
-  needed normally). Adding a **new** utility class in a B2B view → rebuild: from the package
-  run `npm run build` (after `npm install` in `packages/Webkul/{Shop,Admin}`). Don't add a
-  second global stylesheet; for one-offs use a scoped `@push('styles')` block. Full details
-  in AGENTS.md → *Styling*.
+- **Own bundle, never the core's (no core edits).** The package builds its **own** stylesheet
+  into `public/themes/b2b-suite/{admin,shop}/build` — its own manifest, registered as a
+  `bagisto-vite` viter and injected into the core layout heads. **Never write to or publish
+  over `themes/{admin,shop}/default`** (the core replaces those on upgrade), and **keep the
+  injection on `head.before`, not after** — see AGENTS.md → *Styling* → *Load order*. Prebuilt
+  bundles ship via `publishables/public` and are published on install (no Node needed
+  normally). Adding a **new** utility class in a B2B view → rebuild: `npm ci` once per clone,
+  then `npm run build` from the package. For one-offs a scoped `@push('styles')` block still
+  wins over both sheets.
 - **Vue in Blade:** put a component's markup in its own `<script type="text/x-template">`,
   not as slotted content — slot content compiles in the parent scope and breaks the
   component's `data()` bindings. **A Vue `@event` whose name matches a Blade directive
@@ -96,10 +97,13 @@ php artisan optimize:clear
 
 - **`view:cache` is not a syntax check** — it reports success even when the compiled PHP has
   a parse error (which only fires at render). Verify by linting `storage/framework/views/*.php`.
-- **Verify Tailwind utilities against the compiled bundle** (`public/themes/<theme>/default/
-  build/assets/app-*.css` via `manifest.json`) — the B2B theme purges, so an unknown class or
-  responsive variant (e.g. `max-md:flex-col`) silently does nothing. Prefer scoped
-  `@push('styles')` / inline `style` for one-offs.
+- **Verify Tailwind utilities against the compiled bundle** — now B2B's own
+  (`public/themes/b2b-suite/{admin,shop}/build/assets/*.css` via its `manifest.json`), not the
+  core theme's. The sheet purges, so an unknown class silently does nothing. A **responsive
+  variant** (e.g. `max-md:flex-col`) needs one extra check: B2B's sheet loads *before* core's,
+  so if core's bundle emits the plain counterpart and not the variant, core's rule wins —
+  confirm the rendered result, not just that the class exists. Prefer scoped `@push('styles')`
+  / inline `style` for one-offs.
 - **`Helpers\CompanyCatalog::setPrices()` is destructive** — it deletes the whole catalog
   group's `product_customer_group_prices` rows and rewrites from the posted payload; never
   call it with a partial payload or tinker-test it on a real catalog.

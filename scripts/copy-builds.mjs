@@ -1,27 +1,16 @@
-import { fileURLToPath } from "url";
 import path from "path";
 import { cpSync, rmSync, mkdirSync, existsSync } from "fs";
+import paths from "../paths.cjs";
 
 /**
- * Copies the freshly built admin & shop theme bundles (theme + B2B views) from
- * the app's `public/themes/.../build` into this package's `publishables/public`,
- * so they ship with the package and `vendor:publish` can drop them into an
- * install's public folder (no Node/Tailwind build needed at install time).
+ * Copies the built bundles into `publishables/public`, so they ship with the
+ * package and an install needs no Node/Tailwind build.
  *
- * Run via `npm run publishables` (which builds first, then runs this).
+ * Run via `npm run publishables`, which builds first.
  */
-const here = path.dirname(fileURLToPath(import.meta.url));
-const pkgRoot = path.resolve(here, "..");
-const appPublic = path.resolve(pkgRoot, "../../../public");
-
-const builds = [
-    "themes/admin/default/build",
-    "themes/shop/default/build",
-];
-
-for (const build of builds) {
-    const src = path.join(appPublic, build);
-    const dest = path.join(pkgRoot, "publishables/public", build);
+for (const build of paths.buildDirectories) {
+    const src = path.join(paths.appPublic, build);
+    const dest = path.join(paths.publishablePublicDir, build);
 
     if (! existsSync(src)) {
         console.error(`✗ missing build: ${src}\n  run the theme build first (npm run build).`);

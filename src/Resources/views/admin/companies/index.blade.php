@@ -32,7 +32,7 @@
             </template>
 
             <template v-else>
-                <div class="b2b-company-head border-b px-4 py-2.5 dark:border-gray-800">
+                <div class="b2b-company-head b2b-datagrid-head">
                     <!-- Select All -->
                     <p v-if="available.massActions.length">
                         <label for="mass_action_select_all_records">

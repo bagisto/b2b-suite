@@ -28,7 +28,7 @@
             </template>
 
             <template v-else>
-                <div class="b2b-dg-head border-b px-4 py-2.5 dark:border-gray-800">
+                <div class="b2b-dg-head b2b-datagrid-head">
                     <div
                         class="flex select-none items-center gap-2.5"
                         :class="{ 'b2b-dg-divider': index > 0 }"

@@ -59,11 +59,11 @@
             <!-- Header -->
             <template #header="{ isLoading, available, applied, sort }">
                 <template v-if="isLoading">
-                    <x-b2b::shimmer.datagrid.dg.head />
+                    <x-b2b::shimmer.datagrid.dg.head :groups="[1, 1, 1, 0]" />
                 </template>
 
                 <template v-else>
-                    <div class="b2b-dg-head rounded-t-lg border-b border-zinc-200 bg-zinc-50 px-4 py-2.5">
+                    <div class="b2b-dg-head b2b-datagrid-head">
                         <div
                             class="flex select-none items-center gap-2.5"
                             :class="{ 'b2b-dg-divider': index > 0 }"
