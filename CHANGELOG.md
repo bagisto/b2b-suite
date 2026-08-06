@@ -2,6 +2,20 @@
 
 This changelog consists of the bug & security updates.
 
+## **v2.1.0 (6th of August 2026)** - *Release*
+
+- Compatibility with Bagisto v2.4.9.
+
+- Third-level admin menus open again. The suite replaces Bagisto's menu service, and its copy did not expose the current menu key introduced in v2.4.9, so no menu item was ever marked active — affecting Bagisto's own sections such as Settings → Taxes and Marketing → Communications as well as the B2B ones.
+
+- The admin and storefront styles now ship as the suite's own bundle under `public/themes/b2b-suite`, instead of regenerating and replacing Bagisto's theme bundles. Upgrading Bagisto no longer reverts the suite's styling, and the published assets drop from 5.2 MB to under 100 KB.
+
+- Datagrid headers across the suite share one style definition with their loading skeletons, so the placeholder matches the table it stands in for. Grids whose last column holds only row actions no longer show a heading there while loading.
+
+- The asset build no longer assumes a fixed directory depth, so it runs unchanged from a development clone, a `packages/` checkout, or an installed `vendor/` package. Set `BAGISTO_ROOT` when the package lives outside the application tree.
+
+- The PHP requirement now matches Bagisto's own (`>=8.3 <8.5`), instead of advertising support for 8.1 and 8.2, which Bagisto does not install on.
+
 ## **v2.0.2 (8th of July 2026)** - *Release*
 
 - Compatibility with Bagisto v2.4.8.
