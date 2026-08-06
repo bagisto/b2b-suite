@@ -107,14 +107,51 @@ class Menu extends BaseMenu
     }
 
     /**
+     * Key of the menu item the current request belongs to.
+     *
+     * Must be overridden, not inherited. `Webkul\Core\Menu` declares `$currentKey`
+     * private, so this class's own `$currentKey` is a separate slot on the same
+     * object: the inherited accessor reads core's, which nothing here ever writes,
+     * and returns an empty string. `MenuItem::isActive()` calls this for every item,
+     * so an empty key leaves the whole admin menu inactive and no submenu opens.
+     */
+    public function getCurrentKey(): string
+    {
+        return $this->currentKey;
+    }
+
+    /**
      * Prepare menu items.
+     *
+     * Kept in step with `Webkul\Core\Menu::prepareMenuItems()`. The core helpers are
+     * private, so this class cannot call them and has to carry its own copy — only
+     * `getItems()` genuinely differs, to apply B2B's permission and visibility rules.
      */
     private function prepareMenuItems(): void
     {
         $menuWithDotNotation = [];
 
+        /**
+         * The deepest matching item wins, matched on a path boundary rather than as a
+         * bare substring. `MenuItem::isActive()` compares keys, so `currentKey` has to
+         * be the deepest match or a third-level item never reports itself active.
+         */
+        $currentUrl = rtrim(request()->url(), '/');
+
+        $matchedLength = -1;
+
         foreach ($this->configMenu as $item) {
-            if (strpos(request()->url(), route($item['route'])) !== false) {
+            $itemUrl = rtrim(route($item['route']), '/');
+
+            $matches = $currentUrl === $itemUrl
+                || str_starts_with($currentUrl, $itemUrl.'/');
+
+            if (
+                $matches
+                && strlen($itemUrl) >= $matchedLength
+            ) {
+                $matchedLength = strlen($itemUrl);
+
                 $this->currentKey = $item['key'];
             }
 
