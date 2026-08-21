@@ -100,6 +100,7 @@ return [
                 'update-btn' => 'Оновити компанію',
             ],
 
+            'no' => 'Ні',
             'sales-rep' => [
                 'label' => 'Призначений торговий представник',
                 'none' => 'Представника не призначено',
@@ -175,8 +176,10 @@ return [
             'mass-delete-success' => 'Вибрані компанії успішно видалено.',
             'mass-update-status-success' => 'Статус вибраних компаній успішно оновлено.',
             'name-required' => 'Поле назви обов\'язкове.',
+            'select' => 'Вибір',
             'update-success' => 'Компанію успішно оновлено.',
             'website-invalid' => 'Будь ласка, введіть дійсний URL веб-сайту.',
+            'yes' => 'Так',
         ],
 
         'company-attributes' => [
@@ -475,6 +478,7 @@ return [
                 'create-success' => 'Комерційну пропозицію успішно створено.',
                 'delete-failed' => 'Не вдалося видалити комерційну пропозицію.',
                 'delete-success' => 'Комерційну пропозицію успішно видалено.',
+                'mass-delete-success' => 'Selected quotations deleted successfully.',
                 'title' => 'Комерційні пропозиції',
                 'update-success' => 'Комерційну пропозицію успішно оновлено.',
 
@@ -482,6 +486,8 @@ return [
                     'accepted' => 'Прийнято',
                     'agent' => 'Користувач-адміністратор',
                     'base_total' => 'Базова сума',
+                    'cancelled' => 'Скасовано',
+                    'closed' => 'Закрито',
                     'company' => 'Компанія',
                     'company-email' => 'Електронна пошта компанії',
                     'completed' => 'Завершено',
@@ -635,6 +641,7 @@ return [
                 'datagrid' => [
                     'id' => 'ID замовлення на закупівлю',
                     'items' => 'Позиції',
+                    'view' => 'Переглянути',
                 ],
             ],
 
@@ -1032,6 +1039,7 @@ return [
                             'is-default' => 'За замовчуванням',
                             'items' => 'Позиції',
                             'name' => 'Назва',
+                            'order-id' => 'ID замовлення',
                             'status' => 'Статус',
                             'text-no' => 'Ні',
                             'text-yes' => 'Так',
@@ -1187,6 +1195,7 @@ return [
                 ],
 
                 'roles' => [
+                    'being-used' => 'Role is already assigned to a company user.',
                     'create-success' => 'Роль успішно створено.',
                     'delete-success' => 'Роль успішно видалено.',
                     'update-success' => 'Роль успішно оновлено.',

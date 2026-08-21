@@ -100,6 +100,7 @@ return [
                 'update-btn' => 'Actualizar empresa',
             ],
 
+            'no' => 'No',
             'sales-rep' => [
                 'label' => 'Representante de ventas asignado',
                 'none' => 'Ningún representante asignado',
@@ -175,8 +176,10 @@ return [
             'mass-delete-success' => 'Empresas seleccionadas eliminadas correctamente.',
             'mass-update-status-success' => 'Estado de las empresas seleccionadas actualizado correctamente.',
             'name-required' => 'El campo de nombre es obligatorio.',
+            'select' => 'Selección',
             'update-success' => 'Empresa actualizada correctamente.',
             'website-invalid' => 'Introduce una URL de sitio web válida.',
+            'yes' => 'Sí',
         ],
 
         'company-attributes' => [
@@ -475,6 +478,7 @@ return [
                 'create-success' => 'Cotización creada correctamente.',
                 'delete-failed' => 'No se pudo eliminar la cotización.',
                 'delete-success' => 'Cotización eliminada correctamente.',
+                'mass-delete-success' => 'Selected quotations deleted successfully.',
                 'title' => 'Cotizaciones',
                 'update-success' => 'Cotización actualizada correctamente.',
 
@@ -482,6 +486,8 @@ return [
                     'accepted' => 'Aceptada',
                     'agent' => 'Usuario administrador',
                     'base_total' => 'Total base',
+                    'cancelled' => 'Cancelado',
+                    'closed' => 'Cerrado',
                     'company' => 'Empresa',
                     'company-email' => 'Correo electrónico de la empresa',
                     'completed' => 'Completada',
@@ -635,6 +641,7 @@ return [
                 'datagrid' => [
                     'id' => 'ID de la orden de compra',
                     'items' => 'Artículos',
+                    'view' => 'Ver',
                 ],
             ],
 
@@ -1032,6 +1039,7 @@ return [
                             'is-default' => 'Es predeterminada',
                             'items' => 'Artículos',
                             'name' => 'Nombre',
+                            'order-id' => 'ID de Pedido',
                             'status' => 'Estado',
                             'text-no' => 'No',
                             'text-yes' => 'Sí',
@@ -1187,6 +1195,7 @@ return [
                 ],
 
                 'roles' => [
+                    'being-used' => 'Role is already assigned to a company user.',
                     'create-success' => 'Rol creado correctamente.',
                     'delete-success' => 'Rol eliminado correctamente.',
                     'update-success' => 'Rol actualizado correctamente.',

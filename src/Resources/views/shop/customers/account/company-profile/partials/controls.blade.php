@@ -163,7 +163,7 @@
         <div class="flex gap-2.5">
             @if ($customer[$attribute->code])
                 <a
-                    href="{{ route('customer.profile.file.download', [$customer->id, $attribute->id] )}}"
+                    href="{{ Storage::url($customer[$attribute->code]) }}"
                     class="flex"
                 >
                     @if ($attribute->type == 'image')

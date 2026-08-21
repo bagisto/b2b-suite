@@ -100,6 +100,7 @@ return [
                 'update-btn' => 'Atualizar Empresa',
             ],
 
+            'no' => 'Não',
             'sales-rep' => [
                 'label' => 'Representante de Vendas Atribuído',
                 'none' => 'Nenhum representante atribuído',
@@ -175,8 +176,10 @@ return [
             'mass-delete-success' => 'Empresas selecionadas excluídas com sucesso.',
             'mass-update-status-success' => 'Status das empresas selecionadas atualizado com sucesso.',
             'name-required' => 'O campo nome é obrigatório.',
+            'select' => 'Seleção',
             'update-success' => 'Empresa atualizada com sucesso.',
             'website-invalid' => 'Informe uma URL de site válida.',
+            'yes' => 'Sim',
         ],
 
         'company-attributes' => [
@@ -475,6 +478,7 @@ return [
                 'create-success' => 'Cotação criada com sucesso.',
                 'delete-failed' => 'Não foi possível excluir a cotação.',
                 'delete-success' => 'Cotação excluída com sucesso.',
+                'mass-delete-success' => 'Selected quotations deleted successfully.',
                 'title' => 'Cotações',
                 'update-success' => 'Cotação atualizada com sucesso.',
 
@@ -482,6 +486,8 @@ return [
                     'accepted' => 'Aceita',
                     'agent' => 'Usuário Admin',
                     'base_total' => 'Total Base',
+                    'cancelled' => 'Cancelado',
+                    'closed' => 'Fechado',
                     'company' => 'Empresa',
                     'company-email' => 'E-mail da Empresa',
                     'completed' => 'Concluída',
@@ -635,6 +641,7 @@ return [
                 'datagrid' => [
                     'id' => 'ID da Ordem de Compra',
                     'items' => 'Itens',
+                    'view' => 'Visualizar',
                 ],
             ],
 
@@ -1032,6 +1039,7 @@ return [
                             'is-default' => 'É Padrão',
                             'items' => 'Itens',
                             'name' => 'Nome',
+                            'order-id' => 'ID do Pedido',
                             'status' => 'Status',
                             'text-no' => 'Não',
                             'text-yes' => 'Sim',
@@ -1187,6 +1195,7 @@ return [
                 ],
 
                 'roles' => [
+                    'being-used' => 'Role is already assigned to a company user.',
                     'create-success' => 'Função criada com sucesso.',
                     'delete-success' => 'Função excluída com sucesso.',
                     'update-success' => 'Função atualizada com sucesso.',

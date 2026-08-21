@@ -100,6 +100,7 @@ return [
                 'update-btn' => 'কোম্পানি আপডেট করুন',
             ],
 
+            'no' => 'না',
             'sales-rep' => [
                 'label' => 'নিযুক্ত বিক্রয় প্রতিনিধি',
                 'none' => 'কোনো প্রতিনিধি নিযুক্ত নেই',
@@ -175,8 +176,10 @@ return [
             'mass-delete-success' => 'নির্বাচিত কোম্পানিগুলি সফলভাবে মুছে ফেলা হয়েছে।',
             'mass-update-status-success' => 'নির্বাচিত কোম্পানিগুলির অবস্থা সফলভাবে আপডেট হয়েছে।',
             'name-required' => 'নাম ফিল্ডটি আবশ্যক।',
+            'select' => 'নির্বাচন',
             'update-success' => 'কোম্পানি সফলভাবে আপডেট হয়েছে।',
             'website-invalid' => 'অনুগ্রহ করে একটি বৈধ ওয়েবসাইট URL লিখুন।',
+            'yes' => 'হ্যাঁ',
         ],
 
         'company-attributes' => [
@@ -475,6 +478,7 @@ return [
                 'create-success' => 'উদ্ধৃতি সফলভাবে তৈরি হয়েছে।',
                 'delete-failed' => 'উদ্ধৃতি মুছতে অক্ষম।',
                 'delete-success' => 'উদ্ধৃতি সফলভাবে মুছে ফেলা হয়েছে।',
+                'mass-delete-success' => 'Selected quotations deleted successfully.',
                 'title' => 'উদ্ধৃতি',
                 'update-success' => 'উদ্ধৃতি সফলভাবে আপডেট হয়েছে।',
 
@@ -482,6 +486,8 @@ return [
                     'accepted' => 'গৃহীত',
                     'agent' => 'অ্যাডমিন ব্যবহারকারী',
                     'base_total' => 'ভিত্তি মোট',
+                    'cancelled' => 'বাতিল',
+                    'closed' => 'বন্ধ',
                     'company' => 'কোম্পানি',
                     'company-email' => 'কোম্পানি ইমেইল',
                     'completed' => 'সম্পন্ন',
@@ -635,6 +641,7 @@ return [
                 'datagrid' => [
                     'id' => 'ক্রয় আদেশ ID',
                     'items' => 'আইটেম',
+                    'view' => 'দেখুন',
                 ],
             ],
 
@@ -1032,6 +1039,7 @@ return [
                             'is-default' => 'ডিফল্ট কিনা',
                             'items' => 'আইটেম',
                             'name' => 'নাম',
+                            'order-id' => 'অর্ডার আইডি',
                             'status' => 'অবস্থা',
                             'text-no' => 'না',
                             'text-yes' => 'হ্যাঁ',
@@ -1187,6 +1195,7 @@ return [
                 ],
 
                 'roles' => [
+                    'being-used' => 'Role is already assigned to a company user.',
                     'create-success' => 'ভূমিকা সফলভাবে তৈরি হয়েছে।',
                     'delete-success' => 'ভূমিকা সফলভাবে মুছে ফেলা হয়েছে।',
                     'update-success' => 'ভূমিকা সফলভাবে আপডেট হয়েছে।',

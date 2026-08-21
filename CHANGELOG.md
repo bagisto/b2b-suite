@@ -2,6 +2,24 @@
 
 This changelog consists of the bug & security updates.
 
+## **v2.2.0 (21st of August 2026)** - *Release*
+
+- Compatibility with Bagisto v2.4.10. No suite change was required for it: every class, route, Blade component, view and translation key the suite consumes from Bagisto still resolves on v2.4.10, and the admin, storefront and company account areas were exercised against it. The suite continues to support v2.4.9.
+
+- The fixes below were already present in v2.1.0 and apply on both v2.4.9 and v2.4.10 — none was introduced by a Bagisto release.
+
+- Signing in is offered again when a guest opens a company account page. The customer bouncer redirected to `customer.session.index`, a route name Bagisto has never defined — v2.4.9 already named it `shop.customer.session.index` — so every guest reaching a B2B-guarded route met a 500 instead of the login screen.
+
+- File and image values on the company profile open again. Their links pointed at a `customer.profile.file.download` route that exists in neither the suite nor Bagisto, so any company profile carrying a file or image attribute failed to render at all. The links now use the stored file's URL, which the same views already use to display it.
+
+- Company search no longer fails when called without a search term — the admin endpoint read the `query` parameter without checking it was present. The term is also matched with standard SQL string quoting, so the query is no longer MySQL-specific.
+
+- Deleting a company role that is still assigned reports a proper message. It was built from Bagisto admin-user translation keys, one of which has never existed, and passed key names where the message expected no placeholders; it now uses the suite's own message.
+
+- Corrected labels that rendered as raw translation keys across the quotation and purchase order grids, company field types, requisition lists, quotation attachments and the company role messages. Six references pointed at keys that were never defined, three of them borrowed from an `admin::app.admin.system` group Bagisto does not have.
+
+- Added the nine labels those references needed across all **22 locales**.
+
 ## **v2.1.0 (6th of August 2026)** - *Release*
 
 - Compatibility with Bagisto v2.4.9.

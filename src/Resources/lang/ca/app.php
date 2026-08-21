@@ -100,6 +100,7 @@ return [
                 'update-btn' => 'Actualitzar empresa',
             ],
 
+            'no' => 'No',
             'sales-rep' => [
                 'label' => 'Representant de vendes assignat',
                 'none' => 'Cap representant assignat',
@@ -175,8 +176,10 @@ return [
             'mass-delete-success' => 'Empreses seleccionades eliminades correctament.',
             'mass-update-status-success' => 'Estat de les empreses seleccionades actualitzat correctament.',
             'name-required' => 'El camp de nom és obligatori.',
+            'select' => 'Selecció',
             'update-success' => 'Empresa actualitzada correctament.',
             'website-invalid' => 'Introduïu una URL de lloc web vàlida.',
+            'yes' => 'Sí',
         ],
 
         'company-attributes' => [
@@ -475,6 +478,7 @@ return [
                 'create-success' => 'Pressupost creat correctament.',
                 'delete-failed' => 'No s\'ha pogut eliminar el pressupost.',
                 'delete-success' => 'Pressupost eliminat correctament.',
+                'mass-delete-success' => 'Selected quotations deleted successfully.',
                 'title' => 'Pressupostos',
                 'update-success' => 'Pressupost actualitzat correctament.',
 
@@ -482,6 +486,8 @@ return [
                     'accepted' => 'Acceptat',
                     'agent' => 'Usuari administrador',
                     'base_total' => 'Total base',
+                    'cancelled' => 'Cancel·lat',
+                    'closed' => 'Tancat',
                     'company' => 'Empresa',
                     'company-email' => 'Correu electrònic de l\'empresa',
                     'completed' => 'Completat',
@@ -635,6 +641,7 @@ return [
                 'datagrid' => [
                     'id' => 'ID de la comanda de compra',
                     'items' => 'Articles',
+                    'view' => 'Veure',
                 ],
             ],
 
@@ -1032,6 +1039,7 @@ return [
                             'is-default' => 'És per defecte',
                             'items' => 'Articles',
                             'name' => 'Nom',
+                            'order-id' => 'ID de Comanda',
                             'status' => 'Estat',
                             'text-no' => 'No',
                             'text-yes' => 'Sí',
@@ -1187,6 +1195,7 @@ return [
                 ],
 
                 'roles' => [
+                    'being-used' => 'Role is already assigned to a company user.',
                     'create-success' => 'Rol creat correctament.',
                     'delete-success' => 'Rol eliminat correctament.',
                     'update-success' => 'Rol actualitzat correctament.',

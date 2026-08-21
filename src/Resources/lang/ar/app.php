@@ -100,6 +100,7 @@ return [
                 'update-btn' => 'تحديث الشركة',
             ],
 
+            'no' => 'لا',
             'sales-rep' => [
                 'label' => 'مندوب المبيعات المعيّن',
                 'none' => 'لا يوجد مندوب معيّن',
@@ -175,8 +176,10 @@ return [
             'mass-delete-success' => 'تم حذف الشركات المحددة بنجاح.',
             'mass-update-status-success' => 'تم تحديث حالة الشركات المحددة بنجاح.',
             'name-required' => 'حقل الاسم مطلوب.',
+            'select' => 'قائمة منسدلة',
             'update-success' => 'تم تحديث الشركة بنجاح.',
             'website-invalid' => 'يرجى إدخال رابط موقع إلكتروني صالح.',
+            'yes' => 'نعم',
         ],
 
         'company-attributes' => [
@@ -475,6 +478,7 @@ return [
                 'create-success' => 'تم إنشاء عرض السعر بنجاح.',
                 'delete-failed' => 'تعذّر حذف عرض السعر.',
                 'delete-success' => 'تم حذف عرض السعر بنجاح.',
+                'mass-delete-success' => 'Selected quotations deleted successfully.',
                 'title' => 'عروض الأسعار',
                 'update-success' => 'تم تحديث عرض السعر بنجاح.',
 
@@ -482,6 +486,8 @@ return [
                     'accepted' => 'مقبول',
                     'agent' => 'مستخدم المسؤول',
                     'base_total' => 'الإجمالي الأساسي',
+                    'cancelled' => 'تم الإلغاء',
+                    'closed' => 'مغلق',
                     'company' => 'الشركة',
                     'company-email' => 'البريد الإلكتروني للشركة',
                     'completed' => 'مكتمل',
@@ -635,6 +641,7 @@ return [
                 'datagrid' => [
                     'id' => 'معرّف أمر الشراء',
                     'items' => 'العناصر',
+                    'view' => 'عرض',
                 ],
             ],
 
@@ -1032,6 +1039,7 @@ return [
                             'is-default' => 'افتراضي',
                             'items' => 'العناصر',
                             'name' => 'الاسم',
+                            'order-id' => 'رقم الطلب',
                             'status' => 'الحالة',
                             'text-no' => 'لا',
                             'text-yes' => 'نعم',
@@ -1187,6 +1195,7 @@ return [
                 ],
 
                 'roles' => [
+                    'being-used' => 'Role is already assigned to a company user.',
                     'create-success' => 'تم إنشاء الدور بنجاح.',
                     'delete-success' => 'تم حذف الدور بنجاح.',
                     'update-success' => 'تم تحديث الدور بنجاح.',

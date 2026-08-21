@@ -100,6 +100,7 @@ return [
                 'update-btn' => 'Bedrijf bijwerken',
             ],
 
+            'no' => 'Nee',
             'sales-rep' => [
                 'label' => 'Toegewezen verkoopvertegenwoordiger',
                 'none' => 'Geen vertegenwoordiger toegewezen',
@@ -175,8 +176,10 @@ return [
             'mass-delete-success' => 'Geselecteerde bedrijven succesvol verwijderd.',
             'mass-update-status-success' => 'Status van geselecteerde bedrijven succesvol bijgewerkt.',
             'name-required' => 'Het naamveld is verplicht.',
+            'select' => 'Selectie',
             'update-success' => 'Bedrijf succesvol bijgewerkt.',
             'website-invalid' => 'Voer een geldige website-URL in.',
+            'yes' => 'Ja',
         ],
 
         'company-attributes' => [
@@ -475,6 +478,7 @@ return [
                 'create-success' => 'Offerte succesvol aangemaakt.',
                 'delete-failed' => 'Kan offerte niet verwijderen.',
                 'delete-success' => 'Offerte succesvol verwijderd.',
+                'mass-delete-success' => 'Selected quotations deleted successfully.',
                 'title' => 'Offertes',
                 'update-success' => 'Offerte succesvol bijgewerkt.',
 
@@ -482,6 +486,8 @@ return [
                     'accepted' => 'Geaccepteerd',
                     'agent' => 'Beheerder',
                     'base_total' => 'Basistotaal',
+                    'cancelled' => 'Geannuleerd',
+                    'closed' => 'Gesloten',
                     'company' => 'Bedrijf',
                     'company-email' => 'Bedrijfse-mail',
                     'completed' => 'Voltooid',
@@ -635,6 +641,7 @@ return [
                 'datagrid' => [
                     'id' => 'Inkooporder-ID',
                     'items' => 'Items',
+                    'view' => 'Bekijken',
                 ],
             ],
 
@@ -1032,6 +1039,7 @@ return [
                             'is-default' => 'Is standaard',
                             'items' => 'Items',
                             'name' => 'Naam',
+                            'order-id' => 'Bestelnummer',
                             'status' => 'Status',
                             'text-no' => 'Nee',
                             'text-yes' => 'Ja',
@@ -1187,6 +1195,7 @@ return [
                 ],
 
                 'roles' => [
+                    'being-used' => 'Role is already assigned to a company user.',
                     'create-success' => 'Rol succesvol aangemaakt.',
                     'delete-success' => 'Rol succesvol verwijderd.',
                     'update-success' => 'Rol succesvol bijgewerkt.',

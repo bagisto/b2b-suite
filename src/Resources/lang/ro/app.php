@@ -100,6 +100,7 @@ return [
                 'update-btn' => 'Actualizează compania',
             ],
 
+            'no' => 'Nu',
             'sales-rep' => [
                 'label' => 'Reprezentant de vânzări atribuit',
                 'none' => 'Niciun reprezentant atribuit',
@@ -175,8 +176,10 @@ return [
             'mass-delete-success' => 'Companiile selectate au fost șterse cu succes.',
             'mass-update-status-success' => 'Starea companiilor selectate a fost actualizată cu succes.',
             'name-required' => 'Câmpul nume este obligatoriu.',
+            'select' => 'Selecție',
             'update-success' => 'Compania a fost actualizată cu succes.',
             'website-invalid' => 'Vă rugăm să introduceți un URL de site web valid.',
+            'yes' => 'Da',
         ],
 
         'company-attributes' => [
@@ -475,6 +478,7 @@ return [
                 'create-success' => 'Oferta a fost creată cu succes.',
                 'delete-failed' => 'Oferta nu a putut fi ștearsă.',
                 'delete-success' => 'Oferta a fost ștearsă cu succes.',
+                'mass-delete-success' => 'Selected quotations deleted successfully.',
                 'title' => 'Oferte',
                 'update-success' => 'Oferta a fost actualizată cu succes.',
 
@@ -482,6 +486,8 @@ return [
                     'accepted' => 'Acceptată',
                     'agent' => 'Utilizator admin',
                     'base_total' => 'Total de bază',
+                    'cancelled' => 'Canceled',
+                    'closed' => 'Closed',
                     'company' => 'Companie',
                     'company-email' => 'E-mail companie',
                     'completed' => 'Finalizată',
@@ -635,6 +641,7 @@ return [
                 'datagrid' => [
                     'id' => 'ID comandă de achiziție',
                     'items' => 'Articole',
+                    'view' => 'Vizualizează',
                 ],
             ],
 
@@ -1032,6 +1039,7 @@ return [
                             'is-default' => 'Este implicită',
                             'items' => 'Articole',
                             'name' => 'Nume',
+                            'order-id' => 'Order Id',
                             'status' => 'Stare',
                             'text-no' => 'Nu',
                             'text-yes' => 'Da',
@@ -1187,6 +1195,7 @@ return [
                 ],
 
                 'roles' => [
+                    'being-used' => 'Role is already assigned to a company user.',
                     'create-success' => 'Rolul a fost creat cu succes.',
                     'delete-success' => 'Rolul a fost șters cu succes.',
                     'update-success' => 'Rolul a fost actualizat cu succes.',

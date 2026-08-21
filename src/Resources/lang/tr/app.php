@@ -100,6 +100,7 @@ return [
                 'update-btn' => 'Şirketi Güncelle',
             ],
 
+            'no' => 'Hayır',
             'sales-rep' => [
                 'label' => 'Atanmış Satış Temsilcisi',
                 'none' => 'Atanmış temsilci yok',
@@ -175,8 +176,10 @@ return [
             'mass-delete-success' => 'Seçili şirketler başarıyla silindi.',
             'mass-update-status-success' => 'Seçili şirketlerin durumu başarıyla güncellendi.',
             'name-required' => 'Ad alanı zorunludur.',
+            'select' => 'Seçim',
             'update-success' => 'Şirket başarıyla güncellendi.',
             'website-invalid' => 'Lütfen geçerli bir web sitesi URL adresi girin.',
+            'yes' => 'Evet',
         ],
 
         'company-attributes' => [
@@ -475,6 +478,7 @@ return [
                 'create-success' => 'Teklif başarıyla oluşturuldu.',
                 'delete-failed' => 'Teklif silinemedi.',
                 'delete-success' => 'Teklif başarıyla silindi.',
+                'mass-delete-success' => 'Selected quotations deleted successfully.',
                 'title' => 'Teklifler',
                 'update-success' => 'Teklif başarıyla güncellendi.',
 
@@ -482,6 +486,8 @@ return [
                     'accepted' => 'Kabul Edildi',
                     'agent' => 'Yönetici Kullanıcı',
                     'base_total' => 'Temel Toplam',
+                    'cancelled' => 'İptal Edildi',
+                    'closed' => 'Kapatıldı',
                     'company' => 'Şirket',
                     'company-email' => 'Şirket E-postası',
                     'completed' => 'Tamamlandı',
@@ -635,6 +641,7 @@ return [
                 'datagrid' => [
                     'id' => 'Satın Alma Siparişi ID',
                     'items' => 'Öğeler',
+                    'view' => 'Görüntüle',
                 ],
             ],
 
@@ -1032,6 +1039,7 @@ return [
                             'is-default' => 'Varsayılan mı',
                             'items' => 'Öğeler',
                             'name' => 'Ad',
+                            'order-id' => 'Sipariş Kimliği',
                             'status' => 'Durum',
                             'text-no' => 'Hayır',
                             'text-yes' => 'Evet',
@@ -1187,6 +1195,7 @@ return [
                 ],
 
                 'roles' => [
+                    'being-used' => 'Role is already assigned to a company user.',
                     'create-success' => 'Rol başarıyla oluşturuldu.',
                     'delete-success' => 'Rol başarıyla silindi.',
                     'update-success' => 'Rol başarıyla güncellendi.',

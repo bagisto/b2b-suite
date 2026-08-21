@@ -164,10 +164,9 @@ class RoleController extends Controller
         $role = $this->companyRoleRepository->findOrFail($id);
 
         if ($role->customers->count() >= 1) {
-            return new JsonResponse(['message' => trans('admin::app.settings.roles.being-used', [
-                'name' => 'admin::app.settings.roles.index.title',
-                'source' => 'admin::app.settings.roles.index.admin-user',
-            ])], 400);
+            return new JsonResponse([
+                'message' => trans('b2b::app.shop.customers.account.roles.being-used'),
+            ], 400);
         }
 
         if ($this->companyRoleRepository->count() == 1) {

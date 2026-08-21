@@ -100,6 +100,7 @@ return [
                 'update-btn' => 'कंपनी अपडेट करें',
             ],
 
+            'no' => 'नहीं',
             'sales-rep' => [
                 'label' => 'असाइन किया गया विक्रय प्रतिनिधि',
                 'none' => 'कोई प्रतिनिधि असाइन नहीं किया गया',
@@ -175,8 +176,10 @@ return [
             'mass-delete-success' => 'चयनित कंपनियाँ सफलतापूर्वक हटाई गईं।',
             'mass-update-status-success' => 'चयनित कंपनियों की स्थिति सफलतापूर्वक अपडेट की गई।',
             'name-required' => 'नाम फ़ील्ड आवश्यक है।',
+            'select' => 'चुनें',
             'update-success' => 'कंपनी सफलतापूर्वक अपडेट की गई।',
             'website-invalid' => 'कृपया एक मान्य वेबसाइट URL दर्ज करें।',
+            'yes' => 'हाँ',
         ],
 
         'company-attributes' => [
@@ -475,6 +478,7 @@ return [
                 'create-success' => 'कोटेशन सफलतापूर्वक बनाया गया।',
                 'delete-failed' => 'कोटेशन हटाने में असमर्थ।',
                 'delete-success' => 'कोटेशन सफलतापूर्वक हटाया गया।',
+                'mass-delete-success' => 'Selected quotations deleted successfully.',
                 'title' => 'कोटेशन',
                 'update-success' => 'कोटेशन सफलतापूर्वक अपडेट किया गया।',
 
@@ -482,6 +486,8 @@ return [
                     'accepted' => 'स्वीकृत',
                     'agent' => 'व्यवस्थापक उपयोगकर्ता',
                     'base_total' => 'आधार कुल',
+                    'cancelled' => 'रद्द हुआ',
+                    'closed' => 'बंद हुआ',
                     'company' => 'कंपनी',
                     'company-email' => 'कंपनी ईमेल',
                     'completed' => 'पूर्ण',
@@ -635,6 +641,7 @@ return [
                 'datagrid' => [
                     'id' => 'खरीद आदेश ID',
                     'items' => 'आइटम',
+                    'view' => 'देखें',
                 ],
             ],
 
@@ -1032,6 +1039,7 @@ return [
                             'is-default' => 'डिफ़ॉल्ट है',
                             'items' => 'आइटम',
                             'name' => 'नाम',
+                            'order-id' => 'आदेश आईडी',
                             'status' => 'स्थिति',
                             'text-no' => 'नहीं',
                             'text-yes' => 'हाँ',
@@ -1187,6 +1195,7 @@ return [
                 ],
 
                 'roles' => [
+                    'being-used' => 'Role is already assigned to a company user.',
                     'create-success' => 'भूमिका सफलतापूर्वक बनाई गई।',
                     'delete-success' => 'भूमिका सफलतापूर्वक हटाई गई।',
                     'update-success' => 'भूमिका सफलतापूर्वक अपडेट की गई।',

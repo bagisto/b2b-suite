@@ -391,12 +391,14 @@ class CompanyController extends Controller
 
         $repId = Customer::salesRepScopeId();
 
-        $customers = $this->customerRepository->scopeQuery(function ($query) use ($data, $repId) {
+        $term = '%'.urldecode($data['query'] ?? '').'%';
+
+        $customers = $this->customerRepository->scopeQuery(function ($query) use ($data, $repId, $term) {
             return $query->whereIn('type', [$data['type'] ?? 'company', 'company'])
                 ->when($repId, fn ($q) => $q->where('sales_rep_id', $repId))
-                ->where(function ($q) use ($data) {
-                    $q->where('email', 'like', '%'.urldecode($data['query']).'%')
-                        ->orWhereRaw('CONCAT(first_name, " ", last_name) like ?', ['%'.urldecode($data['query']).'%']);
+                ->where(function ($q) use ($term) {
+                    $q->where('email', 'like', $term)
+                        ->orWhereRaw("CONCAT(first_name, ' ', last_name) like ?", [$term]);
                 })
                 ->orderBy('created_at', 'desc');
         })->get();

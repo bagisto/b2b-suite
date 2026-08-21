@@ -100,6 +100,7 @@ return [
                 'update-btn' => 'עדכון חברה',
             ],
 
+            'no' => 'לא',
             'sales-rep' => [
                 'label' => 'נציג מכירות מוקצה',
                 'none' => 'לא הוקצה נציג',
@@ -175,8 +176,10 @@ return [
             'mass-delete-success' => 'החברות שנבחרו נמחקו בהצלחה.',
             'mass-update-status-success' => 'הסטטוס של החברות שנבחרו עודכן בהצלחה.',
             'name-required' => 'שדה השם הוא חובה.',
+            'select' => 'בחירה',
             'update-success' => 'החברה עודכנה בהצלחה.',
             'website-invalid' => 'נא להזין כתובת URL תקינה של האתר.',
+            'yes' => 'כן',
         ],
 
         'company-attributes' => [
@@ -475,6 +478,7 @@ return [
                 'create-success' => 'הצעת המחיר נוצרה בהצלחה.',
                 'delete-failed' => 'לא ניתן למחוק את הצעת המחיר.',
                 'delete-success' => 'הצעת המחיר נמחקה בהצלחה.',
+                'mass-delete-success' => 'Selected quotations deleted successfully.',
                 'title' => 'הצעות מחיר',
                 'update-success' => 'הצעת המחיר עודכנה בהצלחה.',
 
@@ -482,6 +486,8 @@ return [
                     'accepted' => 'התקבלה',
                     'agent' => 'משתמש מנהל',
                     'base_total' => 'סך בסיס',
+                    'cancelled' => 'בוטלה',
+                    'closed' => 'סגורה',
                     'company' => 'חברה',
                     'company-email' => 'דוא"ל החברה',
                     'completed' => 'הושלמה',
@@ -635,6 +641,7 @@ return [
                 'datagrid' => [
                     'id' => 'מזהה הזמנת רכש',
                     'items' => 'פריטים',
+                    'view' => 'צפייה',
                 ],
             ],
 
@@ -1032,6 +1039,7 @@ return [
                             'is-default' => 'ברירת מחדל',
                             'items' => 'פריטים',
                             'name' => 'שם',
+                            'order-id' => 'מספר הזמנה',
                             'status' => 'סטטוס',
                             'text-no' => 'לא',
                             'text-yes' => 'כן',
@@ -1187,6 +1195,7 @@ return [
                 ],
 
                 'roles' => [
+                    'being-used' => 'Role is already assigned to a company user.',
                     'create-success' => 'התפקיד נוצר בהצלחה.',
                     'delete-success' => 'התפקיד נמחק בהצלחה.',
                     'update-success' => 'התפקיד עודכן בהצלחה.',

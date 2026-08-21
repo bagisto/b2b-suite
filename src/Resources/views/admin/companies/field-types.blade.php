@@ -65,7 +65,7 @@
                 :rules="$attribute->is_required ? 'required' : ''"
                 :label="$attribute->admin_name"
             >
-                <option value="">@lang('admin::app.admin.system.select')</option>
+                <option value="">@lang('b2b::app.admin.companies.select')</option>
 
                 @php
                     $selectedOption = $value;
@@ -183,9 +183,9 @@
                 :rules="$attribute->is_required ? 'required' : ''"
                 :label="$attribute->admin_name"
             >
-                <option value="">@lang('admin::app.admin.system.select')</option>
-                <option value="1" {{ $value == '1' ? 'selected' : '' }}>@lang('admin::app.admin.system.yes')</option>
-                <option value="0" {{ $value == '0' ? 'selected' : '' }}>@lang('admin::app.admin.system.no')</option>
+                <option value="">@lang('b2b::app.admin.companies.select')</option>
+                <option value="1" {{ $value == '1' ? 'selected' : '' }}>@lang('b2b::app.admin.companies.yes')</option>
+                <option value="0" {{ $value == '0' ? 'selected' : '' }}>@lang('b2b::app.admin.companies.no')</option>
             </x-admin::form.control-group.control>
 
             <x-admin::form.control-group.error :control-name="$name" />

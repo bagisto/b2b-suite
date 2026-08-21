@@ -100,6 +100,7 @@ return [
                 'update-btn' => 'Perbarui Perusahaan',
             ],
 
+            'no' => 'Tidak',
             'sales-rep' => [
                 'label' => 'Perwakilan Penjualan yang Ditugaskan',
                 'none' => 'Tidak ada perwakilan yang ditugaskan',
@@ -175,8 +176,10 @@ return [
             'mass-delete-success' => 'Perusahaan yang dipilih berhasil dihapus.',
             'mass-update-status-success' => 'Status perusahaan yang dipilih berhasil diperbarui.',
             'name-required' => 'Kolom nama wajib diisi.',
+            'select' => 'Pilihan',
             'update-success' => 'Perusahaan berhasil diperbarui.',
             'website-invalid' => 'Silakan masukkan URL situs web yang valid.',
+            'yes' => 'Ya',
         ],
 
         'company-attributes' => [
@@ -475,6 +478,7 @@ return [
                 'create-success' => 'Penawaran berhasil dibuat.',
                 'delete-failed' => 'Tidak dapat menghapus penawaran.',
                 'delete-success' => 'Penawaran berhasil dihapus.',
+                'mass-delete-success' => 'Selected quotations deleted successfully.',
                 'title' => 'Penawaran',
                 'update-success' => 'Penawaran berhasil diperbarui.',
 
@@ -482,6 +486,8 @@ return [
                     'accepted' => 'Diterima',
                     'agent' => 'Pengguna Admin',
                     'base_total' => 'Total Dasar',
+                    'cancelled' => 'Dibatalkan',
+                    'closed' => 'Ditutup',
                     'company' => 'Perusahaan',
                     'company-email' => 'Email Perusahaan',
                     'completed' => 'Selesai',
@@ -635,6 +641,7 @@ return [
                 'datagrid' => [
                     'id' => 'ID Pesanan Pembelian',
                     'items' => 'Item',
+                    'view' => 'Lihat',
                 ],
             ],
 
@@ -1032,6 +1039,7 @@ return [
                             'is-default' => 'Adalah Bawaan',
                             'items' => 'Item',
                             'name' => 'Nama',
+                            'order-id' => 'ID Pesanan',
                             'status' => 'Status',
                             'text-no' => 'Tidak',
                             'text-yes' => 'Ya',
@@ -1187,6 +1195,7 @@ return [
                 ],
 
                 'roles' => [
+                    'being-used' => 'Role is already assigned to a company user.',
                     'create-success' => 'Peran berhasil dibuat.',
                     'delete-success' => 'Peran berhasil dihapus.',
                     'update-success' => 'Peran berhasil diperbarui.',

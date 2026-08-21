@@ -100,6 +100,7 @@ return [
                 'update-btn' => 'සමාගම යාවත්කාලීන කරන්න',
             ],
 
+            'no' => 'නැත',
             'sales-rep' => [
                 'label' => 'පවරන ලද විකුණුම් නියෝජිතයා',
                 'none' => 'නියෝජිතයෙකු පවරා නැත',
@@ -175,8 +176,10 @@ return [
             'mass-delete-success' => 'තෝරාගත් සමාගම් සාර්ථකව මකා දමන ලදී.',
             'mass-update-status-success' => 'තෝරාගත් සමාගම්වල තත්ත්වය සාර්ථකව යාවත්කාලීන විය.',
             'name-required' => 'නම ක්ෂේත්‍රය අවශ්‍ය වේ.',
+            'select' => 'තේරීම',
             'update-success' => 'සමාගම සාර්ථකව යාවත්කාලීන විය.',
             'website-invalid' => 'කරුණාකර වලංගු වෙබ් අඩවි URL එකක් ඇතුළත් කරන්න.',
+            'yes' => 'ඔව්',
         ],
 
         'company-attributes' => [
@@ -475,6 +478,7 @@ return [
                 'create-success' => 'මිල කැඳවීම සාර්ථකව සාදන ලදී.',
                 'delete-failed' => 'මිල කැඳවීම මැකීමට නොහැකි විය.',
                 'delete-success' => 'මිල කැඳවීම සාර්ථකව මකා දමන ලදී.',
+                'mass-delete-success' => 'Selected quotations deleted successfully.',
                 'title' => 'මිල කැඳවීම්',
                 'update-success' => 'මිල කැඳවීම සාර්ථකව යාවත්කාලීන විය.',
 
@@ -482,6 +486,8 @@ return [
                     'accepted' => 'පිළිගත්',
                     'agent' => 'පරිපාලක පරිශීලකයා',
                     'base_total' => 'මූලික එකතුව',
+                    'cancelled' => 'අවලංගු',
+                    'closed' => 'වසාංගු',
                     'company' => 'සමාගම',
                     'company-email' => 'සමාගම් විද්‍යුත් තැපෑල',
                     'completed' => 'සම්පූර්ණයි',
@@ -635,6 +641,7 @@ return [
                 'datagrid' => [
                     'id' => 'මිලදී ගැනීමේ ඇණවුම් ID',
                     'items' => 'අයිතම',
+                    'view' => 'බලන්න',
                 ],
             ],
 
@@ -1032,6 +1039,7 @@ return [
                             'is-default' => 'පෙරනිමිද',
                             'items' => 'අයිතම',
                             'name' => 'නම',
+                            'order-id' => 'ඇණවුම් අංකය',
                             'status' => 'තත්ත්වය',
                             'text-no' => 'නැත',
                             'text-yes' => 'ඔව්',
@@ -1187,6 +1195,7 @@ return [
                 ],
 
                 'roles' => [
+                    'being-used' => 'Role is already assigned to a company user.',
                     'create-success' => 'භූමිකාව සාර්ථකව සාදන ලදී.',
                     'delete-success' => 'භූමිකාව සාර්ථකව මකා දමන ලදී.',
                     'update-success' => 'භූමිකාව සාර්ථකව යාවත්කාලීන විය.',

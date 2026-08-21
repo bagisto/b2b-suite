@@ -24,7 +24,7 @@
     @case('image')
         @if ($value)
             <a
-                href="{{ route('customer.profile.file.download', [$customer->id, $attribute->id]) }}"
+                href="{{ Storage::url($value) }}"
                 target="_blank"
                 rel="noopener noreferrer"
             >
@@ -42,7 +42,7 @@
     @case('file')
         @if ($value)
             <a
-                href="{{ route('customer.profile.file.download', [$customer->id, $attribute->id]) }}"
+                href="{{ Storage::url($value) }}"
                 class="inline-flex items-center gap-1.5 text-blue-600 hover:underline"
             >
                 <i class="icon-download text-lg"></i>

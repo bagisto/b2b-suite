@@ -47,9 +47,11 @@ Main install — the [README](./README.md) is canonical: `composer require bagis
 → register `B2BSuiteServiceProvider` in `bootstrap/providers.php` **after Shop** (auto-discovery
 is disabled) → `php artisan b2b-suite:install`. Installs into `vendor/bagisto/b2b-suite`.
 
-**This repo is a development checkout** — the package lives at `packages/bagisto/b2b-suite`,
-wired via the root `packages/*/*` path repo (`"bagisto/b2b-suite": "@dev"`) and symlinked into
-`vendor/bagisto/b2b-suite`. That's the dev layout, not the install layout.
+**This repo is a development checkout** — `composer.json` sits at the clone root, so the whole
+clone *is* the package. Wire it into an app with a Composer **path repository** pointing at the
+clone (a `"bagisto/b2b-suite"` version pin is needed, as the package declares none and Bagisto
+sets `minimum-stability: stable`), which symlinks it to `vendor/bagisto/b2b-suite`. Edit the
+clone; never edit through `vendor/`. That's the dev layout, not the install layout.
 
 ## Publishing
 
@@ -86,8 +88,11 @@ php artisan optimize:clear
 - **Translations:** all **22 locales** exist; `en` is the canonical structure and every locale
   shares its exact keys/order (values translated, `:placeholders` preserved). Lang file order:
   top-level `admin, shop, emails, seeders, commands`; within admin/shop `acl, layouts → menu
-  features → configuration`; leaf keys alphabetical; no dead keys. Run
-  `php artisan bagisto:translations:check` after changes.
+  features → configuration`; leaf keys alphabetical; no dead keys.
+  **`php artisan bagisto:translations:check` does not cover this package** — it scans only
+  `base_path('packages/Webkul')`, so for a symlinked clone it reports "All translations are
+  synchronized" without reading one of these files. Compare each locale against `en` yourself,
+  and take wording from an existing key with the same `en` value rather than inventing one.
 - `vendor/bin/pint` for style; `php artisan optimize:clear` after provider/config/route changes.
 - **Comments in Blade-embedded Vue/CSS** use multi-line JSDoc blocks (`/** … */`,
   capitalised and punctuated) — one consistent style per view.

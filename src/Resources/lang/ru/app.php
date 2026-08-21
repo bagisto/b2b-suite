@@ -100,6 +100,7 @@ return [
                 'update-btn' => 'Обновить компанию',
             ],
 
+            'no' => 'Нет',
             'sales-rep' => [
                 'label' => 'Назначенный торговый представитель',
                 'none' => 'Представитель не назначен',
@@ -175,8 +176,10 @@ return [
             'mass-delete-success' => 'Выбранные компании успешно удалены.',
             'mass-update-status-success' => 'Статус выбранных компаний успешно обновлён.',
             'name-required' => 'Поле имени обязательно для заполнения.',
+            'select' => 'Выбор',
             'update-success' => 'Компания успешно обновлена.',
             'website-invalid' => 'Пожалуйста, укажите корректный URL веб-сайта.',
+            'yes' => 'Да',
         ],
 
         'company-attributes' => [
@@ -475,6 +478,7 @@ return [
                 'create-success' => 'Коммерческое предложение успешно создано.',
                 'delete-failed' => 'Не удалось удалить коммерческое предложение.',
                 'delete-success' => 'Коммерческое предложение успешно удалено.',
+                'mass-delete-success' => 'Selected quotations deleted successfully.',
                 'title' => 'Коммерческие предложения',
                 'update-success' => 'Коммерческое предложение успешно обновлено.',
 
@@ -482,6 +486,8 @@ return [
                     'accepted' => 'Принято',
                     'agent' => 'Пользователь-администратор',
                     'base_total' => 'Базовая сумма',
+                    'cancelled' => 'Отменено',
+                    'closed' => 'Закрыто',
                     'company' => 'Компания',
                     'company-email' => 'Эл. почта компании',
                     'completed' => 'Завершено',
@@ -635,6 +641,7 @@ return [
                 'datagrid' => [
                     'id' => 'ID заказа на покупку',
                     'items' => 'Позиции',
+                    'view' => 'Просмотр',
                 ],
             ],
 
@@ -1032,6 +1039,7 @@ return [
                             'is-default' => 'По умолчанию',
                             'items' => 'Позиции',
                             'name' => 'Название',
+                            'order-id' => 'ID заказа',
                             'status' => 'Статус',
                             'text-no' => 'Нет',
                             'text-yes' => 'Да',
@@ -1187,6 +1195,7 @@ return [
                 ],
 
                 'roles' => [
+                    'being-used' => 'Role is already assigned to a company user.',
                     'create-success' => 'Роль успешно создана.',
                     'delete-success' => 'Роль успешно удалена.',
                     'update-success' => 'Роль успешно обновлена.',

@@ -100,6 +100,7 @@ return [
                 'update-btn' => '企業を更新',
             ],
 
+            'no' => 'いいえ',
             'sales-rep' => [
                 'label' => '割り当てられた営業担当者',
                 'none' => '担当者が割り当てられていません',
@@ -175,8 +176,10 @@ return [
             'mass-delete-success' => '選択した企業が正常に削除されました。',
             'mass-update-status-success' => '選択した企業のステータスが正常に更新されました。',
             'name-required' => '名前は必須です。',
+            'select' => '選択',
             'update-success' => '企業が正常に更新されました。',
             'website-invalid' => '有効なウェブサイト URL を入力してください。',
+            'yes' => 'はい',
         ],
 
         'company-attributes' => [
@@ -475,6 +478,7 @@ return [
                 'create-success' => '見積もりが正常に作成されました。',
                 'delete-failed' => '見積もりを削除できません。',
                 'delete-success' => '見積もりが正常に削除されました。',
+                'mass-delete-success' => 'Selected quotations deleted successfully.',
                 'title' => '見積もり',
                 'update-success' => '見積もりが正常に更新されました。',
 
@@ -482,6 +486,8 @@ return [
                     'accepted' => '承諾済み',
                     'agent' => '管理ユーザー',
                     'base_total' => '基本合計',
+                    'cancelled' => 'キャンセル',
+                    'closed' => '終了',
                     'company' => '企業',
                     'company-email' => '企業メールアドレス',
                     'completed' => '完了',
@@ -635,6 +641,7 @@ return [
                 'datagrid' => [
                     'id' => '発注書 ID',
                     'items' => '項目',
+                    'view' => '表示',
                 ],
             ],
 
@@ -1032,6 +1039,7 @@ return [
                             'is-default' => 'デフォルト',
                             'items' => '項目',
                             'name' => '名前',
+                            'order-id' => '注文ID',
                             'status' => 'ステータス',
                             'text-no' => 'いいえ',
                             'text-yes' => 'はい',
@@ -1187,6 +1195,7 @@ return [
                 ],
 
                 'roles' => [
+                    'being-used' => 'Role is already assigned to a company user.',
                     'create-success' => 'ロールが正常に作成されました。',
                     'delete-success' => 'ロールが正常に削除されました。',
                     'update-success' => 'ロールが正常に更新されました。',

@@ -274,7 +274,7 @@ class QuoteController extends Controller
             }
 
             return new JsonResponse([
-                'message' => trans('b2b::app.admin.quotes.index.index.mass-delete-success'),
+                'message' => trans('b2b::app.admin.quotes.index.mass-delete-success'),
             ]);
         } catch (\Exception $exception) {
             return new JsonResponse([

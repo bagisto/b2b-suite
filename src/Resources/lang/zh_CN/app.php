@@ -100,6 +100,7 @@ return [
                 'update-btn' => '更新公司',
             ],
 
+            'no' => '否',
             'sales-rep' => [
                 'label' => '已分配的销售代表',
                 'none' => '未分配代表',
@@ -175,8 +176,10 @@ return [
             'mass-delete-success' => '所选公司删除成功。',
             'mass-update-status-success' => '所选公司状态更新成功。',
             'name-required' => '名称字段为必填项。',
+            'select' => '单选',
             'update-success' => '公司更新成功。',
             'website-invalid' => '请输入有效的网站 URL。',
+            'yes' => '是',
         ],
 
         'company-attributes' => [
@@ -475,6 +478,7 @@ return [
                 'create-success' => '报价单创建成功。',
                 'delete-failed' => '无法删除报价单。',
                 'delete-success' => '报价单删除成功。',
+                'mass-delete-success' => 'Selected quotations deleted successfully.',
                 'title' => '报价单',
                 'update-success' => '报价单更新成功。',
 
@@ -482,6 +486,8 @@ return [
                     'accepted' => '已接受',
                     'agent' => '管理员用户',
                     'base_total' => '基础总额',
+                    'cancelled' => '已取消',
+                    'closed' => '已关闭',
                     'company' => '公司',
                     'company-email' => '公司邮箱',
                     'completed' => '已完成',
@@ -635,6 +641,7 @@ return [
                 'datagrid' => [
                     'id' => '采购订单 ID',
                     'items' => '项目',
+                    'view' => '查看',
                 ],
             ],
 
@@ -1032,6 +1039,7 @@ return [
                             'is-default' => '是否默认',
                             'items' => '项目',
                             'name' => '名称',
+                            'order-id' => '订单ID',
                             'status' => '状态',
                             'text-no' => '否',
                             'text-yes' => '是',
@@ -1187,6 +1195,7 @@ return [
                 ],
 
                 'roles' => [
+                    'being-used' => 'Role is already assigned to a company user.',
                     'create-success' => '角色创建成功。',
                     'delete-success' => '角色删除成功。',
                     'update-success' => '角色更新成功。',

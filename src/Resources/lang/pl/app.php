@@ -100,6 +100,7 @@ return [
                 'update-btn' => 'Aktualizuj firmę',
             ],
 
+            'no' => 'Nie',
             'sales-rep' => [
                 'label' => 'Przypisany przedstawiciel handlowy',
                 'none' => 'Nie przypisano przedstawiciela',
@@ -175,8 +176,10 @@ return [
             'mass-delete-success' => 'Wybrane firmy zostały usunięte pomyślnie.',
             'mass-update-status-success' => 'Status wybranych firm został zaktualizowany pomyślnie.',
             'name-required' => 'Pole nazwa jest wymagane.',
+            'select' => 'Lista wyboru',
             'update-success' => 'Firma została zaktualizowana pomyślnie.',
             'website-invalid' => 'Wprowadź prawidłowy adres strony WWW.',
+            'yes' => 'Tak',
         ],
 
         'company-attributes' => [
@@ -475,6 +478,7 @@ return [
                 'create-success' => 'Oferta została utworzona pomyślnie.',
                 'delete-failed' => 'Nie można usunąć oferty.',
                 'delete-success' => 'Oferta została usunięta pomyślnie.',
+                'mass-delete-success' => 'Selected quotations deleted successfully.',
                 'title' => 'Oferty',
                 'update-success' => 'Oferta została zaktualizowana pomyślnie.',
 
@@ -482,6 +486,8 @@ return [
                     'accepted' => 'Zaakceptowana',
                     'agent' => 'Użytkownik administracyjny',
                     'base_total' => 'Suma bazowa',
+                    'cancelled' => 'Anulowane',
+                    'closed' => 'Zamknięte',
                     'company' => 'Firma',
                     'company-email' => 'E-mail firmy',
                     'completed' => 'Zakończona',
@@ -635,6 +641,7 @@ return [
                 'datagrid' => [
                     'id' => 'ID zamówienia zakupu',
                     'items' => 'Pozycje',
+                    'view' => 'Podgląd',
                 ],
             ],
 
@@ -1032,6 +1039,7 @@ return [
                             'is-default' => 'Domyślna',
                             'items' => 'Pozycje',
                             'name' => 'Nazwa',
+                            'order-id' => 'ID zamówienia',
                             'status' => 'Status',
                             'text-no' => 'Nie',
                             'text-yes' => 'Tak',
@@ -1187,6 +1195,7 @@ return [
                 ],
 
                 'roles' => [
+                    'being-used' => 'Role is already assigned to a company user.',
                     'create-success' => 'Rola została utworzona pomyślnie.',
                     'delete-success' => 'Rola została usunięta pomyślnie.',
                     'update-success' => 'Rola została zaktualizowana pomyślnie.',

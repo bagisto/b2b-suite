@@ -105,7 +105,7 @@ All B2B settings are grouped together under **Admin Panel → Configure → B2B 
 
 ### 2. Requirements:
 
-* **Bagisto**: v2.4.9 or higher
+* **Bagisto**: v2.4.9 or higher (tested through v2.4.10)
 * **PHP**: 8.3 or higher (below 8.5)
 
 ---
@@ -120,7 +120,7 @@ composer require bagisto/b2b-suite
 
 #### Step 2: Register the Service Provider
 
-Add the provider to the array returned by `bootstrap/providers.php` (Bagisto v2.4.9 runs on Laravel 12, which registers providers here rather than in `config/app.php`):
+Add the provider to the array returned by `bootstrap/providers.php` (Bagisto v2.4 runs on Laravel 12, which registers providers here rather than in `config/app.php`):
 
 > **Note:** Composer package auto-discovery is **not possible** for this provider. Order matters—`B2BSuiteServiceProvider` must be listed **after** the Shop package (or last in the array). Auto-discovery would load it too early, which can cause issues.
 

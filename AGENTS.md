@@ -430,7 +430,11 @@ theme bundles, refresh `publishables/public/` with `npm run publishables` and re
   edit → view`) then flash/validation messages. **Leaf keys sorted alphabetically.**
 - **No dead keys.** A key is live only if `b2b::app.<path>` — or any parent prefix, for dynamic
   `'b2b::app.….'.$var` access — appears in `src/` or `publishables/`; audit before removing.
-- After any change run `php artisan bagisto:translations:check` (must report all synced).
+- **`php artisan bagisto:translations:check` does not cover this package.** It scans only
+  `base_path('packages/Webkul')`, so for a clone symlinked in through a path repository it
+  reports success without reading one of these files. Compare every locale against `en`
+  yourself after any change, and source new wording from an existing key with the same `en`
+  value rather than inventing a translation.
 
 ### Dead code
 
@@ -440,7 +444,7 @@ theme bundles, refresh `publishables/public/` with `npm run publishables` and re
 ### General
 
 - **Translations:** see *Translations & lang files* above — every change must keep all 22
-  locales in sync and pass `php artisan bagisto:translations:check`. Mind the array nesting
+  locales in sync, verified by hand (the artisan checker skips this package). Mind the array nesting
   (e.g. shop sign-in keys live at `app.shop.sign-in.*`, a direct child of `shop`).
 - **Code style:** `vendor/bin/pint` (run from the application root).
 - After changing providers/config/routes: `php artisan optimize:clear`.

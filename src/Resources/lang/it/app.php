@@ -100,6 +100,7 @@ return [
                 'update-btn' => 'Aggiorna azienda',
             ],
 
+            'no' => 'No',
             'sales-rep' => [
                 'label' => 'Rappresentante commerciale assegnato',
                 'none' => 'Nessun rappresentante assegnato',
@@ -175,8 +176,10 @@ return [
             'mass-delete-success' => 'Aziende selezionate eliminate con successo.',
             'mass-update-status-success' => 'Stato delle aziende selezionate aggiornato con successo.',
             'name-required' => 'Il campo nome è obbligatorio.',
+            'select' => 'Selezione',
             'update-success' => 'Azienda aggiornata con successo.',
             'website-invalid' => 'Inserisci un URL del sito web valido.',
+            'yes' => 'Sì',
         ],
 
         'company-attributes' => [
@@ -475,6 +478,7 @@ return [
                 'create-success' => 'Preventivo creato con successo.',
                 'delete-failed' => 'Impossibile eliminare il preventivo.',
                 'delete-success' => 'Preventivo eliminato con successo.',
+                'mass-delete-success' => 'Selected quotations deleted successfully.',
                 'title' => 'Preventivi',
                 'update-success' => 'Preventivo aggiornato con successo.',
 
@@ -482,6 +486,8 @@ return [
                     'accepted' => 'Accettato',
                     'agent' => 'Utente amministratore',
                     'base_total' => 'Totale base',
+                    'cancelled' => 'Annullato',
+                    'closed' => 'Chiuso',
                     'company' => 'Azienda',
                     'company-email' => 'Email azienda',
                     'completed' => 'Completato',
@@ -635,6 +641,7 @@ return [
                 'datagrid' => [
                     'id' => 'ID ordine di acquisto',
                     'items' => 'Articoli',
+                    'view' => 'Visualizza',
                 ],
             ],
 
@@ -1032,6 +1039,7 @@ return [
                             'is-default' => 'È predefinita',
                             'items' => 'Articoli',
                             'name' => 'Nome',
+                            'order-id' => 'ID Ordine',
                             'status' => 'Stato',
                             'text-no' => 'No',
                             'text-yes' => 'Sì',
@@ -1187,6 +1195,7 @@ return [
                 ],
 
                 'roles' => [
+                    'being-used' => 'Role is already assigned to a company user.',
                     'create-success' => 'Ruolo creato con successo.',
                     'delete-success' => 'Ruolo eliminato con successo.',
                     'update-success' => 'Ruolo aggiornato con successo.',

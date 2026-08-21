@@ -17,7 +17,7 @@ class CustomerBouncerMiddleware
         $routeName = $request->route()->getName();
 
         if (! $customer) {
-            return redirect()->route('customer.session.index');
+            return redirect()->route('shop.customer.session.index');
         }
 
         $roles = b2b_acl()->getRoles();

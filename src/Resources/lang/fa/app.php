@@ -100,6 +100,7 @@ return [
                 'update-btn' => 'به‌روزرسانی شرکت',
             ],
 
+            'no' => 'خیر',
             'sales-rep' => [
                 'label' => 'نماینده فروش تخصیص‌یافته',
                 'none' => 'هیچ نماینده‌ای تخصیص داده نشده است',
@@ -175,8 +176,10 @@ return [
             'mass-delete-success' => 'شرکت\'های انتخاب‌شده با موفقیت حذف شدند.',
             'mass-update-status-success' => 'وضعیت شرکت\'های انتخاب‌شده با موفقیت به‌روزرسانی شد.',
             'name-required' => 'فیلد نام الزامی است.',
+            'select' => 'انتخابی',
             'update-success' => 'شرکت با موفقیت به‌روزرسانی شد.',
             'website-invalid' => 'لطفاً یک آدرس وب‌سایت معتبر وارد کنید.',
+            'yes' => 'بله',
         ],
 
         'company-attributes' => [
@@ -475,6 +478,7 @@ return [
                 'create-success' => 'استعلام قیمت با موفقیت ایجاد شد.',
                 'delete-failed' => 'حذف استعلام قیمت امکان‌پذیر نیست.',
                 'delete-success' => 'استعلام قیمت با موفقیت حذف شد.',
+                'mass-delete-success' => 'Selected quotations deleted successfully.',
                 'title' => 'استعلام\'های قیمت',
                 'update-success' => 'استعلام قیمت با موفقیت به‌روزرسانی شد.',
 
@@ -482,6 +486,8 @@ return [
                     'accepted' => 'پذیرفته‌شده',
                     'agent' => 'کاربر مدیر',
                     'base_total' => 'مجموع پایه',
+                    'cancelled' => 'لغو شده',
+                    'closed' => 'بسته شده',
                     'company' => 'شرکت',
                     'company-email' => 'ایمیل شرکت',
                     'completed' => 'تکمیل‌شده',
@@ -635,6 +641,7 @@ return [
                 'datagrid' => [
                     'id' => 'شناسه سفارش خرید',
                     'items' => 'اقلام',
+                    'view' => 'مشاهده',
                 ],
             ],
 
@@ -1032,6 +1039,7 @@ return [
                             'is-default' => 'پیش‌فرض است',
                             'items' => 'اقلام',
                             'name' => 'نام',
+                            'order-id' => 'شماره سفارش',
                             'status' => 'وضعیت',
                             'text-no' => 'خیر',
                             'text-yes' => 'بله',
@@ -1187,6 +1195,7 @@ return [
                 ],
 
                 'roles' => [
+                    'being-used' => 'Role is already assigned to a company user.',
                     'create-success' => 'نقش با موفقیت ایجاد شد.',
                     'delete-success' => 'نقش با موفقیت حذف شد.',
                     'update-success' => 'نقش با موفقیت به‌روزرسانی شد.',

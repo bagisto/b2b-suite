@@ -321,7 +321,7 @@ class QuoteController extends Controller
         if (Storage::disk('public')->exists($attachment->path)) {
             return Storage::disk('public')->download($attachment->path, $fileName);
         } else {
-            session()->flash('error', trans('b2b::app.shop.customers.account.quotes.view.no-attachment'));
+            session()->flash('error', trans('b2b::app.shop.customers.account.quotes.view.no-attachments'));
         }
     }
 
